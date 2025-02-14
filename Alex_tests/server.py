@@ -4,7 +4,7 @@ import websockets
 from pyngrok import ngrok
 from dotenv import load_dotenv
 import os
-from sentence_transformers import SentenceTransformer, util
+import tools
 
 server_started=False
 
@@ -20,6 +20,10 @@ def start_server():
     # Expose le serveur WebSocket sur le port 8765
     public_url = ngrok.connect(8765, domain=ngrok_domain)
     print(f"Serveur WebSocket accessible à : {public_url}")
+    
+    # preparer les fonctions serveur
+    tools.init_sentence_model()
+    
     server_started=True
 
     # =================== Données du serveur =================== #
@@ -105,12 +109,3 @@ def start_server():
 
     asyncio.run(main())
     
-    
-
-model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
-
-def sentences_checker(sentence1, sentence2):
-    emb1 = model.encode(sentence1, convert_to_tensor=True)
-    emb2 = model.encode(sentence2, convert_to_tensor=True)
-    score = util.pytorch_cos_sim(emb1, emb2).item()
-    return score
