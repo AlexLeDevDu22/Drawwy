@@ -2,23 +2,52 @@ import pygame
 pygame.init()
 
 def UIresearcher():
-    # Définir les dimensions de la fenêtre
-    largeur, hauteur = 1200, 700
-    ecran = pygame.display.set_mode((largeur, hauteur))
+    # Récupérer les dimensions de l'écran
+    info_ecran = pygame.display.Info()
+    largeur, hauteur = info_ecran.current_w, info_ecran.current_h
+    
+    # Créer une fenêtre en plein écran
+    ecran = pygame.display.set_mode((largeur, hauteur), pygame.FULLSCREEN)
     pygame.display.set_caption("UIresearcher")
     
     # Couleurs
     NOIR = (0, 0, 0)
     BLANC = (255, 255, 255)
     
-    # Définition des zones avec des proportions exactes
-    liste_personnes = pygame.Rect(10, 10, 250, 500)
-    mot_a_deviner = pygame.Rect(10, 520, 250, 170)
-    zone_dessin = pygame.Rect(270, 10, 810, 680)
-    chat = pygame.Rect(1090, 10, 100, 680)
+    # Calcul des proportions adaptées à la taille de l'écran
+    largeur_liste = int(largeur * 0.17)  # environ 17% de la largeur
+    largeur_chat = int(largeur * 0.15)   # environ 15% de la largeur
+    espacement = int(largeur * 0.01)     # 1% pour les marges
     
-    # Police pour les textes
-    police = pygame.font.Font(None, 20)
+    largeur_dessin = largeur - largeur_liste - largeur_chat - espacement * 3
+    
+    hauteur_liste_principale = int(hauteur * 0.75)
+    hauteur_mot = hauteur - hauteur_liste_principale - espacement * 2
+    
+    # Définition des zones avec les proportions calculées
+    marge = espacement
+    liste_personnes = pygame.Rect(marge, marge, 
+                                 largeur_liste, 
+                                 hauteur_liste_principale)
+    
+    mot_a_deviner = pygame.Rect(marge, 
+                               marge + hauteur_liste_principale + espacement, 
+                               largeur_liste, 
+                               hauteur_mot)
+    
+    zone_dessin = pygame.Rect(marge + largeur_liste + espacement, 
+                             marge, 
+                             largeur_dessin, 
+                             hauteur - marge * 2)
+    
+    chat = pygame.Rect(marge + largeur_liste + largeur_dessin + espacement * 2, 
+                      marge, 
+                      largeur_chat, 
+                      hauteur - marge * 2)
+    
+    # Police pour les textes (taille adaptée à la résolution)
+    taille_police = max(16, int(hauteur * 0.025))
+    police = pygame.font.SysFont("Arial", taille_police)
     
     running = True
     while running:
