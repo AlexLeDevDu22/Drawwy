@@ -54,7 +54,7 @@ async def handle_connection(websocket):  # Correction ici
 
         if data["type"] == "join":
             pseudo = data["pseudo"]
-            player_id = random.randint(1000, 9999)  # ID unique
+            player_id = 0 if players==[] else players[-1]["id"] + 1 # ID unique
             new_player = {
                 "id": player_id,
                 "pseudo": pseudo,
