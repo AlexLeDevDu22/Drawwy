@@ -2,74 +2,55 @@ import pygame
 pygame.init()
 
 def UIresearcher():
-    # Récupérer les dimensions de l'écran
-    info_ecran = pygame.display.Info()
-    largeur, hauteur = info_ecran.current_w, info_ecran.current_h
-    ecran = pygame.display.set_mode((largeur, hauteur), pygame.FULLSCREEN)
+    # Définir les dimensions de la fenêtre
+    largeur, hauteur = 1200, 700
+    ecran = pygame.display.set_mode((largeur, hauteur))
     pygame.display.set_caption("UIresearcher")
     
     # Couleurs
     NOIR = (0, 0, 0)
     BLANC = (255, 255, 255)
     
-    # Paramètres des marges et espacement
-    marge_gauche = int(largeur * 0.01)
-    marge_droite = int(largeur * 0.01)
-    marge_haut = int(hauteur * 0.04)
-    marge_bas = int(hauteur * 0.04)
-    espacement = int(largeur * 0.01)
+    # Définition des zones avec des proportions exactes
+    liste_personnes = pygame.Rect(10, 10, 250, 500)
+    mot_a_deviner = pygame.Rect(10, 520, 250, 170)
+    zone_dessin = pygame.Rect(270, 10, 810, 680)
+    chat = pygame.Rect(1090, 10, 100, 680)
     
-    # Calcul des dimensions des zones
-    largeur_disponible = largeur - marge_gauche - marge_droite - 2 * espacement
-    hauteur_disponible = hauteur - marge_haut - marge_bas
-    
-    # Largeurs relatives des zones
-    ratio_liste = 0.15
-    ratio_dessin = 0.65
-    ratio_chat = 0.20
-    
-    # Calcul des dimensions réelles
-    largeur_liste = int(largeur_disponible * ratio_liste)
-    largeur_dessin = int(largeur_disponible * ratio_dessin)
-    largeur_chat = largeur_disponible - largeur_liste - largeur_dessin
-    
-    hauteur_liste_principale = int(hauteur_disponible * 0.82)
-    hauteur_mot_a_deviner = hauteur_disponible - hauteur_liste_principale
-    
-    # Définition des zones (x, y, largeur, hauteur)
-    zones = [
-        # Zone de dessin (centre)
-        (marge_gauche + largeur_liste + espacement, marge_haut, 
-         largeur_dessin, hauteur_disponible),
-        
-        # Liste personnes (gauche haut)
-        (marge_gauche, marge_haut, 
-         largeur_liste, hauteur_liste_principale),
-        
-        # Mot à deviner (gauche bas)
-        (marge_gauche, marge_haut + hauteur_liste_principale, 
-         largeur_liste, hauteur_mot_a_deviner),
-        
-        # Chat (droite)
-        (marge_gauche + largeur_liste + espacement + largeur_dessin + espacement, marge_haut,
-         largeur_chat, hauteur_disponible)
-    ]
-    
-    police = pygame.font.Font(None, 36)
-    textes = ["Zone de dessin", "Liste des personnes", "Mot à deviner", "Chat"]
+    # Police pour les textes
+    police = pygame.font.Font(None, 20)
     
     running = True
     while running:
         ecran.fill(BLANC)
         
-        # Dessiner les zones
-        for i, (x, y, w, h) in enumerate(zones):
-            pygame.draw.rect(ecran, NOIR, (x, y, w, h), 2)
-            
-            # Afficher les textes pour identifier chaque zone
-            texte_surface = police.render(textes[i], True, NOIR)
-            ecran.blit(texte_surface, (x + 10, y + 10))
+        # Dessiner les zones avec des bords noirs
+        pygame.draw.rect(ecran, BLANC, liste_personnes)
+        pygame.draw.rect(ecran, NOIR, liste_personnes, 1)
         
+        pygame.draw.rect(ecran, BLANC, mot_a_deviner)
+        pygame.draw.rect(ecran, NOIR, mot_a_deviner, 1)
+        
+        pygame.draw.rect(ecran, BLANC, zone_dessin)
+        pygame.draw.rect(ecran, NOIR, zone_dessin, 1)
+        
+        pygame.draw.rect(ecran, BLANC, chat)
+        pygame.draw.rect(ecran, NOIR, chat, 1)
+        
+        # Ajouter les textes des titres
+        texte_liste = police.render("Liste des personnes", True, NOIR)
+        ecran.blit(texte_liste, (liste_personnes.x + 10, liste_personnes.y + 5))
+        
+        texte_mot = police.render("Mot à deviner", True, NOIR)
+        ecran.blit(texte_mot, (mot_a_deviner.x + 10, mot_a_deviner.y + 5))
+        
+        texte_dessin = police.render("Zone de dessin", True, NOIR)
+        ecran.blit(texte_dessin, (zone_dessin.x + 10, zone_dessin.y + 5))
+        
+        texte_chat = police.render("Chat", True, NOIR)
+        ecran.blit(texte_chat, (chat.x + 10, chat.y + 5))
+        
+        # Rafraîchir l'écran
         pygame.display.flip()
         
         # Gestion des événements
