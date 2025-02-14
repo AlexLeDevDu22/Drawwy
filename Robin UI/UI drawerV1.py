@@ -1,6 +1,18 @@
+import json
 import pygame
+from pygame.locals import *
+import random
 pygame.init()
+
+
 def UIdrawer(): 
+    
+    
+    
+
+
+
+
     info_ecran = pygame.display.Info()
     largeur, hauteur = info_ecran.current_w, info_ecran.current_h
     # Dimensions de la fenêtre
@@ -20,22 +32,30 @@ def UIdrawer():
         (81/100*largeur, 30.83/100*hauteur, 18/100*largeur, 8.33/100*hauteur),  # Style de stylo
         (81/100*largeur, 40.83/100*hauteur, 18/100*largeur, 54.5/100*hauteur), # Chat
     ]
-
+    
 
     running = True
     while running:
         ecran.fill(BLANC)
 
+        #texte dans mot a deviner
+        phrase = "Une girafe avec un cou noué en nœud qui parle aux extraterrestres"
+        long = int(65/len(phrase)*10)
+        police = pygame.font.SysFont("monospace" ,long)
+        image_texte = police.render ( phrase, 1 , (0,0,0) )
+        ecran.blit(image_texte, (3/100*largeur,84/100*hauteur))
 
+        #dessine les contours
         for x, y, w, h in zones:
             pygame.draw.rect(ecran, NOIR, (x, y, w, h), 2)
-
+        
         pygame.display.flip()
 
         # Gestion des événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+    
 
     pygame.quit()
 UIdrawer()
