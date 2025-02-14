@@ -10,7 +10,7 @@ ngrok_domain = os.getenv("NGROK_DOMAIN")
 
 async def test_server():
     try:
-        async with websockets.connect("ws://localhost:8765") as ws:
+        async with websockets.connect("wss://"+ngrok_domain) as ws:
             return True
     except:
         return False
@@ -22,30 +22,33 @@ async def handle_connection_client(pseudo):
         await websocket.send(json.dumps({"type": "join", "pseudo": pseudo}))
 
         # Recevoir les mises à jour et dessiner si c'est son tour
-        print(websocket)
         async for message in websocket:
             data = json.loads(message)
             
-            print(data)
-            
-            if data["type"] == "welcome":
-                print(f"🎮 Connecté avec l'ID {data['id']}")
-                print(f"👥 Joueurs actuels : {[p['pseudo'] for p in data['players']]}")
-            
-            elif data["type"] == "update":
-                print(f"📜 Mise à jour : {len(data['players'])} joueurs, Tour : {data['turn']}")
-                print(f"🎨 Canvas mis à jour.")
+            #print(data)
+                
+            for row in data["canvas"]:
+                print("".join(["⬜" if x is None else "⬛" for x in row]))
+                
+async def send_message(websocket, message):
+    await websocket.send({"type":"guess", "sentence":message})
+
+async def websocket_draw(websocket, message):#TODO send draw
+    await websocket.send({"type":"guess", "sentence":message})
+
+
+PSEUDO="pseudoBoy"
 
 is_server=not asyncio.run(test_server())
+
+print(is_server)
 
 if is_server:
     import server
     
     threading.Thread(target=server.start_server).start()
-    
-pseudo = input("Entrez votre pseudo : ")
 
-while not server.server_started:
-    pass
+    while not server.server_started:
+        pass
 
-asyncio.run(handle_connection_client(pseudo))
+asyncio.run(handle_connection_client(PSEUDO))

@@ -26,10 +26,11 @@ def start_server():
 
     # Liste des joueurs (avec ID, pseudo, points)
     players = []
-    player_turn = None  # ID du joueur actif
+    index_turn = 0  # ID du joueur actif
+    guess_list=[]
 
     # Création du tableau de dessin (100x100 pixels, tous blancs)
-    canvas_size = 20  # Taille du canvas (20x20 pour le test)
+    canvas_size = 5  # Taille du canvas (20x20 pour le test)
     canvas = [[None for _ in range(canvas_size)] for _ in range(canvas_size)]
 
     async def send_update():
@@ -39,7 +40,8 @@ def start_server():
             "type": "update",
             "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
             "canvas": canvas,
-            "turn": player_turn
+            "turn": index_turn,
+            "messages":guess_list
         }
         await broadcast(json.dumps(state))
 
@@ -49,7 +51,6 @@ def start_server():
             await player["ws"].send(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-        player_turn=None
 
         try:
             # Attente du pseudo du joueur
@@ -67,10 +68,6 @@ def start_server():
                 }
                 players.append(new_player)
 
-                # Définir le premier joueur comme dessinateur
-                if player_turn is None:
-                    player_turn = player_id
-                    
 
                 # Envoyer l'ID du joueur et l'état initial du jeu
                 await websocket.send(json.dumps({
@@ -78,7 +75,7 @@ def start_server():
                     "id": player_id,
                     "canvas": canvas,
                     "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
-                    "turn": player_turn
+                    "turn": index_turn
                 }))
 
                 # Envoyer une mise à jour à tous
@@ -94,8 +91,8 @@ def start_server():
                     await send_update()
 
                 elif data["type"] == "guess":
-                    # Vérification du mot (pas encore implémenté)
-                    pass
+                    #! Vérification du mot (pas encore implémenté)
+                    guess_list.append(data["sentence"])
 
         except websockets.exceptions.ConnectionClosed:
             print("Un joueur s'est déconnecté.")
