@@ -46,4 +46,6 @@ if is_server:
 pseudo = input("Entrez votre pseudo : ")
 
 while not server.server_started:
-    asyncio.run(handle_connection_client(pseudo))
+    pass
+
+asyncio.run(handle_connection_client(pseudo))
