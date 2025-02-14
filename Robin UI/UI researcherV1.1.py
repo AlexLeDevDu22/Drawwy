@@ -5,27 +5,23 @@ import io
 import Fonction
 
 
-<<<<<<< HEAD
+
 def flou(phrase, blur_radius=3.5):
     width, height = phrase.get_size()
     image_str = pygame.image.tostring(phrase, "RGBA")
-=======
+
 def flou(pygame_surface, blur_radius=3.5):
     width, height = pygame_surface.get_size()
     image_str = pygame.image.tostring(pygame_surface, "RGBA")
->>>>>>> 4c2ce9a86c592a46523fea2968c84f0da9d219bb
     image_pil = Image.frombytes("RGBA", (width, height), image_str)
     blurred_pil = image_pil.filter(ImageFilter.GaussianBlur(radius=blur_radius))
     blurred_str = blurred_pil.tobytes()
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
-<<<<<<< HEAD
     return blurred_surface
 
 
-=======
 
     return blurred_surface
->>>>>>> 4c2ce9a86c592a46523fea2968c84f0da9d219bb
 def UIresearcher(phrase,trouver): 
     info_ecran = pygame.display.Info()
     largeur, hauteur = info_ecran.current_w, info_ecran.current_h
@@ -51,13 +47,10 @@ def UIresearcher(phrase,trouver):
         ecran.fill(BLANC)
 
         #texte dans mot a deviner  
-<<<<<<< HEAD
         police = pygame.font.SysFont("serif " ,20)
         image_texte = police.render ( "Phrase à trouver:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5/100*largeur,77/100*hauteur))
 
-=======
->>>>>>> 4c2ce9a86c592a46523fea2968c84f0da9d219bb
         if len(phrase) <=24:
             long = int(24/len(phrase)*16)
             police = pygame.font.SysFont("monospace" ,long)
@@ -96,10 +89,7 @@ def UIresearcher(phrase,trouver):
                     trouver=True
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 4c2ce9a86c592a46523fea2968c84f0da9d219bb
         for x, y, w, h in zones:
             pygame.draw.rect(ecran, NOIR, (x, y, w, h), 2)
 
@@ -114,11 +104,6 @@ def UIresearcher(phrase,trouver):
 
 
 
-#parametres
-<<<<<<< HEAD
 phrase="Un pingouin en roller"
-=======
-phrase="Un pingouin qui fait du"
->>>>>>> 4c2ce9a86c592a46523fea2968c84f0da9d219bb
 trouver=False
 UIresearcher(phrase,trouver)
