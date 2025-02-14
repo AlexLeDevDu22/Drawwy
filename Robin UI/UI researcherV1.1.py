@@ -4,24 +4,12 @@ from PIL import Image, ImageFilter
 import io
 import Fonction
 
+#! JAPPEL LA FUNCT
 
 
-def flou(phrase, blur_radius=3.5):
-    width, height = phrase.get_size()
-    image_str = pygame.image.tostring(phrase, "RGBA")
-
-def flou(pygame_surface, blur_radius=3.5):
-    width, height = pygame_surface.get_size()
-    image_str = pygame.image.tostring(pygame_surface, "RGBA")
-    image_pil = Image.frombytes("RGBA", (width, height), image_str)
-    blurred_pil = image_pil.filter(ImageFilter.GaussianBlur(radius=blur_radius))
-    blurred_str = blurred_pil.tobytes()
-    blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
-    return blurred_surface
+Fonction.flou()
 
 
-
-    return blurred_surface
 def UIresearcher(phrase,trouver): 
     info_ecran = pygame.display.Info()
     largeur, hauteur = info_ecran.current_w, info_ecran.current_h
