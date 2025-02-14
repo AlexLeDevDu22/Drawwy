@@ -1,1 +1,1 @@
-pip install pyngrok dotenv
+pip install pyngrok dotenv asyncio websockets json random os
