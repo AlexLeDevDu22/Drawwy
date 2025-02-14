@@ -7,9 +7,6 @@ BLANC = (255, 255, 255)
 pygame.font.init()
 font = pygame.font.Font(None, 24)
 
-def flou(phrase, blur_radius=3.5):
-    width, height = phrase.get_size()
-    image_str = pygame.image.tostring(phrase, "RGBA")
 
 def flou(pygame_surface, blur_radius=3.5):
     width, height = pygame_surface.get_size()
@@ -19,3 +16,5 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_str = blurred_pil.tobytes()
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
+
+def banniere(pseudo,points,pdp,couleurs,trouver,numero):
