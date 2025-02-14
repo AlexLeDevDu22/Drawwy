@@ -39,11 +39,34 @@ def UIdrawer():
         ecran.fill(BLANC)
 
         #texte dans mot a deviner
-        phrase = "Une girafe avec un cou noué en nœud qui parle aux extraterrestres"
-        long = int(65/len(phrase)*10)
-        police = pygame.font.SysFont("monospace" ,long)
-        image_texte = police.render ( phrase, 1 , (0,0,0) )
-        ecran.blit(image_texte, (3/100*largeur,84/100*hauteur))
+        phrase = "Un pingouin en rollers"
+        if len(phrase) <=24:
+            long = int(24/len(phrase)*14)
+            police = pygame.font.SysFont("monospace" ,long)
+            image_texte = police.render ( phrase, 1 , (0,0,0) )
+            ecran.blit(image_texte, (3/100*largeur,84/100*hauteur))
+        elif len (phrase)<=48:
+            long = int(48/len(phrase)*14)
+            taille2parties = len(phrase)//2
+
+            police = pygame.font.SysFont("monospace" ,long)
+            image_texte = police.render ( phrase[0:taille2parties], 1 , (0,0,0) )
+            ecran.blit(image_texte, (3/100*largeur,82/100*hauteur))
+            image_texte2 = police.render ( phrase[taille2parties:], 1 , (0,0,0) )
+            ecran.blit(image_texte2, (3/100*largeur,86/100*hauteur))
+        else:
+            long = int(72/len(phrase)*14)
+            taille3parties = len(phrase)//3
+
+            police = pygame.font.SysFont("monospace" ,long)
+            image_texte = police.render ( phrase[0:taille3parties], 1 , (0,0,0) )
+            ecran.blit(image_texte, (3/100*largeur,80/100*hauteur))
+            image_texte2 = police.render ( phrase[taille3parties:taille3parties*2], 1 , (0,0,0) )
+            ecran.blit(image_texte2, (3/100*largeur,84/100*hauteur))
+            image_texte3 = police.render ( phrase[taille3parties*2:], 1 , (0,0,0) )
+            ecran.blit(image_texte3, (3/100*largeur,88/100*hauteur))
+
+
 
         #dessine les contours
         for x, y, w, h in zones:
