@@ -1,1 +1,1 @@
-pip install pyngrok dotenv asyncio websockets json random os
+pip install pyngrok dotenv asyncio websockets json random os sentence-transformers
