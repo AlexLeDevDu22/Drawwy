@@ -1004,12 +1004,13 @@ compteur = 0
 test2=0
 test3=20000
 phrased=""
+phrases=[]
 for i in range(len(phrase)):
     compteur +=len(phrase[i])
     test = len(phrase[i])
-    if test>test2:
+    if test<  24:
         test2=test
-        
+        phrases.append(phrase[i])
     if test<test3:
         test3=test
         phrased=phrase[i]
@@ -1017,3 +1018,4 @@ print(compteur/1000) #moyenne des phrases
 print(test2)#phrase la plus longue
 print(test3) #phrase la plus courte
 print(phrased)
+print(phrases)
