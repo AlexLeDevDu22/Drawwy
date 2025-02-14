@@ -17,4 +17,4 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
 
-def banniere(pseudo,points,pdp,couleurs,trouver,numero):
+#def banniere(pseudo,points,pdp,couleurs,trouver,numero):
