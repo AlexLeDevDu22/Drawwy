@@ -37,6 +37,17 @@ def UIdrawer():
     running = True
     while running:
         ecran.fill(BLANC)
+        #texte dans la liste de personnes:
+        police = pygame.font.SysFont("serif " ,20)
+        image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
+        ecran.blit(image_texte, (5/100*largeur,7/100*hauteur))
+
+
+
+
+
+
+
 
         #texte dans mot a deviner
         police = pygame.font.SysFont("serif " ,20)
@@ -80,8 +91,9 @@ def UIdrawer():
 
         # Gestion des événements
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    running=False
     
 
     pygame.quit()
