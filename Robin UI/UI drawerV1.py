@@ -12,12 +12,12 @@ def UIdrawer():
 
 
     zones = [
-        (340, 50, 850, 870),  # Zone de dessin
-        (20, 50, 300, 700),   # Liste personnes
-        (20,770, 300, 150),   # Mot à deviner
-        (1210, 50, 300, 300),  # Couleurs
-        (1210, 370, 300, 100),  # Style de stylo
-        (1210, 490, 300, 430), # Chat
+        (17.7, 4.17, 44.27, 72.5),  # Zone de dessin
+        (1, 4.17, 17.18, 58.33),   # Liste personnes
+        (1,64.17, 17.18, 12.5),   # Mot à deviner
+        (63, 4.17, 17.18, 25),  # Couleurs
+        (63, 30.83, 17.18, 8.33),  # Style de stylo
+        (63, 40.83, 17.18, 35.83), # Chat
     ]
 
 
