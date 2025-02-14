@@ -5,6 +5,10 @@ from pyngrok import ngrok
 from dotenv import load_dotenv
 import os
 import tools
+import yaml
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 server_started=False
 
@@ -14,7 +18,6 @@ def start_server():
     ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
     ngrok_domain = os.getenv("NGROK_DOMAIN")
 
-
     ngrok.set_auth_token(ngrok_token)
 
     # Expose le serveur WebSocket sur le port 8765
@@ -23,29 +26,31 @@ def start_server():
     
     # preparer les fonctions serveur
     tools.init_sentence_model()
-    
-    server_started=True
 
     # =================== Données du serveur =================== #
 
-    # Liste des joueurs (avec ID, pseudo, points)
+    #* game variables
     players = []
-    index_turn = 0  # ID du joueur actif
+    index_drawer = 0  # ID du joueur actif
     guess_list=[]
+    current_sentence=tools.get_random_sentence()
 
-    # Création du tableau de dessin (100x100 pixels, tous blancs)
-    canvas_size = 5  # Taille du canvas (20x20 pour le test)
-    canvas = [[None for _ in range(canvas_size)] for _ in range(canvas_size)]
+    # Création du tableau de dessin tous blancs
+    global canvas
+    canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+    
+    server_started=True # server is ready
 
-    async def send_update():
+    async def send_update(frames=None, new_message=None):
         """Envoie les mises à jour de l'état du jeu à tous les joueurs."""
         
         state = {
             "type": "update",
             "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
-            "canvas": canvas,
-            "turn": index_turn,
-            "messages":guess_list
+            "frames": frames,
+            "drawer": index_drawer,
+            "new_message":new_message,
+            "sentence":current_sentence
         }
         await broadcast(json.dumps(state))
 
@@ -55,13 +60,13 @@ def start_server():
             await player["ws"].send(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-
+        global canvas
+        
         try:
             # Attente du pseudo du joueur
-            message = await websocket.recv()
-            data = json.loads(message)
+            data = json.loads(await websocket.recv())
 
-            if data["type"] == "join":
+            if data["type"] == "join": #! JOINING
                 pseudo = data["pseudo"]
                 player_id = 0 if players==[] else players[-1]["id"] + 1 # ID unique
                 new_player = {
@@ -72,14 +77,15 @@ def start_server():
                 }
                 players.append(new_player)
 
-
                 # Envoyer l'ID du joueur et l'état initial du jeu
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
                     "canvas": canvas,
                     "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
-                    "turn": index_turn
+                    "turn": index_drawer,
+                    "sentence":current_sentence,
+                    "messages":guess_list
                 }))
 
                 # Envoyer une mise à jour à tous
@@ -88,24 +94,35 @@ def start_server():
             async for message in websocket:
                 data = json.loads(message)
 
-                if data["type"] == "draw":
+                if data["type"] == "draw": #! DRAW
                     # Mise à jour du dessin
-                    x, y, color = data["x"], data["y"], data["color"]
-                    canvas[y][x] = color
-                    await send_update()
+                    for frame in data["frames"]:
+                        if "color" in frame.keys():
+                            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
+                        if "radius" in frame.keys():
+                            current_drawing_radius=frame["radius"]
+                        
+                        canvas=tools.draw_canvas(canvas, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+                    await send_update(data["frames"])
 
-                elif data["type"] == "guess":
-                    #! Vérification du mot (pas encore implémenté)
-                    guess_list.append(data["sentence"])
+                elif data["type"] == "guess": #! GUESS
+                    guess_list.append(data["guess"])
+                    for player in players: #found the player
+                        if player["id"] == data["player_id"]:
+                            succeed=tools.check_sentence(current_sentence, data["guess"])
+                            if succeed:
+                                player["points"] += 1
+                            await send_update({"guess":data["guess"], "pseudo":player["pseudo"], "succeed":succeed})
+                            break
 
-        except websockets.exceptions.ConnectionClosed:
+        except websockets.exceptions.ConnectionClosedOK:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != websocket]
             await send_update()
+            
 
     async def main():
         async with websockets.serve(handle_connection_server, "localhost", 8765):
             await asyncio.Future()
 
     asyncio.run(main())
-    

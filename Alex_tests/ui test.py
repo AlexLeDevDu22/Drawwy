@@ -24,12 +24,6 @@ async def handle_connection_client(pseudo):
         async for message in websocket:
             data = json.loads(message)
             print(data)
-            if data["type"] == "welcome":
-                print(f"🎮 Connecté avec l'ID {data['id']}")
-                print(f"👥 Joueurs actuels : {[p['pseudo'] for p in data['players']]}")
-            elif data["type"] == "update":
-                print(f"📜 Mise à jour : {len(data['players'])} joueurs, Tour : {data['turn']}")
-                print(f"🎨 Canvas mis à jour.")
 
 def get_screen_size():
     """Retourne la taille de l'écran"""
