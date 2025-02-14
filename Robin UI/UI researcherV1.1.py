@@ -5,6 +5,11 @@ import io
 import Fonction
 
 
+
+def flou(phrase, blur_radius=3.5):
+    width, height = phrase.get_size()
+    image_str = pygame.image.tostring(phrase, "RGBA")
+
 def flou(pygame_surface, blur_radius=3.5):
     width, height = pygame_surface.get_size()
     image_str = pygame.image.tostring(pygame_surface, "RGBA")
@@ -12,6 +17,9 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_pil = image_pil.filter(ImageFilter.GaussianBlur(radius=blur_radius))
     blurred_str = blurred_pil.tobytes()
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
+    return blurred_surface
+
+
 
     return blurred_surface
 def UIresearcher(phrase,trouver): 
@@ -38,7 +46,21 @@ def UIresearcher(phrase,trouver):
     while running:
         ecran.fill(BLANC)
 
+
+        
+        #texte dans la liste de personnes:
+        police = pygame.font.SysFont("serif " ,20)
+        image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
+        ecran.blit(image_texte, (5/100*largeur,7/100*hauteur))
+
+
+
+
         #texte dans mot a deviner  
+        police = pygame.font.SysFont("serif " ,20)
+        image_texte = police.render ( "Phrase à trouver:", 1 , (0,0,0) )
+        ecran.blit(image_texte, (5/100*largeur,77/100*hauteur))
+
         if len(phrase) <=24:
             long = int(24/len(phrase)*16)
             police = pygame.font.SysFont("monospace" ,long)
@@ -77,6 +99,7 @@ def UIresearcher(phrase,trouver):
                     trouver=True
 
 
+
         for x, y, w, h in zones:
             pygame.draw.rect(ecran, NOIR, (x, y, w, h), 2)
 
@@ -84,14 +107,14 @@ def UIresearcher(phrase,trouver):
 
         # Gestion des événements
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    running=False
 
     pygame.quit()
 
 
 
-#parametres
-phrase="Un pingouin qui fait du"
+phrase="Un pingouin en roller"
 trouver=False
 UIresearcher(phrase,trouver)
