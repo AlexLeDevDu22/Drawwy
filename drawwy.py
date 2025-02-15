@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 import threading
 import tools
+import pygame
+import pages
 
 load_dotenv()
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
@@ -27,11 +29,11 @@ MESSAGES=[]
 CANVAS=[]
 
 
-async def handle_connection_client(pseudo):
+async def handle_connection_client():
     async with websockets.connect("wss://"+NGROK_DOMAIN) as websocket:
         # Demander un pseudo et s'enregistrer
         
-        await websocket.send(json.dumps({"type": "join", "pseudo": pseudo}))
+        await websocket.send(json.dumps({"type": "join", "pseudo": PSEUDO}))
 
         # Recevoir les mises à jour et dessiner si c'est son tour
         async for message in websocket:
@@ -49,15 +51,17 @@ async def handle_connection_client(pseudo):
                 if data["new_message"]:
                     MESSAGES.append(data["new_message"])
                 if data["frames"]:
-                    for frame in data["frames"]:#draw
-                        if "color" in frame.keys():
-                            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
-                        if "radius" in frame.keys():
-                            current_drawing_radius=frame["radius"]
-                        
-                        CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+                    threading.Thread(target=update_canva_by_frames(), args=(data["frames"])).start() # update canvas in realtime
+                    
+def update_canva_by_frames(frames):
+    for frame in frames:#draw
+        if "color" in frame.keys():
+            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
+        if "radius" in frame.keys():
+            current_drawing_radius=frame["radius"]
         
-        
+        CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+
 async def send_message(websocket, message):
     await websocket.send({"type":"guess","player_id":PLAYER_ID, "guess":message})
 
@@ -78,11 +82,14 @@ if is_server:
     import server
     
     threading.Thread(target=server.start_server).start()
+    
+pygame.init()
+PSEUDO = pages.input_pseudo()
 
-    while not server.server_started:
-        pass
+while not server.server_started and is_server:
+    pass
 
-asyncio.run(handle_connection_client(PSEUDO))
+asyncio.run(handle_connection_client())
 
 
 #* here the UI with game variables
