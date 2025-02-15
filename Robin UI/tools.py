@@ -48,6 +48,9 @@ def draw_canvas(canvas,x,y,color,radius):
             # Distance au centre (x, y) pour voir si c'est dans le cercle
             if (i - y) ** 2 + (j - x) ** 2 <= radius ** 2:
                 canvas[i][j] = color  # Colorier la case
+def create_canvas(height, width, default_value="."):
+    return [[default_value for _ in range(width)] for _ in range(height)]
+
 
 
 def flou(pygame_surface, blur_radius=3.5):

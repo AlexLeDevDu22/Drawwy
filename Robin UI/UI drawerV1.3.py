@@ -7,10 +7,12 @@ import io
 from PIL import Image, ImageFilter
 
 
-
 def UIdrawer(phrase): 
     
-    
+    drawing = False  # Indique si on est en train de dessiner
+    last_pos = None  # Dernière position de la souris
+
+
 
     info_ecran = pygame.display.Info()
     largeur, hauteur = info_ecran.current_w, info_ecran.current_h
@@ -29,6 +31,7 @@ def UIdrawer(phrase):
     JAUNE=(255,255,0)
     MAGENTA=(255,0,255)
     CYAN=(0,255,255)
+    ecran.fill(BEIGE)
     zones = [
         (20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur),  # Zone de dessin
         (1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur),   # Liste personnes
@@ -52,8 +55,8 @@ def UIdrawer(phrase):
 
     running = True
     while running:
-        ecran.fill(BEIGE)
-        pygame.draw.rect(ecran, BLANC,(20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur) )
+        
+        
         pygame.draw.rect(ecran, BLANC,(1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur) )
         pygame.draw.rect(ecran, BLANC,(81/100*largeur, 4/100*hauteur, 18/100*largeur, 25/100*hauteur) )
         pygame.draw.rect(ecran, BLANC,(81/100*largeur, 30.83/100*hauteur, 18/100*largeur, 8.33/100*hauteur) )
@@ -68,11 +71,7 @@ def UIdrawer(phrase):
         for i in range(1,10):
             tools.banniere(i,"Caca",JAUNE,3,False)
 
-        for y,player in enumerate(gameVar.PLAYERS):
-            police = pygame.font.SysFont("serif " ,15)
-            image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
-            screen.blit(image_texte, (5/100*largeur,13/100*hauteur+7/100*hauteur*y))
-
+        
         #texte dans mot a deviner
         pygame.draw.rect(ecran, VERT,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )
 
@@ -115,11 +114,25 @@ def UIdrawer(phrase):
         
         pygame.display.flip()
 
+
         # Gestion des événements
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     running=False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                drawing = True
+                last_pos = event.pos  # Mémoriser la première position
+
+         # Mouvement de la souris avec le bouton enfoncé
+            if event.type == pygame.MOUSEMOTION and drawing:
+                pygame.draw.line(ecran, ROUGE, last_pos, event.pos, 3)  # Tracer une ligne
+                last_pos = event.pos  # Mettre à jour la position
+                pygame.display.flip()  # Mettre à jour l'affichage après chaque ligne
+
+            # Fin du dessin (bouton relâché)
+            if event.type == pygame.MOUSEBUTTONUP:
+                drawing = False
     
 
     pygame.quit()
