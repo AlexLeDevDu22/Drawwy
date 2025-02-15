@@ -62,7 +62,6 @@ def start_server():
 
     async def handle_connection_server(websocket):  # Correction ici
         global canvas, guess_list, index_drawer, current_sentence
-        print(guess_list)
         
         try:
             # Attente du pseudo du joueur

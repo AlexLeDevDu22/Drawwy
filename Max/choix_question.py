@@ -22,7 +22,7 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
-font = pygame.font.SysFont("Arial", 24)
+font = pygame.font.Font("Arial", 24)
 
 # Initialisation de la phrase actuelle
 current_phrase = random.choice(data)

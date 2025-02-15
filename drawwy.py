@@ -32,6 +32,7 @@ async def handle_connection_client():
         # Recevoir les mises à jour et dessiner si c'est son tour
         async for message in websocket:
             data = json.loads(message)
+            print(data)
             
             if data["type"] == "welcome":
                 gameVar.CANVAS=data["canvas"]
