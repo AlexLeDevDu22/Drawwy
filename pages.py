@@ -115,7 +115,7 @@ def UIdrawer():
         screen.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
         for y,player in enumerate(gameVar.PLAYERS):
-            tools.banniere(screen,y+1, player["pseudo"], JAUNE, 3, True)
+            tools.banniere(screen,y+1, player["pseudo"], JAUNE, player["points"], True)
 
 
         #dessine les contours
