@@ -36,7 +36,7 @@ radius = 200
 num_sections = 36  # Ajustable
 
 running = True
-#while running:
+while running:
     ecran.fill((255, 255, 255))  # Fond blanc
 
     # Dessiner les arcs colorés
