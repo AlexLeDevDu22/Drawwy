@@ -159,34 +159,34 @@ class gamePage:
                 if not gameVar.FOUND:
                     image_texte=tools.flou(image_texte)
                 self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
-def drawing(self):
-    """Permet de dessiner uniquement dans la zone de dessin."""
-    drawing_zone = self.zones[0]  # Première zone définie comme zone de dessin
-    x_min, y_min, width, height = drawing_zone
-    x_max, y_max = x_min + width, y_min + height
+    def drawing(self):
+        """Permet de dessiner uniquement dans la zone de dessin."""
+        drawing_zone = self.zones[0]  # Première zone définie comme zone de dessin
+        x_min, y_min, width, height = drawing_zone
+        x_max, y_max = x_min + width, y_min + height
 
-    drawing = False
-    last_pos = None
-    color = NOIR  # Couleur du trait
+        drawing = False
+        last_pos = None
+        color = NOIR  # Couleur du trait
 
-    while self.running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                self.running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                    drawing = True
-                    last_pos = event.pos
-            elif event.type == pygame.MOUSEBUTTONUP:
-                drawing = False
-            elif event.type == pygame.MOUSEMOTION and drawing:
-                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                    pygame.draw.line(self.screen, color, last_pos, event.pos, 3)
-                    last_pos = event.pos
+        while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                        drawing = True
+                        last_pos = event.pos
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    drawing = False
+                elif event.type == pygame.MOUSEMOTION and drawing:
+                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                        pygame.draw.line(self.screen, color, last_pos, event.pos, 3)
+                        last_pos = event.pos
 
-        pygame.display.flip()
+            pygame.display.flip()
 
 
     
