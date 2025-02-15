@@ -9,6 +9,7 @@ import tools
 import pages
 import time
 import gameVar
+
 load_dotenv()
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
 
@@ -40,6 +41,7 @@ async def handle_connection_client():
             else:
                 gameVar.PLAYERS=data["players"]
                 gameVar.CURRENT_SENTENCE=data["sentence"]
+                gameVar.FOUND=data["found"]
                 if data["new_message"]:
                     gameVar.MESSAGES.append(data["new_message"])
                 if data["frames"]:
@@ -76,16 +78,17 @@ if is_server:
     
     threading.Thread(target=server.start_server).start()# start the serv
     
-PSEUDO = pages.input_pseudo()
+    PSEUDO = pages.input_pseudo()
 
-if is_server:
     while not server.server_started:
         time.sleep(0.1)
+else:
+    PSEUDO = pages.input_pseudo()
 
 threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=True).start()# start the web connection
 
 #* here the UI with game variables
 
-pages.UIdrawer()
+pages.gamePage()
 
 pygame.quit()#for not crash

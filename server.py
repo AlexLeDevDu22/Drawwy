@@ -48,7 +48,8 @@ def start_server():
             "frames": frames,
             "drawer": index_drawer,
             "new_message":new_message,
-            "sentence":current_sentence
+            "sentence":current_sentence,
+            "found":False
         }
         await broadcast(json.dumps(state))
 
@@ -116,6 +117,7 @@ def start_server():
         except websockets.exceptions.ConnectionClosedOK:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != websocket]
+            print(players)
             await send_update()
             
 

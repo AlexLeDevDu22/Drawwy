@@ -2,12 +2,23 @@ import pygame
 import sys
 import tools
 import gameVar
+import yaml
+import tools
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 #*pygame
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 BLEU_CLAIR = pygame.Color('lightskyblue3')
 BLEU = pygame.Color('dodgerblue2')
+BEIGE = (250, 240, 230)
+VERT = (0,255,0)
+ROUGE= (255,0,0)
+JAUNE=(255,255,0)
+MAGENTA=(255,0,255)
+CYAN=(0,255,255)
 
 def input_pseudo():
     """Affiche une fenêtre pour entrer le pseudo"""
@@ -48,119 +59,129 @@ def input_pseudo():
         clock.tick(30)
 
 
-        
-def UIdrawer(): 
-    pygame.init()
+
+class gamePage:
     
-    largeur, hauteur = tools.get_screen_size()
-    # Dimensions de la fenêtre
-    screen = pygame.display.set_mode((largeur, hauteur))
-    pygame.display.set_caption("UIdrawer")
-    clock = pygame.time.Clock()
-    clock.tick(1)
-
-    # Couleurs
-    NOIR = (0, 0, 0)
-    BLANC = (255, 255, 255)
-    BEIGE = (250, 240, 230)
-    VERT = (0,255,0)
-    ROUGE= (255,0,0)
-    BLEU= (0,0,255)
-    JAUNE=(255,255,0)
-    MAGENTA=(255,0,255)
-    CYAN=(0,255,255)
-
+    def background(self):
+        self.screen.fill(BEIGE)
+        pygame.draw.rect(self.screen, BLANC,(20/100*self.W, 4/100*self.H, 60/100*self.W, 91/100*self.H) )
+        pygame.draw.rect(self.screen, BLANC,(1/100*self.W, 4/100*self.H, 18/100*self.W, 70/100*self.H) )
+        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 4/100*self.H, 18/100*self.W, 25/100*self.H) )
+        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 30.83/100*self.H, 18/100*self.W, 8.33/100*self.H) )
+        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 40.83/100*self.H, 18/100*self.W, 54.5/100*self.H) )
+        
+        for x, y, w, h in self.zones:
+            pygame.draw.rect(self.screen, NOIR, (x, y, w, h), 1)
     
-
-    zones = [
-        (20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur),  # Zone de dessin
-        (1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur),   # Liste personnes
-        (1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur),   # Mot à deviner
-        (81/100*largeur, 4/100*hauteur, 18/100*largeur, 25/100*hauteur),  # Couleurs
-        (81/100*largeur, 30.83/100*hauteur, 18/100*largeur, 8.33/100*hauteur),  # Style de stylo
-        (81/100*largeur, 40.83/100*hauteur, 18/100*largeur, 54.5/100*hauteur), # Chat
-        (1/100*largeur, 4/100*hauteur, 18/100*largeur, 7/100*hauteur), #Texte joueurs
-        (1/100*largeur, 11/100*hauteur, 18/100*largeur, 7/100*hauteur),#p1
-        (1/100*largeur, 18/100*hauteur, 18/100*largeur, 7.1/100*hauteur),#p2
-        (1/100*largeur, 25/100*hauteur, 18/100*largeur, 7/100*hauteur),#p3
-        (1/100*largeur, 32/100*hauteur, 18/100*largeur, 7/100*hauteur),#p4
-        (1/100*largeur, 39/100*hauteur, 18/100*largeur, 7/100*hauteur),#p5
-        (1/100*largeur, 46/100*hauteur, 18/100*largeur, 7/100*hauteur),#p6
-        (1/100*largeur, 53/100*hauteur, 18/100*largeur, 7.1/100*hauteur),#p7
-        (1/100*largeur, 60/100*hauteur, 18/100*largeur, 7/100*hauteur),#p8
-        (1/100*largeur, 67/100*hauteur, 18/100*largeur, 7/100*hauteur),#p9
-
-    ]
-    
-
-    running = True
-    while running:
-        
-        
-        #! background
-        
-        screen.fill(BEIGE)
-        pygame.draw.rect(screen, BLANC,(20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur) )
-        pygame.draw.rect(screen, BLANC,(1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur) )
-        pygame.draw.rect(screen, BLANC,(81/100*largeur, 4/100*hauteur, 18/100*largeur, 25/100*hauteur) )
-        pygame.draw.rect(screen, BLANC,(81/100*largeur, 30.83/100*hauteur, 18/100*largeur, 8.33/100*hauteur) )
-        pygame.draw.rect(screen, BLANC,(81/100*largeur, 40.83/100*hauteur, 18/100*largeur, 54.5/100*hauteur) )
-        
-        
-        
-
-        #! texte dans la liste de personnes:
+    def players(self):
         police = pygame.font.SysFont("serif " ,20)
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
-        screen.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
+        self.screen.blit(image_texte, (5.5/100*self.W,6/100*self.H))
+
+
+        dico_co = [
+            [
+                (5.5 / 100 * self.W, (i * 7 + 5.5) / 100 * self.H),  # Coordonnée 1
+                (1 / 100 * self.W, (i * 7) / 100 * self.H, 18 / 100 * self.W, 7 / 100 * self.H),  # Zone
+                (12 / 100 * self.W, (i * 7 + 2) / 100 * self.H),  # Coordonnée 2
+                (17.4 / 100 * self.W, (i * 7 + 1.2) / 100 * self.H),  # Coordonnée 3
+                (12 / 100 * self.W, (i * 7) / 100 * self.H),  # Coordonnée 4
+            ]
+            for i in range(9)  # Génère 9 entrées automatiquement
+        ]
 
         for y,player in enumerate(gameVar.PLAYERS):
-            tools.banniere(screen,y+1, player["pseudo"], JAUNE, 3, True)
+            
+            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==0 else (0,0,0),dico_co[y][1])
+            pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][1][0]+3,dico_co[y][1][1]+3,dico_co[y][1][2]-6,dico_co[y][1][3]-6))
+            police = pygame.font.SysFont("serif " ,30)
+            image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
+            police = pygame.font.SysFont("serif " ,20)
+            self.screen.blit(image_texte, dico_co[y][0])
+            image_texte = police.render ( "points:    "+str(player["points"]), 1 , (0,0,0) )
+            self.screen.blit(image_texte, dico_co[y][2])
 
-
-        #dessine les contours
-        for x, y, w, h in zones:
-            pygame.draw.rect(screen, NOIR, (x, y, w, h), 1)
-
-        #! texte dans mot a deviner
-        pygame.draw.rect(screen, VERT,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )
+            image_texte = police.render ( "Trouvé ? ", 1 , (0,0,0) )
+            self.screen.blit(image_texte, dico_co[y][4])
+            pygame.draw.circle(self.screen, NOIR, dico_co[y][3], 7)
+            # if trouver == True: #! pas si on met que il a trouvé, les autres vont copier sur lui ?
+            #     pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
+            # else:
+            #     pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
+    
+    def sentence(self):
+        pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
         police = pygame.font.SysFont("serif " ,20)
         image_texte = police.render ( "Mot à faire deviner:", 1 , (0,0,0) )
-        screen.blit(image_texte, (5/100*largeur,77/100*hauteur))
-
-    
+        self.screen.blit(image_texte, (5/100*self.W,77/100*self.H))
+        
         if len(gameVar.CURRENT_SENTENCE) >0:
-            if len(gameVar.CURRENT_SENTENCE) <=24:
-                long = int(24/len(gameVar.CURRENT_SENTENCE)*16)
-                police = pygame.font.SysFont("monospace" ,long)
-                image_texte = police.render ( gameVar.CURRENT_SENTENCE, 1 , (0,0,0) )
-                screen.blit(image_texte, (3/100*largeur,84/100*hauteur))
-            elif len (gameVar.CURRENT_SENTENCE)<=48:
-                long = int(48/len(gameVar.CURRENT_SENTENCE)*14)
-                taille2parties = len(gameVar.CURRENT_SENTENCE)//2
+            MAX_LARGEUR = 24  # Nombre max de caractères par ligne (ajuste si besoin)
+            FONT_SIZE_BASE = 16  # Taille de base de la police
+            Y_START = 80 / 100 * self.H  # Position de départ
 
-                police = pygame.font.SysFont("monospace" ,long)
-                image_texte = police.render ( gameVar.CURRENT_SENTENCE[0:taille2parties], 1 , (0,0,0) )
-                screen.blit(image_texte, (3/100*largeur,82/100*hauteur))
-                image_texte2 = police.render ( gameVar.CURRENT_SENTENCE[taille2parties:], 1 , (0,0,0) )
-                screen.blit(image_texte2, (3/100*largeur,86/100*hauteur))
+            # Choisir la taille de police en fonction de la longueur du texte
+            if len(gameVar.CURRENT_SENTENCE) <= MAX_LARGEUR:
+                font_size = FONT_SIZE_BASE
+            elif len(gameVar.CURRENT_SENTENCE) <= 2 * MAX_LARGEUR:
+                font_size = FONT_SIZE_BASE - 2
             else:
-                long = int(72/len(gameVar.CURRENT_SENTENCE)*14)
-                taille3parties = len(gameVar.CURRENT_SENTENCE)//3
+                font_size = FONT_SIZE_BASE - 4
 
-                police = pygame.font.SysFont("monospace" ,long)
-                image_texte = police.render ( gameVar.CURRENT_SENTENCE[0:taille3parties], 1 , (0,0,0) )
-                screen.blit(image_texte, (3/100*largeur,80/100*hauteur))
-                image_texte2 = police.render ( gameVar.CURRENT_SENTENCE[taille3parties:taille3parties*2], 1 , (0,0,0) )
-                screen.blit(image_texte2, (3/100*largeur,84/100*hauteur))
-                image_texte3 = police.render ( gameVar.CURRENT_SENTENCE[taille3parties*2:], 1 , (0,0,0) )
-                screen.blit(image_texte3, (3/100*largeur,88/100*hauteur))
+            police = pygame.font.SysFont("monospace", font_size)
 
-        # Gestion des événements
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q or event.key == pygame.QUIT:
-                    running=False
+            # Découpage intelligent du texte (évite de couper en plein milieu des mots)
+            mots = gameVar.CURRENT_SENTENCE.split()
+            lignes = []
+            ligne_actuelle = ""
+
+            for mot in mots:
+                if len(ligne_actuelle + " " + mot) <= MAX_LARGEUR:
+                    ligne_actuelle += " " + mot if ligne_actuelle else mot
+                else:
+                    lignes.append(ligne_actuelle)
+                    ligne_actuelle = mot
+            if ligne_actuelle:
+                lignes.append(ligne_actuelle)
+
+            # Affichage ligne par ligne
+            for i, ligne in enumerate(lignes):
+                image_texte = police.render(ligne, True, (0, 0, 0))
+                if not gameVar.FOUND:
+                    image_texte=tools.flou(image_texte)
+                self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
+    
+    def __init__(self):
+        pygame.init()
+        
+        # Dimensions de la fenêtre
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        pygame.display.set_caption("UIdrawer")
+        self.clock = pygame.time.Clock()
+        self.clock.tick(1)
+        
+        self.W, self.H = tools.get_screen_size()
+        self.zones = [
+            (0.2 * self.W, 0.04 * self.H, 0.6 * self.W, 0.91 * self.H),  # Zone de dessin
+            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H),  # Liste personnes
+            (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H),  # Mot à deviner
+            (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H),  # Couleurs
+            (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H),  # Style de stylo
+            (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
+            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.07 * self.H),  # Texte joueurs
+        ]
+        
+        self.running = True
+        while self.running:
+            
+            self.background()
+            self.players()
+            self.sentence()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q or event.key == pygame.QUIT:
+                        self.running=False
                     
-        pygame.display.flip()
+            pygame.display.flip()
