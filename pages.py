@@ -80,15 +80,25 @@ class gamePage:
 
 
         dico_co = [
-            [
-                (5.5 / 100 * self.W, (i * 7 + 5.5) / 100 * self.H),  # Coordonnée 1
-                (1 / 100 * self.W, (i * 7) / 100 * self.H, 18 / 100 * self.W, 7 / 100 * self.H),  # Zone
-                (12 / 100 * self.W, (i * 7 + 2) / 100 * self.H),  # Coordonnée 2
-                (17.4 / 100 * self.W, (i * 7 + 1.2) / 100 * self.H),  # Coordonnée 3
-                (12 / 100 * self.W, (i * 7) / 100 * self.H),  # Coordonnée 4
-            ]
+            [(5.5/100*self.W,(12.5+i*7)/100*self.H),
+             (1/100*self.W, (11+i*7)/100*self.H, 18/100*self.W, 7/100*self.H),
+             (12/100*self.W,(14+i*7)/100*self.H),
+             (17.4/100*self.W,(13.2+i*7)/100*self.H),
+             (12/100*self.W,(12+i*7)/100*self.H)]
             for i in range(9)  # Génère 9 entrées automatiquement
         ]
+        
+        # dico_co={
+        #     1: [(5.5/100*self.W,12.5/100*self.H),(1/100*self.W, 11/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,14/100*self.H),(17.4/100*self.W,13.2/100*self.H),(12/100*self.W,12/100*self.H)],
+        #     2: [(5.5/100*self.W,19.5/100*self.H),(1/100*self.W, 18/100*self.H, 18/100*self.W, 7.1/100*self.H),(12/100*self.W,21/100*self.H),(17.4/100*self.W,20.2/100*self.H),(12/100*self.W,19/100*self.H)],
+        #     3: [(5.5/100*self.W,26.5/100*self.H),(1/100*self.W, 25/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,28/100*self.H),(17.4/100*self.W,27.2/100*self.H),(12/100*self.W,26/100*self.H)],
+        #     4: [(5.5/100*self.W,33.5/100*self.H),(1/100*self.W, 32/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,35/100*self.H),(17.4/100*self.W,34.2/100*self.H),(12/100*self.W,33/100*self.H)],
+        #     5: [(5.5/100*self.W,40.5/100*self.H),(1/100*self.W, 39/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,42/100*self.H),(17.4/100*self.W,41.2/100*self.H),(12/100*self.W,40/100*self.H)],
+        #     6: [(5.5/100*self.W,47.5/100*self.H),(1/100*self.W, 46/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,49/100*self.H),(17.4/100*self.W,48.2/100*self.H),(12/100*self.W,47/100*self.H)],
+        #     7: [(5.5/100*self.W,54.5/100*self.H),(1/100*self.W, 53/100*self.H, 18/100*self.W, 7.1/100*self.H),(12/100*self.W,56/100*self.H),(17.4/100*self.W,55.2/100*self.H),(12/100*self.W,54/100*self.H)],
+        #     8: [(5.5/100*self.W,61.5/100*self.H),(1/100*self.W, 60/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,63/100*self.H),(17.4/100*self.W,62.2/100*self.H),(12/100*self.W,61/100*self.H)],
+        #     9: [(5.5/100*self.W,68.5/100*self.H),(1/100*self.W, 67/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,70/100*self.H),(17.4/100*self.W,69.2/100*self.H),(12/100*self.W,68/100*self.H)]
+        # }
 
         for y,player in enumerate(gameVar.PLAYERS):
 
@@ -159,7 +169,7 @@ class gamePage:
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         pygame.display.set_caption("UIdrawer")
         self.clock = pygame.time.Clock()
-        self.clock.tick(1)
+        self.clock.tick(30)
         
         self.W, self.H = tools.get_screen_size()
         self.zones = [

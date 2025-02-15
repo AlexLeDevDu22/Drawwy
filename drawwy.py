@@ -76,7 +76,8 @@ is_server=not asyncio.run(test_server())
 if is_server:
     import server
     
-    threading.Thread(target=server.start_server).start()# start the serv
+    connection=threading.Thread(target=server.start_server)
+    connection.start()# start the serv
     
     PSEUDO = pages.input_pseudo()
 
@@ -92,3 +93,5 @@ threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=
 pages.gamePage()
 
 pygame.quit()#for not crash
+if is_server:
+    connection.stop()
