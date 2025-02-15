@@ -93,5 +93,4 @@ threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=
 pages.gamePage()
 
 pygame.quit()#for not crash
-if is_server:
-    connection.stop()
+os._exit(0) # for threads
