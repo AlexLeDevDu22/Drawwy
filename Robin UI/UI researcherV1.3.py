@@ -2,8 +2,10 @@ import pygame
 pygame.init()
 from PIL import Image, ImageFilter
 import io
-import Fonction
 import tools
+
+
+
 
 def UIresearcher(phrase,trouver): 
     info_ecran = pygame.display.Info()
@@ -12,6 +14,7 @@ def UIresearcher(phrase,trouver):
     ecran = pygame.display.set_mode((largeur, hauteur))
     pygame.display.set_caption("UIdrawer")
 
+
     # Couleurs
     NOIR = (0, 0, 0)
     BLANC = (255, 255, 255)
@@ -19,12 +22,16 @@ def UIresearcher(phrase,trouver):
     VERT = (0,255,0)
     ROUGE= (255,0,0)
     BLEU= (0,0,255)
+    JAUNE=(255,255,0)
+    MAGENTA=(255,0,255)
+    CYAN=(0,255,255)
     zones = [
         (20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur),  # Zone de dessin
         (1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur),   # Liste personnes
         (1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur),   # Mot à deviner
         (81/100*largeur, 4/100*hauteur, 18/100*largeur, 91/100*hauteur), # Chat
         (1/100*largeur, 4/100*hauteur, 18/100*largeur, 7/100*hauteur), #Texte joueurs
+          
         (1/100*largeur, 11/100*hauteur, 18/100*largeur, 7/100*hauteur),#p1
         (1/100*largeur, 18/100*hauteur, 18/100*largeur, 7.1/100*hauteur),#p2
         (1/100*largeur, 25/100*hauteur, 18/100*largeur, 7/100*hauteur),#p3
@@ -56,7 +63,8 @@ def UIresearcher(phrase,trouver):
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
-
+        for i in range(1,10):
+            tools.banniere(i,"Caca",JAUNE,3,False)
 
 
         #texte dans mot a deviner  
@@ -74,7 +82,7 @@ def UIresearcher(phrase,trouver):
             police = pygame.font.SysFont("monospace" ,long)
             image_texte = police.render ( phrase, 1 , (0,0,0) )
             if trouver==False:
-                image_texte= Fonction.flou(image_texte)
+                image_texte= tools.flou(image_texte)
             ecran.blit(image_texte, (3/100*largeur,84/100*hauteur))
         elif len (phrase)<=48:
             long = int(48/len(phrase)*14)
@@ -83,8 +91,8 @@ def UIresearcher(phrase,trouver):
             image_texte = police.render ( phrase[0:taille2parties], 1 , (0,0,0) )
             image_texte2 = police.render ( phrase[taille2parties:], 1 , (0,0,0) )
             if trouver==False:
-                image_texte=Fonction.flou(image_texte)
-                image_texte2=Fonction.flou(image_texte2)
+                image_texte=tools.flou(image_texte)
+                image_texte2=tools.flou(image_texte2)
             ecran.blit(image_texte, (3/100*largeur,82/100*hauteur))
             ecran.blit(image_texte2, (3/100*largeur,86/100*hauteur))
         else:
@@ -95,9 +103,9 @@ def UIresearcher(phrase,trouver):
             image_texte2 = police.render ( phrase[taille3parties:taille3parties*2], 1 , (0,0,0) )
             image_texte3 = police.render ( phrase[taille3parties*2:], 1 , (0,0,0) )
             if trouver==False:
-                image_texte=Fonction.flou(image_texte)
-                image_texte2=Fonction.flou(image_texte2)
-                image_texte3=Fonction.flou(image_texte3)
+                image_texte=tools.flou(image_texte)
+                image_texte2=tools.flou(image_texte2)
+                image_texte3=tools.flou(image_texte3)
             ecran.blit(image_texte, (3/100*largeur,80/100*hauteur))
             ecran.blit(image_texte2, (3/100*largeur,84/100*hauteur))
             ecran.blit(image_texte3, (3/100*largeur,88/100*hauteur))

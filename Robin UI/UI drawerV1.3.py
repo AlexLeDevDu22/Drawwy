@@ -1,10 +1,11 @@
 import json
 import pygame
-from pygame.locals import *
-import random
-import Fonction
-import tools
 pygame.init()
+from pygame.locals import *
+import tools
+import io
+from PIL import Image, ImageFilter
+
 
 
 def UIdrawer(phrase): 
@@ -14,6 +15,7 @@ def UIdrawer(phrase):
     info_ecran = pygame.display.Info()
     largeur, hauteur = info_ecran.current_w, info_ecran.current_h
     # Dimensions de la fenêtre
+    
     ecran = pygame.display.set_mode((largeur, hauteur))
     pygame.display.set_caption("UIdrawer")
 
@@ -24,7 +26,9 @@ def UIdrawer(phrase):
     VERT = (0,255,0)
     ROUGE= (255,0,0)
     BLEU= (0,0,255)
-
+    JAUNE=(255,255,0)
+    MAGENTA=(255,0,255)
+    CYAN=(0,255,255)
     zones = [
         (20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur),  # Zone de dessin
         (1/100*largeur, 4/100*hauteur, 18/100*largeur, 70/100*hauteur),   # Liste personnes
@@ -61,7 +65,8 @@ def UIdrawer(phrase):
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
-
+        for i in range(1,10):
+            tools.banniere(i,"Caca",JAUNE,3,False)
 
 
 
