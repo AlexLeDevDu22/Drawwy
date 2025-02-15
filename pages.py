@@ -4,7 +4,7 @@ import tools
 import gameVar
 import yaml
 import tools
-
+import math
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
@@ -226,3 +226,31 @@ class gamePage:
                         self.running=False
                     
             pygame.display.flip()
+def couleurs(self):
+    num_sections = 36
+    running = True
+    center_x, center_y = 0.2 * self.W, 0.04 * self.H
+    radius = 100
+    # Dessiner les arcs colorés
+    for i in range(num_sections):
+        angle_start = (i / num_sections) * 2 * math.pi  # Début de l'arc
+        angle_end = ((i + 1) / num_sections) * 2 * math.pi  # Fin de l'arc
+
+        # Générer une couleur en fonction de l'angle
+        hue = i / num_sections  # Valeur de teinte entre 0 et 1
+        color = pygame.Color(0)
+        color.hsva = (hue * 360, 100, 100, 100)  # Teinte, saturation, valeur, alpha
+
+            # Points pour dessiner un arc
+        points = []
+        for j in range(10):  # Plus de points = plus lisse
+            angle = angle_start + (angle_end - angle_start) * (j / 9)
+            x = center_x + math.cos(angle) * radius  # Décalé au bon endroit
+            y = center_y + math.sin(angle) * radius
+            points.append((x, y))
+            
+            # Fermer l'arc en reliant au centre
+        points.append((center_x, center_y))
+
+            # Dessiner le segment coloré
+        pygame.draw.polygon(self.screen, color, points)
