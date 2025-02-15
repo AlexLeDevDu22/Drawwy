@@ -203,37 +203,40 @@ class gamePage:
         palette_x, palette_y = int(0.81 * self.W), int(0.04 * self.H)
         palette_w, palette_h = int(0.18 * self.W), int(0.25 * self.H)
 
-        
         # Taille des carrés de couleur
         cols = 4  # Nombre de couleurs par ligne
         square_size = min(palette_w // cols, palette_h // (len(config["drawing_colors"]) // cols + 1))
-        
+        spacing = 10  # Espacement entre les couleurs
+        offset_x = (palette_w - (square_size + spacing) * cols) // 2  # Centrage horizontal
+
         for i, color in enumerate(config["drawing_colors"]):
             row = i // cols
             col = i % cols
-            x = palette_x + col * (square_size+10)  +(palette_w-(square_size+10)*4)//2
-            y = palette_y + row * (square_size+10)
+            x = palette_x + col * (square_size + spacing) + offset_x
+            y = palette_y + row * (square_size + spacing)
             pygame.draw.rect(self.screen, color, (x, y, square_size, square_size))
             pygame.draw.rect(self.screen, (0, 0, 0), (x, y, square_size, square_size), 2)  # Bordure noire
 
         # Afficher la couleur sélectionnée
         selected_x = palette_x + palette_w // 2 - 50
-        selected_y = palette_y + palette_h -15
+        selected_y = palette_y + palette_h - 15
         pygame.draw.rect(self.screen, self.pen_color, (selected_x, selected_y, 100, 30))
         pygame.draw.rect(self.screen, (0, 0, 0), (selected_x, selected_y, 100, 30), 2)  # Bordure noire
-        
-        
-        #! click on color
+
+        # Gestion du clic sur une couleur
         for event in self.events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 for i, color in enumerate(config["drawing_colors"]):
                     row = i // cols
                     col = i % cols
-                    x = palette_x + col * (square_size+10)
-                    y = palette_y + row * (square_size+10)
+                    x = palette_x + col * (square_size + spacing) + offset_x
+                    y = palette_y + row * (square_size + spacing)
+
                     if x <= mouse_x < x + square_size and y <= mouse_y < y + square_size:
                         self.pen_color = color
+                        break  # Empêche de changer plusieurs fois la couleur dans une seule itération
+
 
     def chat(self):
         (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
@@ -289,5 +292,5 @@ class gamePage:
                     self.mouseDown=True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown=False
-                    
+            
             pygame.display.flip()

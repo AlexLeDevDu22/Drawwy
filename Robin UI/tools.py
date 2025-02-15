@@ -65,12 +65,12 @@ def flou(pygame_surface, blur_radius=3.5):
   
 dico_co={
     1: [(5.5/100*largeur,12.5/100*hauteur),(1/100*largeur, 11/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,14/100*hauteur),(17.4/100*largeur,13.2/100*hauteur),(12/100*largeur,12/100*hauteur)],
-    2: [(5.5/100*largeur,19.5/100*hauteur),(1/100*largeur, 18/100*hauteur, 18/100*largeur, 7.1/100*hauteur),(12/100*largeur,21/100*hauteur),(17.4/100*largeur,20.2/100*hauteur),(12/100*largeur,19/100*hauteur)],
+    2: [(5.5/100*largeur,19.5/100*hauteur),(1/100*largeur, 18/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,21/100*hauteur),(17.4/100*largeur,20.2/100*hauteur),(12/100*largeur,19/100*hauteur)],
     3: [(5.5/100*largeur,26.5/100*hauteur),(1/100*largeur, 25/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,28/100*hauteur),(17.4/100*largeur,27.2/100*hauteur),(12/100*largeur,26/100*hauteur)],
     4: [(5.5/100*largeur,33.5/100*hauteur),(1/100*largeur, 32/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,35/100*hauteur),(17.4/100*largeur,34.2/100*hauteur),(12/100*largeur,33/100*hauteur)],
     5: [(5.5/100*largeur,40.5/100*hauteur),(1/100*largeur, 39/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,42/100*hauteur),(17.4/100*largeur,41.2/100*hauteur),(12/100*largeur,40/100*hauteur)],
     6: [(5.5/100*largeur,47.5/100*hauteur),(1/100*largeur, 46/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,49/100*hauteur),(17.4/100*largeur,48.2/100*hauteur),(12/100*largeur,47/100*hauteur)],
-    7: [(5.5/100*largeur,54.5/100*hauteur),(1/100*largeur, 53/100*hauteur, 18/100*largeur, 7.1/100*hauteur),(12/100*largeur,56/100*hauteur),(17.4/100*largeur,55.2/100*hauteur),(12/100*largeur,54/100*hauteur)],
+    7: [(5.5/100*largeur,54.5/100*hauteur),(1/100*largeur, 53/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,56/100*hauteur),(17.4/100*largeur,55.2/100*hauteur),(12/100*largeur,54/100*hauteur)],
     8: [(5.5/100*largeur,61.5/100*hauteur),(1/100*largeur, 60/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,63/100*hauteur),(17.4/100*largeur,62.2/100*hauteur),(12/100*largeur,61/100*hauteur)],
     9: [(5.5/100*largeur,68.5/100*hauteur),(1/100*largeur, 67/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,70/100*hauteur),(17.4/100*largeur,69.2/100*hauteur),(12/100*largeur,68/100*hauteur)]
 

@@ -68,11 +68,9 @@ def UIdrawer(phrase):
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
-        for i in range(1,10):
-            tools.banniere(i,"Caca",JAUNE,3,False)
-
         
-        #texte dans mot a deviner
+        
+        # Texte dans mot à deviner
         pygame.draw.rect(ecran, VERT,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )
 
         police = pygame.font.Font("PermanentMarker.ttf" ,20)
@@ -115,7 +113,7 @@ def UIdrawer(phrase):
         pygame.display.flip()
 
 
-        # Gestion des événements
+        # Gestion des évènements
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
