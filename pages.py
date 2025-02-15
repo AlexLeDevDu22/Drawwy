@@ -90,7 +90,7 @@ class gamePage:
 
 
         dico_co = [
-            [(5.5/100*self.W,(12.5+i*7)/100*self.H),
+            [(5/100*self.W,(12.5+i*7)/100*self.H),
              (1/100*self.W, (11+i*7)/100*self.H, 18/100*self.W, 7/100*self.H),
              (12/100*self.W,(14+i*7)/100*self.H),
              (17.4/100*self.W,(13.2+i*7)/100*self.H),
