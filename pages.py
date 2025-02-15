@@ -125,8 +125,8 @@ class gamePage:
         self.screen.blit(image_texte, (5/100*self.W,77/100*self.H))
         
         if len(gameVar.CURRENT_SENTENCE) >0:
-            MAX_LARGEUR = 24  # Nombre max de caractères par ligne (ajuste si besoin)
-            FONT_SIZE_BASE = 16  # Taille de base de la police
+            MAX_LARGEUR = 20  # Nombre max de caractères par ligne (ajuste si besoin)
+            FONT_SIZE_BASE = 22  # Taille de base de la police
             Y_START = 80 / 100 * self.H  # Position de départ
 
             # Choisir la taille de police en fonction de la longueur du texte
@@ -194,17 +194,19 @@ class gamePage:
             police = pygame.font.SysFont("serif " ,15)
             image_texte = police.render ( mess["guess"], 1 , (0,0,0) )
             self.screen.blit(image_texte, (0.83 * self.W, 0.41 * self.H))
+            image_texte = police.render ( mess["pseudo"], 1 , (0,0,0) )
+            self.screen.blit(image_texte, (0.83 * self.W, 0.38 * self.H))
     
     def __init__(self):
         pygame.init()
         
         # Dimensions de la fenêtre
-        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.W, self.H = tools.get_screen_size()
+        self.screen = pygame.display.set_mode((self.W,self.H))
         pygame.display.set_caption("UIdrawer")
         self.clock = pygame.time.Clock()
         self.clock.tick(30)
         
-        self.W, self.H = tools.get_screen_size()
         
         self.running = True
         while self.running:
@@ -212,6 +214,7 @@ class gamePage:
             self.background()
             self.players()
             self.sentence()
+            self.chat()
             
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:

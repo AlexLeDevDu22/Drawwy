@@ -29,7 +29,7 @@ def start_server():
     #* game variables
     players = []
     index_drawer = 0  # ID du joueur actif
-    guess_list=[]
+    guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
     current_sentence=tools.get_random_sentence()
 
     # Création du tableau de dessin tous blancs
@@ -59,7 +59,7 @@ def start_server():
             await player["ws"].send(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-        global canvas
+        global canvas, guess_list, index_drawer, current_sentence
         
         try:
             # Attente du pseudo du joueur
@@ -77,6 +77,7 @@ def start_server():
                 players.append(new_player)
 
                 # Envoyer l'ID du joueur et l'état initial du jeu
+                print(guess_list)
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
