@@ -4,7 +4,7 @@ import tools
 import gameVar
 import yaml
 import tools
-
+import math
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
