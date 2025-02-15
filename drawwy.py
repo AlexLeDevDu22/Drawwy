@@ -78,8 +78,9 @@ if is_server:
     
 PSEUDO = pages.input_pseudo()
 
-while (not server.server_started) and is_server:
-    time.sleep(0.1)
+if is_server:
+    while not server.server_started:
+        time.sleep(0.1)
 
 threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=True).start()# start the web connection
 
