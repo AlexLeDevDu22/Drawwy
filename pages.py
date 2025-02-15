@@ -165,6 +165,8 @@ class gamePage:
         if not gameVar.CANVAS:
             return
         
+        drawing=False
+        
         zone_x_min = int(0.2 * self.W)   # 20% de la largeur de la fenêtre
         zone_x_max = int(0.8 * self.W)   # 60% de la largeur de la fenêtre
         zone_y_min = 0                    # Commence en haut de la fenêtre
@@ -187,52 +189,61 @@ class gamePage:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Vérifier si le clic est dans la zone de dessin
-                self.is_drawing = True
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
+                    drawing = True
                     # Calculer la position du clic dans le tableau CANVAS
                     canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
                     canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
                     tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
-                    tools.websocket_draw(gameVar.WS, canvas_x, canvas_y, self.pen_color, self.pen_radius)
-                    
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.is_drawing = False
-            if event.type == pygame.MOUSEMOTION and self.is_drawing:
+                drawing = False
+            elif event.type == pygame.MOUSEMOTION and drawing==False:
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
                     canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
                     canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
                     tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
-                    tools.websocket_draw(gameVar.WS, canvas_x, canvas_y, self.pen_color, self.pen_radius)
 
     def couleurs(self):
-        num_sections = 36
-        running = True
-        center_x, center_y = (0.90 * self.W, 0.16 * self.H,)
-        radius = 100
-        # Dessiner les arcs colorés
-        for i in range(num_sections):
-            angle_start = (i / num_sections) * 2 * math.pi  # Début de l'arc
-            angle_end = ((i + 1) / num_sections) * 2 * math.pi  # Fin de l'arc
+        # Taille de la palette
+    palette_width, palette_height = 400, 250
+    palette_x, palette_y = 50, 50  # Position de la palette
 
-            # Générer une couleur en fonction de l'angle
-            hue = i / num_sections  # Valeur de teinte entre 0 et 1
-            color = pygame.Color(0)
-            color.hsva = (hue * 360, 100, 100, 100)  # Teinte, saturation, valeur, alpha
+    # Créer une surface pour stocker la palette
+    palette_surface = pygame.Surface((palette_width, palette_height))
 
-                # Points pour dessiner un arc
-            points = []
-            for j in range(10):  # Plus de points = plus lisse
-                angle = angle_start + (angle_end - angle_start) * (j / 9)
-                x = center_x + math.cos(angle) * radius  # Décalé au bon endroit
-                y = center_y + math.sin(angle) * radius
-                points.append((x, y))
-                
-                # Fermer l'arc en reliant au centre
-            points.append((center_x, center_y))
+    # Générer les couleurs (dégradé)
+    for x in range(palette_width):
+        for y in range(palette_height):
+            hue = (x / palette_width) * 360  # Teinte (0 à 360°)
+            saturation = 100  # Saturation maximale
+            value = 100 - (y / palette_height) * 100  # Valeur (luminosité)
+            
+            color = pygame.Color(0)  # Couleur vide
+            color.hsva = (hue, saturation, value, 100)  # Appliquer HSV
 
-                # Dessiner le segment coloré
-            pygame.draw.polygon(self.screen, color, points)
-    
+            palette_surface.set_at((x, y), color)  # Placer la couleur
+
+    # Couleur sélectionnée
+    selected_color = (255, 255, 255)
+
+    running = True
+    while running:
+        self.screen.fill((255, 255, 255))  # Fond blanc
+        self.screen.blit(palette_surface, (palette_x, palette_y))  # Dessiner la palette
+        
+        # Affichage de la couleur sélectionnée
+        pygame.draw.rect(self.screen, selected_color, (width // 2 - 50, 370, 100, 30))
+        pygame.draw.rect(self.screen, (0, 0, 0), (width // 2 - 50, 370, 100, 30), 2)  # Bordure
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            # Clic pour choisir une couleur
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if palette_x <= mouse_x < palette_x + palette_width and palette_y <= mouse_y < palette_y + palette_height:
+                    selected_color = palette_surface.get_at((mouse_x - palette_x, mouse_y - palette_y))
     def chat(self):
         (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
         
@@ -252,12 +263,12 @@ class gamePage:
         self.screen = pygame.display.set_mode((self.W,self.H))
         pygame.display.set_caption("UIdrawer")
         self.clock = pygame.time.Clock()
-        self.clock.tick(60)
+        self.clock.tick(30)
         
         #pen values
         self.pen_color=(0,0,0)
         self.pen_radius=1
-        self.is_drawing = False
+        
         
         self.me={   "id": -1,
                     "pseudo": "",
