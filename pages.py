@@ -11,6 +11,7 @@ BLEU = pygame.Color('dodgerblue2')
 
 def input_pseudo():
     """Affiche une fenêtre pour entrer le pseudo"""
+    pygame.init()
     screen = pygame.display.set_mode((400, 200))
     pygame.display.set_caption("Entrez votre pseudo")
     font = pygame.font.Font(None, 36)

@@ -52,6 +52,7 @@ def draw_canvas(canvas,x,y,color,radius):
 def get_screen_size():
     info_ecran = pygame.display.Info()
     return info_ecran.current_w, info_ecran.current_h
+
 largeur, hauteur = get_screen_size()
 dico_co={
     1: [(5.5/100*largeur,12.5/100*hauteur),(1/100*largeur, 11/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,14/100*hauteur),(17.4/100*largeur,13.2/100*hauteur),(12/100*largeur,12/100*hauteur)],
@@ -63,9 +64,6 @@ dico_co={
     7: [(5.5/100*largeur,54.5/100*hauteur),(1/100*largeur, 53/100*hauteur, 18/100*largeur, 7.1/100*hauteur),(12/100*largeur,56/100*hauteur),(17.4/100*largeur,55.2/100*hauteur),(12/100*largeur,54/100*hauteur)],
     8: [(5.5/100*largeur,61.5/100*hauteur),(1/100*largeur, 60/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,63/100*hauteur),(17.4/100*largeur,62.2/100*hauteur),(12/100*largeur,61/100*hauteur)],
     9: [(5.5/100*largeur,68.5/100*hauteur),(1/100*largeur, 67/100*hauteur, 18/100*largeur, 7/100*hauteur),(12/100*largeur,70/100*hauteur),(17.4/100*largeur,69.2/100*hauteur),(12/100*largeur,68/100*hauteur)]
-
-
-
 
 }
 def banniere(screen,numero,pseudo,couleurs,points,trouver):

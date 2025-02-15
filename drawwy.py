@@ -5,7 +5,6 @@ import os
 from dotenv import load_dotenv
 import threading
 import pygame
-pygame.init()
 import tools
 import pages
 import time
@@ -77,7 +76,6 @@ if is_server:
     
     threading.Thread(target=server.start_server).start()# start the serv
     
-pygame.init()
 PSEUDO = pages.input_pseudo()
 
 while (not server.server_started) and is_server:
