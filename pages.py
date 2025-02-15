@@ -65,6 +65,11 @@ def UIdrawer():
     VERT = (0,255,0)
     ROUGE= (255,0,0)
     BLEU= (0,0,255)
+    JAUNE=(255,255,0)
+    MAGENTA=(255,0,255)
+    CYAN=(0,255,255)
+
+    
 
     zones = [
         (20/100*largeur, 4/100*hauteur, 60/100*largeur, 91/100*hauteur),  # Zone de dessin
@@ -101,10 +106,7 @@ def UIdrawer():
         pygame.draw.rect(screen, BLANC,(81/100*largeur, 40.83/100*hauteur, 18/100*largeur, 54.5/100*hauteur) )
         
         
-        #dessine les contours
-        for x, y, w, h in zones:
-            pygame.draw.rect(screen, NOIR, (x, y, w, h), 1)
-
+        
 
         #! texte dans la liste de personnes:
         police = pygame.font.SysFont("serif " ,20)
@@ -112,11 +114,12 @@ def UIdrawer():
         screen.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
         for y,player in enumerate(gameVar.PLAYERS):
-            police = pygame.font.SysFont("serif " ,15)
-            image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
-            screen.blit(image_texte, (5/100*largeur,13/100*hauteur+7/100*hauteur*y))
+            tools.banniere(screen,y+1, player["pseudo"], JAUNE, 3, True)
 
 
+        #dessine les contours
+        for x, y, w, h in zones:
+            pygame.draw.rect(screen, NOIR, (x, y, w, h), 1)
 
         #! texte dans mot a deviner
         pygame.draw.rect(screen, VERT,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )

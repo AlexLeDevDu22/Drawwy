@@ -68,7 +68,10 @@ def UIdrawer(phrase):
         for i in range(1,10):
             tools.banniere(i,"Caca",JAUNE,3,False)
 
-
+        for y,player in enumerate(gameVar.PLAYERS):
+            police = pygame.font.SysFont("serif " ,15)
+            image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
+            screen.blit(image_texte, (5/100*largeur,13/100*hauteur+7/100*hauteur*y))
 
         #texte dans mot a deviner
         pygame.draw.rect(ecran, VERT,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )

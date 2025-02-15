@@ -4,12 +4,12 @@ import json
 import os
 from dotenv import load_dotenv
 import threading
-import tools
 import pygame
+pygame.init()
+import tools
 import pages
 import time
 import gameVar
-
 load_dotenv()
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
 
