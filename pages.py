@@ -70,6 +70,16 @@ class gamePage:
         pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 30.83/100*self.H, 18/100*self.W, 8.33/100*self.H) )
         pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 40.83/100*self.H, 18/100*self.W, 54.5/100*self.H) )
         
+        self.zones = [
+            (0.2 * self.W, 0.04 * self.H, 0.6 * self.W, 0.91 * self.H),  # Zone de dessin
+            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H),  # Liste personnes
+            (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H),  # Mot à deviner
+            (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H),  # Couleurs
+            (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H),  # Style de stylo
+            (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
+            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.07 * self.H),  # Texte joueurs
+        ]
+        
         for x, y, w, h in self.zones:
             pygame.draw.rect(self.screen, NOIR, (x, y, w, h), 1)
     
@@ -87,18 +97,6 @@ class gamePage:
              (12/100*self.W,(12+i*7)/100*self.H)]
             for i in range(9)  # Génère 9 entrées automatiquement
         ]
-        
-        # dico_co={
-        #     1: [(5.5/100*self.W,12.5/100*self.H),(1/100*self.W, 11/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,14/100*self.H),(17.4/100*self.W,13.2/100*self.H),(12/100*self.W,12/100*self.H)],
-        #     2: [(5.5/100*self.W,19.5/100*self.H),(1/100*self.W, 18/100*self.H, 18/100*self.W, 7.1/100*self.H),(12/100*self.W,21/100*self.H),(17.4/100*self.W,20.2/100*self.H),(12/100*self.W,19/100*self.H)],
-        #     3: [(5.5/100*self.W,26.5/100*self.H),(1/100*self.W, 25/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,28/100*self.H),(17.4/100*self.W,27.2/100*self.H),(12/100*self.W,26/100*self.H)],
-        #     4: [(5.5/100*self.W,33.5/100*self.H),(1/100*self.W, 32/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,35/100*self.H),(17.4/100*self.W,34.2/100*self.H),(12/100*self.W,33/100*self.H)],
-        #     5: [(5.5/100*self.W,40.5/100*self.H),(1/100*self.W, 39/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,42/100*self.H),(17.4/100*self.W,41.2/100*self.H),(12/100*self.W,40/100*self.H)],
-        #     6: [(5.5/100*self.W,47.5/100*self.H),(1/100*self.W, 46/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,49/100*self.H),(17.4/100*self.W,48.2/100*self.H),(12/100*self.W,47/100*self.H)],
-        #     7: [(5.5/100*self.W,54.5/100*self.H),(1/100*self.W, 53/100*self.H, 18/100*self.W, 7.1/100*self.H),(12/100*self.W,56/100*self.H),(17.4/100*self.W,55.2/100*self.H),(12/100*self.W,54/100*self.H)],
-        #     8: [(5.5/100*self.W,61.5/100*self.H),(1/100*self.W, 60/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,63/100*self.H),(17.4/100*self.W,62.2/100*self.H),(12/100*self.W,61/100*self.H)],
-        #     9: [(5.5/100*self.W,68.5/100*self.H),(1/100*self.W, 67/100*self.H, 18/100*self.W, 7/100*self.H),(12/100*self.W,70/100*self.H),(17.4/100*self.W,69.2/100*self.H),(12/100*self.W,68/100*self.H)]
-        # }
 
         for y,player in enumerate(gameVar.PLAYERS):
 
@@ -114,10 +112,10 @@ class gamePage:
             image_texte = police.render ( "Trouvé ? ", 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][4])
             pygame.draw.circle(self.screen, NOIR, dico_co[y][3], 7)
-            # if trouver == True: #! pas si on met que il a trouvé, les autres vont copier sur lui ?
-            #     pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
-            # else:
-            #     pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
+            if gameVar.FOUND == True:
+                pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
+            else:
+                pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
         pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
@@ -162,6 +160,41 @@ class gamePage:
                     image_texte=tools.flou(image_texte)
                 self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
     
+    def drawing(self):
+
+        WHITE = (255, 255, 255)
+        BLACK = (0, 0, 0)
+        self.screen.fill(WHITE)
+
+        drawing = False
+        last_pos = None
+        color = BLACK
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    drawing = True
+                    last_pos = event.pos
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    drawing = False
+                elif event.type == pygame.MOUSEMOTION and drawing:
+                    pygame.draw.line(self.screen, color, last_pos, event.pos, 3)
+                    last_pos = event.pos
+
+            pygame.display.flip()
+
+    
+    def chat(self):
+        (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
+        
+        for mess in gameVar.MESSAGES:
+            police = pygame.font.SysFont("serif " ,15)
+            image_texte = police.render ( mess["guess"], 1 , (0,0,0) )
+            self.screen.blit(image_texte, (0.83 * self.W, 0.41 * self.H))
+    
     def __init__(self):
         pygame.init()
         
@@ -172,15 +205,6 @@ class gamePage:
         self.clock.tick(30)
         
         self.W, self.H = tools.get_screen_size()
-        self.zones = [
-            (0.2 * self.W, 0.04 * self.H, 0.6 * self.W, 0.91 * self.H),  # Zone de dessin
-            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H),  # Liste personnes
-            (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H),  # Mot à deviner
-            (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H),  # Couleurs
-            (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H),  # Style de stylo
-            (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
-            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.07 * self.H),  # Texte joueurs
-        ]
         
         self.running = True
         while self.running:
