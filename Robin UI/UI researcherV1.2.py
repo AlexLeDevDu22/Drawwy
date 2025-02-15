@@ -3,6 +3,7 @@ pygame.init()
 from PIL import Image, ImageFilter
 import io
 import Fonction
+import tools
 
 def UIresearcher(phrase,trouver): 
     info_ecran = pygame.display.Info()
@@ -122,6 +123,6 @@ def UIresearcher(phrase,trouver):
 
 
 
-phrase="Un pingouin en roller"
+phrase=tools.get_random_sentence()
 trouver=False
 UIresearcher(phrase,trouver)
