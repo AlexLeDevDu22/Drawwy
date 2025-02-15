@@ -2,10 +2,12 @@ import json
 import pygame
 from pygame.locals import *
 import random
+import Fonction
+import tools
 pygame.init()
 
 
-def UIdrawer(): 
+def UIdrawer(phrase): 
     
     
 
@@ -70,7 +72,7 @@ def UIdrawer():
         image_texte = police.render ( "Mot à faire deviner:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5/100*largeur,77/100*hauteur))
 
-        phrase = "Un pingouin en rollers"
+    
         if len(phrase) <=24:
             long = int(24/len(phrase)*16)
             police = pygame.font.SysFont("monospace" ,long)
@@ -113,4 +115,5 @@ def UIdrawer():
     
 
     pygame.quit()
-UIdrawer()
+test = tools.get_random_sentence()
+UIdrawer(test)
