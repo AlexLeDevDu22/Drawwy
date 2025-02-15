@@ -11,13 +11,11 @@ def get_random_sentence():
     with open("Max/phrases_droles_v2.json") as f:
         return random.choice(json.load(f))
 
-
-def init_sentence_model():
-    global model 
-    model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
-
+model=None
 def check_sentence(sentence1, sentence2):
     global model
+    if not model:
+        model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
     emb1 = model.encode(sentence1, convert_to_tensor=True)
     emb2 = model.encode(sentence2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()

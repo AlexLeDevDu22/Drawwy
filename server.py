@@ -23,9 +23,6 @@ def start_server():
     # Expose le serveur WebSocket sur le port 8765
     public_url = ngrok.connect(8765, domain=ngrok_domain)
     print(f"Serveur WebSocket accessible à : {public_url}")
-    
-    # preparer les fonctions serveur
-    tools.init_sentence_model()
 
     # =================== Données du serveur =================== #
 
@@ -39,6 +36,7 @@ def start_server():
     global canvas
     canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
     
+    global server_started
     server_started=True # server is ready
 
     async def send_update(frames=None, new_message=None):
@@ -125,4 +123,6 @@ def start_server():
         async with websockets.serve(handle_connection_server, "localhost", 8765):
             await asyncio.Future()
 
-    asyncio.run(main())
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())

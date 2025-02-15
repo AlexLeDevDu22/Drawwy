@@ -7,6 +7,8 @@ import threading
 import tools
 import pygame
 import pages
+import time
+import gameVar
 
 load_dotenv()
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
@@ -18,18 +20,10 @@ async def test_server():
     except:
         return False
     
-#! MAIN VARIABLES
-PLAYER_ID=0
-PSEUDO="pseudoBoy"
-PLAYERS=[]
-CURRENT_DRAWER=0
-SCORE=0
-CURRENT_SENTENCE=""
-MESSAGES=[]
-CANVAS=[]
-
 
 async def handle_connection_client():
+    global PLAYER_ID, PSEUDO, PLAYERS, CURRENT_DRAWER, SCORE, CURRENT_SENTENCE, MESSAGES, CANVAS
+
     async with websockets.connect("wss://"+NGROK_DOMAIN) as websocket:
         # Demander un pseudo et s'enregistrer
         
@@ -39,19 +33,18 @@ async def handle_connection_client():
         async for message in websocket:
             data = json.loads(message)
             
-            print(data)
-            
             if data["type"] == "welcome":
-                CANVAS=data["canvas"]
-                PLAYER_ID=data["id"]
-                MESSAGES=data["messages"]
+                gameVar.CANVAS=data["canvas"]
+                gameVar.PLAYER_ID=data["id"]
+                gameVar.MESSAGES=data["messages"]
+                gameVar.CURRENT_SENTENCE=data["sentence"]
             else:
-                PLAYERS=data["players"]
-                CURRENT_SENTENCE=data["sentence"]
+                gameVar.PLAYERS=data["players"]
+                gameVar.CURRENT_SENTENCE=data["sentence"]
                 if data["new_message"]:
-                    MESSAGES.append(data["new_message"])
+                    gameVar.MESSAGES.append(data["new_message"])
                 if data["frames"]:
-                    threading.Thread(target=update_canva_by_frames(), args=(data["frames"])).start() # update canvas in realtime
+                    threading.Thread(target=update_canva_by_frames, args=(data["frames"])).start() # update canvas in realtime
                     
 def update_canva_by_frames(frames):
     for frame in frames:#draw
@@ -60,7 +53,8 @@ def update_canva_by_frames(frames):
         if "radius" in frame.keys():
             current_drawing_radius=frame["radius"]
         
-        CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+        gameVar.CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+        time.sleep(frame["period"])
 
 async def send_message(websocket, message):
     await websocket.send({"type":"guess","player_id":PLAYER_ID, "guess":message})
@@ -81,15 +75,18 @@ is_server=not asyncio.run(test_server())
 if is_server:
     import server
     
-    threading.Thread(target=server.start_server).start()
+    threading.Thread(target=server.start_server).start()# start the serv
     
 pygame.init()
 PSEUDO = pages.input_pseudo()
 
-while not server.server_started and is_server:
-    pass
+while (not server.server_started) and is_server:
+    time.sleep(0.1)
 
-asyncio.run(handle_connection_client())
-
+threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=True).start()# start the web connection
 
 #* here the UI with game variables
+
+pages.UIdrawer()
+
+pygame.quit()#for not crash
