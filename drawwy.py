@@ -32,7 +32,6 @@ async def handle_connection_client():
         # Recevoir les mises à jour et dessiner si c'est son tour
         async for message in websocket:
             data = json.loads(message)
-            print(data)
             
             if data["type"] == "welcome":
                 gameVar.CANVAS=data["canvas"]
@@ -42,9 +41,10 @@ async def handle_connection_client():
             else:
                 gameVar.PLAYERS=data["players"]
                 gameVar.CURRENT_SENTENCE=data["sentence"]
-                gameVar.FOUND=data["found"]
                 if data["new_message"]:
                     gameVar.MESSAGES.append(data["new_message"])
+                    if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
+                        gameVar.FOUND=True
                 if data["frames"]:
                     threading.Thread(target=update_canva_by_frames, args=(data["frames"])).start() # update canvas in realtime
                     

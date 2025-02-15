@@ -109,16 +109,15 @@ class gamePage:
             image_texte = police.render ( "points:    "+str(player["points"]), 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][2])
 
-            image_texte = police.render ( "Trouvé ? ", 1 , (0,0,0) )
+            image_texte = police.render ( "Trouvé ", 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][4])
             pygame.draw.circle(self.screen, NOIR, dico_co[y][3], 7)
-            if gameVar.FOUND == True:
+            if player["found"]:
                 pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
             else:
                 pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
-        print(gameVar.CURRENT_SENTENCE)
         pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
         police = pygame.font.Font("PermanentMarker.ttf" ,20)
@@ -128,7 +127,7 @@ class gamePage:
         if len(gameVar.CURRENT_SENTENCE) >0:
             MAX_LARGEUR = 20  # Nombre max de caractères par ligne (ajuste si besoin)
             FONT_SIZE_BASE = 22  # Taille de base de la police
-            Y_START = 80 / 100 * self.H  # Position de départ
+            Y_START = 77 / 100 * self.H +36 # Position de départ
 
             # Choisir la taille de police en fonction de la longueur du texte
             if len(gameVar.CURRENT_SENTENCE) <= MAX_LARGEUR:
@@ -157,39 +156,54 @@ class gamePage:
             # Affichage ligne par ligne
             for i, ligne in enumerate(lignes):
                 image_texte = police.render(ligne, True, (0, 0, 0))
-                if not gameVar.FOUND:
+                if not self.me["found"] or self.me["id"] != gameVar.CURRENT_DRAWER:
                     image_texte=tools.flou(image_texte)
                 self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
+                
     def drawing(self):
         """Permet de dessiner uniquement dans la zone de dessin."""
-        drawing_zone = self.zones[0]  # Première zone définie comme zone de dessin
-        x_min, y_min, width, height = drawing_zone
-        x_max, y_max = x_min + width, y_min + height
+        if not gameVar.CANVAS:
+            return
+        
+        zone_x_min = int(0.2 * self.W)   # 20% de la largeur de la fenêtre
+        zone_x_max = int(0.8 * self.W)   # 60% de la largeur de la fenêtre
+        zone_y_min = 0                    # Commence en haut de la fenêtre
+        zone_y_max = self.H               # Remplie toute la hauteur de la fenêtre
+        
+        print(gameVar.CANVAS)
+        canvas_width = len(gameVar.CANVAS[0])
+        canvas_height = len(gameVar.CANVAS)
 
-        drawing = False
-        last_pos = None
+        # Affichage du CANVAS à l'écran
+        pixel_width = (zone_x_max - zone_x_min) // canvas_width
+        pixel_height = (zone_y_max - zone_y_min) // canvas_height
 
+        #! show
+        for y in range(canvas_height):
+            for x in range(canvas_width):
+                color = gameVar.CANVAS[y][x] if gameVar.CANVAS[y][x] else BLANC
+                pygame.draw.rect(self.screen, color, (zone_x_min + x * pixel_width, zone_y_min + y * pixel_height, pixel_width, pixel_height))
+
+        #! drawing
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                self.running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Vérifier si le clic est dans la zone de dessin
+                if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
                     drawing = True
-                    last_pos = event.pos
+                    # Calculer la position du clic dans le tableau CANVAS
+                    canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
+                    canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
+                    tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
             elif event.type == pygame.MOUSEBUTTONUP:
                 drawing = False
             elif event.type == pygame.MOUSEMOTION and drawing:
-                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                    pygame.draw.line(self.screen, NOIR, last_pos, event.pos, 3)
-                    last_pos = event.pos
-
-
+                if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
+                    canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
+                    canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
+                    tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
 
     def couleurs(self):
         num_sections = 36
-        running = True
         center_x, center_y = (0.81 * self.W, 0.04 * self.H,)
         radius = 100
         # Dessiner les arcs colorés
@@ -221,10 +235,11 @@ class gamePage:
         
         for mess in gameVar.MESSAGES:
             police = pygame.font.Font("PermanentMarker.ttf" ,15)
-            image_texte = police.render ( mess["pseudo"], 1 , (0,0,0) )
-            self.screen.blit(image_texte, (0.83 * self.W, 0.41 * self.H))
+            image_texte = police.render ( mess["pseudo"], 1 , (80,80,80) )
+            self.screen.blit(image_texte, (0.82 * self.W + 30, 0.41 * self.H))
+            police = pygame.font.Font("PermanentMarker.ttf" ,12)
             image_texte = police.render ( mess["guess"], 1 , (0,0,0) )
-            self.screen.blit(image_texte, (0.83 * self.W, 0.44 * self.H))
+            self.screen.blit(image_texte, (0.82 * self.W, 0.41 * self.H + 20))
     
     def __init__(self):
         pygame.init()
@@ -236,9 +251,22 @@ class gamePage:
         self.clock = pygame.time.Clock()
         self.clock.tick(30)
         
+        #pen values
+        self.pen_color=(0,0,0)
+        self.pen_radius=5
         
+        
+        self.me={   "id": -1,
+                    "pseudo": "",
+                    "points": 0,
+                    "found":False,}
         self.running = True
         while self.running:
+            
+            for player in gameVar.PLAYERS:
+                if player["id"] == gameVar.PLAYER_ID:
+                    self.me=player #my data
+                    
             
             self.background()
             self.players()

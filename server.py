@@ -46,7 +46,7 @@ def start_server():
         
         state = {
             "type": "update",
-            "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
+            "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
             "frames": frames,
             "drawer": index_drawer,
             "new_message":new_message,
@@ -74,6 +74,7 @@ def start_server():
                     "id": player_id,
                     "pseudo": pseudo,
                     "points": 0,
+                    "found":False,
                     "ws": websocket
                 }
                 players.append(new_player)
@@ -83,7 +84,7 @@ def start_server():
                     "type": "welcome",
                     "id": player_id,
                     "canvas": canvas,
-                    "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"]} for p in players],#players datas without ws key
+                    "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
                     "turn": index_drawer,
                     "sentence":current_sentence,
                     "messages":guess_list
@@ -112,8 +113,9 @@ def start_server():
                         if player["id"] == data["player_id"]:
                             succeed=tools.check_sentence(current_sentence, data["guess"])
                             if succeed:
+                                player["found"] = True
                                 player["points"] += 1
-                            await send_update({"guess":data["guess"], "pseudo":player["pseudo"], "succeed":succeed})
+                            await send_update({"guess":data["guess"], "id":player["id"]})
                             break
 
         except websockets.exceptions.ConnectionClosedOK:
