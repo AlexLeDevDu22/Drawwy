@@ -232,8 +232,8 @@ class gamePage:
             self.screen.blit(palette_surface, (palette_x, palette_y))  # Dessiner la palette
             
             # Affichage de la couleur sélectionnée
-            pygame.draw.rect(self.screen, selected_color, (self.width // 2 - 50, 370, 100, 30))
-            pygame.draw.rect(self.screen, (0, 0, 0), (self.width // 2 - 50, 370, 100, 30), 2)  # Bordure
+            pygame.draw.rect(self.screen, selected_color, (self.W // 2 - 50, 370, 100, 30))
+            pygame.draw.rect(self.screen, (0, 0, 0), (self.W // 2 - 50, 370, 100, 30), 2)  # Bordure
 
             for event in pygame.event.get():
                        # Clic pour choisir une couleur
