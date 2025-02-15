@@ -236,10 +236,7 @@ class gamePage:
             pygame.draw.rect(self.screen, (0, 0, 0), (self.width // 2 - 50, 370, 100, 30), 2)  # Bordure
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                # Clic pour choisir une couleur
+                       # Clic pour choisir une couleur
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = event.pos
                     if palette_x <= mouse_x < palette_x + palette_width and palette_y <= mouse_y < palette_y + palette_height:
