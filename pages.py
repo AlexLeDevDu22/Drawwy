@@ -84,7 +84,7 @@ class gamePage:
             pygame.draw.rect(self.screen, NOIR, (x, y, w, h), 1)
     
     def players(self):
-        police = pygame.font.Font("PermanentMarker.ttf " ,20)
+        police = pygame.font.Font("PermanentMarker.ttf" ,20)
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
         self.screen.blit(image_texte, (5.5/100*self.W,6/100*self.H))
 
@@ -102,9 +102,9 @@ class gamePage:
 
             pygame.draw.rect(self.screen, (222,0,0) if player["id"]==0 else (0,0,0),dico_co[y][1])
             pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][1][0]+3,dico_co[y][1][1]+3,dico_co[y][1][2]-6,dico_co[y][1][3]-6))
-            police = pygame.font.Font("PermanentMarker.ttf " ,30)
+            police = pygame.font.Font("PermanentMarker.ttf" ,30)
             image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
-            police = pygame.font.Font("PermanentMarker.ttf " ,20)
+            police = pygame.font.Font("PermanentMarker.ttf" ,20)
             self.screen.blit(image_texte, dico_co[y][0])
             image_texte = police.render ( "points:    "+str(player["points"]), 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][2])
@@ -118,9 +118,10 @@ class gamePage:
                 pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
+        print(gameVar.CURRENT_SENTENCE)
         pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
-        police = pygame.font.Font("PermanentMarker.ttf " ,20)
+        police = pygame.font.Font("PermanentMarker.ttf" ,20)
         image_texte = police.render ( "Mot à faire deviner:", 1 , (0,0,0) )
         self.screen.blit(image_texte, (4/100*self.W,77/100*self.H))
         
@@ -137,7 +138,7 @@ class gamePage:
             else:
                 font_size = FONT_SIZE_BASE - 4
 
-            police = pygame.font.Font("monospace", font_size)
+            police = pygame.font.Font("PermanentMarker.ttf", font_size)
 
             # Découpage intelligent du texte (évite de couper en plein milieu des mots)
             mots = gameVar.CURRENT_SENTENCE.split()
@@ -167,26 +168,23 @@ class gamePage:
 
         drawing = False
         last_pos = None
-        color = NOIR  # Couleur du trait
 
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                    self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                        drawing = True
-                        last_pos = event.pos
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    drawing = False
-                elif event.type == pygame.MOUSEMOTION and drawing:
-                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                        pygame.draw.line(self.screen, color, last_pos, event.pos, 3)
-                        last_pos = event.pos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                self.running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                    drawing = True
+                    last_pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                drawing = False
+            elif event.type == pygame.MOUSEMOTION and drawing:
+                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                    pygame.draw.line(self.screen, NOIR, last_pos, event.pos, 3)
+                    last_pos = event.pos
 
-            pygame.display.flip()
 
 
     def couleurs(self):
@@ -222,7 +220,7 @@ class gamePage:
         (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
         
         for mess in gameVar.MESSAGES:
-            police = pygame.font.Font("PermanentMarker.ttf " ,15)
+            police = pygame.font.Font("PermanentMarker.ttf" ,15)
             image_texte = police.render ( mess["pseudo"], 1 , (0,0,0) )
             self.screen.blit(image_texte, (0.83 * self.W, 0.41 * self.H))
             image_texte = police.render ( mess["guess"], 1 , (0,0,0) )
