@@ -165,8 +165,6 @@ class gamePage:
         if not gameVar.CANVAS:
             return
         
-        drawing=False
-        
         zone_x_min = int(0.2 * self.W)   # 20% de la largeur de la fenêtre
         zone_x_max = int(0.8 * self.W)   # 60% de la largeur de la fenêtre
         zone_y_min = 0                    # Commence en haut de la fenêtre
@@ -189,15 +187,15 @@ class gamePage:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Vérifier si le clic est dans la zone de dessin
+                self.is_drawing = True
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
-                    drawing = True
                     # Calculer la position du clic dans le tableau CANVAS
                     canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
                     canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
                     tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
             elif event.type == pygame.MOUSEBUTTONUP:
-                drawing = False
-            elif event.type == pygame.MOUSEMOTION and drawing==False:
+                self.is_drawing = False
+            if event.type == pygame.MOUSEMOTION and self.is_drawing:
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
                     canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
                     canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
@@ -256,7 +254,7 @@ class gamePage:
         #pen values
         self.pen_color=(0,0,0)
         self.pen_radius=1
-        
+        self.is_drawing = False
         
         self.me={   "id": -1,
                     "pseudo": "",
