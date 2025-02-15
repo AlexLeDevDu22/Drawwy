@@ -12,6 +12,18 @@ with open("config.yaml", "r") as f:
 
 server_started=False
 
+#* game variables
+global canvas,players, guess_list, index_drawer, current_sentence
+players = []
+index_drawer = 0  # ID du joueur actif
+guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
+
+current_sentence=tools.get_random_sentence()
+
+# Création du tableau de dessin tous blancs
+canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+
+
 def start_server():
     # Charger le token ngrok depuis .env
     load_dotenv()
@@ -26,16 +38,6 @@ def start_server():
 
     # =================== Données du serveur =================== #
 
-    #* game variables
-    players = []
-    index_drawer = 0  # ID du joueur actif
-    guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
-    current_sentence=tools.get_random_sentence()
-
-    # Création du tableau de dessin tous blancs
-    global canvas
-    canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
-    
     global server_started
     server_started=True # server is ready
 
@@ -60,6 +62,7 @@ def start_server():
 
     async def handle_connection_server(websocket):  # Correction ici
         global canvas, guess_list, index_drawer, current_sentence
+        print(guess_list)
         
         try:
             # Attente du pseudo du joueur
@@ -77,7 +80,6 @@ def start_server():
                 players.append(new_player)
 
                 # Envoyer l'ID du joueur et l'état initial du jeu
-                print(guess_list)
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
