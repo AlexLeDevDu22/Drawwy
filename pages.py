@@ -91,8 +91,7 @@ class gamePage:
         ]
 
         for y,player in enumerate(gameVar.PLAYERS):
-<<<<<<< HEAD
-            
+
             pygame.draw.rect(self.screen, (222,0,0) if player["id"]==0 else (0,0,0),dico_co[y][1])
             pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][1][0]+3,dico_co[y][1][1]+3,dico_co[y][1][2]-6,dico_co[y][1][3]-6))
             police = pygame.font.SysFont("serif " ,30)
@@ -101,9 +100,6 @@ class gamePage:
             self.screen.blit(image_texte, dico_co[y][0])
             image_texte = police.render ( "points:    "+str(player["points"]), 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][2])
-=======
-            tools.banniere(screen,y+1, player["pseudo"], JAUNE, player["points"], True)
->>>>>>> ca0c931087f268e647c55fec7636179bd316b142
 
             image_texte = police.render ( "Trouvé ? ", 1 , (0,0,0) )
             self.screen.blit(image_texte, dico_co[y][4])
