@@ -80,9 +80,9 @@ dico_co={
 }
 def banniere(numero,pseudo,couleurs,points,trouver):
     pygame.draw.rect(ecran, couleurs,dico_co[numero][1])
-    police = pygame.font.Font("PermanentMarker.ttf " ,30)
+    police = pygame.font.Font("PermanentMarker.ttf" ,30)
     image_texte = police.render ( pseudo, 1 , (0,0,0) )
-    police = pygame.font.Font("PermanentMarker.ttf " ,20)
+    police = pygame.font.Font("PermanentMarker.ttf" ,20)
     ecran.blit(image_texte, dico_co[numero][0])
     image_texte = police.render ( "points:    "+str(points), 1 , (0,0,0) )
     ecran.blit(image_texte, dico_co[numero][2])

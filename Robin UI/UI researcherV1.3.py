@@ -59,7 +59,7 @@ def UIresearcher(phrase,trouver):
 
         
         #texte dans la liste de personnes:
-        police = pygame.font.Font("PermanentMarker.ttf " ,20)
+        police = pygame.font.Font("PermanentMarker.ttf" ,20)
         image_texte = police.render ( "Liste de joueurs:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5.5/100*largeur,6/100*hauteur))
 
@@ -73,13 +73,13 @@ def UIresearcher(phrase,trouver):
         else:
             pygame.draw.rect(ecran, ROUGE,(1/100*largeur,75/100*hauteur, 18/100*largeur, 20/100*hauteur) )
 
-        police = pygame.font.Font("PermanentMarker.ttf " ,20)
+        police = pygame.font.Font("PermanentMarker.ttf" ,20)
         image_texte = police.render ( "Phrase à trouver:", 1 , (0,0,0) )
         ecran.blit(image_texte, (5/100*largeur,77/100*hauteur))
 
         if len(phrase) <=24:
             long = int(24/len(phrase)*16)
-            police = pygame.font.Font("monospace" ,long)
+            police = pygame.font.Font("PermanentMarker.ttf" ,long)
             image_texte = police.render ( phrase, 1 , (0,0,0) )
             if trouver==False:
                 image_texte= tools.flou(image_texte)
@@ -87,7 +87,7 @@ def UIresearcher(phrase,trouver):
         elif len (phrase)<=48:
             long = int(48/len(phrase)*14)
             taille2parties = len(phrase)//2
-            police = pygame.font.Font("monospace" ,long)
+            police = pygame.font.Font("PermanentMarker.ttf" ,long)
             image_texte = police.render ( phrase[0:taille2parties], 1 , (0,0,0) )
             image_texte2 = police.render ( phrase[taille2parties:], 1 , (0,0,0) )
             if trouver==False:
@@ -98,7 +98,7 @@ def UIresearcher(phrase,trouver):
         else:
             long = int(72/len(phrase)*14)
             taille3parties = len(phrase)//3
-            police = pygame.font.Font("monospace" ,long)
+            police = pygame.font.Font("PermanentMarker.ttf" ,long)
             image_texte = police.render ( phrase[0:taille3parties], 1 , (0,0,0) )
             image_texte2 = police.render ( phrase[taille3parties:taille3parties*2], 1 , (0,0,0) )
             image_texte3 = police.render ( phrase[taille3parties*2:], 1 , (0,0,0) )
