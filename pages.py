@@ -205,45 +205,45 @@ class gamePage:
 
     def couleurs(self):
         # Taille de la palette
-    palette_width, palette_height = 400, 250
-    palette_x, palette_y = 50, 50  # Position de la palette
+        palette_width , palette_height = 400, 250
+        palette_x, palette_y = 50, 50  # Position de la palette
 
-    # Créer une surface pour stocker la palette
-    palette_surface = pygame.Surface((palette_width, palette_height))
+        # Créer une surface pour stocker la palette
+        palette_surface = pygame.Surface((palette_width, palette_height))
 
-    # Générer les couleurs (dégradé)
-    for x in range(palette_width):
-        for y in range(palette_height):
-            hue = (x / palette_width) * 360  # Teinte (0 à 360°)
-            saturation = 100  # Saturation maximale
-            value = 100 - (y / palette_height) * 100  # Valeur (luminosité)
+        # Générer les couleurs (dégradé)
+        for x in range(palette_width):
+            for y in range(palette_height):
+                hue = (x / palette_width) * 360  # Teinte (0 à 360°)
+                saturation = 100  # Saturation maximale
+                value = 100 - (y / palette_height) * 100  # Valeur (luminosité)
+                
+                color = pygame.Color(0)  # Couleur vide
+                color.hsva = (hue, saturation, value, 100)  # Appliquer HSV
+
+                palette_surface.set_at((x, y), color)  # Placer la couleur
+
+        # Couleur sélectionnée
+        selected_color = (255, 255, 255)
+
+        running = True
+        while running:
+            self.screen.fill((255, 255, 255))  # Fond blanc
+            self.screen.blit(palette_surface, (palette_x, palette_y))  # Dessiner la palette
             
-            color = pygame.Color(0)  # Couleur vide
-            color.hsva = (hue, saturation, value, 100)  # Appliquer HSV
+            # Affichage de la couleur sélectionnée
+            pygame.draw.rect(self.screen, selected_color, (self.width // 2 - 50, 370, 100, 30))
+            pygame.draw.rect(self.screen, (0, 0, 0), (self.width // 2 - 50, 370, 100, 30), 2)  # Bordure
 
-            palette_surface.set_at((x, y), color)  # Placer la couleur
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-    # Couleur sélectionnée
-    selected_color = (255, 255, 255)
-
-    running = True
-    while running:
-        self.screen.fill((255, 255, 255))  # Fond blanc
-        self.screen.blit(palette_surface, (palette_x, palette_y))  # Dessiner la palette
-        
-        # Affichage de la couleur sélectionnée
-        pygame.draw.rect(self.screen, selected_color, (width // 2 - 50, 370, 100, 30))
-        pygame.draw.rect(self.screen, (0, 0, 0), (width // 2 - 50, 370, 100, 30), 2)  # Bordure
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            # Clic pour choisir une couleur
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
-                if palette_x <= mouse_x < palette_x + palette_width and palette_y <= mouse_y < palette_y + palette_height:
-                    selected_color = palette_surface.get_at((mouse_x - palette_x, mouse_y - palette_y))
+                # Clic pour choisir une couleur
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_x, mouse_y = event.pos
+                    if palette_x <= mouse_x < palette_x + palette_width and palette_y <= mouse_y < palette_y + palette_height:
+                        selected_color = palette_surface.get_at((mouse_x - palette_x, mouse_y - palette_y))
     def chat(self):
         (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
         
