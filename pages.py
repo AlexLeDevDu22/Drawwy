@@ -195,13 +195,8 @@ class gamePage:
                     canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
                     canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
                     tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
-            elif event.type == pygame.MOUSEBUTTONUP:
-                drawing = False
-            elif event.type == pygame.MOUSEMOTION and drawing==False:
-                if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
-                    canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
-                    canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
-                    tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
+
+            
 
     def couleurs(self):
         num_sections = 36
