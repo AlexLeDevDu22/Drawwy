@@ -48,25 +48,27 @@ async def handle_connection_client():
                     if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
                         gameVar.FOUND=True
                 if data["frames"]:
-                    threading.Thread(target=update_canva_by_frames, args=(data["frames"])).start() # update canvas in realtime
-                    
-def update_canva_by_frames(frames):
+                    threading.Thread(target=update_canva_by_frames, args=(data["frames"], data["period"])).start() # update canvas in realtime
+                    pass
+                
+def update_canva_by_frames(frames, period):
+    print(frames)
     for frame in frames:#draw
+        print(frame)
         if "color" in frame.keys():
             current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
         if "radius" in frame.keys():
             current_drawing_radius=frame["radius"]
         
-        gameVar.CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
-        time.sleep(frame["period"])
+        if gameVar.CANVAS: gameVar.CANVAS=tools.draw_canvas(gameVar.CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+        time.sleep(period)
 
 is_server=not asyncio.run(test_server())
 
 if is_server:
     import server
     
-    connection=threading.Thread(target=server.start_server)
-    connection.start()# start the serv
+    threading.Thread(target=server.start_server).start()# start the serv
     
     PSEUDO = pages.input_pseudo()
 

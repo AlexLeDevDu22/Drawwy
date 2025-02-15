@@ -41,12 +41,14 @@ def start_server():
     global server_started
     server_started=True # server is ready
 
-    async def send_update(frames=None, new_message=None):
+    async def send_update(frames=None, period=None, new_message=None):
         """Envoie les mises à jour de l'état du jeu à tous les joueurs."""
         
+        print(frames)
         state = {
             "type": "update",
             "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
+            "period": period,
             "frames": frames,
             "drawer": index_drawer,
             "new_message":new_message,
@@ -104,8 +106,8 @@ def start_server():
                         if "radius" in frame.keys():
                             current_drawing_radius=frame["radius"]
                         
-                        canvas=tools.draw_canvas(canvas, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
-                    await send_update(data["frames"])
+                        if canvas: canvas=tools.draw_canvas(canvas, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
+                    await send_update(data["frames"], data["period"])
 
                 elif data["type"] == "guess": #! GUESS
                     guess_list.append(data["guess"])
@@ -115,7 +117,7 @@ def start_server():
                             if succeed:
                                 player["found"] = True
                                 player["points"] += 1
-                            await send_update({"guess":data["guess"], "id":player["id"]})
+                            await send_update(new_message={"guess":data["guess"], "id":player["id"]})
                             break
 
         except websockets.exceptions.ConnectionClosedOK:

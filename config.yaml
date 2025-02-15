@@ -13,3 +13,17 @@ players_colors:
   - [240, 190, 255] # 8e - Mauve pastel
   - [250, 200, 230] # 9e - Rose bonbon
   - [255, 210, 210] # 10e - Rose saumoné
+
+drawing_colors:
+  - [255, 0, 0] # Rouge
+  - [0, 255, 0] # Vert
+  - [0, 0, 255] # Bleu
+  - [255, 255, 0] # Jaune
+  - [255, 165, 0] # Orange
+  - [128, 0, 128] # Violet
+  - [0, 0, 0] # Noir
+  - [255, 255, 255] # Blanc
+  - [0, 255, 255] # Cyan
+  - [255, 20, 147] # Rose vif
+  - [139, 69, 19] # Marron
+  - [128, 128, 128] # Gris

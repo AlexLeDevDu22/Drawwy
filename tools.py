@@ -28,7 +28,7 @@ def get_random_sentence():
     
     
 async def send_message(websocket, message):
-    await websocket.send({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message})
+    await websocket.send(json.dumps({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message}))
 
 async def websocket_draw(websocket, x, y, color, radius):
     # await websocket.send({"type":"draw","period":0.1,"frames":[
@@ -40,11 +40,10 @@ async def websocket_draw(websocket, x, y, color, radius):
     #                                                         {"x":2,"y":1}
     #                                                         ]
     # })
-    
-    await websocket.send({"type":"draw","period":0.1,"frames":[
+    await websocket.send(json.dumps({"type":"draw","period":0.1,"frames":[
                                                             {"x":x,"y":y,"color":color,"radius":radius},
                                                             ]
-    })
+    }))
 
 model=None
 def check_sentence(sentence1, sentence2):
