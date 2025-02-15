@@ -28,6 +28,8 @@ async def handle_connection_client():
         # Demander un pseudo et s'enregistrer
         
         await websocket.send(json.dumps({"type": "join", "pseudo": PSEUDO}))
+        
+        gameVar.WS=websocket
 
         # Recevoir les mises à jour et dessiner si c'est son tour
         async for message in websocket:
@@ -57,20 +59,6 @@ def update_canva_by_frames(frames):
         
         gameVar.CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
         time.sleep(frame["period"])
-
-async def send_message(websocket, message):
-    await websocket.send({"type":"guess","player_id":PLAYER_ID, "guess":message})
-
-async def websocket_draw(websocket):
-    await websocket.send({"type":"draw","period":0.1,"frames":[
-                                                            {"x":0,"y":0,"color":"#000000","width":2},
-                                                            {"x":2,"y":1},
-                                                            {"x":0,"y":0,"color":"#220000"},
-                                                            {"x":2,"y":1},
-                                                            {"x":0,"y":0,"width":3},
-                                                            {"x":2,"y":1}
-                                                            ]
-    })
 
 is_server=not asyncio.run(test_server())
 

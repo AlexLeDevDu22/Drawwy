@@ -1,6 +1,6 @@
 sentence_checker_seuil: 0.75
-canvas_height: 10
-canvas_width: 10
+canvas_height: 150
+canvas_width: 150
 
 players_colors:
   - [255, 220, 220] # 1er - Rose pâle

@@ -4,6 +4,7 @@ import random
 import yaml
 import pygame
 from PIL import Image, ImageFilter
+import gameVar
 
 
 NOIR = (0, 0, 0)
@@ -24,6 +25,26 @@ with open("config.yaml", "r") as f:
 def get_random_sentence():
     with open("Max/phrases_droles_v2.json") as f:
         return random.choice(json.load(f))
+    
+    
+async def send_message(websocket, message):
+    await websocket.send({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message})
+
+async def websocket_draw(websocket, x, y, color, radius):
+    # await websocket.send({"type":"draw","period":0.1,"frames":[
+    #                                                         {"x":0,"y":0,"color":"#000000","width":2},
+    #                                                         {"x":2,"y":1},
+    #                                                         {"x":0,"y":0,"color":"#220000"},
+    #                                                         {"x":2,"y":1},
+    #                                                         {"x":0,"y":0,"width":3},
+    #                                                         {"x":2,"y":1}
+    #                                                         ]
+    # })
+    
+    await websocket.send({"type":"draw","period":0.1,"frames":[
+                                                            {"x":x,"y":y,"color":color,"radius":radius},
+                                                            ]
+    })
 
 model=None
 def check_sentence(sentence1, sentence2):
