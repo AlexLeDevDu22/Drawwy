@@ -255,7 +255,7 @@ class gamePage:
         
         #pen values
         self.pen_color=(0,0,0)
-        self.pen_radius=5
+        self.pen_radius=1
         
         
         self.me={   "id": -1,
