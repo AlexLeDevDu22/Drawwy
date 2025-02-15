@@ -165,12 +165,13 @@ class gamePage:
         if not gameVar.CANVAS:
             return
         
+        drawing=False
+        
         zone_x_min = int(0.2 * self.W)   # 20% de la largeur de la fenêtre
         zone_x_max = int(0.8 * self.W)   # 60% de la largeur de la fenêtre
         zone_y_min = 0                    # Commence en haut de la fenêtre
         zone_y_max = self.H               # Remplie toute la hauteur de la fenêtre
         
-        print(gameVar.CANVAS)
         canvas_width = len(gameVar.CANVAS[0])
         canvas_height = len(gameVar.CANVAS)
 
