@@ -48,6 +48,14 @@ async def handle_connection_client(pseudo):
                 CURRENT_SENTENCE=data["sentence"]
                 if data["new_message"]:
                     MESSAGES.append(data["new_message"])
+                if data["frames"]:
+                    for frame in data["frames"]:#draw
+                        if "color" in frame.keys():
+                            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
+                        if "radius" in frame.keys():
+                            current_drawing_radius=frame["radius"]
+                        
+                        CANVAS=tools.draw_canvas(CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
         
         
 async def send_message(websocket, message):
@@ -75,3 +83,6 @@ if is_server:
         pass
 
 asyncio.run(handle_connection_client(PSEUDO))
+
+
+#* here the UI with game variables
