@@ -192,7 +192,7 @@ class gamePage:
     def couleurs(self):
         num_sections = 36
         running = True
-        center_x, center_y = 0.2 * self.W, 0.04 * self.H
+        center_x, center_y = (0.81 * self.W, 0.04 * self.H,)
         radius = 100
         # Dessiner les arcs colorés
         for i in range(num_sections):
