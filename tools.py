@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer, util
 import json
 import random
 import yaml
+import pygame
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -32,3 +33,8 @@ def draw_canvas(canvas,x,y,color,radius):
             # Distance au centre (x, y) pour voir si c'est dans le cercle
             if (i - y) ** 2 + (j - x) ** 2 <= radius ** 2:
                 canvas[i][j] = color  # Colorier la case
+                
+                
+def get_screen_size():
+    info_ecran = pygame.display.Info()
+    return info_ecran.current_w, info_ecran.current_h
