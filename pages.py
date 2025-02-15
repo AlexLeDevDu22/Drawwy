@@ -118,6 +118,7 @@ class gamePage:
                 pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
+        print(gameVar.CURRENT_SENTENCE)
         pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
         police = pygame.font.Font("PermanentMarker.ttf" ,20)
@@ -167,26 +168,23 @@ class gamePage:
 
         drawing = False
         last_pos = None
-        color = NOIR  # Couleur du trait
 
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                    self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                        drawing = True
-                        last_pos = event.pos
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    drawing = False
-                elif event.type == pygame.MOUSEMOTION and drawing:
-                    if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
-                        pygame.draw.line(self.screen, color, last_pos, event.pos, 3)
-                        last_pos = event.pos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                self.running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                    drawing = True
+                    last_pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONUP:
+                drawing = False
+            elif event.type == pygame.MOUSEMOTION and drawing:
+                if x_min <= event.pos[0] <= x_max and y_min <= event.pos[1] <= y_max:
+                    pygame.draw.line(self.screen, NOIR, last_pos, event.pos, 3)
+                    last_pos = event.pos
 
-            pygame.display.flip()
 
 
     def couleurs(self):
