@@ -1,7 +1,7 @@
 import asyncio
 import json
 import websockets
-from pyngrok import ngrok
+import ngrok
 from dotenv import load_dotenv
 import os
 import tools
@@ -13,23 +13,25 @@ with open("config.yaml", "r") as f:
 server_started=False
 
 #* game variables
-global canvas,players, guess_list, drawer_id, current_sentence
+global canvas,players, guess_list, drawer_id, sentences
 players = []
 drawer_id = 0  # ID du joueur actif
 guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
 
-current_sentence=tools.get_random_sentence()
+sentences=[tools.get_random_sentence()]
 
 # Création du tableau de dessin tous blancs
 canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
 
-def start_server():
-    # Charger le token ngrok depuis .env
-    load_dotenv()
-    ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
-    ngrok_domain = os.getenv("NGROK_DOMAIN")
 
-    ngrok.set_auth_token(ngrok_token)
+# Charger le token ngrok depuis .env
+load_dotenv()
+ngrok_domain = os.getenv("NGROK_DOMAIN")
+ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
+ngrok.set_auth_token(ngrok_token)
+
+def start_server():
+    global ngrok_domain, ngrok_token
 
     # Expose le serveur WebSocket sur le port 8765
     public_url = ngrok.connect(8765, domain=ngrok_domain)
@@ -49,8 +51,7 @@ def start_server():
             "frames": frames,
             "drawer_id": drawer_id,
             "new_message":new_message,
-            "sentence":current_sentence,
-            "found":False
+            "sentence":sentences[-1]
         }
         await broadcast(json.dumps(state))
 
@@ -62,10 +63,10 @@ def start_server():
         except websockets.exceptions.ConnectionClosedError:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != player["ws"]]
-            await broadcast(message)
+            if player!=[]: await broadcast(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-        global canvas, guess_list, drawer_id, current_sentence
+        global canvas, guess_list, drawer_id, sentences
         
         try:
             # Attente du pseudo du joueur
@@ -95,23 +96,43 @@ def start_server():
 
             async for message in websocket:
                 data = json.loads(message)
+                    
+                match data["type"]:
+                    case "draw":
+                        print(data["frames"])
+                        # Mise à jour du dessin
+                        canvas=tools.update_canva_by_frames(data["frames"], canvas)
+                        await send_update(data["frames"])
+                        break
+                    case "guess":
+                        guess_list.append(data["guess"])
+                        for player in players: #found the player
+                            if player["id"] == data["player_id"]:
+                                succeed=tools.check_sentence(sentences[-1], data["guess"])
+                                if succeed:
+                                    player["found"] = True
+                                    player["points"] += 1
+                                    players[drawer_id]["points"] += 1
+                                await send_update(new_message={"guess":data["guess"], "id":player["id"]})
+                                break
+                        break
+                    case "game_finished":
+                        for player in players:
+                            if player["found"]:
+                                player["found"]=False
+                                
+                        for i in range(len(players)):
+                            if player["id"] == drawer_id:
+                                drawer_id = players[(i+1)%len(players)]["id"]
+                                break
+                            
+                        sentences.append(tools.get_random_sentence())
+                        
+                        canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+                        guess_list=[]
 
-                if data["type"] == "draw": #! DRAW
-                    # Mise à jour du dessin
-                    print(data["frames"])
-                    canvas=tools.update_canva_by_frames(data["frames"], canvas)
-                    await send_update(data["frames"])
-
-                elif data["type"] == "guess": #! GUESS
-                    guess_list.append(data["guess"])
-                    for player in players: #found the player
-                        if player["id"] == data["player_id"]:
-                            succeed=tools.check_sentence(current_sentence, data["guess"])
-                            if succeed:
-                                player["found"] = True
-                                player["points"] += 1
-                            await send_update(new_message={"guess":data["guess"], "id":player["id"]})
-                            break
+                        await send_update()
+                    
 
         except websockets.exceptions.ConnectionClosedOK:
             print("Un joueur s'est déconnecté.")
@@ -126,3 +147,11 @@ def start_server():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(main())
+    
+    stop_server()
+
+def stop_server():
+    global ngrok_domain
+    ngrok.disconnect(ngrok_domain)
+    
+stop_server()#close the serv if it already exists  doesn't work

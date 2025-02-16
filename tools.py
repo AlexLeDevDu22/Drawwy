@@ -35,12 +35,16 @@ async def websocket_draw(websocket, frames):
     #simplify frames
     
     color, radius=None, None
-    for frame in frames:
+    for i,frame in enumerate(frames):
         if frame["color"]==color:
-            del frame["color"]
+            del frames[i]["color"]
+        else:
+            color=frame["color"]
         if frame["radius"]==radius: 
-            del frame["radius"]
-    
+            del frames[i]["radius"]
+        else:
+            radius=frame["radius"]
+    print(json.dumps({"type":"draw","frames":frames}))
     await websocket.send(json.dumps({"type":"draw","frames":frames}))
 
 model=None

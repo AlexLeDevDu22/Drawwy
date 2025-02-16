@@ -1,6 +1,7 @@
 sentence_checker_seuil: 0.75
-canvas_height: 150
-canvas_width: 150
+game_duration: 60
+canvas_height: 200
+canvas_width: 200
 
 game_page_fps: 30
 refresh_drawing_time: 1

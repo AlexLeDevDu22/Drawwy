@@ -53,22 +53,28 @@ async def handle_connection_client():
 is_server=not asyncio.run(test_server())
 
 if is_server:
+    # start the serv
     import server
     
-    threading.Thread(target=server.start_server).start()# start the serv
+    serv_thread=threading.Thread(target=server.start_server)
+    serv_thread.start()
     
+    pygame.init()
     PSEUDO = pages.input_pseudo()
 
     while not server.server_started:
         time.sleep(0.1)
 else:
+    pygame.init()
     PSEUDO = pages.input_pseudo()
 
-threading.Thread(target=lambda: asyncio.run(handle_connection_client()), daemon=True).start()# start the web connection
-
-#* here the UI with game variables
+threading.Thread(target=lambda: asyncio.run(handle_connection_client()),daemon=True).start()# start the web connection
 
 pages.gamePage()
 
 pygame.quit()#for not crash
-os._exit(0) # for threads
+
+if is_server:
+    server.stop_server()
+    time.sleep(0.1)
+os._exit(0) # kill threads
