@@ -91,7 +91,7 @@ class gamePage:
 
 
         dico_co = [
-            [(5/100*self.W,(12.5+i*7)/100*self.H),
+            [(4/100*self.W,(12.5+i*7)/100*self.H),
              (1/100*self.W, (11+i*7)/100*self.H, 18/100*self.W, 7/100*self.H),
              (12/100*self.W,(14+i*7)/100*self.H),
              (17.4/100*self.W,(13.2+i*7)/100*self.H),
@@ -100,19 +100,20 @@ class gamePage:
         ]
 
         for y,player in enumerate(gameVar.PLAYERS):
+            text_color=(10,10,10) if player["id"] == gameVar.PLAYER_ID else (100,100,100)
 
-            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==0 else (0,0,0),dico_co[y][1])
+            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][1])
             pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][1][0]+3,dico_co[y][1][1]+3,dico_co[y][1][2]-6,dico_co[y][1][3]-6))
             police = pygame.font.Font("PermanentMarker.ttf" ,30)
-            image_texte = police.render ( player["pseudo"], 1 , (0,0,0) )
+            image_texte = police.render ( player["pseudo"], 1 , text_color )
             police = pygame.font.Font("PermanentMarker.ttf" ,20)
             self.screen.blit(image_texte, dico_co[y][0])
-            image_texte = police.render ( "points:    "+str(player["points"]), 1 , (0,0,0) )
+            image_texte = police.render ( "points:    "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
 
-            image_texte = police.render ( "Trouvé ", 1 , (0,0,0) )
+            image_texte = police.render ( "Trouvé ", 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][4])
-            pygame.draw.circle(self.screen, NOIR, dico_co[y][3], 7)
+            pygame.draw.circle(self.screen, text_color, dico_co[y][3], 7)
             if player["found"]:
                 pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
             else:
@@ -167,10 +168,10 @@ class gamePage:
             return
         
         
-        zone_x_min = int(0.2 * self.W)+2  # 20% de la largeur de la fenêtre
-        zone_x_max = int(0.8 * self.W)+2  # 60% de la largeur de la fenêtre
-        zone_y_min = int(0.04 * self.H)   # Commence en haut de la fenêtre
-        zone_y_max = int(0.96 * self.H)   # Remplie toute la hauteur de la fenêtre
+        zone_x_min = int(0.2 * self.W)+2    # 20% de la largeur de la fenêtre
+        zone_x_max = int(0.8 * self.W)-4    # 60% de la largeur de la fenêtre
+        zone_y_min = int(0.04 * self.H)+2   # Commence en haut de la fenêtre
+        zone_y_max = int(0.96 * self.H)-4   # Remplie toute la hauteur de la fenêtre
         
         canvas_width = len(gameVar.CANVAS[0])
         canvas_height = len(gameVar.CANVAS)
@@ -187,17 +188,33 @@ class gamePage:
 
         #! drawing
         for event in self.events:
-            if self.mouseDown and event.type==pygame.MOUSEMOTION:
+            if self.mouseDown and event.type == pygame.MOUSEMOTION:
                 # Vérifier si le clic est dans la zone de dessin
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
-                    self.is_drawing = True
-                    # Calculer la position du clic dans le tableau CANVAS
-                    canvas_x = (event.pos[0] - zone_x_min) * canvas_width // (zone_x_max - zone_x_min)
-                    canvas_y = (event.pos[1] - zone_y_min) * canvas_height // (zone_y_max - zone_y_min)
-                    tools.draw_canvas(gameVar.CANVAS, canvas_x, canvas_y, self.pen_color, self.pen_radius)  # Dessiner un pixel noir
-                    
-                    asyncio.run(tools.websocket_draw(gameVar.WS, canvas_x, canvas_y, self.pen_color, self.pen_radius))  #send datas
+                    if self.lastMouseDown:
+                        # Position actuelle dans le CANVAS
+                        canvas_x = (event.pos[0] - zone_x_min) // pixel_width
+                        canvas_y = (event.pos[1] - zone_y_min) // pixel_height
 
+                        # Dessiner une ligne entre last_click et la position actuelle
+                        if self.last_canvas_click and self.last_canvas_click != (canvas_x, canvas_y):
+                            x1, y1 = self.last_canvas_click
+                            x2, y2 = canvas_x, canvas_y
+
+                            # Générer les points entre les deux
+                            gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius)
+                            self.frames.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+
+                        # Mettre à jour la dernière position
+                        self.last_canvas_click = (canvas_x, canvas_y)
+
+        #send draw
+        if self.frame_num>=config["game_page_fps"]:
+            self.frame_num=0
+            if self.frames!=[]:
+                asyncio.run(tools.websocket_draw(gameVar.WS, self.frames))  #send datas
+                self.frames=[]
+        
     def couleurs(self):
         """Affiche une palette de couleurs fixes et permet de sélectionner une couleur."""
         palette_x, palette_y = int(0.81 * self.W), int(0.04 * self.H)
@@ -219,7 +236,7 @@ class gamePage:
 
         # Afficher la couleur sélectionnée
         selected_x = palette_x + palette_w // 2 - 50
-        selected_y = palette_y + palette_h - 15
+        selected_y = palette_y + palette_h - 25
         pygame.draw.rect(self.screen, self.pen_color, (selected_x, selected_y, 100, 30))
         pygame.draw.rect(self.screen, (0, 0, 0), (selected_x, selected_y, 100, 30), 2)  # Bordure noire
 
@@ -257,17 +274,24 @@ class gamePage:
         self.screen = pygame.display.set_mode((self.W,self.H))
         pygame.display.set_caption("UIdrawer")
         self.clock = pygame.time.Clock()
-        self.clock.tick(30)
-        
-        #pen values
-        self.pen_color=(0,0,0)
-        self.pen_radius=1
-        self.mouseDown=False
+        self.clock.tick(config["game_page_fps"])
         
         self.me={   "id": -1,
                     "pseudo": "",
                     "points": 0,
                     "found":False,}
+        
+        #pen values
+        self.pen_color=(0,0,0)
+        self.pen_radius=1
+        self.mouseDown=False
+        self.lastMouseDown=False
+        self.last_canvas_click=None
+        
+        #for drawing
+        self.frames=[]
+        self.frame_num=0
+        
         self.running = True
         while self.running:
             
@@ -292,5 +316,10 @@ class gamePage:
                     self.mouseDown=True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown=False
+                    self.last_canvas_click=None
+                if event.type == pygame.MOUSEMOTION and self.mouseDown:
+                    self.lastMouseDown=self.mouseDown
             
             pygame.display.flip()
+            
+            self.frame_num+=1

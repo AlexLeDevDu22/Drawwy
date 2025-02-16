@@ -38,30 +38,17 @@ async def handle_connection_client():
             if data["type"] == "welcome":
                 gameVar.CANVAS=data["canvas"]
                 gameVar.PLAYER_ID=data["id"]
-                gameVar.MESSAGES=data["messages"]
-                gameVar.CURRENT_SENTENCE=data["sentence"]
             else:
                 gameVar.PLAYERS=data["players"]
                 gameVar.CURRENT_SENTENCE=data["sentence"]
+                gameVar.CURRENT_DRAWER=data["drawer_id"]
                 if data["new_message"]:
                     gameVar.MESSAGES.append(data["new_message"])
                     if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
                         gameVar.FOUND=True
-                if data["frames"]:
-                    threading.Thread(target=update_canva_by_frames, args=(data["frames"], data["period"])).start() # update canvas in realtime
-                    pass
-                
-def update_canva_by_frames(frames, period):
-    print(frames)
-    for frame in frames:#draw
-        print(frame)
-        if "color" in frame.keys():
-            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
-        if "radius" in frame.keys():
-            current_drawing_radius=frame["radius"]
-        
-        if gameVar.CANVAS: gameVar.CANVAS=tools.draw_canvas(gameVar.CANVAS, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
-        time.sleep(period)
+                if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
+                    threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+
 
 is_server=not asyncio.run(test_server())
 

@@ -13,16 +13,15 @@ with open("config.yaml", "r") as f:
 server_started=False
 
 #* game variables
-global canvas,players, guess_list, index_drawer, current_sentence
+global canvas,players, guess_list, drawer_id, current_sentence
 players = []
-index_drawer = 0  # ID du joueur actif
+drawer_id = 0  # ID du joueur actif
 guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
 
 current_sentence=tools.get_random_sentence()
 
 # Création du tableau de dessin tous blancs
 canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
-
 
 def start_server():
     # Charger le token ngrok depuis .env
@@ -41,16 +40,14 @@ def start_server():
     global server_started
     server_started=True # server is ready
 
-    async def send_update(frames=None, period=None, new_message=None):
+    async def send_update(frames=None, new_message=None):
         """Envoie les mises à jour de l'état du jeu à tous les joueurs."""
         
-        print(frames)
         state = {
             "type": "update",
             "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
-            "period": period,
             "frames": frames,
-            "drawer": index_drawer,
+            "drawer_id": drawer_id,
             "new_message":new_message,
             "sentence":current_sentence,
             "found":False
@@ -59,11 +56,16 @@ def start_server():
 
     async def broadcast(message):
         """Envoie un message à tous les joueurs connectés."""
-        for player in players:
-            await player["ws"].send(message)
+        try:
+            for player in players:
+                await player["ws"].send(message)
+        except websockets.exceptions.ConnectionClosedError:
+            print("Un joueur s'est déconnecté.")
+            players[:] = [p for p in players if p["ws"] != player["ws"]]
+            await broadcast(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-        global canvas, guess_list, index_drawer, current_sentence
+        global canvas, guess_list, drawer_id, current_sentence
         
         try:
             # Attente du pseudo du joueur
@@ -85,11 +87,7 @@ def start_server():
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
-                    "canvas": canvas,
-                    "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
-                    "turn": index_drawer,
-                    "sentence":current_sentence,
-                    "messages":guess_list
+                    "canvas": canvas
                 }))
 
                 # Envoyer une mise à jour à tous
@@ -100,14 +98,9 @@ def start_server():
 
                 if data["type"] == "draw": #! DRAW
                     # Mise à jour du dessin
-                    for frame in data["frames"]:
-                        if "color" in frame.keys():
-                            current_drawing_color, current_drawing_radius=frame["color"],frame["radius"]
-                        if "radius" in frame.keys():
-                            current_drawing_radius=frame["radius"]
-                        
-                        if canvas: canvas=tools.draw_canvas(canvas, frame["x"], frame["y"], current_drawing_color, current_drawing_radius)
-                    await send_update(data["frames"], data["period"])
+                    print(data["frames"])
+                    canvas=tools.update_canva_by_frames(data["frames"], canvas)
+                    await send_update(data["frames"])
 
                 elif data["type"] == "guess": #! GUESS
                     guess_list.append(data["guess"])
@@ -123,7 +116,6 @@ def start_server():
         except websockets.exceptions.ConnectionClosedOK:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != websocket]
-            print(players)
             await send_update()
             
 
