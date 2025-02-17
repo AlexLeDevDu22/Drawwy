@@ -127,8 +127,8 @@ def start_server():
                                     if players[i]["id"] == drawer_id:
                                         players[i]["points"] -= 1
                                 
-                            if player["id"] != drawer_id:
-                                list_found.append(player["found"])
+                        if player["id"] != drawer_id:
+                            list_found.append(player["found"])
                             
                                 
                             mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
