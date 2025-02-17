@@ -121,7 +121,7 @@ def start_server():
                             succeed=tools.check_sentences(sentences[-1], data["guess"])
                             if succeed:
                                 player["found"] = True
-                                player["points"] += 1
+                                player["points"] += 2
                                 
                                 for i in len(players):
                                     if players[i]["id"] == drawer_id:
