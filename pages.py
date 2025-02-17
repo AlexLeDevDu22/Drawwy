@@ -6,6 +6,7 @@ import yaml
 import tools
 import asyncio
 import json
+import pygetwindow as gw
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -22,30 +23,6 @@ JAUNE=(255,255,0)
 MAGENTA=(255,0,255)
 CYAN=(0,255,255)
 
-connected=False
-def launcher():
-    """Affiche une fenêtre pour entrer le pseudo"""
-    pygame.init()
-    screen = pygame.display.set_mode((400, 200), pygame.NOFRAME)
-    pygame.display.set_caption("Drawwy")
-    clock = pygame.time.Clock()
-
-    while not connected:
-        screen.fill((255, 180, 50))
-        image = pygame.image.load("launcher.png")
-        image = pygame.transform.scale(image, (200, 200))
-        screen.blit(image, (100, 0))
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-                
-        pygame.display.flip()
-        clock.tick(10)
-        
-    pygame.quit()
-
 def input_pseudo():
     """Affiche une fenêtre pour entrer le pseudo"""
     pygame.init()
@@ -56,6 +33,8 @@ def input_pseudo():
     text = ''
     active = True
     clock = pygame.time.Clock()
+    try:gw.getWindowsWithTitle("Entrez votre pseudo")[0].activate()  # First plan
+    except:pass
     
     while True:
         screen.fill(BLANC)
@@ -335,7 +314,9 @@ class gamePage:
         # Dimensions de la fenêtre
         self.W, self.H = tools.get_screen_size()
         self.screen = pygame.display.set_mode((self.W,self.H))
-        pygame.display.set_caption("UIdrawer")
+        pygame.display.set_caption("Drawwy")
+        try:gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
+        except:pass
         self.clock = pygame.time.Clock()
         self.clock.tick(config["game_page_fps"])
         

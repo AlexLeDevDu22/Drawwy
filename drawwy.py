@@ -1,8 +1,9 @@
 import threading
-import pages
-launch_page=threading.Thread(target=pages.launcher)
+import launcher
+launch_page=threading.Thread(target=launcher.launcher)
 launch_page.start()
 
+import pages
 import asyncio
 import websockets
 import json
@@ -59,14 +60,14 @@ if is_server:
     
     threading.Thread(target=server.start_server).start()
     
-    pages.connected=True
+    launcher.connected=True
     launch_page.join()
     PSEUDO = pages.input_pseudo()
 
     while not server.server_started:
         time.sleep(0.1)
 else:
-    pages.connected=True
+    launcher.connected=True
     launch_page.join()
     PSEUDO = pages.input_pseudo()
 
