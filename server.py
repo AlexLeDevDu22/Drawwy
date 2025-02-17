@@ -119,7 +119,6 @@ def start_server():
                     succeed=False
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
-                            #await send_update(new_message={"guess":data["guess"], "id":player["id"], "succeed":succeed})
                             succeed=tools.check_sentences(sentences_list[-1], data["guess"])
                             if succeed:
                                 player["found"] = True
@@ -128,25 +127,26 @@ def start_server():
                                 for i in len(players):
                                     if players[i]["id"] == drawer_id:
                                         players[i]["points"] -= 1
+                                        
+                            mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
                                 
                         if player["id"] != drawer_id:
                             list_found.append(player["found"])
                             
-                        mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
-                            
-                            
+                        
+                        
                     guess_list.append(mess)
                     
                     new_game=False
                     if all(list_found):
-                        new_game=datetime.now()
-                        last_game_start=new_game
+                        new_game=True
+                        last_game_start=datetime.now()
                         
                         sentences_list.append(sentences.new_sentence())
                         
                         canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                         guess_list=[]
-                    
+
                     await send_update(new_message=mess, new_game=new_game)
                         
                 elif data["type"] == "game_finished":
@@ -161,6 +161,8 @@ def start_server():
                     
                     canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                     guess_list=[]
+                    
+                    last_game_start=datetime.now()
 
                     await send_update(new_game=True)
 
