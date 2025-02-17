@@ -128,11 +128,16 @@ class gamePage:
             
             #save draw
             if self.me["id"] == gameVar.CURRENT_DRAWER:
-                with open("your_best_draws.json", "w", encoding="utf-8") as f:
-                    if not gameVar.CANVAS in json.loads(f.read()):
-                        data=json.loads(f.read())
-                        data.append(gameVar.CANVAS)
-                        json.dump(data, f)
+                with open("your_best_draws.json", "r", encoding="utf-8") as f:
+                    data = json.load(f)  # Charge le contenu du fichier JSON dans une variable
+
+                # Vérifie si CANVAS n'est pas déjà dans les données
+                if gameVar.CANVAS not in data:
+                    data.append(gameVar.CANVAS)  # Ajoute CANVAS aux données
+
+                    # Ouvre à nouveau le fichier en mode écriture pour sauvegarder les modifications
+                    with open("your_best_draws.json", "w", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=4) 
             
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
@@ -167,12 +172,12 @@ class gamePage:
             if player["id"] != gameVar.CURRENT_DRAWER:
                 image_texte = font.render ( "Trouvé ", 1 , text_color )
                 self.screen.blit(image_texte, dico_co[y][4])
-                
-            pygame.draw.circle(self.screen, text_color, dico_co[y][3], 7)
-            if player["found"]:
-                pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
-            else:
-                pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
+                    
+                pygame.draw.circle(self.screen, text_color, dico_co[y][3], 7)
+                if player["found"]:
+                    pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
+                else:
+                    pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
         text= "Phrase à trouver:" if (not self.me["found"]) and self.me["id"] != gameVar.CURRENT_DRAWER else "Phrase à faire deviner:"
@@ -431,7 +436,7 @@ class gamePage:
                 self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
                 
                 if gameVar.GAMESTART:
-                    print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)
+                    pass#print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)
             
             for player in gameVar.PLAYERS:
                 if player["id"] == gameVar.PLAYER_ID:
