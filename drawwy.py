@@ -43,7 +43,7 @@ async def handle_connection_client():
                 gameVar.CURRENT_SENTENCE=data["sentence"]
                 gameVar.CURRENT_DRAWER=data["drawer_id"]
                 if data["new_message"] and data["new_message"]["player_id"] != gameVar.PLAYER_ID:
-                    gameVar.MESSAGES.append(data["new_message"])
+                    asyncio.create_task(gameVar.MESSAGES.append(data["new_message"]))
                     if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
                         gameVar.FOUND=True
                 if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer

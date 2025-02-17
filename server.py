@@ -107,7 +107,7 @@ def start_server():
                 elif data["type"] == "guess": #! GUESS
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
-                            await send_update(new_message=mess)
+                            await send_update(new_message={"guess":data["guess"], "id":player["id"], "succeed":succeed})
                             succeed=tools.check_sentence(sentences[-1], data["guess"])
                             print("succeed", succeed)
                             if succeed:
