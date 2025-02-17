@@ -27,6 +27,14 @@ def get_random_sentence():
     with open("Max/phrases_droles_v2.json") as f:
         return random.choice(json.load(f))
     
+model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
+
+def check_sentences(phrase1, phrase2):
+    global model
+    emb1 = model.encode(phrase1, convert_to_tensor=True)
+    emb2 = model.encode(phrase2, convert_to_tensor=True)
+    score = util.pytorch_cos_sim(emb1, emb2).item()
+    return score>config["sentence_checker_seuil"]
     
 async def send_message(websocket, message):
     await websocket.send(json.dumps({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message}))
@@ -42,8 +50,6 @@ async def websocket_draw(websocket, frames):
             del frame["radius"]
     
     await websocket.send(json.dumps({"type":"draw","frames":frames}))
-
-model=None
 
 def update_canva_by_frames(frames, specified_canva=None):
     current_drawing_color=(0,0,0)

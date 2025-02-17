@@ -115,7 +115,12 @@ class gamePage:
         
         if self.game_remaining_time==0:
             if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
-                asyncio.create_task(gameVar.WS.send(json.dumps({"type":"game_finished"})))
+                try:
+                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                    asyncio.set_event_loop(loop)
+                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
                 
             gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
             self.game_remaining_time=config["game_duration"]
@@ -127,7 +132,12 @@ class gamePage:
             for player in gameVar.PLAYERS:
                 list_found.append(player["found"])
             if all(list_found):
-                asyncio.create_task(gameVar.WS.send(json.dumps({"type":"game_finished"})))
+                try:
+                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                    asyncio.set_event_loop(loop)
+                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
             
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
@@ -368,6 +378,7 @@ class gamePage:
                     except RuntimeError:
                         loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                         asyncio.set_event_loop(loop)
+                    asyncio.run(tools.send_message(gameVar.WS, self.guess))
                     gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:

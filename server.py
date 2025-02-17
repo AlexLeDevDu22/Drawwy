@@ -20,7 +20,7 @@ ngrok_domain = os.getenv("NGROK_DOMAIN")
 ngrok.set_auth_token(ngrok_token)
 
 #* game variables
-global canvas,players, guess_list, drawer_id, current_sentence
+global canvas,players, guess_list, drawer_id, sentences
 players = []
 drawer_id = 0  # ID du joueur actif
 guess_list=[]
@@ -69,13 +69,13 @@ def start_server():
 
     async def handle_connection_server(websocket):  # Correction ici
         global canvas, guess_list, drawer_id, sentences
-        
         try:
             # Attente du pseudo du joueur
             data = json.loads(await websocket.recv())
 
             if data["type"] == "join": #! JOINING
                 pseudo = data["pseudo"]
+                print("id", 0 if players==[] else players[-1]["id"] + 1)
                 player_id = 0 if players==[] else players[-1]["id"] + 1 # ID unique
                 new_player = {
                     "id": player_id,
@@ -90,7 +90,8 @@ def start_server():
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
-                    "canvas": canvas
+                    "canvas": canvas,
+                    "messages":guess_list,
                 }))
 
                 # Envoyer une mise à jour à tous
@@ -107,27 +108,27 @@ def start_server():
                 elif data["type"] == "guess": #! GUESS
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
-                            await send_update(new_message={"guess":data["guess"], "id":player["id"], "succeed":succeed})
-                            succeed=tools.check_sentence(sentences[-1], data["guess"])
-                            print("succeed", succeed)
+                            #await send_update(new_message={"guess":data["guess"], "id":player["id"], "succeed":succeed})
+                            succeed=tools.check_sentences(sentences[-1], data["guess"])
                             if succeed:
                                 player["found"] = True
                                 player["points"] += 1
                                 
-                            mess={"guess":data["guess"], "id":player["id"], "succeed":succeed}
+                            mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
                             await send_update(new_message=mess)
-                                
-                            break
+                            
                     guess_list.append(mess)
                         
                 elif data["type"] == "game_finished":
                     for player in players:
                         player["found"]=False
-                            
+                    print(drawer_id)
                     for i in range(len(players)):
-                        if player["id"] == drawer_id:
+                        print(player["id"], drawer_id)
+                        if int(player["id"]) == int(drawer_id):
                             drawer_id = players[(i+1)%len(players)]["id"]
                             break
+                    print(drawer_id)
                         
                     sentences.append(tools.get_random_sentence())
                     

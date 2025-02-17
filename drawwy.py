@@ -38,12 +38,13 @@ async def handle_connection_client():
             if data["type"] == "welcome":
                 gameVar.CANVAS=data["canvas"]
                 gameVar.PLAYER_ID=data["id"]
+                gameVar.MESSAGES=data["messages"]
             else:
                 gameVar.PLAYERS=data["players"]
                 gameVar.CURRENT_SENTENCE=data["sentence"]
                 gameVar.CURRENT_DRAWER=data["drawer_id"]
                 if data["new_message"] and data["new_message"]["player_id"] != gameVar.PLAYER_ID:
-                    asyncio.create_task(gameVar.MESSAGES.append(data["new_message"]))
+                    gameVar.MESSAGES.append(data["new_message"])
                     if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
                         gameVar.FOUND=True
                 if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer

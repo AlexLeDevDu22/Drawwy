@@ -3,6 +3,7 @@ from sentence_transformers import SentenceTransformer, util
 model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
 
 def phrases_similaires(phrase1, phrase2):
+    global model
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
