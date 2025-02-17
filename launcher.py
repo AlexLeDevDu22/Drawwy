@@ -6,6 +6,7 @@ def launcher():
     global connected
 
     pygame.init()
+    pygame.display.set_icon(pygame.image.load("launcher.png"))
     screen = pygame.display.set_mode((350, 300), pygame.NOFRAME)
     pygame.display.set_caption("Drawwy")
     clock = pygame.time.Clock()

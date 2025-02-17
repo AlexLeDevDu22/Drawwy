@@ -26,6 +26,7 @@ CYAN=(0,255,255)
 def input_pseudo():
     """Affiche une fenêtre pour entrer le pseudo"""
     pygame.init()
+    pygame.display.set_icon(pygame.image.load("launcher.png"))
     screen = pygame.display.set_mode((400, 200))
     pygame.display.set_caption("Entrez votre pseudo")
     font = pygame.font.Font(None, 36)
@@ -112,11 +113,16 @@ class gamePage:
         # Afficher le texte du timer
         self.screen.blit(text_surface, text_rect)
         
-        
-        if self.me["id"] == gameVar.CURRENT_DRAWER and self.game_remaining_time==0: #if game time over
-            gameVar["WS"].send(json.dumps({"type":"game_finished"}))
+        if self.game_remaining_time==0:
+            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
+                gameVar.WS.send(json.dumps({"type":"game_finished"}))
+                
+            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+            self.game_remaining_time=config["game_duration"]
+            gameVar.FOUND=False
+            gameVar.MESSAGES=[]
             
-        if self.me["id"] == gameVar.CURRENT_DRAWER:
+        if self.me["id"] == gameVar.CURRENT_DRAWER: # if everybody found
             list_found=[]
             for player in gameVar.PLAYERS:
                 list_found.append(player["found"])
@@ -241,8 +247,7 @@ class gamePage:
             if self.mouseDown and event.type == pygame.MOUSEMOTION:
                 # Vérifier si le clic est dans la zone de dessin
                 if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
-                    print(True)
-                    if self.lastMouseDown:
+                    if self.lastMouseDown and self.me["id"] == gameVar.CURRENT_DRAWER and 0<self.game_remaining_time<config["game_duration"]: # can draw
                         # Position actuelle dans le CANVAS
                         canvas_x = (event.pos[0] - zone_x_min) // self.pixel_width
                         canvas_y = (event.pos[1] - zone_y_min) // self.pixel_height
@@ -341,7 +346,7 @@ class gamePage:
     def chat(self):
         #(0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
 
-        for i,mess in enumerate(gameVar.MESSAGES):
+        for i,mess in enumerate(gameVar.MESSAGES):  
             color=(0,255,0) if mess["succeed"] else (0,0,0)
             font = pygame.font.Font("PermanentMarker.ttf" ,16)
             image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
@@ -359,7 +364,7 @@ class gamePage:
             if event.type == pygame.KEYDOWN and self.guess_input_active:
                 if event.key == pygame.K_RETURN and self.guess.strip() and self.me["id"]!=gameVar.CURRENT_DRAWER:
                     tools.send_message(gameVar.WS, self.guess)
-                    gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess})
+                    gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
                     self.guess = self.guess[:-1]
@@ -376,6 +381,7 @@ class gamePage:
     
     def __init__(self):
         pygame.init()
+        pygame.display.set_icon(pygame.image.load("launcher.png"))
         
         # Dimensions de la fenêtre
         self.W, self.H = tools.get_screen_size()

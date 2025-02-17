@@ -105,18 +105,19 @@ def start_server():
                     await send_update(data["frames"])
 
                 elif data["type"] == "guess": #! GUESS
-                    guess_list.append(data["guess"])
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
                             succeed=tools.check_sentence(sentences[-1], data["guess"])
+                            print("succeed", succeed)
                             if succeed:
                                 player["found"] = True
                                 player["points"] += 1
-                                await send_update(new_message={"guess":data["guess"], "id":player["id"], succeed:True}, only_drawer=True)
-                            else:
-                                await send_update(new_message={"guess":data["guess"], "id":player["id"], succeed:True})
+                                
+                            mess={"guess":data["guess"], "id":player["id"], "succeed":succeed}
+                            await send_update(new_message=mess)
                                 
                             break
+                    guess_list.append(mess)
                         
                 elif data["type"] == "game_finished":
                     for player in players:
