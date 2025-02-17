@@ -7,6 +7,7 @@ import os
 import tools
 import yaml
 from datetime import datetime
+import sentences
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -21,12 +22,12 @@ ngrok_domain = os.getenv("NGROK_DOMAIN")
 ngrok.set_auth_token(ngrok_token)
 
 #* game variables
-global canvas,players, guess_list, drawer_id, sentences
+global canvas,players, guess_list, drawer_id, sentences_list
 players = []
 drawer_id = 0  # ID du joueur actif
 guess_list=[]
 
-sentences=[tools.get_random_sentence()]
+sentences_list=[sentences.new_sentence()]
 
 last_game_start=None
 
@@ -53,7 +54,7 @@ def start_server():
             "frames": frames,
             "drawer_id": drawer_id,
             "new_message":new_message,
-            "sentence":sentences[-1],
+            "sentence":sentences_list[-1],
             "found":False,
             "new_game":last_game_start.isoformat() if new_game else False
         }
@@ -72,7 +73,7 @@ def start_server():
             await broadcast(message, only_drawer)
 
     async def handle_connection_server(websocket):  # Correction ici
-        global canvas, guess_list, drawer_id, sentences, last_game_start
+        global canvas, guess_list, drawer_id, sentences_list, last_game_start
         try:
             # Attente du pseudo du joueur
             data = json.loads(await websocket.recv())
@@ -115,10 +116,11 @@ def start_server():
 
                 elif data["type"] == "guess": #! GUESS
                     list_found=[]
+                    succeed=False
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
                             #await send_update(new_message={"guess":data["guess"], "id":player["id"], "succeed":succeed})
-                            succeed=tools.check_sentences(sentences[-1], data["guess"])
+                            succeed=tools.check_sentences(sentences_list[-1], data["guess"])
                             if succeed:
                                 player["found"] = True
                                 player["points"] += 2
@@ -139,6 +141,11 @@ def start_server():
                     if all(list_found):
                         new_game=datetime.now()
                         last_game_start=new_game
+                        
+                        sentences_list.append(sentences.new_sentence())
+                        
+                        canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+                        guess_list=[]
                     
                     await send_update(new_message=mess, new_game=new_game)
                         
@@ -150,7 +157,7 @@ def start_server():
                             drawer_id = players[(i+1)%len(players)]["id"]
                             break
                         
-                    sentences.append(tools.get_random_sentence())
+                    sentences_list.append(sentences.new_sentence())
                     
                     canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                     guess_list=[]
