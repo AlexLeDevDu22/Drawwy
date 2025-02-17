@@ -130,8 +130,7 @@ def start_server():
                         if player["id"] != drawer_id:
                             list_found.append(player["found"])
                             
-                                
-                            mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
+                        mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
                             
                             
                     guess_list.append(mess)

@@ -420,7 +420,7 @@ class gamePage:
         self.running = True
         while self.running:
             
-            if self.frame_num==0:
+            if self.frame_num<5:
                 self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds if gameVar.GAMESTART else config["game_duration"]
             
             for player in gameVar.PLAYERS:
