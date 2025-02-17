@@ -126,6 +126,14 @@ class gamePage:
                 asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
             gameVar.GAMESTART=datetime.now()
             
+            #save draw
+            if self.me["id"] == gameVar.CURRENT_DRAWER:
+                with open("your_best_draws.json", "w", encoding="utf-8") as f:
+                    if not gameVar.CANVAS in json.loads(f.read()):
+                        data=json.loads(f.read())
+                        data.append(gameVar.CANVAS)
+                        json.dump(data, f)
+            
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
     
@@ -345,7 +353,7 @@ class gamePage:
     def chat(self):
         #(0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
 
-        for i,mess in enumerate(gameVar.MESSAGES):  
+        for i,mess in enumerate(gameVar.MESSAGES[-10:]):  
             color=(0,255,0) if mess["succeed"] else (0,0,0)
             font = pygame.font.Font("PermanentMarker.ttf" ,16)
             image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
