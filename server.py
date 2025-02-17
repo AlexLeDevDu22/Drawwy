@@ -124,8 +124,8 @@ def start_server():
                         player["found"]=False
                     print(drawer_id)
                     for i in range(len(players)):
-                        print(player["id"], drawer_id)
-                        if int(player["id"]) == int(drawer_id):
+                        print(players[i]["id"], drawer_id)
+                        if int(players[i]["id"]) == int(drawer_id):
                             drawer_id = players[(i+1)%len(players)]["id"]
                             break
                     print(drawer_id)
