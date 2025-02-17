@@ -25,25 +25,25 @@ actions = [
     "qui fait un duel au sabre avec un dark-vador"
 ]
 
-details = [
-    "avec un chapeau de paille", "avec un perroquet de compagnie", "avec des lunettes de soleil", "avec une pizza à la main",
-    "avec un ballon de foot", "avec des ailes de papillon", "en train de faire du skateboard", "avec une baguette magique", 
-    "avec une moustache géante", "avec un tuba et des palmes", "avec une guitare", "avec des cheveux en feu", 
-    "avec un parapluie", "avec des chaussettes dépareillées", "avec un gâteau géant", "avec un masque de super-héros", 
-    "avec des boucles d'oreilles en forme de cœur", "avec un smartphone", "avec un costume de clown", "avec un énorme sourire", 
-    "avec une cape de super-héros", "avec une tasse de chocolat chaud", "avec un appareil photo", "avec des coussins partout", 
-    "avec des lunettes 3D", "avec des ballons gonflés", "avec une grosse barbe", "avec un casque de vélo", 
-    "avec une cape en écharpe", "avec un t-shirt fluo", "avec des extraterrestes autour", "avec un costume de pirate", 
-    "avec un sac à dos énorme", "avec un drone volant autour", "avec une pizza géante", "avec un cheval en bois", 
-    "avec des paillettes partout", "avec un sac à main", "avec des écouteurs géants", "avec un ballon de baudruche", 
-    "avec des lunettes à moustache", "avec une couronne en papier", "avec un chat sur l'épaule", "avec un cactus", 
-    "avec des palmes géantes", "avec un tapis volant", "avec un soleil en fond", "avec des chaussons en forme d'animaux", 
-    "avec des tatouages temporaires", "avec des pattes de lapin", "avec un chaton", "avec une tasse de thé", 
-    "avec des étoiles autour", "avec une fusée en arrière-plan", "avec un sac de bonbons", "avec un oreiller", 
-    "avec des lunettes de ski", "avec une écharpe en laine", "avec une raquette de tennis", "avec un vélo sur le dos", 
-    "avec une poignée de fleurs", "avec un bouquet de roses", "avec des chocolats", "avec des glaces", "avec des feux d'artifice",
-    "avec des guirlandes", "avec un skate", "avec une bouée", "avec des chaussettes rigolotes", "avec un coussin"
-]
+# details = [
+#     "avec un chapeau de paille", "avec un perroquet de compagnie", "avec des lunettes de soleil", "avec une pizza à la main",
+#     "avec un ballon de foot", "avec des ailes de papillon", "en train de faire du skateboard", "avec une baguette magique", 
+#     "avec une moustache géante", "avec un tuba et des palmes", "avec une guitare", "avec des cheveux en feu", 
+#     "avec un parapluie", "avec des chaussettes dépareillées", "avec un gâteau géant", "avec un masque de super-héros", 
+#     "avec des boucles d'oreilles en forme de cœur", "avec un smartphone", "avec un costume de clown", "avec un énorme sourire", 
+#     "avec une cape de super-héros", "avec une tasse de chocolat chaud", "avec un appareil photo", "avec des coussins partout", 
+#     "avec des lunettes 3D", "avec des ballons gonflés", "avec une grosse barbe", "avec un casque de vélo", 
+#     "avec une cape en écharpe", "avec un t-shirt fluo", "avec des extraterrestes autour", "avec un costume de pirate", 
+#     "avec un sac à dos énorme", "avec un drone volant autour", "avec une pizza géante", "avec un cheval en bois", 
+#     "avec des paillettes partout", "avec un sac à main", "avec des écouteurs géants", "avec un ballon de baudruche", 
+#     "avec des lunettes à moustache", "avec une couronne en papier", "avec un chat sur l'épaule", "avec un cactus", 
+#     "avec des palmes géantes", "avec un tapis volant", "avec un soleil en fond", "avec des chaussons en forme d'animaux", 
+#     "avec des tatouages temporaires", "avec des pattes de lapin", "avec un chaton", "avec une tasse de thé", 
+#     "avec des étoiles autour", "avec une fusée en arrière-plan", "avec un sac de bonbons", "avec un oreiller", 
+#     "avec des lunettes de ski", "avec une écharpe en laine", "avec une raquette de tennis", "avec un vélo sur le dos", 
+#     "avec une poignée de fleurs", "avec un bouquet de roses", "avec des chocolats", "avec des glaces", "avec des feux d'artifice",
+#     "avec des guirlandes", "avec un skate", "avec une bouée", "avec des chaussettes rigolotes", "avec un coussin"
+# ]
 
 
 def new_sentence():
@@ -52,6 +52,6 @@ def new_sentence():
     sujet = random.choice(sujets)
     action = random.choice(actions)
     detail = random.choice(details)
-    sentence = f"{sujet} {action} {detail}"
+    sentence = f"{sujet} {action}"
         
     return sentence
