@@ -12,6 +12,11 @@ from dotenv import load_dotenv
 import tools
 import time
 import gameVar
+import yaml
+from datetime import datetime
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 async def test_server():
     try:
@@ -49,6 +54,11 @@ async def handle_connection_client():
                         gameVar.FOUND=True
                 if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
                     threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+                if data["new_game"]:
+                    gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+                    gameVar.FOUND=False
+                    gameVar.MESSAGES=[]
+                    gameVar.GAMESTART=datetime.fromisoformat(data["new_game"])
 
 load_dotenv()
 NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")

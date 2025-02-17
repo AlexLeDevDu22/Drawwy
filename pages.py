@@ -7,6 +7,7 @@ import tools
 import asyncio
 import json
 import pygetwindow as gw
+from datetime import datetime, timedelta
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -90,7 +91,18 @@ class gamePage:
             
             
     def timer(self):
-        if self.frame_num==config["game_page_fps"]-1 and len(gameVar.PLAYERS)>1:
+        if self.game_remaining_time==0:
+            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
+                try:
+                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                    asyncio.set_event_loop(loop)
+                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
+            self.game_remaining_time=config["game_duration"]
+            
+        if len(gameVar.PLAYERS)==1: return
+        if self.frame_num==config["game_page_fps"]-1:
             self.game_remaining_time=max(0,self.game_remaining_time-1)
             
         timer_text = f"{self.game_remaining_time//60}:{0 if self.game_remaining_time%60<10 else ''}{self.game_remaining_time%60}"
@@ -113,31 +125,6 @@ class gamePage:
         # Afficher le texte du timer
         self.screen.blit(text_surface, text_rect)
         
-        if self.game_remaining_time==0:
-            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
-                try:
-                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                except RuntimeError:
-                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                    asyncio.set_event_loop(loop)
-                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
-                
-            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
-            self.game_remaining_time=config["game_duration"]
-            gameVar.FOUND=False
-            gameVar.MESSAGES=[]
-            
-        if self.me["id"] == gameVar.CURRENT_DRAWER: # if everybody found
-            list_found=[]
-            for player in gameVar.PLAYERS:
-                list_found.append(player["found"])
-            if all(list_found):
-                try:
-                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                except RuntimeError:
-                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                    asyncio.set_event_loop(loop)
-                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
             
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
@@ -169,8 +156,10 @@ class gamePage:
             image_texte = font.render ( "points:    "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
 
-            image_texte = font.render ( "Trouvé ", 1 , text_color )
-            self.screen.blit(image_texte, dico_co[y][4])
+            if player["id"] != gameVar.CURRENT_DRAWER:
+                image_texte = font.render ( "Trouvé ", 1 , text_color )
+                self.screen.blit(image_texte, dico_co[y][4])
+                
             pygame.draw.circle(self.screen, text_color, dico_co[y][3], 7)
             if player["found"]:
                 pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
@@ -430,6 +419,9 @@ class gamePage:
         
         self.running = True
         while self.running:
+            
+            if self.frame_num==0:
+                self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds if gameVar.GAMESTART else config["game_duration"]
             
             for player in gameVar.PLAYERS:
                 if player["id"] == gameVar.PLAYER_ID:
