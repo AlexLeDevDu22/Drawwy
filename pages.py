@@ -387,7 +387,7 @@ class gamePage:
                 if event.type == pygame.MOUSEMOTION and self.mouseDown:
                     self.lastMouseDown=self.mouseDown
             
-            pygame.display.flip()
+            if self.running: pygame.display.flip()
             
             self.frame_num=(self.frame_num+1)%config["game_page_fps"]
             self.clock.tick(config["game_page_fps"])
