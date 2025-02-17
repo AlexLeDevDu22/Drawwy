@@ -91,7 +91,7 @@ class gamePage:
             
             
     def timer(self):
-        if self.game_remaining_time==0 and not self.game_finished:
+        if self.game_remaining_time==0:
             if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
                 try:
                     loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
@@ -99,7 +99,7 @@ class gamePage:
                     loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                     asyncio.set_event_loop(loop)
                 asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
-            self.game_finished = True
+            gameVar.GAMESTART=datetime.now()
         if len(gameVar.PLAYERS)==1: return
         if self.frame_num==config["game_page_fps"]-1:
             self.game_remaining_time=max(0,self.game_remaining_time-1)
@@ -395,7 +395,6 @@ class gamePage:
         self.clock = pygame.time.Clock()
         self.clock.tick(config["game_page_fps"])
         
-        self.game_finished=False
         self.game_remaining_time=config["game_duration"]
         
         self.me={   "id": -1,
@@ -419,9 +418,11 @@ class gamePage:
         
         self.running = True
         while self.running:
-            
             if self.frame_num<5:
                 self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds if gameVar.GAMESTART else config["game_duration"]
+                
+                if gameVar.GAMESTART:
+                    print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)
             
             for player in gameVar.PLAYERS:
                 if player["id"] == gameVar.PLAYER_ID:

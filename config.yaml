@@ -1,5 +1,5 @@
 sentence_checker_seuil: 0.8
-game_duration: 120
+game_duration: 10
 canvas_height: 200
 canvas_width: 200
 
