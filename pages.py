@@ -115,6 +115,7 @@ class gamePage:
         
         if self.game_remaining_time==0:
             if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
+                print("game_fini")
                 gameVar.WS.send(json.dumps({"type":"game_finished"}))
                 
             gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
@@ -362,13 +363,13 @@ class gamePage:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.guess_input_active = input_box.collidepoint(event.pos)
             if event.type == pygame.KEYDOWN and self.guess_input_active:
-                if event.key == pygame.K_RETURN and self.guess.strip() and self.me["id"]!=gameVar.CURRENT_DRAWER:
+                if event.key == pygame.K_RETURN and self.guess.strip():
                     tools.send_message(gameVar.WS, self.guess)
                     gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
                     self.guess = self.guess[:-1]
-                elif self.me["id"]!=gameVar.CURRENT_DRAWER:
+                else:
                     self.guess += event.unicode
 
         # Mise à jour visuelle

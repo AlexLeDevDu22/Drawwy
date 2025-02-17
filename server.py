@@ -107,6 +107,7 @@ def start_server():
                 elif data["type"] == "guess": #! GUESS
                     for player in players: #found the player
                         if player["id"] == data["player_id"]:
+                            await send_update(new_message=mess)
                             succeed=tools.check_sentence(sentences[-1], data["guess"])
                             print("succeed", succeed)
                             if succeed:
@@ -121,8 +122,7 @@ def start_server():
                         
                 elif data["type"] == "game_finished":
                     for player in players:
-                        if player["found"]:
-                            player["found"]=False
+                        player["found"]=False
                             
                     for i in range(len(players)):
                         if player["id"] == drawer_id:
