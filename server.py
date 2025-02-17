@@ -136,6 +136,7 @@ def start_server():
                             
                     guess_list.append(mess)
                     
+                    new_game=False
                     if all(list_found):
                         new_game=datetime.now()
                         last_game_start=new_game
