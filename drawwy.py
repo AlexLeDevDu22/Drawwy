@@ -1,17 +1,16 @@
+import threading
+import pages
+launch_page=threading.Thread(target=pages.launcher)
+launch_page.start()
+
 import asyncio
 import websockets
 import json
 import os
 from dotenv import load_dotenv
-import threading
-import pygame
 import tools
-import pages
 import time
 import gameVar
-
-load_dotenv()
-NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
 
 async def test_server():
     try:
@@ -49,6 +48,8 @@ async def handle_connection_client():
                 if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
                     threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
 
+load_dotenv()
+NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
 
 is_server=not asyncio.run(test_server())
 
@@ -56,23 +57,22 @@ if is_server:
     # start the serv
     import server
     
-    serv_thread=threading.Thread(target=server.start_server)
-    serv_thread.start()
+    threading.Thread(target=server.start_server).start()
     
-    pygame.init()
+    pages.connected=True
+    launch_page.join()
     PSEUDO = pages.input_pseudo()
 
     while not server.server_started:
         time.sleep(0.1)
 else:
-    pygame.init()
+    pages.connected=True
+    launch_page.join()
     PSEUDO = pages.input_pseudo()
 
 threading.Thread(target=lambda: asyncio.run(handle_connection_client()),daemon=True).start()# start the web connection
 
 pages.gamePage()
-
-pygame.quit()#for not crash
 
 if is_server:
     server.stop_server()

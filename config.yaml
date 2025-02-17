@@ -3,7 +3,7 @@ game_duration: 60
 canvas_height: 200
 canvas_width: 200
 
-game_page_fps: 30
+game_page_fps: 50
 refresh_drawing_time: 1
 
 players_colors:

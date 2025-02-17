@@ -35,16 +35,12 @@ async def websocket_draw(websocket, frames):
     #simplify frames
     
     color, radius=None, None
-    for i,frame in enumerate(frames):
+    for frame in frames:
         if frame["color"]==color:
-            del frames[i]["color"]
-        else:
-            color=frame["color"]
+            del frame["color"]
         if frame["radius"]==radius: 
-            del frames[i]["radius"]
-        else:
-            radius=frame["radius"]
-    print(json.dumps({"type":"draw","frames":frames}))
+            del frame["radius"]
+    
     await websocket.send(json.dumps({"type":"draw","frames":frames}))
 
 model=None
@@ -54,7 +50,7 @@ def update_canva_by_frames(frames, specified_canva=None):
     current_drawing_radius=1
     
     for frame in frames:#draw
-        time.sleep(0.5/len(frames))
+        time.sleep(0.45/len(frames))
         if "color" in frame.keys():
             current_drawing_color=frame["color"]
         if "radius" in frame.keys():
@@ -65,7 +61,7 @@ def update_canva_by_frames(frames, specified_canva=None):
         else:
             gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
         
-        time.sleep(0.5/len(frames))
+        time.sleep(0.45/len(frames))
     
     if specified_canva:
         return specified_canva
