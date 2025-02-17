@@ -76,9 +76,10 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius):
         return 0 <= x < width and 0 <= y < height
 
     # Fonction pour dessiner un cercle dans canvas
+    radius=max(radius//4,1)
     def draw_circle(cx, cy):
-        for i in range(-radius, radius + 1):
-            for j in range(-radius, radius + 1):
+        for i in range(-radius, radius):
+            for j in range(-radius, radius):
                 if i ** 2 + j ** 2 <= radius ** 2:  # Vérifie si (i, j) est dans le cercle
                     if in_bounds(cx + i, cy + j):
                         canvas[cy + j][cx + i] = color

@@ -23,7 +23,7 @@ ngrok.set_auth_token(ngrok_token)
 global canvas,players, guess_list, drawer_id, current_sentence
 players = []
 drawer_id = 0  # ID du joueur actif
-guess_list=[{"guess": "message gros.", "pseudo": "pseudo gros."}]
+guess_list=[]
 
 sentences=[tools.get_random_sentence()]
 
@@ -41,7 +41,7 @@ def start_server():
     global server_started
     server_started=True # server is ready
 
-    async def send_update(frames=None, new_message=None):
+    async def send_update(frames=None, new_message=None, only_drawer=False):
         """Envoie les mises à jour de l'état du jeu à tous les joueurs."""
         
         state = {
@@ -53,17 +53,19 @@ def start_server():
             "sentence":sentences[-1],
             "found":False
         }
-        await broadcast(json.dumps(state))
+        await broadcast(json.dumps(state), only_drawer)
 
-    async def broadcast(message):
+    async def broadcast(message, only_drawer):
         """Envoie un message à tous les joueurs connectés."""
         try:
             for player in players:
-                await player["ws"].send(message)
+                if (not only_drawer) or player["id"] == drawer_id:
+                    await player["ws"].send(message)
+                    
         except websockets.exceptions.ConnectionClosedError:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != player["ws"]]
-            await broadcast(message)
+            await broadcast(message, only_drawer)
 
     async def handle_connection_server(websocket):  # Correction ici
         global canvas, guess_list, drawer_id, sentences
@@ -110,7 +112,10 @@ def start_server():
                             if succeed:
                                 player["found"] = True
                                 player["points"] += 1
-                            await send_update(new_message={"guess":data["guess"], "id":player["id"]})
+                                await send_update(new_message={"guess":data["guess"], "id":player["id"], succeed:True}, only_drawer=True)
+                            else:
+                                await send_update(new_message={"guess":data["guess"], "id":player["id"], succeed:True})
+                                
                             break
                         
                 elif data["type"] == "game_finished":
