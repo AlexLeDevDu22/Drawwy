@@ -96,7 +96,7 @@ def start_server():
                     "id": player_id,
                     "canvas": canvas,
                     "messages":guess_list,
-                    "new_game":last_game_start
+                    "new_game":last_game_start.isoformat() if last_game_start else False,
                 }))
 
                 if len(players)==2:
