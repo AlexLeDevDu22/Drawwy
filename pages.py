@@ -91,15 +91,7 @@ class gamePage:
             
             
     def timer(self):
-        if self.game_remaining_time==0:
-            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
-                try:
-                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                except RuntimeError:
-                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                    asyncio.set_event_loop(loop)
-                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
-            gameVar.GAMESTART=datetime.now()
+            
         if len(gameVar.PLAYERS)==1: return
         if self.frame_num==config["game_page_fps"]-1:
             self.game_remaining_time=max(0,self.game_remaining_time-1)
@@ -124,6 +116,15 @@ class gamePage:
         # Afficher le texte du timer
         self.screen.blit(text_surface, text_rect)
         
+        if self.game_remaining_time==0:
+            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
+                try:
+                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                    asyncio.set_event_loop(loop)
+                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
+            gameVar.GAMESTART=datetime.now()
             
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
@@ -152,7 +153,7 @@ class gamePage:
             image_texte = font.render ( player["pseudo"], 1 , text_color )
             font = pygame.font.Font("PermanentMarker.ttf" ,20)
             self.screen.blit(image_texte, dico_co[y][0])
-            image_texte = font.render ( "points:    "+str(player["points"]), 1 , text_color )
+            image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
 
             if player["id"] != gameVar.CURRENT_DRAWER:
@@ -418,8 +419,8 @@ class gamePage:
         
         self.running = True
         while self.running:
-            if self.frame_num<5:
-                self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds if gameVar.GAMESTART else config["game_duration"]
+            if self.frame_num==0:
+                self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
                 
                 if gameVar.GAMESTART:
                     print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)

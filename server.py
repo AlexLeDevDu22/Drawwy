@@ -144,6 +144,9 @@ def start_server():
                         
                         sentences_list.append(sentences.new_sentence())
                         
+                        for player in players:
+                            player["found"]=False
+                        
                         canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                         guess_list=[]
 
@@ -163,6 +166,7 @@ def start_server():
                     guess_list=[]
                     
                     last_game_start=datetime.now()
+                    print("fini", last_game_start)
 
                     await send_update(new_game=True)
 
