@@ -6,6 +6,7 @@ import pygame
 from PIL import Image, ImageFilter
 import gameVar
 import time
+from datetime import datetime
 
 
 NOIR = (0, 0, 0)
@@ -34,10 +35,11 @@ def check_sentences(phrase1, phrase2):
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
+    print(score)
     return score>config["sentence_checker_seuil"]
     
-async def send_message(websocket, message):
-    await websocket.send(json.dumps({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message}))
+async def send_message(websocket, message, remaining_time):
+    await websocket.send(json.dumps({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message, "remaining_time":remaining_time}))
 
 async def websocket_draw(websocket, frames):
     #simplify frames
