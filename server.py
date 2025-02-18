@@ -45,7 +45,7 @@ def start_server():
     global server_started
     server_started=True # server is ready
 
-    async def send_update(frames=None, new_message=None, only_drawer=False, new_game=False):
+    async def send_update(frames=None, new_message=None, new_game=False):
         """Envoie les mises à jour de l'état du jeu à tous les joueurs."""
         
         state = {
@@ -58,19 +58,18 @@ def start_server():
             "found":False,
             "new_game":last_game_start.isoformat() if new_game else False
         }
-        await broadcast(json.dumps(state), only_drawer)
+        await broadcast(json.dumps(state))
 
-    async def broadcast(message, only_drawer):
+    async def broadcast(message):
         """Envoie un message à tous les joueurs connectés."""
         try:
             for player in players:
-                if (not only_drawer) or player["id"] == drawer_id:
-                    await player["ws"].send(message)
+                await player["ws"].send(message)
                     
         except websockets.exceptions.ConnectionClosedError:
             print("Un joueur s'est déconnecté.")
             players[:] = [p for p in players if p["ws"] != player["ws"]]
-            await broadcast(message, only_drawer)
+            await broadcast(message)
 
     async def handle_connection_server(websocket):  # Correction ici
         global canvas, guess_list, drawer_id, sentences_list, last_game_start
@@ -117,24 +116,26 @@ def start_server():
                 elif data["type"] == "guess": #! GUESS
                     list_found=[]
                     succeed=False
-                    for player in players: #found the player
+                    for i,player in enumerate(players): #found the player
                         if player["id"] == data["player_id"]:
-                            succeed=tools.check_sentences(sentences_list[-1], data["guess"])
-                            if succeed:
-                                if not player["found"]:
-                                    player["points"] += 2
-                                player["found"] = True
-                                
-                                for i in len(players):
-                                    if players[i]["id"] == drawer_id:
-                                        players[i]["points"] -= 1
-                                        
-                            mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":succeed}
-                                
+                            if player["id"]==drawer_id:
+                                mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"], "succeed":False}
+                            else:
+                                succeed=tools.check_sentences(sentences_list[-1], data["guess"])
+                                if succeed:
+                                    if not player["found"]:
+                                        players[i]["points"] += int((data["remaining_time"]/config["game_duration"])*len(players) *config["points_per_found"])
+                                    players[i]["found"] = True
+                                    
+                                    for j in range(len(players)):
+                                        if players[j]["id"] == drawer_id:
+                                            players[j]["points"] += config["points_per_found"]
+                                            break
+                                mess={"guess":data["guess"], "player_id":player["id"],"pseudo":player["pseudo"],"points":player["points"], "succeed":succeed}
+                        
                         if player["id"] != drawer_id:
                             list_found.append(player["found"])
                             
-                        
                         
                     guess_list.append(mess)
                     
@@ -147,6 +148,10 @@ def start_server():
                         
                         for player in players:
                             player["found"]=False
+                        for i in range(len(players)):
+                            if int(players[i]["id"]) == int(drawer_id):
+                                drawer_id = players[(i+1)%len(players)]["id"]
+                                break
                         
                         canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                         guess_list=[]
