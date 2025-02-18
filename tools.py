@@ -46,31 +46,44 @@ async def websocket_draw(websocket, frames):
     
     color, radius=None, None
     for frame in frames:
-        if frame["color"]==color:
-            del frame["color"]
-        if frame["radius"]==radius: 
-            del frame["radius"]
+        if frame["type"]=="draw":
+            if frame["color"]==color:
+                del frame["color"]
+            if frame["radius"]==radius: 
+                del frame["radius"]
     
-    await websocket.send(json.dumps({"type":"draw","frames":frames}))
+    await websocket.send(json.dumps({"type":"draw","frames_types":"draw","frames":frames}))
 
-def update_canva_by_frames(frames, specified_canva=None):
+def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
+    if reset:
+        if specified_canva:
+            specified_canva=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+        else:
+            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+            
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
     
-    for frame in frames:#draw
-        time.sleep(0.45/len(frames))
-        if "color" in frame.keys():
-            current_drawing_color=frame["color"]
-        if "radius" in frame.keys():
-            current_drawing_radius=frame["radius"]
-        
-        if specified_canva:
-            specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
-        else:
-            gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
-        
-        time.sleep(0.45/len(frames))
+    print(gameVar.ROLL_BACK)
+    print(frames)
+    new_frames=frames.copy()
+    new_frames=remove_steps_by_roll_back(new_frames, gameVar.ROLL_BACK)
+    print(new_frames)
     
+    for frame in new_frames:#draw
+        if frame["type"]=="draw":
+            if delay: time.sleep(0.45/len(frames))
+            if "color" in frame.keys():
+                current_drawing_color=frame["color"]
+            if "radius" in frame.keys():
+                current_drawing_radius=frame["radius"]
+            
+            if specified_canva:
+                specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
+            else:
+                gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
+            
+            if delay:time.sleep(0.45/len(frames))
     if specified_canva:
         return specified_canva
 
@@ -90,7 +103,7 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius):
             for j in range(-radius, radius):
                 if i ** 2 + j ** 2 <= radius ** 2:  # Vérifie si (i, j) est dans le cercle
                     if in_bounds(cx + i, cy + j):
-                        canvas[cy + j][cx + i] = color
+                        canvas[cy + j][cx + i] = (color[0], color[1], color[2])  # Mettre la couleur (R, G, B)
 
     # Fonction pour dessiner une ligne épaisse
     def draw_thick_line(x1, y1, x2, y2):
@@ -113,6 +126,19 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius):
 
     return canvas  # Retourne le canvas mis à jour
 
+def remove_steps_by_roll_back(frames, roll_back):
+    new_frames = frames.copy()
+
+    for i in range(len(new_frames)-1,-1,-1):  # On parcourt à l'envers
+        print(i)
+        if roll_back==0:
+            return new_frames
+        
+        if frames[i]["type"] in {"new_step", "shape"}:
+            new_frames=new_frames[:i]
+            roll_back-=1
+
+    return []
                 
 def get_screen_size():
     info_ecran = pygame.display.Info()
@@ -126,3 +152,17 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_str = blurred_pil.tobytes()
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
+
+def save_bmp(color_matrix, filename):
+    height = len(color_matrix)
+    width = max(len(row) for row in color_matrix)  # Trouve la ligne la plus longue
+
+    img = Image.new("RGB", (width, height), "white")  # Fond blanc
+
+    for y, row in enumerate(color_matrix):
+        for x, color in enumerate(row):
+            if color is not None:
+                img.putpixel((x, y), (color[0], color[1], color[2]))# Mettre la couleur (R, G, B)
+            else:
+                img.putpixel((x,y), (255,255,255))
+    img.save(filename, "BMP")
