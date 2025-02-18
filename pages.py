@@ -133,7 +133,7 @@ class gamePage:
 
                 # Vérifie si CANVAS n'est pas déjà dans les données
                 if gameVar.CANVAS not in data:
-                    data.append(gameVar.CANVAS)  # Ajoute CANVAS aux données
+                    data.append({"players": gameVar.PLAYERS,"date":datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "canvas": gameVar.CANVAS})  # Ajoute CANVAS aux données
 
                     # Ouvre à nouveau le fichier en mode écriture pour sauvegarder les modifications
                     with open("your_best_draws.json", "w", encoding="utf-8") as f:
@@ -356,16 +356,31 @@ class gamePage:
 
 
     def chat(self):
-        #(0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
+        y=0.9533 * self.H-60
 
-        for i,mess in enumerate(gameVar.MESSAGES[-10:]):  
-            color=(0,255,0) if mess["succeed"] else (0,0,0)
-            font = pygame.font.Font("PermanentMarker.ttf" ,16)
-            image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
-            self.screen.blit(image_texte, (0.82 * self.W + 30,i*40+ 0.41 * self.H))
-            font = pygame.font.Font("PermanentMarker.ttf" ,12)
-            image_texte = font.render ( mess["guess"], 1 , color )
-            self.screen.blit(image_texte, (0.82 * self.W,i*40+ 0.41 * self.H + 20))
+        for mess in gameVar.MESSAGES:
+            if y<0.4083*self.H+16:
+                break
+            if mess["succeed"]:
+                y-=16
+                font = pygame.font.Font("PermanentMarker.ttf" ,16)
+                image_texte = font.render ( f"{mess['pseudo']} à trouvé (+{mess["points"]})!", 1 , (0,255,0) )
+                self.screen.blit(image_texte, (0.82 * self.W,y))
+            
+            else:
+                if y<0.4083*self.H+32:
+                    break
+                
+                y-=16
+                font = pygame.font.Font("PermanentMarker.ttf" ,16)
+                image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
+                self.screen.blit(image_texte, (0.82 * self.W + 30,y))
+                y-=16
+                font = pygame.font.Font("PermanentMarker.ttf" ,12)
+                image_texte = font.render ( mess["guess"], 1 , (0,0,0) )
+                self.screen.blit(image_texte, (0.82 * self.W,y))
+                
+            y-=10
             
             
         input_box = pygame.Rect(0.82 * self.W, 0.9533 * self.H-45, 0.16 * self.W, 40)
@@ -380,7 +395,7 @@ class gamePage:
                     except RuntimeError:
                         loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                         asyncio.set_event_loop(loop)
-                    asyncio.run(tools.send_message(gameVar.WS, self.guess))
+                    asyncio.run(tools.send_message(gameVar.WS, self.guess,self.game_remaining_time))
                     gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
