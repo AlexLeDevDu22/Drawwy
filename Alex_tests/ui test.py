@@ -127,11 +127,17 @@ while True:
             if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):
                 if action_index >= 0:
                     action_index -= 1
+                    # Réinitialiser le dessin en cours si nécessaire
+                    drawing = False
+                    start_pos = None
+                    pygame.time.delay(50)  # Ajouter un délai pour stabiliser l'affichage
                     redraw_screen()
             if event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
                 if action_index < len(actions) - 1:
                     action_index += 1
+                    pygame.time.delay(50)  # Ajouter un délai pour stabiliser l'affichage
                     redraw_screen()
+            
 
     draw_buttons()
     pygame.display.flip()
