@@ -1,0 +1,26 @@
+[
+  {
+    "name": "salle 1",
+    "draws": [
+      { "sentence": "la phrase", "path": "test.bmp" },
+      { "sentence": "", "path": null },
+      { "sentence": "", "path": null }
+    ]
+  },
+  {
+    "name": "salle 2",
+    "draws": [
+      { "sentence": "", "path": null },
+      { "sentence": "", "path": null },
+      { "sentence": "", "path": null }
+    ]
+  },
+  {
+    "name": "salle 3",
+    "draws": [
+      { "sentence": "", "path": null },
+      { "sentence": "", "path": null },
+      { "sentence": "", "path": null }
+    ]
+  }
+]
