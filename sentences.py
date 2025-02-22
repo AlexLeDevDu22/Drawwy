@@ -15,7 +15,7 @@ actions = [
     "qui jongle avec des poissons", "qui pilote un avion en papier", "qui joue à cache-cache", "qui chante sous la douche", 
     "qui escalade une montagne de bonbons", "qui fait du vélo sur l'eau", "qui marche sur un trampoline", "qui joue au basket", 
     "qui peint un tableau", "qui joue aux échecs avec un fantôme", "qui fabrique une fusée en carton", "qui écrit un poème", 
-    "qui jongle avec des oranges", "qui essaie de réparer un robot", "qui pêche des étoiles filantes", "qui jongle avec des claçons", 
+    "qui jongle avec des oranges", "qui essaie de réparer un robot", "qui pêche des étoiles filantes", "qui jongle avec des cubes de glace", 
     "qui se dispute avec son miroir", "qui mange un gâteau géant", "qui saute en parachute avec un parapluie", 
     "qui essaie de voler avec des ballons", "qui fait du patin à glace sur une banane", "qui joue du piano avec ses pieds", 
     "qui construit un château en sable lunaire", "qui se bat contre son ombre", "qui se cache dans un frigo", 
