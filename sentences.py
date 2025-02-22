@@ -7,7 +7,7 @@ sujets = [
     "Un pharaon", "Un monstre des marais", "Un cyclope", "Une fée", "Un yéti", "Un fantôme", "Un zombie", "Un gladiateur", 
     "Un scientifique fou", "Un chevalier", "Un esquimau", "Un capitaine de bateau", "Un pingouin", "Un singe", "Un escargot", 
     "Un avocat", "Un cactus vivant", "Un marshmallow avec des bras", "Un cochon", "Un serpent", "Un kiwi (le fruit)", 
-    "Une étoile de mer", "Un iceberg", "Un brocoli", "Un ballon de foot vivant", "Une brique de lait", "Un poisson rouge"
+    "Une étoile de mer", "Un iceberg", "Un brocoli", "Un ballon de foot vivant", "Une brique de lait", "Un poisson rouge", "Shreck"
 ]
 
 actions = [
