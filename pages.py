@@ -213,97 +213,31 @@ class gamePage:
                 pygame.draw.rect(self.screen, color, (zone_x_min + x * self.pixel_width, zone_y_min + y * self.pixel_height, self.pixel_width, self.pixel_height))
 
         #! drawing
-        if self.me["is_drawer"]:
-            if zone_x_min <= self.mouse_pos[0] <= zone_x_max and zone_y_min <= self.mouse_pos[1] <= zone_y_max:# Vérifier si le clic est dans la zone de dessin
-                for event in self.events:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
-                        gameVar.STEP_NUM=0
-                        for frame in gameVar.ALL_FRAMES:
-                            if frame["type"] in ["new_step", "shape"]:
-                                gameVar.STEP_NUM+=1
-                        
-                        gameVar.ROLL_BACK=0
-                        self.second_draw_frames.append({"type":"new_step"})
-                        gameVar.ALL_FRAMES.append({"type":"new_step"})
+        for event in self.events:
+            if self.mouseDown and event.type == pygame.MOUSEMOTION:
+                # Vérifier si le clic est dans la zone de dessin
+                if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
+                    if self.lastMouseDown and self.me["id"] == gameVar.CURRENT_DRAWER and 0<self.game_remaining_time<config["game_duration"]: # can draw
+                        # Position actuelle dans le CANVAS
+                        canvas_x = (event.pos[0] - zone_x_min) // self.pixel_width
+                        canvas_y = (event.pos[1] - zone_y_min) // self.pixel_height
 
-                        print("mouse down")
-                        print("rollback",gameVar.ROLL_BACK)
-                        print("step num",gameVar.STEP_NUM)
+                        # Dessiner une ligne entre last_click et la position actuelle
+                        if self.last_canvas_click and self.last_canvas_click != (canvas_x, canvas_y):
+                            x1, y1 = self.last_canvas_click
+                            x2, y2 = canvas_x, canvas_y
 
-                        
-                    elif self.mouseDown and event.type == pygame.MOUSEMOTION:
-                        if self.lastMouseDown and 0<self.game_remaining_time<config["game_duration"]:   # can draw    
-                            # Position actuelle dans le CANVAS
-                            canvas_x = (event.pos[0] - zone_x_min) // self.pixel_width
-                            canvas_y = (event.pos[1] - zone_y_min) // self.pixel_height
+                            # Générer les points entre les deux
+                            gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius)
+                            self.frames.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
 
-                            # Dessiner une ligne entre last_click et la position actuelle
-                            if self.last_canvas_click and self.last_canvas_click != (canvas_x, canvas_y):
-                                x1, y1 = self.last_canvas_click
-                                x2, y2 = canvas_x, canvas_y
-
-                                # Générer les points entre les deux
-                                gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius, 0)
-                                self.second_draw_frames.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
-                                gameVar.ALL_FRAMES.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
-
-                            # Mettre à jour la dernière position
-                            self.last_canvas_click = (canvas_x, canvas_y)
-                                    
-                    elif event.type == pygame.MOUSEBUTTONUP:
-                        gameVar.STEP_NUM+=1
-
-                        print("mouse up")
-                        print("rollback",gameVar.ROLL_BACK)
-                        print("step num",gameVar.STEP_NUM)
-                                    
-                    elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Z
-
-                            gameVar.ROLL_BACK=min(gameVar.STEP_NUM,gameVar.ROLL_BACK+1)
-                            
-                            tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
-
-                            try:
-                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                            except RuntimeError:
-                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                                asyncio.set_event_loop(loop)
-                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
-
-
-
-                            print("undo")
-                            print("rollback",gameVar.ROLL_BACK)
-                            print("step num",gameVar.STEP_NUM)
-
-                                
-                        elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
-
-                            gameVar.ROLL_BACK=max(0,gameVar.ROLL_BACK-1)
-                            
-                            tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
-
-
-                            try:
-                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                            except RuntimeError:
-                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                                asyncio.set_event_loop(loop)
-                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
-
-
-                            print("redo")
-                            print("rollback",gameVar.ROLL_BACK)
-                            print("step num",gameVar.STEP_NUM)
-                    
+                        # Mettre à jour la dernière position
+                        self.last_canvas_click = (canvas_x, canvas_y)
 
         #send draw
-        if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
-            print("envoi du draw", self.second_draw_frames)
-            asyncio.run(tools.websocket_draw(gameVar.WS, self.second_draw_frames))  #send datas
-            self.second_draw_frames=[]
+        if self.frame_num==config["game_page_fps"]-1 and self.frames!=[]:
+            asyncio.run(tools.websocket_draw(gameVar.WS, self.frames))  #send datas
+            self.frames=[]
         
     def couleurs(self):
         pygame.draw.rect(self.screen, BLANC, (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H))

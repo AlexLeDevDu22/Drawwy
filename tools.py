@@ -76,44 +76,24 @@ async def websocket_draw(websocket, frames):
     
     await websocket.send(json.dumps({"type":"draw","frames_types":"draw","frames":frames}))
 
-def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
-    if reset:
-        gameVar.ALL_FRAMES=[]
-        if specified_canva:
-            specified_canva=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
-        else:
-            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
-            
+def update_canva_by_frames(frames, specified_canva=None):
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
     
-    new_frames=frames.copy()
-    print(new_frames)
-    new_frames=split_steps_by_roll_back(new_frames, gameVar.ROLL_BACK)
-    print(new_frames)
-
-    for frame in new_frames[0]:#draw
-        if frame["type"]=="draw":
-            if delay: 
-                duration=1/len(frames)
-            else:
-                duration=0
-            
-            if "color" in frame.keys():
-                current_drawing_color=frame["color"]
-            if "radius" in frame.keys():
-                current_drawing_radius=frame["radius"]
-            
-            if specified_canva:
-                specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
-            else:
-                gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
-
-        gameVar.ALL_FRAMES.append(frame)
-
-    for frame in new_frames[1]:
-        gameVar.ALL_FRAMES.append(frame)
-            
+    for frame in frames:#draw
+        time.sleep(0.45/len(frames))
+        if "color" in frame.keys():
+            current_drawing_color=frame["color"]
+        if "radius" in frame.keys():
+            current_drawing_radius=frame["radius"]
+        
+        if specified_canva:
+            specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
+        else:
+            gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius)
+        
+        time.sleep(0.45/len(frames))
+    
     if specified_canva:
         return specified_canva
 
@@ -159,16 +139,6 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
 
     return canvas  # Retourne le canvas mis à jour
 
-def split_steps_by_roll_back(frames, roll_back):
-    new_frames = frames.copy()
-    for i in range(len(new_frames)-1,-1,-1):  # On parcourt à l'envers
-
-        if frames[i]["type"] in {"new_step", "shape"}:
-            roll_back-=1
-        if roll_back==0:
-            return [new_frames[:i], new_frames[i:]]
-
-    return [new_frames,[]]
                 
 def get_screen_size():
     info_ecran = pygame.display.Info()
@@ -182,47 +152,3 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_str = blurred_pil.tobytes()
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
-
-
-def lines_return(text, font, max_largeur_pixels):
-    mots = text.split()
-    lignes = []
-    ligne_actuelle = ""
-
-    for mot in mots:
-        # Obtenez la largeur du mot actuel en pixels
-        largeur_mot = font.size(mot)[0]
-
-        # Si la ligne actuelle + le mot ne dépasse pas la largeur maximale en pixels
-        if font.size(ligne_actuelle + " " + mot if ligne_actuelle else mot)[0] <= max_largeur_pixels:
-            ligne_actuelle += " " + mot if ligne_actuelle else mot
-        else:
-            lignes.append(ligne_actuelle)
-            ligne_actuelle = mot
-
-    if ligne_actuelle:
-        lignes.append(ligne_actuelle)
-
-    return lignes
-
-def save_canvas(color_matrix, filename, sentence):
-    height = len(color_matrix)
-    width = max(len(row) for row in color_matrix)  # Trouve la ligne la plus longue
-
-    img = Image.new("RGB", (width, height), "white")  # Fond blanc
-
-    for y, row in enumerate(color_matrix):
-        for x, color in enumerate(row):
-            if color is not None:
-                img.putpixel((x, y), (color[0], color[1], color[2]))  # Mettre la couleur (R, G, B)
-            else:
-                img.putpixel((x, y), (255, 255, 255))
-
-    img.save(filename, "BMP")
-
-    # Ajouter la phrase en fin de fichier BMP
-    with open(filename, "ab") as f:
-        f.write(b"\nMETADATA_START\n")  # Marqueur pour retrouver la phrase
-        f.write(sentence.encode("utf-8"))  # Écriture de la phrase
-        f.write(b"\nMETADATA_END\n")  # Marqueur de fin
-
