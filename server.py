@@ -22,7 +22,7 @@ ngrok_domain = os.getenv("NGROK_DOMAIN")
 ngrok.set_auth_token(ngrok_token)
 
 #* game variables
-global canvas,players, guess_list, drawer_id, sentences_list
+global players, guess_list, drawer_id, sentences_list, roll_back
 players = []
 drawer_id = 0  # ID du joueur actif
 guess_list=[]
@@ -32,7 +32,8 @@ sentences_list=[sentences.new_sentence()]
 last_game_start=None
 
 # Création du tableau de dessin tous blancs
-canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+all_frames=[]
+roll_back=0
 
 def start_server():
 
@@ -56,7 +57,8 @@ def start_server():
             "new_message":new_message,
             "sentence":sentences_list[-1],
             "found":False,
-            "new_game":last_game_start.isoformat() if new_game else False
+            "new_game":last_game_start.isoformat() if new_game else False,
+            "roll_back":roll_back
         }
         await broadcast(json.dumps(state))
 
@@ -72,7 +74,7 @@ def start_server():
             await broadcast(message)
 
     async def handle_connection_server(websocket):  # Correction ici
-        global canvas, guess_list, drawer_id, sentences_list, last_game_start
+        global guess_list, drawer_id, sentences_list, last_game_start, all_frames, roll_back
         try:
             # Attente du pseudo du joueur
             data = json.loads(await websocket.recv())
@@ -94,9 +96,10 @@ def start_server():
                 await websocket.send(json.dumps({
                     "type": "welcome",
                     "id": player_id,
-                    "canvas": canvas,
+                    "all_frames": all_frames,
                     "messages":guess_list,
                     "new_game":last_game_start.isoformat() if last_game_start else False,
+                    "roll_back": roll_back
                 }))
 
                 if len(players)==2:
@@ -110,9 +113,12 @@ def start_server():
 
                 if data["type"] == "draw": #! DRAW
                     # Mise à jour du dessin
-                    canvas=tools.update_canva_by_frames(data["frames"], canvas)
+                    all_frames.append(data["frames"])
                     await send_update(data["frames"])
-
+                elif data["type"] == "roll_back": #! DRAW
+                    # Mise à jour du dessin
+                    roll_back=data["roll_back"]
+                    await send_update()
                 elif data["type"] == "guess": #! GUESS
                     list_found=[]
                     succeed=False
@@ -153,7 +159,6 @@ def start_server():
                                 drawer_id = players[(i+1)%len(players)]["id"]
                                 break
                         
-                        canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                         guess_list=[]
 
                     await send_update(new_message=mess, new_game=new_game)
@@ -168,7 +173,6 @@ def start_server():
                         
                     sentences_list.append(sentences.new_sentence())
                     
-                    canvas = [[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
                     guess_list=[]
                     
                     last_game_start=datetime.now()
