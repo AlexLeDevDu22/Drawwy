@@ -27,7 +27,7 @@ CYAN=(0,255,255)
 def input_pseudo():
     """Affiche une fenêtre pour entrer le pseudo"""
     pygame.init()
-    pygame.display.set_icon(pygame.image.load("launcher.png"))
+    pygame.display.set_icon(pygame.image.load("icon.png"))
     screen = pygame.display.set_mode((400, 200))
     pygame.display.set_caption("Entrez votre pseudo")
     font = pygame.font.Font(None, 36)
@@ -69,32 +69,9 @@ def input_pseudo():
 
 class gamePage:
     
-    def background(self):
-        self.screen.fill(BEIGE)
-        #pygame.draw.rect(self.screen, BLANC,(20/100*self.W, 4/100*self.H, 60/100*self.W, 91/100*self.H) )
-        pygame.draw.rect(self.screen, BLANC,(1/100*self.W, 4/100*self.H, 18/100*self.W, 70/100*self.H) )
-        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 4/100*self.H, 18/100*self.W, 25/100*self.H) )
-        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 30.83/100*self.H, 18/100*self.W, 8.33/100*self.H) )
-        pygame.draw.rect(self.screen, BLANC,(81/100*self.W, 40.83/100*self.H, 18/100*self.W, 54.5/100*self.H) )
-        
-        self.zones = [
-            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H),  # Liste personnes
-            (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H),  # Mot à deviner
-            (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H),  # Couleurs
-            (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H),  # taille de stylo
-            (0.81 * self.W, 0.4083 * self.H, 0.18 * self.W, 0.545 * self.H),  # Chat
-            (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.07 * self.H),  # Texte joueurs
-        ]
-        
-        for x, y, w, h in self.zones:
-            pygame.draw.rect(self.screen, NOIR, (x, y, w, h), 1)
-            
-            
     def timer(self):
             
         if len(gameVar.PLAYERS)==1: return
-        if self.frame_num==config["game_page_fps"]-1:
-            self.game_remaining_time=max(0,self.game_remaining_time-1)
             
         timer_text = f"{self.game_remaining_time//60}:{0 if self.game_remaining_time%60<10 else ''}{self.game_remaining_time%60}"
         
@@ -117,7 +94,7 @@ class gamePage:
         self.screen.blit(text_surface, text_rect)
         
         if self.game_remaining_time==0:
-            if self.me["id"] == gameVar.CURRENT_DRAWER: #if game time over
+            if self.me["is_drawer"]: #if game time over
                 try:
                     loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
                 except RuntimeError:
@@ -126,23 +103,13 @@ class gamePage:
                 asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
             gameVar.GAMESTART=datetime.now()
             
-            #save draw
-            if self.me["id"] == gameVar.CURRENT_DRAWER:
-                with open("your_best_draws.json", "r", encoding="utf-8") as f:
-                    data = json.load(f)  # Charge le contenu du fichier JSON dans une variable
-
-                # Vérifie si CANVAS n'est pas déjà dans les données
-                if gameVar.CANVAS not in data:
-                    data.append({"players": gameVar.PLAYERS,"date":datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "canvas": gameVar.CANVAS})  # Ajoute CANVAS aux données
-
-                    # Ouvre à nouveau le fichier en mode écriture pour sauvegarder les modifications
-                    with open("your_best_draws.json", "w", encoding="utf-8") as f:
-                        json.dump(data, f, ensure_ascii=False, indent=4) 
-            
         if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
             if gameVar.WS: asyncio.run(gameVar.WS.ping())
     
     def players(self):
+        pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H))
+        pygame.draw.rect(self.screen, NOIR, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H), 1)
+
         font = pygame.font.Font("PermanentMarker.ttf" ,20)
         image_texte = font.render ( "Liste de joueurs:", 1 , (0,0,0) )
         self.screen.blit(image_texte, (5.5/100*self.W,6/100*self.H))
@@ -156,7 +123,7 @@ class gamePage:
              (12/100*self.W,(12+i*7)/100*self.H)]
             for i in range(9)  # Génère 9 entrées automatiquement
         ]
-
+        
         for y,player in enumerate(gameVar.PLAYERS):
             text_color=(10,10,10) if player["id"] == gameVar.PLAYER_ID else (100,100,100)
 
@@ -180,50 +147,41 @@ class gamePage:
                     pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
-        text= "Phrase à trouver:" if (not self.me["found"]) and self.me["id"] != gameVar.CURRENT_DRAWER else "Phrase à faire deviner:"
-        pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
+        # pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H))
+        # pygame.draw.rect(self.screen, NOIR, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H), 1)
+
+        text= "Phrase à faire deviner:"if self.me["is_drawer"] else "Phrase à trouver:"
+        # pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
         font = pygame.font.Font("PermanentMarker.ttf" ,22)
-        image_texte = font.render ( text, 1 , (0,0,0) )
-        self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
+        image_texte = font.render( text, True , (0,0,0) )
+        #self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
         
-        if len(gameVar.CURRENT_SENTENCE) >0:
-            MAX_LARGEUR = 26  # Nombre max de caractères par ligne (ajuste si besoin)
-            FONT_SIZE_BASE = 20  # Taille de base de la font
-            Y_START = 77 / 100 * self.H +36 # Position de départ
+        # if len(gameVar.CURRENT_SENTENCE) >0:
+        #     FONT_SIZE_BASE = 20  # Taille de base de la font
+            # Y_START = 77 / 100 * self.H +36 # Position de départ
 
-            # Choisir la taille de font en fonction de la longueur du texte
-            if len(gameVar.CURRENT_SENTENCE) <= MAX_LARGEUR:
-                font_size = FONT_SIZE_BASE
-            elif len(gameVar.CURRENT_SENTENCE) <= 2 * MAX_LARGEUR:
-                font_size = FONT_SIZE_BASE - 2
-            else:
-                font_size = FONT_SIZE_BASE - 4
+            # # Choisir la taille de font en fonction de la longueur du texte
+            # if len(gameVar.CURRENT_SENTENCE) <= 30:
+            #     font_size = FONT_SIZE_BASE
+            # elif len(gameVar.CURRENT_SENTENCE) <= 60:
+            #     font_size = FONT_SIZE_BASE - 2
+            # else:
+            #     font_size = FONT_SIZE_BASE - 4
 
-            font = pygame.font.Font("PermanentMarker.ttf", font_size)
+            # font = pygame.font.Font("PermanentMarker.ttf", font_size)
 
-            # Découpage intelligent du texte (évite de couper en plein milieu des mots)
-            mots = gameVar.CURRENT_SENTENCE.split()
-            lignes = []
-            ligne_actuelle = ""
-
-            for mot in mots:
-                if len(ligne_actuelle + " " + mot) <= MAX_LARGEUR:
-                    ligne_actuelle += " " + mot if ligne_actuelle else mot
-                else:
-                    lignes.append(ligne_actuelle)
-                    ligne_actuelle = mot
-            if ligne_actuelle:
-                lignes.append(ligne_actuelle)
+            # lines=tools.lines_return(gameVar.CURRENT_SENTENCE, font, 0.16 * self.W)
 
             # Affichage ligne par ligne
-            for i, ligne in enumerate(lignes):
-                image_texte = font.render(ligne, True, (0, 0, 0))
-                if (not self.me["found"]) and self.me["id"] != gameVar.CURRENT_DRAWER:
-                    image_texte=tools.flou(image_texte)
-                self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
+            # for i, ligne in enumerate(lines):
+            #     image_texte = font.render(ligne, True, (20, 10, 10))
+            #     if (not self.me["found"]) and not self.me["is_drawer"]:
+            #         image_texte=tools.flou(image_texte)
+            #     self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
                 
     def drawing(self):
+
         """Permet de dessiner uniquement dans la zone de dessin."""
         if not gameVar.CANVAS:
             return
@@ -255,33 +213,102 @@ class gamePage:
                 pygame.draw.rect(self.screen, color, (zone_x_min + x * self.pixel_width, zone_y_min + y * self.pixel_height, self.pixel_width, self.pixel_height))
 
         #! drawing
-        for event in self.events:
-            if self.mouseDown and event.type == pygame.MOUSEMOTION:
-                # Vérifier si le clic est dans la zone de dessin
-                if zone_x_min <= event.pos[0] <= zone_x_max and zone_y_min <= event.pos[1] <= zone_y_max:
-                    if self.lastMouseDown and self.me["id"] == gameVar.CURRENT_DRAWER and 0<self.game_remaining_time<config["game_duration"]: # can draw
-                        # Position actuelle dans le CANVAS
-                        canvas_x = (event.pos[0] - zone_x_min) // self.pixel_width
-                        canvas_y = (event.pos[1] - zone_y_min) // self.pixel_height
+        if self.me["is_drawer"]:
+            if zone_x_min <= self.mouse_pos[0] <= zone_x_max and zone_y_min <= self.mouse_pos[1] <= zone_y_max:# Vérifier si le clic est dans la zone de dessin
+                for event in self.events:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
+                        gameVar.STEP_NUM=0
+                        for frame in gameVar.ALL_FRAMES:
+                            if frame["type"] in ["new_step", "shape"]:
+                                gameVar.STEP_NUM+=1
+                        
+                        gameVar.ROLL_BACK=0
+                        self.second_draw_frames.append({"type":"new_step"})
+                        gameVar.ALL_FRAMES.append({"type":"new_step"})
 
-                        # Dessiner une ligne entre last_click et la position actuelle
-                        if self.last_canvas_click and self.last_canvas_click != (canvas_x, canvas_y):
-                            x1, y1 = self.last_canvas_click
-                            x2, y2 = canvas_x, canvas_y
+                        print("mouse down")
+                        print("rollback",gameVar.ROLL_BACK)
+                        print("step num",gameVar.STEP_NUM)
 
-                            # Générer les points entre les deux
-                            gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius)
-                            self.frames.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+                        
+                    elif self.mouseDown and event.type == pygame.MOUSEMOTION:
+                        if self.lastMouseDown and 0<self.game_remaining_time<config["game_duration"]:   # can draw    
+                            # Position actuelle dans le CANVAS
+                            canvas_x = (event.pos[0] - zone_x_min) // self.pixel_width
+                            canvas_y = (event.pos[1] - zone_y_min) // self.pixel_height
 
-                        # Mettre à jour la dernière position
-                        self.last_canvas_click = (canvas_x, canvas_y)
+                            # Dessiner une ligne entre last_click et la position actuelle
+                            if self.last_canvas_click and self.last_canvas_click != (canvas_x, canvas_y):
+                                x1, y1 = self.last_canvas_click
+                                x2, y2 = canvas_x, canvas_y
+
+                                # Générer les points entre les deux
+                                gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius, 0)
+                                self.second_draw_frames.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+                                gameVar.ALL_FRAMES.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+
+                            # Mettre à jour la dernière position
+                            self.last_canvas_click = (canvas_x, canvas_y)
+                                    
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        gameVar.STEP_NUM+=1
+
+                        print("mouse up")
+                        print("rollback",gameVar.ROLL_BACK)
+                        print("step num",gameVar.STEP_NUM)
+                                    
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Z
+
+                            gameVar.ROLL_BACK=min(gameVar.STEP_NUM,gameVar.ROLL_BACK+1)
+                            
+                            tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
+
+                            try:
+                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                            except RuntimeError:
+                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                                asyncio.set_event_loop(loop)
+                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
+
+
+
+                            print("undo")
+                            print("rollback",gameVar.ROLL_BACK)
+                            print("step num",gameVar.STEP_NUM)
+
+                                
+                        elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
+
+                            gameVar.ROLL_BACK=max(0,gameVar.ROLL_BACK-1)
+                            
+                            tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
+
+
+                            try:
+                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+                            except RuntimeError:
+                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
+                                asyncio.set_event_loop(loop)
+                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
+
+
+                            print("redo")
+                            print("rollback",gameVar.ROLL_BACK)
+                            print("step num",gameVar.STEP_NUM)
+                    
 
         #send draw
-        if self.frame_num==config["game_page_fps"]-1 and self.frames!=[]:
-            asyncio.run(tools.websocket_draw(gameVar.WS, self.frames))  #send datas
-            self.frames=[]
+        if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
+            print("envoi du draw", self.second_draw_frames)
+            asyncio.run(tools.websocket_draw(gameVar.WS, self.second_draw_frames))  #send datas
+            self.second_draw_frames=[]
         
     def couleurs(self):
+        pygame.draw.rect(self.screen, BLANC, (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H))
+        pygame.draw.rect(self.screen, NOIR, (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H), 1)
+
         """Affiche une palette de couleurs fixes et permet de sélectionner une couleur."""
         palette_x, palette_y = int(0.81 * self.W), int(0.04 * self.H)+6
         palette_w, palette_h = int(0.18 * self.W), int(0.25 * self.H)
@@ -321,6 +348,9 @@ class gamePage:
                         break  # Empêche de changer plusieurs fois la couleur dans une seule itération
 
     def slider_radius(self):
+        pygame.draw.rect(self.screen, BLANC, (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H))
+        pygame.draw.rect(self.screen, NOIR, (0.81 * self.W, 0.3083 * self.H, 0.18 * self.W, 0.0833 * self.H), 1)
+
         try: self.pixel_height #test la variable
         except: return
         
@@ -352,38 +382,11 @@ class gamePage:
                     self.pen_radius = int((int(1 + (radius_slider_pos - slider_min) * 10 / (slider_max - slider_min)))* self.pixel_height)
                     
 
-
-
-
     def chat(self):
-        y=0.9533 * self.H-60
 
-        for mess in gameVar.MESSAGES:
-            if y<0.4083*self.H+16:
-                break
-            if mess["succeed"]:
-                y-=16
-                font = pygame.font.Font("PermanentMarker.ttf" ,16)
-                image_texte = font.render ( f"{mess['pseudo']} à trouvé (+{mess["points"]})!", 1 , (0,255,0) )
-                self.screen.blit(image_texte, (0.82 * self.W,y))
-            
-            else:
-                if y<0.4083*self.H+32:
-                    break
-                
-                y-=16
-                font = pygame.font.Font("PermanentMarker.ttf" ,16)
-                image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
-                self.screen.blit(image_texte, (0.82 * self.W + 30,y))
-                y-=16
-                font = pygame.font.Font("PermanentMarker.ttf" ,12)
-                image_texte = font.render ( mess["guess"], 1 , (0,0,0) )
-                self.screen.blit(image_texte, (0.82 * self.W,y))
-                
-            y-=10
-            
-            
-        input_box = pygame.Rect(0.82 * self.W, 0.9533 * self.H-45, 0.16 * self.W, 40)
+        font = pygame.font.Font("PermanentMarker.ttf" ,18)
+        guess_line=tools.lines_return(self.guess, font, 0.15 * self.W)
+        input_box = pygame.Rect(0.82 * self.W, 0.9533 * self.H-45 -len(guess_line)*20, 0.16 * self.W, max(40,15+20*len(guess_line)))
         
         for event in self.events:
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -404,16 +407,62 @@ class gamePage:
                     self.guess += event.unicode
 
         # Mise à jour visuelle
+        min_y=0.4083 * self.H if self.me["is_drawer"] else 0.04 * self.H -45 -len(guess_line)*20
+        pygame.draw.rect(self.screen, BLANC, (0.81 * self.W, min_y, 0.18 * self.W, 0.9533 * self.H - min_y))
+        pygame.draw.rect(self.screen, NOIR, (0.81 * self.W, min_y, 0.18 * self.W, 0.9533 * self.H - min_y), 1)
+
         color = BLEU if self.guess_input_active else BLEU_CLAIR
-        font = pygame.font.Font("PermanentMarker.ttf" ,18)
-        txt_surface = font.render(self.guess, True, NOIR)
-        self.screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        for i,line in enumerate(guess_line):
+            txt_surface = font.render(line, True, NOIR)
+            self.screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5+i*20))
         pygame.draw.rect(self.screen, color, input_box, 2)
+
+
+        #chat
+        y=0.9533 * self.H-60 -len(guess_line)*20
+
+        for mess in gameVar.MESSAGES[::-1]:
+
+            font = pygame.font.Font("PermanentMarker.ttf" ,16)
+            if type(mess)==dict: #message formated
+                if mess["succeed"]:
+
+                    text=f"{mess['pseudo']} à trouvé (+{mess['points']} points)!"
+                    color=(0,255,0)
+                
+                else:
+
+                    text=mess["guess"]
+                    color=(0,0,0)
+            elif type(mess)==str:
+                text=mess
+                color=(0,50,210)
+
+            # write the message
+            lines=tools.lines_return(text, font, 0.16 * self.W)
+
+            for line in lines[::-1]:
+                if y>min_y+16:
+                    y-=19
+
+                    image_texte = font.render ( line, 1 , color)
+                    self.screen.blit(image_texte, (0.82 * self.W,y))
+            
+            if y<min_y+18:
+                break
+
+            # write pseudo
+            if type(mess)==dict and not mess["succeed"]:
+                y-=20
+                image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
+                self.screen.blit(image_texte, (0.82 * self.W + 30,y))
+
+            y-=10
 
     
     def __init__(self):
         pygame.init()
-        pygame.display.set_icon(pygame.image.load("launcher.png"))
+        pygame.display.set_icon(pygame.image.load("icon.png"))
         
         # Dimensions de la fenêtre
         self.W, self.H = tools.get_screen_size()
@@ -429,7 +478,9 @@ class gamePage:
         self.me={   "id": -1,
                     "pseudo": "",
                     "points": 0,
-                    "found":False,}
+                    "found":False,
+                    "is_drawer":False
+                    }
         
         #pen values
         self.pen_color=(0,0,0)
@@ -438,8 +489,11 @@ class gamePage:
         self.lastMouseDown=False
         self.last_canvas_click=None
         
+        self.mouse_pos=(0,0)
+        
         #for drawing
-        self.frames=[]
+        self.second_draw_frames=[]
+        
         self.frame_num=0
         
         self.guess_input_active=False
@@ -447,41 +501,49 @@ class gamePage:
         
         self.running = True
         while self.running:
-            if self.frame_num==0:
+            self.clock.tick(config["game_page_fps"])
+            print(self.clock.get_fps())
+
+            for player in gameVar.PLAYERS:
+                if player["id"] == gameVar.PLAYER_ID:
+                    self.me=player
+                    self.me["is_drawer"]=gameVar.PLAYER_ID==gameVar.CURRENT_DRAWER
+                    break
+
+            if self.frame_num%2==0:
                 self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
                 
                 if gameVar.GAMESTART:
                     pass#print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)
             
-            for player in gameVar.PLAYERS:
-                if player["id"] == gameVar.PLAYER_ID:
-                    self.me=player #my data
-            
             self.events=pygame.event.get()
             
-            self.background()
+            self.screen.fill(BEIGE)
+
             self.players()
             self.sentence()
             self.drawing()
             self.chat()
-            self.couleurs()
-            self.slider_radius()
+            if self.me["id"]==gameVar.PLAYER_ID:
+                self.couleurs()
+                self.slider_radius()
             self.timer()
             
             for event in self.events:
                 if event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_q and not self.guess_input_active) or event.key == pygame.QUIT:
-                        self.running=False
                         pygame.quit()
+                        return
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown=True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown=False
                     self.last_canvas_click=None
-                if event.type == pygame.MOUSEMOTION and self.mouseDown:
-                    self.lastMouseDown=self.mouseDown
+                if event.type == pygame.MOUSEMOTION:
+                    self.mouse_pos=event.pos
+                    if self.mouseDown:
+                        self.lastMouseDown=self.mouseDown
             
-            if self.running: pygame.display.flip()
+            pygame.display.flip()
             
             self.frame_num=(self.frame_num+1)%config["game_page_fps"]
-            self.clock.tick(config["game_page_fps"])

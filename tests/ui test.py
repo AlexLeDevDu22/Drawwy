@@ -126,6 +126,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):
                 if action_index >= 0:
+<<<<<<< HEAD:Alex_tests/ui test.py
                     action_index2 = action_index
                     action_index-=1
                     
@@ -138,8 +139,14 @@ while True:
                 if action_index < len(actions) - 1:
                     action_index2 = action_index+1
                     pygame.time.delay(50)  # Ajouter un délai pour stabiliser l'affichage
+=======
+                    action_index -= 1
                     redraw_screen()
-            
+            if event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+                if action_index < len(actions) - 1:
+                    action_index += 1
+>>>>>>> 672d33d134e7e56149f4fedda670e0583124c3ae:tests/ui test.py
+                    redraw_screen()
 
     draw_buttons()
     pygame.display.flip()
