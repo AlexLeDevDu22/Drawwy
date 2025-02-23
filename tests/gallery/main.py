@@ -15,11 +15,20 @@ clock = pygame.time.Clock()
 frames_per_dimensions={(200,200):{"image": pygame.image.load("tests/gallery/assets/frame6.png"), "x": 24, "y": 39, "w": 150, "h": 129}}
 
 # Chargement des images (remplace les chemins par tes propres assets)
-line = pygame.image.load("tests/gallery/assets/line.jpg").convert()
+wall = pygame.image.load("tests/gallery/assets/wall.jpg").convert()
+line = pygame.image.load("tests/gallery/assets/line.png").convert_alpha()
+parquet = pygame.image.load("tests/gallery/assets/parquet.jpg").convert()
+
+WALL_SIZE = int(0.80*H)
+LINE_SIZE = W
+
+wall = pygame.transform.scale(wall, (WALL_SIZE, WALL_SIZE))
+line = pygame.transform.scale(line, (LINE_SIZE, LINE_SIZE*0.01))
+parquet = pygame.transform.rotate(parquet, 270)
+parquet = pygame.transform.scale(parquet, (WALL_SIZE, WALL_SIZE*0.9))
 
 n=0
 for i in range(len(rooms)):
-    print(len(rooms[i]["draws"]))
     for j in range(len(rooms[i]["draws"])):
         if rooms[i]["draws"][j]["path"] is not None:
             rooms[i]["draws"][j]["image"]=pygame.image.load("tests/gallery/draws/"+rooms[i]["draws"][j]["path"]).convert()
@@ -32,7 +41,7 @@ for i in range(len(rooms)):
             rooms[i]["draws"][j]["image"] = pygame.transform.scale(rooms[i]["draws"][j]["image"], (rooms[i]["draws"][j]["frame"]["w"], rooms[i]["draws"][j]["frame"]["h"]))
 
         rooms[i]["draws"][j]["x"]=100+n*400
-        rooms[i]["draws"][j]["y"]=random.randint(100,H*0.75 - 200)
+        rooms[i]["draws"][j]["y"]=random.randint(100,int(WALL_SIZE) - 200)
 
         n+=1
 
@@ -58,13 +67,17 @@ while True:
     
     if mouse_x > W-300:
         view_pos = min(100+n*400  - W + 80,view_pos+(mouse_x-(W-300))/14)
-    LINE_SIZE=W
+    
 
     # Dessiner les calques avec leur décalage respectif
-    line = pygame.transform.scale(line, (LINE_SIZE, LINE_SIZE*0.07))
 
+        
+    for i in range(WALL_SIZE):
+        screen.blit(wall, (-(view_pos%WALL_SIZE)+i*WALL_SIZE, 0))
+        screen.blit(parquet, (-(view_pos%WALL_SIZE)+i*WALL_SIZE, WALL_SIZE))
+        
     for i in range(int(W//LINE_SIZE)+2):
-        screen.blit(line, (-(view_pos%LINE_SIZE)+i*LINE_SIZE, H*0.75))
+        screen.blit(line, (-(view_pos%LINE_SIZE)+i*LINE_SIZE, WALL_SIZE-line.get_height()//2))
 
 
     for room in rooms:
