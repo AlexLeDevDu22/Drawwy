@@ -148,38 +148,38 @@ class gamePage:
                     pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
     
     def sentence(self):
-        # pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H))
-        # pygame.draw.rect(self.screen, NOIR, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H), 1)
+        pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H))
+        pygame.draw.rect(self.screen, NOIR, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H), 1)
 
         text= "Phrase à faire deviner:"if self.me["is_drawer"] else "Phrase à trouver:"
-        # pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
+        pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
         font = pygame.font.Font("PermanentMarker.ttf" ,22)
         image_texte = font.render( text, True , (0,0,0) )
-        #self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
+        self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
         
-        # if len(gameVar.CURRENT_SENTENCE) >0:
-        #     FONT_SIZE_BASE = 20  # Taille de base de la font
-            # Y_START = 77 / 100 * self.H +36 # Position de départ
+        if len(gameVar.CURRENT_SENTENCE) >0:
+            FONT_SIZE_BASE = 20  # Taille de base de la font
+            Y_START = 77 / 100 * self.H +36 # Position de départ
 
-            # # Choisir la taille de font en fonction de la longueur du texte
-            # if len(gameVar.CURRENT_SENTENCE) <= 30:
-            #     font_size = FONT_SIZE_BASE
-            # elif len(gameVar.CURRENT_SENTENCE) <= 60:
-            #     font_size = FONT_SIZE_BASE - 2
-            # else:
-            #     font_size = FONT_SIZE_BASE - 4
+            # Choisir la taille de font en fonction de la longueur du texte
+            if len(gameVar.CURRENT_SENTENCE) <= 30:
+                font_size = FONT_SIZE_BASE
+            elif len(gameVar.CURRENT_SENTENCE) <= 60:
+                font_size = FONT_SIZE_BASE - 2
+            else:
+                font_size = FONT_SIZE_BASE - 4
 
-            # font = pygame.font.Font("PermanentMarker.ttf", font_size)
+            font = pygame.font.Font("PermanentMarker.ttf", font_size)
 
-            # lines=tools.lines_return(gameVar.CURRENT_SENTENCE, font, 0.16 * self.W)
+            lines=tools.lines_return(gameVar.CURRENT_SENTENCE, font, 0.16 * self.W)
 
             # Affichage ligne par ligne
-            # for i, ligne in enumerate(lines):
-            #     image_texte = font.render(ligne, True, (20, 10, 10))
-            #     if (not self.me["found"]) and not self.me["is_drawer"]:
-            #         image_texte=tools.flou(image_texte)
-            #     self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
+            for i, ligne in enumerate(lines):
+                image_texte = font.render(ligne, True, (20, 10, 10))
+                if (not self.me["found"]) and not self.me["is_drawer"]:
+                    image_texte=tools.flou(image_texte)
+                self.screen.blit(image_texte, (0.03 * self.W, Y_START + (i * (font_size + 2))))
                 
     def drawing(self):
 
