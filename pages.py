@@ -6,7 +6,8 @@ import yaml
 import tools
 import asyncio
 import json
-import pygetwindow as gw
+if sys.platform.startswith("win"):
+    import pygetwindow as gw
 from datetime import datetime, timedelta
 
 with open("config.yaml", "r") as f:
