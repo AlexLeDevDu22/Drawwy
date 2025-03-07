@@ -467,7 +467,7 @@ class gamePage:
         
         # Dimensions de la fenêtre
         self.W, self.H = tools.get_screen_size()
-        self.screen = pygame.display.set_mode((self.W,self.H))
+        self.screen = pygame.display.set_mode((self.W,self.H), pygame.RESIZABLE)
         pygame.display.set_caption("Drawwy")
         try:gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
         except:pass
@@ -503,7 +503,6 @@ class gamePage:
         self.running = True
         while self.running:
             self.clock.tick(config["game_page_fps"])
-            print(self.clock.get_fps())
 
             for player in gameVar.PLAYERS:
                 if player["id"] == gameVar.PLAYER_ID:
@@ -531,10 +530,9 @@ class gamePage:
             self.timer()
             
             for event in self.events:
-                if event.type == pygame.KEYDOWN:
-                    if (event.key == pygame.K_q and not self.guess_input_active) or event.key == pygame.QUIT:
-                        pygame.quit()
-                        return
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown=True
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -544,6 +542,8 @@ class gamePage:
                     self.mouse_pos=event.pos
                     if self.mouseDown:
                         self.lastMouseDown=self.mouseDown
+                if event.type == pygame.VIDEORESIZE:
+                    self.W, self.H = tools.get_screen_size()
             
             pygame.display.flip()
             
