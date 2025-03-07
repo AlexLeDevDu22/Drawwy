@@ -148,7 +148,7 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
             y = round(y1 + t * dy)
             draw_circle(x, y)  # On dessine un cercle autour de chaque point
             
-            time.sleep(max(0,step_duration-0.002))
+            time.sleep(max(0,step_duration-0.004))
 
     # Dessiner la ligne épaisse
     draw_thick_line(x1, y1, x2, y2)

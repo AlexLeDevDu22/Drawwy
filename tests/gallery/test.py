@@ -1,13 +1,12 @@
 import pygame
 import sys
 import json
-import random
 import cv2
 import numpy as np
 
 ### --- CHARGEMENT DES DONNÉES --- ###
 
-with open("tests/gallery/gamery_data.json", "r") as f:
+with open("tests/gallery/gallery_data.json", "r") as f:
     rooms = json.load(f)
 
 pygame.init()
@@ -15,12 +14,6 @@ screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.displa
 W, H = screen.get_size()
 clock = pygame.time.Clock()
 
-frames_per_dimensions = {
-    (200, 200): {
-        "image": pygame.image.load("tests/gallery/assets/frame6.png"), 
-        "x": 24, "y": 39, "w": 150, "h": 129
-    }
-}
 
 wall = pygame.image.load("tests/gallery/assets/wall3.jpg").convert()
 line = pygame.image.load("tests/gallery/assets/line.png").convert_alpha()
@@ -35,51 +28,51 @@ line = pygame.transform.scale(line, (LINE_SIZE, LINE_SIZE * 0.01))
 parquet = pygame.transform.scale(parquet, (WALL_SIZE, (H-WALL_SIZE)*(1/PERSPECTIVE)))
 
 # Largeur totale du sol pour permettre le déplacement
-CORRIDOR_WIDTH = 4*W
+CORRIDOR_WIDTH = int(W+PERSPECTIVE*2*W)
 FLOOR_HEIGHT = int(0.9 * WALL_SIZE)
 
-# Création de la surface sol (parquet répété)
-corridor_surface = pygame.Surface((CORRIDOR_WIDTH, FLOOR_HEIGHT))
-corridor_surface = corridor_surface.convert()
-parquet_w, parquet_h = parquet.get_size()
-
-for x in range(0, CORRIDOR_WIDTH, parquet_w):
-    corridor_surface.blit(parquet, (x, 0))
-
 # --- TRANSFORMATION EN PERSPECTIVE --- #
-def perspective_transform(surface):
-    arr = pygame.surfarray.array3d(surface)
-    arr = np.transpose(arr, (1, 0, 2))
-    
-    h, w = arr.shape[:2]
-    top_w = w * PERSPECTIVE
-    dx = (w - top_w) / 2
-    src_pts = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-    dst_pts = np.float32([[dx, 0], [dx + top_w, 0], [0, h], [w, h]])
+cached_parquet=None
+def perspective_parquet(parquet, view_pos):
+    """Transforme et affiche le sol avec une meilleure gestion de la perspective."""
+    global cached_parquet
 
-    matrix = cv2.getPerspectiveTransform(src_pts, dst_pts)
-    transformed = cv2.warpPerspective(arr, matrix, (w, h))
-    transformed = np.transpose(transformed, (1, 0, 2))
+    # Création de la surface sol
+    surface = pygame.Surface((CORRIDOR_WIDTH, FLOOR_HEIGHT)).convert()
 
-    return pygame.surfarray.make_surface(transformed)
+    # Remplissage du sol avec le parquet
+    for x in range(0, CORRIDOR_WIDTH, parquet.get_width()):
+        surface.blit(parquet, (x, 0))
 
-corridor_surface_persp = perspective_transform(corridor_surface)
+    # Ajustement de l'offset pour correspondre au déplacement horizontal
+    offset = -view_pos % parquet.get_width()
+    new_surface = pygame.Surface((surface.get_width(), FLOOR_HEIGHT))
+    new_surface.blit(surface, (offset, 0),(0,0,surface.get_width()-offset, FLOOR_HEIGHT))
 
-# --- CHARGEMENT DES DESSINS AVEC CADRES --- #
-n = 0
-for i in range(len(rooms)):
-    for j in range(len(rooms[i]["draws"])):
-        if rooms[i]["draws"][j]["path"] is not None:
-            rooms[i]["draws"][j]["image"] = pygame.image.load("tests/gallery/draws/" + rooms[i]["draws"][j]["path"]).convert()
-            image_w, image_h = rooms[i]["draws"][j]["image"].get_size()
-            rooms[i]["draws"][j]["frame"] = frames_per_dimensions.get((image_w, image_h))
-            if rooms[i]["draws"][j]["frame"]:
-                rooms[i]["draws"][j]["frame"]["image"] = pygame.transform.scale(rooms[i]["draws"][j]["frame"]["image"], (image_w, image_h))
-                rooms[i]["draws"][j]["image"] = pygame.transform.scale(rooms[i]["draws"][j]["image"], (rooms[i]["draws"][j]["frame"]["w"], rooms[i]["draws"][j]["frame"]["h"]))
-        
-        rooms[i]["draws"][j]["x"] = 100 + n * 400
-        rooms[i]["draws"][j]["y"] = random.randint(100, int(WALL_SIZE) - 200)
-        n += 1
+    # Transformation en perspective (une seule fois si possible)
+    if cached_parquet is None:
+        arr = pygame.surfarray.array3d(new_surface)
+        arr = np.transpose(arr, (1, 0, 2))
+        h, w = arr.shape[:2]
+
+        # Points sources et cibles pour la transformation perspective
+        top_w = w * PERSPECTIVE
+        dx = (w - top_w) / 2
+        src_pts = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+        dst_pts = np.float32([[dx, 0], [dx + top_w, 0], [0, h], [w, h]])
+
+        # Matrice de transformation perspective
+        matrix = cv2.getPerspectiveTransform(src_pts, dst_pts)
+
+        # Application de la transformation
+        transformed = cv2.warpPerspective(arr, matrix, (w, h))
+        transformed = np.transpose(transformed, (1, 0, 2))
+
+        cached_parquet = pygame.surfarray.make_surface(transformed)
+
+    return cached_parquet
+
+
 
 # Position de la caméra
 view_pos = 0
@@ -98,38 +91,30 @@ while True:
 
     # Gestion du déplacement horizontal
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    speed_factor = 1 + (1 - PERSPECTIVE) * 2  # Rend le déplacement plus naturel
     if mouse_x < 300:
-        view_pos = max(0, view_pos - (300 - mouse_x) / 14)
+        view_pos = max(0, view_pos - (300 - mouse_x) / (10 * speed_factor))
+        cached_parquet = None
     if mouse_x > W - 300:
-        view_pos = min(CORRIDOR_WIDTH - W, view_pos + (mouse_x - (W - 300)) / 14)
+        view_pos = min(CORRIDOR_WIDTH - W, view_pos + (mouse_x - (W - 300)) / (10 * speed_factor))
+        cached_parquet = None
 
     # Dessin des murs et du sol
     for i in range(WALL_SIZE):
         screen.blit(wall, (-(view_pos % WALL_SIZE) + i * WALL_SIZE, 0))
 
     # Affichage du parquet transformé
-    screen.blit(corridor_surface_persp, (0, WALL_SIZE), area=pygame.Rect(view_pos, 0, W, FLOOR_HEIGHT))
+    corridor_surface_persp = perspective_parquet(parquet,view_pos)
+    screen.blit(corridor_surface_persp, (0-WALL_SIZE*PERSPECTIVE/2, WALL_SIZE), ((corridor_surface_persp.get_width()-W)//2, 0, W+WALL_SIZE*PERSPECTIVE, FLOOR_HEIGHT))
 
     # Affichage de la ligne entre mur et sol
-    for i in range(int(W // LINE_SIZE) + 2):
-        screen.blit(line, (-(view_pos % LINE_SIZE) + i * LINE_SIZE, WALL_SIZE - line.get_height() // 2))
+    for i in range(W // WALL_SIZE + 2):
+        screen.blit(wall, (-(view_pos % WALL_SIZE) + i * WALL_SIZE, 0))
 
-    # Affichage des œuvres
-    for room in rooms:
-        for draw in room["draws"]:
-            if draw["path"] is not None:
-                image_w, image_h = draw["image"].get_size()
-                screen.blit(draw["image"], (draw["x"] + draw["frame"]["x"] - view_pos, draw["y"] + draw["frame"]["y"]))
-                draw["frame"]["image"].set_alpha(128)
-                screen.blit(draw["frame"]["image"], (draw["x"] - view_pos, draw["y"]))
-            else:
-                shadow = pygame.Surface((200, 200), pygame.SRCALPHA)
-                shadow.fill((0, 0, 0, 100))
-                screen.blit(shadow, (draw["x"] - view_pos, draw["y"]))
 
     # Affichage du nom de la salle
     text = font.render("Salle des Maîtres", True, (255, 255, 255))
     screen.blit(text, (20, 20))
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(50)

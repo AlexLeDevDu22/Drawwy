@@ -1,4 +1,4 @@
-import pygetwindow as gw
+import sys
 import pygame
 
 connected = False
@@ -23,10 +23,9 @@ def launcher():
     clock = pygame.time.Clock()
 
     # Essayons de mettre la fenêtre au premier plan
-    try:
+    if sys.platform.startswith("win"):
+        import pygetwindow as gw
         gw.getWindowsWithTitle("Drawwy")[0].activate()
-    except:
-        pass
 
     # Charger la police
     police = pygame.font.Font("PermanentMarker.ttf", 20)

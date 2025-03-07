@@ -56,7 +56,7 @@ def draw_buttons():
 def redraw_screen():
     screen.fill(WHITE)
     draw_buttons()
-    for action in actions[:action_index+1 ]:
+    for action in actions[:action_index + 1]:
         shape_type, start, end, width = action
         if shape_type == "rectangle":
             rect = pygame.Rect(start, (end[0] - start[0], end[1] - start[1]))
@@ -121,31 +121,16 @@ while True:
                     actions.append(("circle", start_pos, end_pos, line_width))
                 elif shape == "line":
                     actions.append(("line", start_pos, end_pos, line_width))
-                action_index2 += 1
+                action_index += 1
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):
                 if action_index >= 0:
-<<<<<<< HEAD:Alex_tests/ui test.py
-                    action_index2 = action_index
-                    action_index-=1
-                    
-                    # Réinitialiser le dessin en cours si nécessaire
-                    drawing = False
-                    start_pos = None
-                    pygame.time.delay(50)  # Ajouter un délai pour stabiliser l'affichage
-                    redraw_screen()
-            if event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
-                if action_index < len(actions) - 1:
-                    action_index2 = action_index+1
-                    pygame.time.delay(50)  # Ajouter un délai pour stabiliser l'affichage
-=======
                     action_index -= 1
                     redraw_screen()
             if event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
                 if action_index < len(actions) - 1:
                     action_index += 1
->>>>>>> 672d33d134e7e56149f4fedda670e0583124c3ae:tests/ui test.py
                     redraw_screen()
 
     draw_buttons()

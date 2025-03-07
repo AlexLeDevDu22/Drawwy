@@ -3,7 +3,7 @@ import sys
 import json
 import random
 
-with open("tests/gallery/gamery_data.json", "r") as f:
+with open("tests/gallery/gallery_data.json", "r") as f:
     rooms = json.load(f)
 
 
