@@ -61,9 +61,9 @@ class DrawingElement:
         self.y = y
         self.type = random.choice(["pencil", "brush", "circle", "square"])
         self.color = random.choice([soft_orange, pastel_pink, pastel_green, pastel_yellow, dark_blue])
-        self.size = random.randint(10, 30)
+        self.size = random.randint(10, 35)
         self.angle = random.uniform(0, 2*math.pi)
-        self.speed = random.uniform(0.3, 1.0)
+        self.speed = random.uniform(0.3, 1)
     
     def update(self):
         self.angle += 0.01
@@ -115,7 +115,7 @@ def draw_textbox(text, x, y, width, height, font, text_color, bg_color, surface,
     return box_rect
 
 # Créer quelques éléments de dessin flottants
-drawing_elements = [DrawingElement(random.randint(0, largeur), random.randint(0, hauteur)) for _ in range(15)]
+drawing_elements = [DrawingElement(random.randint(0, largeur), random.randint(0, hauteur)) for _ in range(50)]
 
 # Liste pour stocker les particules
 particles = []
@@ -140,10 +140,7 @@ except:
 clock = pygame.time.Clock()
 running = True
 
-# Variables pour l'écran de paramètres
-volume = 50
-difficulty = "Moyen"
-theme = "Classique"
+
 
 while running:
     mouse_pos = pygame.mouse.get_pos()
@@ -234,12 +231,9 @@ while running:
         draw_text("DRAWWY", title_font_animated, black, ecran, 
                  largeur // 2, main_panel_y + 150)
         
-        # Sous-titre
-        draw_text("Le jeu de dessin collaboratif", small_font, dark_blue, ecran, 
-                 largeur // 2, main_panel_y + 230)
         
         # Boutons
-        buttons = ["JOUER", "SUCCÈS", "PARAMÈTRES", "QUITTER"]
+        buttons = ["JOUER", "SUCCÈS", "QUITTER"]
         button_width = 500
         button_height = 80
         button_x = (largeur - button_width) // 2
@@ -303,146 +297,21 @@ while running:
                         random.choice([orange, soft_orange, pastel_yellow])
                     ))
                 
-                if button_text == "PARAMÈTRES":
-                    current_screen = "settings"
-                elif button_text == "QUITTER":
+                if button_text == "QUITTER":
                     running = False
                 elif button_text == "JOUER":
                     current_screen = "play"
                 elif button_text == "SUCCÈS":
                     current_screen = "achievements"
     
-    # === ÉCRAN DES PARAMÈTRES ===
-    elif current_screen == "settings":
-        # Panneau principal
-        main_panel_width = 800
-        main_panel_height = 600
-        main_panel_x = (largeur - main_panel_width) // 2
-        main_panel_y = (hauteur - main_panel_height) // 2
-        
-        pygame.draw.rect(ecran, dark_beige, 
-                        (main_panel_x + 10, main_panel_y + 10, 
-                         main_panel_width, main_panel_height), 
-                        border_radius=30)
-        
-        pygame.draw.rect(ecran, beige, 
-                        (main_panel_x, main_panel_y, 
-                         main_panel_width, main_panel_height), 
-                        border_radius=30)
-        
-        # Titre
-        draw_text("PARAMÈTRES", button_font, black, ecran, 
-                 largeur // 2, main_panel_y + 60)
-        
-        settings_y = main_panel_y + 150
-        setting_spacing = 100
-        
-        # Contrôle du volume
-        draw_text("Volume:", small_font, black, ecran, 
-                 main_panel_x + 150, settings_y)
-        
-        # Barre de volume
-        volume_bar_x = main_panel_x + 300
-        volume_bar_y = settings_y - 15
-        volume_bar_width = 300
-        volume_bar_height = 30
-        
-        # Fond de la barre
-        pygame.draw.rect(ecran, light_gray, 
-                        (volume_bar_x, volume_bar_y, volume_bar_width, volume_bar_height), 
-                        border_radius=15)
-        
-        # Niveau actuel
-        pygame.draw.rect(ecran, orange, 
-                        (volume_bar_x, volume_bar_y, 
-                         int(volume_bar_width * volume / 100), volume_bar_height), 
-                        border_radius=15)
-        
-        # Curseur
-        cursor_x = volume_bar_x + int(volume_bar_width * volume / 100)
-        pygame.draw.circle(ecran, dark_blue, 
-                          (cursor_x, volume_bar_y + volume_bar_height // 2), 
-                          15)
-        
-        # Vérifier si le curseur est manipulé
-        volume_bar_rect = pygame.Rect(volume_bar_x, volume_bar_y, volume_bar_width, volume_bar_height)
-        if mouse_clicked and volume_bar_rect.collidepoint(mouse_pos):
-            volume = ((mouse_pos[0] - volume_bar_x) / volume_bar_width) * 100
-            volume = max(0, min(100, volume))
-        
-        # Difficulté
-        draw_text("Difficulté:", small_font, black, ecran, 
-                 main_panel_x + 150, settings_y + setting_spacing)
-        
-        difficulty_options = ["Facile", "Moyen", "Difficile"]
-        difficulty_x = main_panel_x + 300
-        
-        for i, option in enumerate(difficulty_options):
-            option_x = difficulty_x + i * 140
-            option_rect = pygame.Rect(option_x, settings_y + setting_spacing - 20, 120, 40)
-            
-            # Vérifier si cette option est sélectionnée
-            selected = (option == difficulty)
-            
-            # Dessiner le fond du bouton
-            pygame.draw.rect(ecran, orange if selected else light_gray, 
-                            option_rect, border_radius=20)
-            
-            # Dessiner le texte
-            draw_text(option, small_font, black, ecran, 
-                     option_x + 60, settings_y + setting_spacing)
-            
-            # Gérer le clic
-            if mouse_clicked and option_rect.collidepoint(mouse_pos):
-                difficulty = option
-                if has_sound:
-                    button_sound.play()
-        
-        # Thème
-        draw_text("Thème:", small_font, black, ecran, 
-                 main_panel_x + 150, settings_y + 2 * setting_spacing)
-        
-        theme_options = ["Classique", "Sombre", "Coloré"]
-        theme_x = main_panel_x + 300
-        
-        for i, option in enumerate(theme_options):
-            option_x = theme_x + i * 140
-            option_rect = pygame.Rect(option_x, settings_y + 2 * setting_spacing - 20, 120, 40)
-            
-            # Vérifier si cette option est sélectionnée
-            selected = (option == theme)
-            
-            # Dessiner le fond du bouton
-            pygame.draw.rect(ecran, orange if selected else light_gray, 
-                            option_rect, border_radius=20)
-            
-            # Dessiner le texte
-            draw_text(option, small_font, black, ecran, 
-                     option_x + 60, settings_y + 2 * setting_spacing)
-            
-            # Gérer le clic
-            if mouse_clicked and option_rect.collidepoint(mouse_pos):
-                theme = option
-                if has_sound:
-                    button_sound.play()
-        
-        # Bouton de retour
-        back_button_rect = draw_textbox("RETOUR", main_panel_x + main_panel_width // 2 - 100, 
-                                      main_panel_y + main_panel_height - 80, 
-                                      200, 50, small_font, black, orange, ecran, 25)
-        
-        if mouse_clicked and back_button_rect.collidepoint(mouse_pos):
-            if has_sound:
-                button_sound.play()
-            current_screen = "menu"
-    
+
     # === ÉCRAN DE JEU ===
     elif current_screen == "play":
         # Titre
         draw_text("Mode de jeu", button_font, black, ecran, largeur // 2, 100)
         
         # Options de jeu
-        game_modes = ["Solo", "Multijoueur Local", "En ligne"]
+        game_modes = ["Solo", "Multijoueur",]
         mode_width = 300
         mode_height = 200
         modes_y = hauteur // 2 - mode_height // 2
