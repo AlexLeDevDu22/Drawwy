@@ -1,82 +1,78 @@
 import pygame
-from pygame.locals import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
+import time
 
-# Définition des murs, sol et plafond
-vertices = [
-    (-5, -2, -5), (5, -2, -5), (5, -2, 5), (-5, -2, 5),  # Sol
-    (-5, 3, -5), (5, 3, -5), (5, 3, 5), (-5, 3, 5)  # Plafond
-]
-edges = [(0,1), (1,2), (2,3), (3,0),  # Sol
-         (4,5), (5,6), (6,7), (7,4),  # Plafond
-         (0,4), (1,5), (2,6), (3,7)]  # Murs verticaux
-
-# Fonction pour dessiner la salle
-def draw_room():
-    glBegin(GL_QUADS)
-    
-    # Sol
-    glColor3f(0.6, 0.6, 0.6)
-    glVertex3f(-5, -2, -5)
-    glVertex3f(5, -2, -5)
-    glVertex3f(5, -2, 5)
-    glVertex3f(-5, -2, 5)
-    
-    # Plafond
-    glColor3f(0.8, 0.8, 0.8)
-    glVertex3f(-5, 3, -5)
-    glVertex3f(5, 3, -5)
-    glVertex3f(5, 3, 5)
-    glVertex3f(-5, 3, 5)
-
-    # Murs
-    glColor3f(0.7, 0.5, 0.3)
-    for i in range(4):
-        glVertex3fv(vertices[i])
-        glVertex3fv(vertices[(i+1)%4])
-        glVertex3fv(vertices[(i+1)%4 + 4])
-        glVertex3fv(vertices[i + 4])
-
-    glEnd()
-
-# Fonction pour dessiner un tableau (mur du fond)
-def draw_painting():
-    glColor3f(1, 1, 1)
-    glBegin(GL_QUADS)
-    glVertex3f(-1, 1, -4.9)
-    glVertex3f(1, 1, -4.9)
-    glVertex3f(1, -1, -4.9)
-    glVertex3f(-1, -1, -4.9)
-    glEnd()
-
-# Initialisation de Pygame et OpenGL
 pygame.init()
-screen = pygame.display.set_mode((800, 600), DOUBLEBUF | OPENGL)
-gluPerspective(60, (800/600), 0.1, 50.0)
-glTranslatef(0, 0, -10)
 
-# Boucle principale
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            running = False
+# Création de la fenêtre
+screen_width, screen_height = 800, 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption('Cinématique Pygame')
 
-    keys = pygame.key.get_pressed()
-    if keys[K_LEFT]:
-        glRotatef(2, 0, 1, 0)
-    if keys[K_RIGHT]:
-        glRotatef(-2, 0, 1, 0)
-    if keys[K_UP]:
-        glTranslatef(0, 0, 0.2)
-    if keys[K_DOWN]:
-        glTranslatef(0, 0, -0.2)
+# Chargement des images avec vérification
+def load_image(path):
+    try:
+        image = pygame.image.load(path)
+        return image
+    except pygame.error:
+        print(f"Erreur de chargement de l'image : {path}")
+        return None
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    draw_room()
-    draw_painting()
-    pygame.display.flip()
-    pygame.time.wait(10)
+background = load_image('tests/background.png')
+character = load_image('tests/character.png')
 
+# Si l'un des assets échoue à charger, quitter
+if background is None or character is None:
+    pygame.quit()
+    exit()
+
+# Redimensionnement des images pour s'adapter à la fenêtre
+background = pygame.transform.scale(background, (screen_width, screen_height))
+character = pygame.transform.scale(character, (int(screen_width * 0.2), int(screen_height * 0.2)))  # Redimensionner le personnage
+
+# Chargement et démarrage de la musique
+try:
+    pygame.mixer.music.load('tests/cinematic_music.mp3')
+    pygame.mixer.music.play(-1)  # -1 pour répéter en boucle
+except pygame.error:
+    print("Erreur de chargement de la musique.")
+    pygame.quit()
+    exit()
+
+# Fonction de cinématique avec un bouton de sortie
+def cinematic():
+    running = True
+    screen.fill((0, 0, 0))  # Fond noir
+    screen.blit(background, (0, 0))  # Affichage du fond
+    screen.blit(character, (300, 250))  # Affichage du personnage
+    pygame.display.update()  # Mise à jour de l'écran
+    
+    time.sleep(2)  # Pause de 2 secondes
+    
+    # Affichage du texte
+    font = pygame.font.Font(None, 36)
+    text = font.render('Voici une cinématique...', True, (255, 255, 255))
+    screen.blit(text, (250, 500))
+    pygame.display.update()
+    
+    time.sleep(3)  # Affichage du texte pendant 3 secondes
+
+    # Affichage du bouton pour quitter
+    quit_text = font.render('Appuyez sur Q pour quitter', True, (255, 255, 255))
+    screen.blit(quit_text, (250, 550))
+    pygame.display.update()
+
+    # Attente d'une touche pour quitter
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:  # Quitter si "Q" est pressé
+                    running = False
+        pygame.time.delay(50)  # Réduire la charge CPU
+
+# Lancer la cinématique
+cinematic()
+
+# Fermer proprement
 pygame.quit()
