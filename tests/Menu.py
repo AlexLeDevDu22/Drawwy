@@ -22,28 +22,27 @@ gray = (200, 200, 200)
 font = pygame.font.SysFont(None, 300)
 small_font = pygame.font.SysFont(None, 80)
 
-# Fonction pour dessiner le texte
+
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
     textrect.center = (x, y)
     surface.blit(textobj, textrect)
 
-# Boucle principale
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Remplir l'écran avec du blanc
+
     ecran.fill(white)
 
-    # Dessiner le titre
+
     draw_text("DRAWWY", font, black, ecran, (largeur, hauteur)[0]//2 , 200)
 
-    # Dessiner les boutons
-    buttons = ["JOUER", "SUCCES", "PARAMETRES", "QUITTER"]
+
+    buttons = ["JOUER", "SUCCÈS", "PARAMÈTRES", "QUITTER"]
     button_y_start = 400
     button_height = 100
     button_width = 500
@@ -54,9 +53,9 @@ while running:
         pygame.draw.rect(ecran, gray, (button_x, button_y, button_width, button_height), border_radius=100)
         draw_text(button_text, small_font, black, ecran, button_x + button_width // 2, button_y + button_height // 2)
 
-    # Mettre à jour l'affichage
+
     pygame.display.flip()
 
-# Quitter Pygame
+
 pygame.quit()
 sys.exit()
