@@ -55,49 +55,138 @@ class Particle:
         pygame.draw.circle(surface, self.color, (int(self.x), int(self.y)), int(self.size))
 
 # Classe pour les éléments de dessin décoratifs
+import pygame
+import random
+import math
+
+import pygame
+import random
+import math
+
 class DrawingElement:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.type = random.choice(["pencil", "brush", "circle", "square"])
-        self.color = random.choice([soft_orange, pastel_pink, pastel_green, pastel_yellow, dark_blue])
-        self.size = random.randint(10, 35)
-        self.angle = random.uniform(0, 2*math.pi)
-        self.speed = random.uniform(0.3, 1)
-    
+        self.type = random.choice(["flower", "star", "heart", "cloud"])
+        self.color = random.choice([(255, 102, 102), (255, 204, 102), (102, 204, 255), (153, 255, 153), (255, 153, 255)])
+        self.size = random.randint(20, 50)
+        self.angle = random.uniform(0, 2 * math.pi)
+        self.speed = random.uniform(0.3, 0.5)  
+        self.angle_change = random.uniform(-0.01, 0.01)
+        # Store initial parameters for smooth drawing
+        self.initial_angle = self.angle
+        
     def update(self):
-        self.angle += 0.01
+        self.angle += self.angle_change  
         self.x += math.sin(self.angle) * self.speed
         self.y += math.cos(self.angle) * self.speed
         
-        # Si l'élément sort de l'écran, le repositionner
-        if self.x < -50 or self.x > largeur + 50 or self.y < -50 or self.y > hauteur + 50:
-            if random.choice([True, False]):
-                self.x = random.randint(0, largeur)
-                self.y = random.choice([-50, hauteur + 50])
-            else:
-                self.x = random.choice([-50, largeur + 50])
-                self.y = random.randint(0, hauteur)
-    
     def draw(self, surface):
-        if self.type == "pencil":
-            points = [(self.x, self.y), 
-                      (self.x + self.size, self.y), 
-                      (self.x + self.size * 0.8, self.y + self.size * 3)]
-            pygame.draw.polygon(surface, self.color, points)
-        elif self.type == "brush":
-            pygame.draw.rect(surface, self.color, 
-                            (self.x, self.y, self.size * 0.5, self.size * 2))
-            pygame.draw.circle(surface, self.color, 
-                            (int(self.x + self.size * 0.25), int(self.y)), 
-                            int(self.size * 0.6))
-        elif self.type == "circle":
-            pygame.draw.circle(surface, self.color, 
-                            (int(self.x), int(self.y)), int(self.size))
-        else:  # square
-            pygame.draw.rect(surface, self.color, 
-                            (self.x, self.y, self.size, self.size))
-
+        if self.type == "flower":
+            self.draw_flower(surface)
+        elif self.type == "star":
+            self.draw_star(surface)
+        elif self.type == "heart":
+            self.draw_heart(surface)
+        elif self.type == "cloud":
+            self.draw_cloud(surface)
+            
+    def draw_flower(self, surface):
+        center = (int(self.x), int(self.y))
+        petal_distance = self.size // 2.5
+        # Remove random trembling by using fixed angles
+        for angle in range(0, 360, 72):
+            rad = math.radians(angle)
+            petal_x = center[0] + int(math.cos(rad) * petal_distance)
+            petal_y = center[1] + int(math.sin(rad) * petal_distance)
+            pygame.draw.circle(surface, self.color, (petal_x, petal_y), self.size // 3)
+            pygame.draw.circle(surface, (0, 0, 0), (petal_x, petal_y), self.size // 3, 2)  
+        pygame.draw.circle(surface, (255, 255, 0), center, self.size // 4)  
+        pygame.draw.circle(surface, (0, 0, 0), center, self.size // 4, 2)  
+        
+    def draw_star(self, surface):
+        points = []
+        # Remove random trembling by using fixed angles
+        for i in range(10):
+            angle = math.pi / 5 * i
+            radius = self.size if i % 2 == 0 else self.size // 2
+            x = self.x + math.cos(angle) * radius
+            y = self.y + math.sin(angle) * radius
+            points.append((x, y))
+        pygame.draw.polygon(surface, self.color, points)
+        pygame.draw.polygon(surface, (0, 0, 0), points, 3)  
+        
+    def draw_heart(self, surface):
+        """Improved heart shape with smoother curves"""
+        # Heart shape parameters
+        size = self.size
+        # Create a list of points for the heart shape
+        points = []
+        for angle in range(0, 360, 5):
+            rad = math.radians(angle)
+            # Heart parametric equations for smoother shape
+            x = self.x + 16 * size/40 * math.sin(rad) ** 3
+            y = self.y - (13 * size/40 * math.cos(rad) - 5 * size/40 * math.cos(2*rad) - 
+                          2 * size/40 * math.cos(3*rad) - size/40 * math.cos(4*rad))
+            points.append((x, y))
+            
+        # Fill heart shape
+        pygame.draw.polygon(surface, self.color, points)
+        # Draw outline
+        pygame.draw.polygon(surface, (0, 0, 0), points, 2)
+        
+    def draw_cloud(self, surface):
+        """Improved cloud with smoother shape and better organization"""
+        # Cloud base parameters
+        cloud_radius = self.size // 2.5
+        small_radius = cloud_radius * 0.8
+        
+        # Main cloud body (larger central circle)
+        center = (int(self.x), int(self.y))
+        pygame.draw.circle(surface, self.color, center, cloud_radius)
+        
+        # Additional circles to form cloud shape
+        offsets = [
+            (-cloud_radius*0.8, -cloud_radius*0.3),  # top left
+            (cloud_radius*0.8, -cloud_radius*0.3),   # top right
+            (-cloud_radius*1.2, cloud_radius*0.2),   # middle left
+            (cloud_radius*1.2, cloud_radius*0.2),    # middle right
+            (0, -cloud_radius*0.7),                  # top middle
+        ]
+        
+        # Draw additional circles
+        for offset in offsets:
+            pos = (int(center[0] + offset[0]), int(center[1] + offset[1]))
+            pygame.draw.circle(surface, self.color, pos, small_radius)
+        
+        # Draw outline to join all circles together
+        outline_points = []
+        steps = 36
+        for i in range(steps):
+            angle = 2 * math.pi * i / steps
+            
+            # Find furthest point at this angle
+            max_dist = cloud_radius
+            max_x, max_y = center[0] + math.cos(angle) * cloud_radius, center[1] + math.sin(angle) * cloud_radius
+            
+            for offset in offsets:
+                pos = (center[0] + offset[0], center[1] + offset[1])
+                # Distance from this circle edge to center
+                edge_x = pos[0] + math.cos(angle) * small_radius
+                edge_y = pos[1] + math.sin(angle) * small_radius
+                
+                # Distance from center of main cloud
+                dist_from_center = math.sqrt((edge_x - center[0])**2 + (edge_y - center[1])**2)
+                
+                if dist_from_center > max_dist:
+                    max_dist = dist_from_center
+                    max_x, max_y = edge_x, edge_y
+            
+            outline_points.append((max_x, max_y))
+            
+        # Draw cloud outline
+        pygame.draw.polygon(surface, self.color, outline_points)
+        pygame.draw.polygon(surface, (0, 0, 0), outline_points, 2)
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
