@@ -43,7 +43,7 @@ while running:
     draw_text("DRAWWY", font, black, ecran, (largeur, hauteur)[0]//2 , 200)
 
     # Dessiner les boutons
-    buttons = ["ONLINE", "HISTOIRE", "QUITTER"]
+    buttons = ["ONLINE", "HISTOIRE", "RETOUR"]
     button_y_start = 400
     button_height = 100
     button_width = 500
