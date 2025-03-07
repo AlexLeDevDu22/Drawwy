@@ -42,7 +42,7 @@ show_buttons = False  # Affiche les boutons après l'animation
 
 # --- Palette de couleurs ---
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 165, 0), (255, 255, 255), (0, 0, 0)]
-color_rects = [pygame.Rect(avatar_target_pos[0] + i * 40, avatar_target_pos[1]-50, 30, 30) for i in range(len(colors))]
+color_rects = [pygame.Rect(avatar_target_pos[0] + i * 60, avatar_target_pos[1]-60, 50, 50) for i in range(len(colors))]
 brush_color = colors[0]  # Rouge par défaut
 
 # --- Boutons ---
@@ -50,12 +50,12 @@ button_width, button_height = 120, 40
 validate_button_rect = pygame.Rect(WIDTH // 2 - 130, pseudo_target_pos[1] + 50, button_width, button_height)
 cancel_button_rect = pygame.Rect(WIDTH // 2 + 10, pseudo_target_pos[1] + 50, button_width, button_height)
 
-button_width = 60
-button_height = 60
-button_padding = 20
-add_button_rect = pygame.Rect(WIDTH // 2 - button_width - button_padding, HEIGHT // 2 - button_height // 2, button_width, button_height)
-subtract_button_rect = pygame.Rect(WIDTH // 2 + button_padding, HEIGHT // 2 - button_height // 2, button_width, button_height)
-
+size_min=1
+size_max=5
+size_button_width = 50
+size_button_height = 50
+decrease_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width, avatar_start_pos[1]+size_button_height//2, size_button_width, size_button_height)
+increase_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width+40, avatar_start_pos[1]+size_button_height//2, size_button_width, size_button_height)
 
 # --- Couleurs ---
 WHITE = (255, 255, 255)
@@ -63,7 +63,9 @@ GRAY = (200, 200, 200)
 BLACK = (0, 0, 0)
 RED = (200, 50, 50)
 GREEN = (50, 200, 50)
-
+ORANGE = (255, 95, 31)
+SOFT_ORANGE = (255, 160, 122)
+DARK_BEIGE = (222, 184, 135)
 # --- Masque circulaire ---
 def apply_circular_mask(image):
     mask = pygame.Surface(image.get_size(), pygame.SRCALPHA)
@@ -76,6 +78,25 @@ def save_state():
     if len(history) > 20:  # Limite historique
         history.pop(0)
     redo_stack.clear()  # Reset redo
+
+
+
+def size_button(rect, text, hover):
+    # Ombre
+    offset = 3
+    pygame.draw.rect(screen, DARK_BEIGE if not hover else GRAY,
+                     (rect.x + offset, rect.y + offset, rect.width, rect.height),
+                     border_radius=30)
+
+    # Bouton principal
+    button_color = ORANGE if not hover else SOFT_ORANGE
+    pygame.draw.rect(screen, button_color, rect, border_radius=30)
+
+    # Texte du bouton
+    text_surface = font.render(text, True, BLACK)
+    text_x = rect.x + (rect.width - text_surface.get_width()) // 2
+    text_y = rect.y + (rect.height - text_surface.get_height()) // 2 - (2 if hover else 0)
+    screen.blit(text_surface, (text_x, text_y))
 
 running = True
 while running:
@@ -94,12 +115,6 @@ while running:
                    avatar_start_pos[1] < mouse_y < avatar_start_pos[1] + avatar_size:
                     is_expanding = True
                     pseudo_editable = True
-            if add_button_rect.collidepoint(event.pos):  # Clique sur "+"
-                if brush_size < 5:
-                    brush_size += 1
-            elif subtract_button_rect.collidepoint(event.pos):  # Clique sur "-"
-                if brush_size > 1:
-                    brush_size -= 1
             else:
                 if validate_button_rect.collidepoint(mouse_x, mouse_y):  # ✔ Valider
                     pygame.image.save(avatar, "tests/avatar.bmp")  # Enregistrer en .bmp
@@ -199,25 +214,14 @@ while running:
         for i, rect in enumerate(color_rects):
             pygame.draw.rect(screen, colors[i], rect)
         # size
-        # Fond du compteur
-        pygame.draw.rect(screen, (100,100,230), (WIDTH // 2 - 180, HEIGHT // 2 - 60, 360, 120))
-        pygame.draw.rect(screen, BLACK, (WIDTH // 2 - 180, HEIGHT // 2 - 60, 360, 120), 5)  # Bordure noire
+        for rect, label, action in [(increase_button_rect, "+", lambda: min(size_max, brush_size + 1)),
+                                 (decrease_button_rect, "-", lambda: max(size_min, brush_size - 1))]:
+            hover = rect.collidepoint(mouse_x, mouse_y)
 
-        # Texte de la valeur actuelle
-        value_text = font.render(str(brush_size), True, WHITE)
-        screen.blit(value_text, (WIDTH // 2 - value_text.get_width() // 2, HEIGHT // 2 - value_text.get_height() // 2))
+            if hover and mouse_pressed:
+                brush_size = action()  # Applique l'action correspondante
 
-        pygame.draw.rect(screen, GRAY, add_button_rect)
-        pygame.draw.rect(screen, BLACK, add_button_rect, 5)
-        add_text = font.render("+", True, BLACK)
-        screen.blit(add_text, (add_button_rect.x + add_button_rect.width // 2 - add_text.get_width() // 2, add_button_rect.y + add_button_rect.height // 2 - add_text.get_height() // 2))
-
-        # Bouton Soustraire (-)
-        pygame.draw.rect(screen, GRAY, subtract_button_rect)
-        pygame.draw.rect(screen, BLACK, subtract_button_rect, 5)
-        subtract_text = font.render("-", True, BLACK)
-        screen.blit(subtract_text, (subtract_button_rect.x + subtract_button_rect.width // 2 - subtract_text.get_width() // 2, subtract_button_rect.y + subtract_button_rect.height // 2 - subtract_text.get_height() // 2))
-
+            size_button(rect, label, hover)
 
         # --- Dessin des boutons (si activés) ---
         pygame.draw.rect(screen, GREEN, validate_button_rect)
