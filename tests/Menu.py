@@ -271,10 +271,7 @@ while running:
             button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
             pygame.draw.rect(ecran, button_color, button_rect, border_radius=40)
             
-            # Effet de brillance sur le bouton
-            highlight_rect = pygame.Rect(button_x + 10, button_y + 5, button_width - 20, 15)
-            pygame.draw.rect(ecran, soft_orange if not hover else pastel_yellow, 
-                           highlight_rect, border_radius=10)
+
             
             # Texte du bouton avec un léger déplacement lorsqu'il est survolé
             text_y_offset = 3 if hover else 0
