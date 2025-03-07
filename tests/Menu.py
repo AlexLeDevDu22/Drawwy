@@ -12,9 +12,9 @@ pygame.display.set_caption("DRAWWY")
 white = (255, 255, 255)
 black = (0, 0, 0)
 gray = (170, 170, 170)
-light_blue = (119,181,254)
+BEIGE = (250, 240, 230)
 light_gray = (200, 200, 200)  # Couleur plus claire pour le survol
-orange = (255,95,31)
+orange = ( 204 , 78 , 92)
 
 font = pygame.font.SysFont(None, 300)
 small_font = pygame.font.SysFont(None, 80)
@@ -33,7 +33,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    ecran.fill(light_blue)
+    ecran.fill(BEIGE)
 
     draw_text("DRAWWY", font, black, ecran, largeur // 2, 200)
 
