@@ -12,7 +12,9 @@ pygame.display.set_caption("DRAWWY")
 white = (255, 255, 255)
 black = (0, 0, 0)
 gray = (170, 170, 170)
+light_blue = (119,181,254)
 light_gray = (200, 200, 200)  # Couleur plus claire pour le survol
+orange = (255,95,31)
 
 font = pygame.font.SysFont(None, 300)
 small_font = pygame.font.SysFont(None, 80)
@@ -31,7 +33,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    ecran.fill(white)
+    ecran.fill(light_blue)
 
     draw_text("DRAWWY", font, black, ecran, largeur // 2, 200)
 
@@ -49,7 +51,7 @@ while running:
         if button_rect.collidepoint(mouse_pos):
             pygame.draw.rect(ecran, light_gray, button_rect, border_radius=100)
         else:
-            pygame.draw.rect(ecran, gray, button_rect, border_radius=100)
+            pygame.draw.rect(ecran, orange, button_rect, border_radius=100)
 
         draw_text(button_text, small_font, black, ecran, button_x + button_width // 2, button_y + button_height // 2)
 
