@@ -394,11 +394,11 @@ while running:
             
             # Texte
             draw_text(achievement["name"], small_font, black, ecran, 
-                     main_panel_x + 200, achievement_y + 20)
+                     main_panel_x + 400, achievement_y + 20)
             
             description_font = pygame.font.SysFont(None, 30)
             draw_text(achievement["description"], description_font, gray, ecran, 
-                     main_panel_x + 200, achievement_y + 50)
+                     main_panel_x + 400, achievement_y + 50)
             
             # Icône
             if achievement["completed"]:
