@@ -431,6 +431,7 @@ while running:
             if has_sound:
                 button_sound.play()
             current_screen = "menu"
+        
     
     # Afficher la version
     version_text = "DRAWWY v1.0"
