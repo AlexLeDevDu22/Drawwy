@@ -10,7 +10,7 @@ font = pygame.font.Font(None, 36)
 
 # --- Charger l'image de profil ---
 AVATAR_PATH = "tests/avatar.bmp"
-avatar_original = pygame.image.load(AVATAR_PATH)  # Mets ton image ici
+avatar_original = pygame.image.load(AVATAR_PATH).convert_alpha()  # Mets ton image ici
 avatar_original = pygame.transform.scale(avatar_original, (100, 100))  # Taille initiale
 avatar = avatar_original.copy()  # Copie pour modifications
 
@@ -30,8 +30,8 @@ pseudo_start_pos = (WIDTH - avatar_size - 35, avatar_size + 30)
 
 # Positions Finales (Centré)
 avatar_target_size = int(0.7 * HEIGHT)
-avatar_target_pos = ((WIDTH - avatar_target_size) // 2, (HEIGHT - avatar_target_size) // 2 - 50)
-pseudo_target_pos = (WIDTH // 2 - 50, avatar_target_pos[1] + avatar_target_size + 10)
+avatar_target_pos = ((WIDTH - avatar_target_size) // 2, (HEIGHT - avatar_target_size) // 2 - 80)
+pseudo_target_pos = (WIDTH // 2 - 50, avatar_target_pos[1] + avatar_target_size + 70)
 
 # État de transition
 anim_progress = 0  # 0 → 1
@@ -46,16 +46,16 @@ color_rects = [pygame.Rect(avatar_target_pos[0] + i * 60, avatar_target_pos[1]-6
 brush_color = colors[0]  # Rouge par défaut
 
 # --- Boutons ---
-button_width, button_height = 120, 40
-validate_button_rect = pygame.Rect(WIDTH // 2 - 130, pseudo_target_pos[1] + 50, button_width, button_height)
-cancel_button_rect = pygame.Rect(WIDTH // 2 + 10, pseudo_target_pos[1] + 50, button_width, button_height)
+button_width, button_height = 140, 50
+cancel_button_rect = pygame.Rect(WIDTH // 2 -140, pseudo_target_pos[1] + 45, button_width, button_height)
+validate_button_rect = pygame.Rect(WIDTH // 2 + 20, pseudo_target_pos[1] + 45, button_width, button_height)
 
 size_min=1
 size_max=5
-size_button_width = 50
+size_button_width = 60
 size_button_height = 50
-decrease_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width, avatar_start_pos[1]+size_button_height//2, size_button_width, size_button_height)
-increase_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width+40, avatar_start_pos[1]+size_button_height//2, size_button_width, size_button_height)
+decrease_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width, avatar_start_pos[1]+size_button_height//2-10, size_button_width, size_button_height)
+increase_button_rect = pygame.Rect(avatar_target_pos[0]+avatar_target_size-size_button_width+70, avatar_start_pos[1]+size_button_height//2-10, size_button_width, size_button_height)
 
 # --- Couleurs ---
 WHITE = (255, 255, 255)
@@ -69,6 +69,7 @@ DARK_BEIGE = (222, 184, 135)
 # --- Masque circulaire ---
 def apply_circular_mask(image):
     mask = pygame.Surface(image.get_size(), pygame.SRCALPHA)
+    mask.fill((0, 0, 0, 0))
     pygame.draw.circle(mask, (255, 255, 255, 255), (image.get_width() // 2, image.get_height() // 2), image.get_width() // 2)
     image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
@@ -113,39 +114,49 @@ while running:
             if not show_buttons:  # Si pas déjà en mode édition
                 if avatar_start_pos[0] < mouse_x < avatar_start_pos[0] + avatar_size and \
                    avatar_start_pos[1] < mouse_y < avatar_start_pos[1] + avatar_size:
+                    input_text = pseudo
                     is_expanding = True
                     pseudo_editable = True
             else:
-                if validate_button_rect.collidepoint(mouse_x, mouse_y):  # ✔ Valider
+                if decrease_button_rect.collidepoint(mouse_x, mouse_y):
+                    brush_size = max(size_min, brush_size - 1)
+
+                elif increase_button_rect.collidepoint(mouse_x, mouse_y):
+                    brush_size = min(size_max, brush_size + 1)
+
+                elif validate_button_rect.collidepoint(mouse_x, mouse_y):  # ✔ Valider
                     pygame.image.save(avatar, "tests/avatar.bmp")  # Enregistrer en .bmp
+                    pseudo = input_text
                     show_buttons = False  # Cacher les boutons
                     pseudo_editable = False
                     is_retracting = True
 
-                if cancel_button_rect.collidepoint(mouse_x, mouse_y):  # ❌ Annuler
+                elif cancel_button_rect.collidepoint(mouse_x, mouse_y):  # ❌ Annuler
                     avatar = avatar_original.copy()  # Reset image
                     is_retracting = True
                     show_buttons = False
 
             for i, rect in enumerate(color_rects):
                 if rect.collidepoint(mouse_x, mouse_y):
-                    print("Couleur choisie:", colors[i])
                     brush_color = colors[i]
                     erasing = (brush_color == (255, 255, 255))  # Activer gomme si blanc
+        elif event.type == pygame.MOUSEBUTTONUP:
+            save_state()
 
-
-        if event.type == pygame.KEYDOWN and pseudo_editable:
-            if event.key == pygame.K_RETURN and pseudo_editable:  # Valider avec ENTER
-                pygame.image.save(avatar, AVATAR_PATH)
-                show_buttons = False
+        elif event.type == pygame.KEYDOWN and pseudo_editable:
+            if event.key == pygame.K_RETURN:  # Valider avec ENTER
+                pygame.image.save(avatar, "tests/avatar.bmp")  # Enregistrer en .bmp
+                pseudo = input_text
+                show_buttons = False  # Cacher les boutons
                 pseudo_editable = False
-            elif event.key == pygame.K_ESCAPE and pseudo_editable:  # Annuler avec ESC
-                avatar = history[0].copy()
+                is_retracting = True
+            elif event.key == pygame.K_ESCAPE:  # Annuler avec ESC
+                avatar = avatar_original.copy()  # Reset image
                 is_retracting = True
                 show_buttons = False
-            elif event.key == pygame.K_UP:  # Augmenter la taille du pinceau
+            elif event.key == pygame.K_UP and brush_size < size_max:  # Augmenter la taille du pinceau
                 brush_size += 1
-            elif event.key == pygame.K_DOWN and brush_size > 1:  # Diminuer la taille
+            elif event.key == pygame.K_DOWN and brush_size > size_min:  # Diminuer la taille
                 brush_size -= 1
             elif event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Z (Undo)
                 if len(history) > 1:
@@ -156,15 +167,19 @@ while running:
                     avatar = redo_stack.pop()
                     history.append(avatar.copy())
 
+            elif event.key == pygame.K_BACKSPACE:
+                input_text = input_text[:-1]
+            else:
+                input_text += event.unicode
+
     # --- Dessin sur l'image (seulement si agrandie) ---
-    if show_buttons and mouse_pressed[0]:  # Si on clique gauche
+    if show_buttons and True in mouse_pressed:
         rel_x = (mouse_x - avatar_pos[0]) / avatar_size
         rel_y = (mouse_y - avatar_pos[1]) / avatar_size
         if 0 <= rel_x <= 1 and 0 <= rel_y <= 1:  # Vérifie si on est bien sur l'image
             px = int(rel_x * avatar.get_width())
             py = int(rel_y * avatar.get_height())
             pygame.draw.circle(avatar, brush_color, (px, py), brush_size)
-            save_state() 
 
     # --- Interpolation Positions/Tailles ---
     avatar_size = int(100 + (avatar_target_size - 50) * anim_progress)
@@ -180,6 +195,7 @@ while running:
             anim_progress = 1
             is_expanding = False
             show_buttons = True  # Afficher les boutons une fois centré
+            pseudo_editable = True
 
     # --- Animation Retrait ---
     if is_retracting:
@@ -201,6 +217,7 @@ while running:
     )
 
     # --- Dessin de l'avatar ---
+    pygame.draw.circle(screen, ORANGE, (avatar_pos[0]+avatar_size//2,avatar_pos[1]+avatar_size//2), avatar_size // 2+4+(8*anim_progress))
     temp_avatar = pygame.transform.scale(avatar, (avatar_size, avatar_size))
     apply_circular_mask(temp_avatar)
     screen.blit(temp_avatar, avatar_pos)
@@ -209,29 +226,28 @@ while running:
     pseudo_surf = font.render(input_text + "|" if pseudo_editable else pseudo, True, WHITE)
     screen.blit(pseudo_surf, pseudo_pos)
 
-    if show_buttons:
+    if show_buttons :
         # --- Palette de couleurs ---
         for i, rect in enumerate(color_rects):
-            pygame.draw.rect(screen, colors[i], rect)
+            pygame.draw.rect(screen, colors[i], rect, border_radius=8)
         # size
+        pygame.draw.circle(screen, brush_color, (avatar_target_pos[0]+avatar_target_size+5, avatar_start_pos[1]+size_button_height+60), brush_size**2+5, width=5)
+
         for rect, label, action in [(increase_button_rect, "+", lambda: min(size_max, brush_size + 1)),
                                  (decrease_button_rect, "-", lambda: max(size_min, brush_size - 1))]:
             hover = rect.collidepoint(mouse_x, mouse_y)
 
-            if hover and mouse_pressed:
-                brush_size = action()  # Applique l'action correspondante
-
             size_button(rect, label, hover)
 
         # --- Dessin des boutons (si activés) ---
-        pygame.draw.rect(screen, GREEN, validate_button_rect)
-        pygame.draw.rect(screen, RED, cancel_button_rect)
+        pygame.draw.rect(screen, GREEN, validate_button_rect, border_radius=10)
+        pygame.draw.rect(screen, RED, cancel_button_rect, border_radius=10)
 
         validate_text = font.render("✔ Valider", True, WHITE)
         cancel_text = font.render("❌ Annuler", True, WHITE)
 
-        screen.blit(validate_text, (validate_button_rect.x + 10, validate_button_rect.y + 10))
-        screen.blit(cancel_text, (cancel_button_rect.x + 10, cancel_button_rect.y + 10))
+        screen.blit(validate_text, (validate_button_rect.x + 20, validate_button_rect.y + 15))
+        screen.blit(cancel_text, (cancel_button_rect.x + 20, cancel_button_rect.y + 15))
 
     pygame.display.flip()
     clock.tick(30)
