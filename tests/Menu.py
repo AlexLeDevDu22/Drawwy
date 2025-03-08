@@ -29,11 +29,12 @@ try:
     title_font = pygame.font.Font(None, 300)
     button_font = pygame.font.Font(None, 80)
     small_font = pygame.font.Font(None, 40)
+    very_small_font = pygame.font.Font(None, 25)
 except:
     title_font = pygame.font.SysFont(None, 300)
     button_font = pygame.font.SysFont(None, 80)
     small_font = pygame.font.SysFont(None, 40)
-
+    very_small_font = pygame.font.Font(None, 25)
 # Classe pour les effets de particules
 class Particle:
     def __init__(self, x, y, color):
@@ -361,6 +362,21 @@ while running:
             button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
             pygame.draw.rect(ecran, button_color, button_rect, border_radius=40)
             
+            # Dessiner le bouton rond "crédit"
+            credit_button_radius = 40
+            credit_button_x = main_panel_x + 775
+            credit_button_y = main_panel_y + main_panel_height - 65 - credit_button_radius
+            credit_button_color = orange
+
+            # Dessiner le cercle
+            pygame.draw.circle(ecran, credit_button_color,
+            (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
+            credit_button_radius)
+
+            # Dessiner le texte "crédit"
+            draw_text("CRÉDIT", very_small_font, black, ecran,
+            credit_button_x + credit_button_radius,
+            credit_button_y + credit_button_radius)
 
             
             # Texte du bouton avec un léger déplacement lorsqu'il est survolé
@@ -390,32 +406,13 @@ while running:
                     current_screen = "play"
                 elif button_text == "SUCCÈS":
                     current_screen = "achievements"
+                elif button_text == "CRÉDIT":
+                    current_screen == "credit"
     
-    # Dessiner le bouton rond "crédit"
-    credit_button_radius = 60
-    credit_button_x = main_panel_x + 775
-    credit_button_y = main_panel_y + main_panel_height - 65 - credit_button_radius
-    credit_button_color = orange
 
-    # Dessiner le cercle
-    pygame.draw.circle(ecran, credit_button_color,
-                       (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
-                       credit_button_radius)
 
-    # Dessiner le texte "crédit"
-    draw_text("CRÉDIT", small_font, black, ecran,
-              credit_button_x + credit_button_radius,
-              credit_button_y + credit_button_radius)
-
-    # Vérifier si le bouton est cliqué
-    if mouse_clicked:
-        distance_to_button = math.sqrt((mouse_pos[0] - (credit_button_x + credit_button_radius))**2 +
-                                      (mouse_pos[1] - (credit_button_y + credit_button_radius))**2)
-        if distance_to_button <= credit_button_radius:
-            if has_sound:
-                button_sound.play()
-            current_screen = "credits"  # Vous pouvez créer un écran de crédits si nécessaire
-
+    
+    
 
 
     # === ÉCRAN DE JEU ===
@@ -548,7 +545,7 @@ while running:
                 button_sound.play()
             current_screen = "menu"
         
-    
+           
     # Afficher la version
     version_text = "DRAWWY v1.0"
     version_font = pygame.font.SysFont(None, 24)
