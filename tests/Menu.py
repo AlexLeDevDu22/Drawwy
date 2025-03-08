@@ -660,8 +660,22 @@ while running:
             button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
             pygame.draw.rect(ecran, button_color, button_rect, border_radius=40)
             
-
+            # Dessiner le bouton rond "crédit"
+            credit_button_radius = 50
+            credit_button_x = main_panel_x + 775
+            credit_button_y = main_panel_y + main_panel_height - 60- credit_button_radius
+            credit_button_color = orange
             
+            # Dessiner le cercle
+            pygame.draw.circle(ecran, credit_button_color,
+                       (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
+                       credit_button_radius)
+            
+            # Dessiner le texte "crédit"
+            draw_text("CRÉDIT", very_small_font, black, ecran,
+              credit_button_x + credit_button_radius,
+              credit_button_y + credit_button_radius)
+
             # Texte du bouton avec un léger déplacement lorsqu'il est survolé
             text_y_offset = 3 if hover else 0
             draw_text(button_text, button_font, black, ecran, 
@@ -688,6 +702,8 @@ while running:
                 elif button_text == "JOUER":
                     current_screen = "play"
                 elif button_text == "SUCCÈS":
+                    current_screen = "achievements"
+                elif button_text == "CRÉDIT ":
                     current_screen = "achievements"
     
 
