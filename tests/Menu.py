@@ -509,7 +509,7 @@ angle = 0
 current_screen = "menu"
 selected_button = None
 active_buttons = []
-
+editcredit_active_buttons = []
 # Créer le gestionnaire d'avatar
 avatar_manager = AvatarManager(ecran)
 
@@ -629,7 +629,8 @@ while running:
         button_y_start = main_panel_y + 320
         
         active_buttons = []
-        
+        credit_active_buttons = []
+
         for i, button_text in enumerate(buttons):
             button_y = button_y_start + i * 1.3 * button_height
             
@@ -639,16 +640,9 @@ while running:
                 hover = True
                 if selected_button != i:
                     selected_button = i
-                
-                # Ajouter quelques particules sur survol
-                if animation_counter % 10 == 0:
-                    for _ in range(3):
-                        particles.append(Particle(
-                            random.randint(button_x, button_x + button_width),
-                            button_y + button_height,
-                            random.choice([orange, soft_orange])
-                        ))
             
+                
+
             # Dessiner l'ombre du bouton
             offset = 5
             pygame.draw.rect(ecran, dark_beige if not hover else gray, 
@@ -666,6 +660,13 @@ while running:
             credit_button_y = main_panel_y + main_panel_height - 60- credit_button_radius
             credit_button_color = orange
             
+            # Animation de survol du credit
+            hover_credit = False
+            if credit_button_x <= mouse_pos[0] <= credit_button_x + credit_button_radius and credit_button_y <= mouse_pos[1] <= credit_button_y + credit_button_radius:
+                hover_credit = True
+                if selected_button != i:
+                    selected_button = i
+
             # Dessiner le cercle
             pygame.draw.circle(ecran, credit_button_color,
                        (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
@@ -675,6 +676,13 @@ while running:
             draw_text("CRÉDIT", very_small_font, black, ecran,
               credit_button_x + credit_button_radius,
               credit_button_y + credit_button_radius)
+
+            # Texte du bouton Credit avec un léger déplacement lorsqu'il est survolé
+            credit_text_y_offset = 3 if hover_credit else 0
+            draw_text("CRÉDIT", very_small_font, black, ecran, 
+                     credit_button_x +  credit_button_radius, 
+                     credit_button_y + credit_button_radius - credit_text_y_offset)
+            credit_active_buttons.append((credit_button_radius, "CRÉDIT"))
 
             # Texte du bouton avec un léger déplacement lorsqu'il est survolé
             text_y_offset = 3 if hover else 0
