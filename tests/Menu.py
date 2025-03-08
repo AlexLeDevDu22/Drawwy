@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import math
+import os
 
 pygame.init()
 info_ecran = pygame.display.Info()
@@ -13,9 +14,9 @@ pygame.display.set_caption("DRAWWY")
 white = (255, 255, 255)
 black = (0, 0, 0)
 gray = (170, 170, 170)
+light_gray = (200, 200, 200)
 light_blue = (119, 181, 254)
 dark_blue = (65, 105, 225)
-light_gray = (200, 200, 200)
 orange = (255, 95, 31)
 soft_orange = (255, 160, 122)
 beige = (245, 222, 179)
@@ -23,6 +24,8 @@ dark_beige = (222, 184, 135)
 pastel_pink = (255, 209, 220)
 pastel_green = (193, 225, 193)
 pastel_yellow = (253, 253, 150)
+red = (200, 50, 50)
+green = (50, 200, 50)
 
 # Police personnalisée
 try:
@@ -56,14 +59,6 @@ class Particle:
         pygame.draw.circle(surface, self.color, (int(self.x), int(self.y)), int(self.size))
 
 # Classe pour les éléments de dessin décoratifs
-import pygame
-import random
-import math
-
-import pygame
-import random
-import math
-
 class DrawingElement:
     def __init__(self, x, y):
         self.x = x
@@ -188,6 +183,302 @@ class DrawingElement:
         # Draw cloud outline
         pygame.draw.polygon(surface, self.color, outline_points)
         pygame.draw.polygon(surface, (0, 0, 0), outline_points, 2)
+
+# Classe pour la gestion de l'avatar
+class AvatarManager:
+    def __init__(self, screen):
+        self.screen = screen
+        self.avatar_size = 100
+        self.pseudo = "Joueur"
+        self.input_text = self.pseudo
+        
+        # Charger ou créer l'avatar
+        self.avatar_path = "tests/avatar.bmp"
+        try:
+            self.avatar_original = pygame.image.load(self.avatar_path).convert_alpha()
+            self.avatar_original = pygame.transform.scale(self.avatar_original, (100, 100))
+        except:
+            # Créer un avatar par défaut
+            self.avatar_original = pygame.Surface((100, 100), pygame.SRCALPHA)
+            self.avatar_original.fill((100, 100, 255, 255))  # Bleu par défaut
+            pygame.draw.circle(self.avatar_original, orange, (50, 50), 50)
+            
+        self.avatar = self.avatar_original.copy()
+        
+        # Historique des modifications
+        self.history = [self.avatar.copy()]
+        self.redo_stack = []
+        
+        # Positions
+        self.avatar_start_pos = (largeur - self.avatar_size - 25, 20)
+        self.pseudo_start_pos = (largeur - self.avatar_size - 35, self.avatar_size + 30)
+        
+        # Positions cibles pour l'édition
+        self.avatar_target_size = int(0.71 * hauteur)
+        self.avatar_target_pos = ((largeur - self.avatar_target_size) // 2, (hauteur - self.avatar_target_size) // 2-70)
+        self.pseudo_target_pos = (largeur // 2 - 50, self.avatar_target_pos[1] + self.avatar_target_size + 25)
+        
+        # État d'animation
+        self.anim_progress = 0
+        self.is_expanding = False
+        self.is_retracting = False
+        self.pseudo_editable = False
+        self.show_buttons = False
+        
+        # Propriétés du pinceau
+        self.drawing = False
+        self.brush_size = 5
+        self.size_min = 1
+        self.size_max = 20
+        
+        # Palette de couleurs pour l'édition d'avatar
+        self.colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), 
+                       (255, 165, 0), (255, 255, 255), (0, 0, 0)]
+        self.brush_color = self.colors[0]
+        
+        # Créer les rectangles pour la palette de couleurs
+        self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60, 
+                            self.avatar_target_pos[1] - 70, 50, 50) 
+                            for i in range(len(self.colors))]
+        
+        # Boutons
+        button_width, button_height = 160, 50
+        self.cancel_button_rect = pygame.Rect(largeur // 2 - 150, self.pseudo_target_pos[1] + 45, 
+                                             button_width, button_height)
+        self.validate_button_rect = pygame.Rect(largeur // 2 + 30, self.pseudo_target_pos[1] + 45, 
+                                               button_width, button_height)
+        
+        # Boutons de taille de pinceau
+        size_button_width = 60
+        size_button_height = 50
+        self.decrease_button_rect = pygame.Rect(self.avatar_target_pos[0] + self.avatar_target_size - size_button_width, 
+                                              self.avatar_start_pos[1] + size_button_height // 2 - 10, 
+                                              size_button_width, size_button_height)
+        self.increase_button_rect = pygame.Rect(self.avatar_target_pos[0] + self.avatar_target_size - size_button_width + 70, 
+                                              self.avatar_start_pos[1] + size_button_height // 2 - 10, 
+                                              size_button_width, size_button_height)
+        
+    def save_state(self):
+        self.history.append(self.avatar.copy())
+        if len(self.history) > 20:  # Limite historique
+            self.history.pop(0)
+        self.redo_stack.clear()  # Reset redo
+        
+    def apply_circular_mask(self, image):
+        mask = pygame.Surface(image.get_size(), pygame.SRCALPHA)
+        mask.fill((0, 0, 0, 0))
+        pygame.draw.circle(mask, (255, 255, 255, 255), 
+                          (image.get_width() // 2, image.get_height() // 2), 
+                          image.get_width() // 2)
+        image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        
+    def size_button(self, rect, text, hover):
+        # Ombre
+        offset = 3
+        pygame.draw.rect(self.screen, dark_beige if not hover else gray,
+                       (rect.x + offset, rect.y + offset, rect.width, rect.height),
+                       border_radius=30)
+
+        # Bouton principal
+        button_color = orange if not hover else soft_orange
+        pygame.draw.rect(self.screen, button_color, rect, border_radius=30)
+
+        # Texte du bouton
+        text_surface = small_font.render(text, True, black)
+        text_x = rect.x + (rect.width - text_surface.get_width()) // 2
+        text_y = rect.y + (rect.height - text_surface.get_height()) // 2 - (2 if hover else 0)
+        self.screen.blit(text_surface, (text_x, text_y))
+        
+    def handle_event(self, event, mouse_pos, mouse_pressed):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if not self.show_buttons:  # Si pas déjà en mode édition
+                if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
+                   self.avatar_start_pos[1] < mouse_pos[1] < self.avatar_start_pos[1] + self.avatar_size:
+                    self.input_text = self.pseudo
+                    self.is_expanding = True
+                    self.pseudo_editable = True
+                    return True  # Indique que l'événement a été géré
+            else:
+                if self.decrease_button_rect.collidepoint(mouse_pos):
+                    self.brush_size = max(self.size_min, self.brush_size - 1)
+                    return True
+
+                elif self.increase_button_rect.collidepoint(mouse_pos):
+                    self.brush_size = min(self.size_max, self.brush_size + 1)
+                    return True
+
+                elif self.validate_button_rect.collidepoint(mouse_pos):  # Valider
+                    pygame.image.save(self.avatar, self.avatar_path)
+                    self.pseudo = self.input_text
+                    self.show_buttons = False
+                    self.pseudo_editable = False
+                    self.is_retracting = True
+                    return True
+
+                elif self.cancel_button_rect.collidepoint(mouse_pos) and self.input_text!="":  # Annuler
+                    self.avatar = self.avatar_original.copy()
+                    self.is_retracting = True
+                    self.show_buttons = False
+                    return True
+
+                # Sélection de couleur
+                for i, rect in enumerate(self.color_rects):
+                    if rect.collidepoint(mouse_pos):
+                        self.brush_color = self.colors[i]
+                        return True
+                        
+                # Vérifier si on dessine sur l'avatar
+                avatar_pos = self.get_current_avatar_position()
+                avatar_size = self.get_current_avatar_size()
+                
+                rel_x = (mouse_pos[0] - avatar_pos[0]) / avatar_size
+                rel_y = (mouse_pos[1] - avatar_pos[1]) / avatar_size
+                if 0 <= rel_x <= 1 and 0 <= rel_y <= 1:
+                    px = int(rel_x * self.avatar.get_width())
+                    py = int(rel_y * self.avatar.get_height())
+                    print(self.brush_size)
+                    pygame.draw.circle(self.avatar, self.brush_color, (px, py), self.brush_size//2)
+                    return True
+                
+        elif event.type == pygame.MOUSEBUTTONUP and self.show_buttons:
+            self.save_state()
+            return True
+            
+        elif event.type == pygame.KEYDOWN and self.pseudo_editable:
+            if event.key == pygame.K_RETURN:  # Valider avec ENTER
+                pygame.image.save(self.avatar, self.avatar_path)
+                self.pseudo = self.input_text
+                self.show_buttons = False
+                self.pseudo_editable = False
+                self.is_retracting = True
+                return True
+            elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC
+                self.avatar = self.avatar_original.copy()
+                self.is_retracting = True
+                self.show_buttons = False
+                return True
+            elif event.key == pygame.K_UP and self.brush_size < self.size_max:
+                self.brush_size += 1
+                return True
+            elif event.key == pygame.K_DOWN and self.brush_size > self.size_min:
+                self.brush_size -= 1
+                return True
+            elif event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Z (Undo)
+                if len(self.history) > 1:
+                    self.redo_stack.append(self.history.pop())
+                    self.avatar = self.history[-1].copy()
+                return True
+            elif event.key == pygame.K_y and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Y (Redo)
+                if self.redo_stack:
+                    self.avatar = self.redo_stack.pop()
+                    self.history.append(self.avatar.copy())
+                return True
+            elif event.key == pygame.K_BACKSPACE:
+                self.input_text = self.input_text[:-1]
+                return True
+            elif event.unicode:
+                self.input_text += event.unicode
+                return True
+                
+        return False  # L'événement n'a pas été géré
+        
+    def update(self, mouse_pos, mouse_pressed):
+        # Dessin sur l'avatar si en mode édition et que la souris est appuyée
+        if self.show_buttons and True in mouse_pressed:
+            avatar_pos = self.get_current_avatar_position()
+            avatar_size = self.get_current_avatar_size()
+            
+            rel_x = (mouse_pos[0] - avatar_pos[0]) / avatar_size
+            rel_y = (mouse_pos[1] - avatar_pos[1]) / avatar_size
+            if 0 <= rel_x <= 1 and 0 <= rel_y <= 1:
+                px = int(rel_x * self.avatar.get_width())
+                py = int(rel_y * self.avatar.get_height())
+                pygame.draw.circle(self.avatar, self.brush_color, (px, py), self.brush_size)
+        
+        # Animation Expansion
+        if self.is_expanding:
+            self.anim_progress += 0.1
+            if self.anim_progress >= 1:
+                self.anim_progress = 1
+                self.is_expanding = False
+                self.show_buttons = True
+                self.pseudo_editable = True
+                
+        # Animation Retrait
+        if self.is_retracting:
+            self.anim_progress -= 0.1
+            if self.anim_progress <= 0:
+                self.anim_progress = 0
+                self.is_retracting = False
+                self.pseudo_editable = False
+    
+    def get_current_avatar_position(self):
+        return (
+            int(self.avatar_start_pos[0] + (self.avatar_target_pos[0] - self.avatar_start_pos[0]) * self.anim_progress),
+            int(self.avatar_start_pos[1] + (self.avatar_target_pos[1] - self.avatar_start_pos[1]) * self.anim_progress)
+        )
+        
+    def get_current_avatar_size(self):
+        return int(100 + (self.avatar_target_size - 100) * self.anim_progress)
+        
+    def get_current_pseudo_position(self):
+        return (
+            int(self.pseudo_start_pos[0] + (self.pseudo_target_pos[0] - self.pseudo_start_pos[0]) * self.anim_progress),
+            int(self.pseudo_start_pos[1] + (self.pseudo_target_pos[1] - self.pseudo_start_pos[1]) * self.anim_progress)
+        )
+    
+    def draw(self):
+        # Dessiner l'avatar
+        avatar_pos = self.get_current_avatar_position()
+        avatar_size = self.get_current_avatar_size()
+        pseudo_pos = self.get_current_pseudo_position()
+        
+        # Contour orange de l'avatar
+        pygame.draw.circle(self.screen, orange, 
+                          (avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2), 
+                          avatar_size // 2 + 4 + (8 * self.anim_progress))
+        
+        # Afficher l'avatar avec masque circulaire
+        temp_avatar = pygame.transform.scale(self.avatar, (avatar_size, avatar_size))
+        self.apply_circular_mask(temp_avatar)
+        self.screen.blit(temp_avatar, avatar_pos)
+        
+        # Afficher le pseudo
+        pseudo_surf = small_font.render(self.input_text + "|" if self.pseudo_editable else self.pseudo, True, white)
+        self.screen.blit(pseudo_surf, pseudo_pos)
+        
+        # Afficher les boutons et contrôles d'édition si activés
+        if self.show_buttons:
+            # Palette de couleurs
+            for i, rect in enumerate(self.color_rects):
+                pygame.draw.rect(self.screen, self.colors[i], rect, border_radius=8)
+                
+            # Aperçu de la taille du pinceau
+            pygame.draw.circle(self.screen, self.brush_color, 
+                              (self.avatar_target_pos[0] + self.avatar_target_size + 5, 
+                               self.avatar_start_pos[1] + 50 + 60), 
+                              self.brush_size + 5, width=5)
+            
+            # Boutons de taille du pinceau
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            
+            for rect, label in [(self.increase_button_rect, "+"), (self.decrease_button_rect, "-")]:
+                hover = rect.collidepoint(mouse_x, mouse_y)
+                self.size_button(rect, label, hover)
+            
+            # Boutons valider/annuler
+            pygame.draw.rect(self.screen, green, self.validate_button_rect, border_radius=10)
+            pygame.draw.rect(self.screen, red, self.cancel_button_rect, border_radius=10)
+            
+            validate_text = small_font.render("✔ Valider", True, white)
+            cancel_text = small_font.render("❌ Annuler", True, white)
+            
+            self.screen.blit(validate_text, (self.validate_button_rect.x + 20, self.validate_button_rect.y + 15))
+            self.screen.blit(cancel_text, (self.cancel_button_rect.x + 20, self.cancel_button_rect.y + 15))
+            
+    def is_editing(self):
+        return self.show_buttons or self.is_expanding or self.is_retracting
+
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
@@ -219,6 +510,9 @@ current_screen = "menu"
 selected_button = None
 active_buttons = []
 
+# Créer le gestionnaire d'avatar
+avatar_manager = AvatarManager(ecran)
+
 # Musique et son
 try:
     pygame.mixer.init()
@@ -230,8 +524,6 @@ except:
 clock = pygame.time.Clock()
 running = True
 
-
-
 while running:
     mouse_pos = pygame.mouse.get_pos()
     mouse_clicked = False
@@ -241,6 +533,10 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_clicked = True
+            
+        # Donner priorité aux événements d'avatar s'il est en cours d'édition
+        if avatar_manager.handle_event(event, mouse_pos, pygame.mouse.get_pressed()):
+            continue  # Événement déjà traité par le gestionnaire d'avatar
     
     # Mise à jour de l'animation
     animation_counter += 1
@@ -263,6 +559,9 @@ while running:
             hauteur + 10,
             random.choice([soft_orange, pastel_pink, pastel_green, pastel_yellow])
         ))
+    
+    # Mise à jour du gestionnaire d'avatar
+    avatar_manager.update(mouse_pos, pygame.mouse.get_pressed())
     
     # Effacer l'écran
     ecran.fill(light_blue)
@@ -321,15 +620,14 @@ while running:
         draw_text("DRAWWY", title_font_animated, black, ecran, 
                  largeur // 2, main_panel_y + 150)
         
-
+        
         # Boutons
-        buttons = ["JOUER", "SUCCÈS","QUITTER",]
+        buttons = ["JOUER", "SUCCÈS", "QUITTER"]
         button_width = 500
         button_height = 80
         button_x = (largeur - button_width) // 2
         button_y_start = main_panel_y + 320
         
-
         active_buttons = []
         
         for i, button_text in enumerate(buttons):
@@ -362,21 +660,6 @@ while running:
             button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
             pygame.draw.rect(ecran, button_color, button_rect, border_radius=40)
             
-            # Dessiner le bouton rond "crédit"
-            credit_button_radius = 40
-            credit_button_x = main_panel_x + 775
-            credit_button_y = main_panel_y + main_panel_height - 65 - credit_button_radius
-            credit_button_color = orange
-
-            # Dessiner le cercle
-            pygame.draw.circle(ecran, credit_button_color,
-            (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
-            credit_button_radius)
-
-            # Dessiner le texte "crédit"
-            draw_text("CRÉDIT", very_small_font, black, ecran,
-            credit_button_x + credit_button_radius,
-            credit_button_y + credit_button_radius)
 
             
             # Texte du bouton avec un léger déplacement lorsqu'il est survolé
@@ -406,14 +689,7 @@ while running:
                     current_screen = "play"
                 elif button_text == "SUCCÈS":
                     current_screen = "achievements"
-                elif button_text == "CRÉDIT":
-                    current_screen == "credit"
     
-
-
-    
-    
-
 
     # === ÉCRAN DE JEU ===
     elif current_screen == "play":
@@ -545,7 +821,7 @@ while running:
                 button_sound.play()
             current_screen = "menu"
         
-           
+    
     # Afficher la version
     version_text = "DRAWWY v1.0"
     version_font = pygame.font.SysFont(None, 24)
