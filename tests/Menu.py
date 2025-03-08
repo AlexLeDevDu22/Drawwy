@@ -320,14 +320,15 @@ while running:
         draw_text("DRAWWY", title_font_animated, black, ecran, 
                  largeur // 2, main_panel_y + 150)
         
-        
+
         # Boutons
-        buttons = ["JOUER", "SUCCÈS", "QUITTER"]
+        buttons = ["JOUER", "SUCCÈS","QUITTER",]
         button_width = 500
         button_height = 80
         button_x = (largeur - button_width) // 2
         button_y_start = main_panel_y + 320
         
+
         active_buttons = []
         
         for i, button_text in enumerate(buttons):
@@ -390,6 +391,32 @@ while running:
                 elif button_text == "SUCCÈS":
                     current_screen = "achievements"
     
+    # Dessiner le bouton rond "crédit"
+    credit_button_radius = 60
+    credit_button_x = main_panel_x + 775
+    credit_button_y = main_panel_y + main_panel_height - 65 - credit_button_radius
+    credit_button_color = orange
+
+    # Dessiner le cercle
+    pygame.draw.circle(ecran, credit_button_color,
+                       (credit_button_x + credit_button_radius, credit_button_y + credit_button_radius),
+                       credit_button_radius)
+
+    # Dessiner le texte "crédit"
+    draw_text("CRÉDIT", small_font, black, ecran,
+              credit_button_x + credit_button_radius,
+              credit_button_y + credit_button_radius)
+
+    # Vérifier si le bouton est cliqué
+    if mouse_clicked:
+        distance_to_button = math.sqrt((mouse_pos[0] - (credit_button_x + credit_button_radius))**2 +
+                                      (mouse_pos[1] - (credit_button_y + credit_button_radius))**2)
+        if distance_to_button <= credit_button_radius:
+            if has_sound:
+                button_sound.play()
+            current_screen = "credits"  # Vous pouvez créer un écran de crédits si nécessaire
+
+
 
     # === ÉCRAN DE JEU ===
     elif current_screen == "play":
