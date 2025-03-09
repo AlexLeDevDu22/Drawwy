@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scribble Game</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="login-overlay">
+        <form class="login-form" id="login-form">
+            <h2 class="login-title">Rejoingnez le jeu Scribble</h2>
+            <div class="input-group">
+                <input type="text" class="login-input" id="pseudo-input" placeholder="Votre pseudo" required>
+            </div>
+            <div class="avatar-selection" id="avatar-selection">
+                <div class="avatar-option selected" data-avatar="🎨" style="background-color: #FFA07A;">🎨</div>
+                <div class="avatar-option" data-avatar="🐱" style="background-color: #98FB98;">🐱</div>
+                <div class="avatar-option" data-avatar="🐶" style="background-color: #ADD8E6;">🐶</div>
+                <div class="avatar-option" data-avatar="🦊" style="background-color: #FFB6C1;">🦊</div>
+                <div class="avatar-option" data-avatar="🐼" style="background-color: #DDA0DD;">🐼</div>
+                <div class="avatar-option" data-avatar="🦁" style="background-color: #FFDAB9;">🦁</div>
+            </div>
+            <button type="submit" class="login-btn">Jouer</button>
+        </form>
+    </div>
+
+    <!-- Game interface -->
+    <div class="container">
+        <header class="header">
+            <h1>Scribble Game</h1>
+        </header>
+
+        <section class="players-section">
+            <h2>Joueurs</h2>
+            <ul class="player-list" id="player-list">
+                <!-- Players will be added here dynamically -->
+            </ul>
+        </section>
+
+        <section class="game-section">
+            <div class="game-info">
+                <div class="word-display" id="word-display">
+                    <span id="hint-text">En attente de joueurs...</span>
+                </div>
+                <div class="timer">
+                    <span id="timer-text">2:00</span>
+                    <div class="timer-bar">
+                        <div class="timer-progress" id="timer-progress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="drawing-canvas"></canvas>
+                <div class="drawing-tools" id="drawing-tools">
+                    <button class="tool-btn active" data-tool="pencil" title="Crayon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="line" title="Ligne">
+                        <i class="fas fa-slash"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="rectangle" title="Rectangle">
+                        <i class="far fa-square"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="circle" title="Cercle">
+                        <i class="far fa-circle"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="eraser" title="Gomme">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="fill" title="Remplir">
+                        <i class="fas fa-fill-drip"></i>
+                    </button>
+                    <div class="color-picker">
+                        <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
+                        <div class="color-option" style="background-color: #FF0000;" data-color="#FF0000"></div>
+                        <div class="color-option" style="background-color: #00FF00;" data-color="#00FF00"></div>
+                        <div class="color-option" style="background-color: #0000FF;" data-color="#0000FF"></div>
+                        <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+                        <div class="color-option" style="background-color: #FFA500;" data-color="#FFA500"></div>
+                        <div class="color-option" style="background-color: #800080;" data-color="#800080"></div>
+                        <div class="color-option" style="background-color: #FFC0CB;" data-color="#FFC0CB"></div>
+                        <div class="color-option" style="background-color: #FFFFFF;" data-color="#FFFFFF"></div>
+                    </div>
+                    <input type="range" min="1" max="20" value="5" class="size-slider" id="size-slider">
+                    <button class="tool-btn" data-tool="clear" title="Effacer tout">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="tool-btn" data-tool="undo" title="Annuler">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="chat-section">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message system-message">Bienvenue dans le jeu Scribble !</div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Devinez le mot...">
+                <button class="send-btn" id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Game completion modal -->
+    <div class="modal" id="game-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Partie terminée !</h2>
+            <div class="result-info" id="result-info">
+                Tout le monde a trouvé le mot !
+            </div>
+            <div class="word-reveal" id="word-reveal">
+                Chien
+            </div>
+            <button class="continue-btn" id="continue-btn">Continuer</button>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>
