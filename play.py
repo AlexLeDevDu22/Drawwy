@@ -1,5 +1,4 @@
 import threading
-import launcher
 import pygame
 import sys
 import tools
@@ -120,7 +119,6 @@ class MultiplayersGame:
 
 
     async def handle_connection_client(self):
-        global MultiplayersGame
 
         async with websockets.connect("wss://"+NGROK_DOMAIN) as websocket:
             # Demander un pseudo et s'enregistrer
