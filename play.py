@@ -1,3 +1,5 @@
+import threading
+import launcher
 import pygame
 import sys
 import tools
@@ -6,12 +8,21 @@ import yaml
 import tools
 import asyncio
 import json
-if sys.platform.startswith("win"):
-    import pygetwindow as gw
+from dotenv import load_dotenv
+import os
+import websockets
+import json
 from datetime import datetime, timedelta
+import time
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
+
+with open("players_data.json") as f:
+    player_data = json.load(f)
+
+load_dotenv()
+NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
 
 #*pygame
 NOIR = (0, 0, 0)
@@ -25,50 +36,149 @@ JAUNE=(255,255,0)
 MAGENTA=(255,0,255)
 CYAN=(0,255,255)
 
-def input_pseudo():
-    """Affiche une fenêtre pour entrer le pseudo"""
-    pygame.init()
-    pygame.display.set_icon(pygame.image.load("icon.png"))
-    screen = pygame.display.set_mode((400, 200))
-    pygame.display.set_caption("Entrez votre pseudo")
-    font = pygame.font.Font(None, 36)
-    input_box = pygame.Rect(100, 80, 200, 40)
-    text = ''
-    active = True
-    clock = pygame.time.Clock()
-    try:gw.getWindowsWithTitle("Entrez votre pseudo")[0].activate()  # First plan
-    except:pass
+# def input_pseudo():
+#     """Affiche une fenêtre pour entrer le pseudo"""
+#     pygame.init()
+#     pygame.display.set_icon(pygame.image.load("icon.png"))
+#     screen = pygame.display.set_mode((400, 200))
+#     pygame.display.set_caption("Entrez votre pseudo")
+#     font = pygame.font.Font(None, 36)
+#     input_box = pygame.Rect(100, 80, 200, 40)
+#     text = ''
+#     active = True
+#     clock = pygame.time.Clock()
+#     try:gw.getWindowsWithTitle("Entrez votre pseudo")[0].activate()  # First plan
+#     except:pass
     
-    while True:
-        screen.fill(BLANC)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                active = input_box.collidepoint(event.pos)
-            if event.type == pygame.KEYDOWN and active:
-                if event.key == pygame.K_RETURN and text.strip():
+#     while True:
+#         screen.fill(BLANC)
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 pygame.quit()
+#                 sys.exit()
+#             if event.type == pygame.MOUSEBUTTONDOWN:
+#                 active = input_box.collidepoint(event.pos)
+#             if event.type == pygame.KEYDOWN and active:
+#                 if event.key == pygame.K_RETURN and text.strip():
+#                     pygame.quit()
+#                     return text  # Retourne le pseudo saisi
+#                 elif event.key == pygame.K_BACKSPACE:
+#                     text = text[:-1]
+#                 else:
+#                     text += event.unicode
+
+#         # Mise à jour visuelle
+#         color = BLEU if active else BLEU_CLAIR
+#         txt_surface = font.render(text, True, NOIR)
+#         input_box.w = max(200, txt_surface.get_width() + 10)
+#         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+#         pygame.draw.rect(screen, color, input_box, 2)
+
+#         pygame.display.flip()
+#         clock.tick(30)
+
+
+
+class MultiplayersGame:
+    def connection_page(self):
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+        screen = pygame.display.set_mode((350, 300), pygame.NOFRAME)
+        pygame.display.set_caption("Drawwy")
+        clock = pygame.time.Clock()
+
+        # Essayons de mettre la fenêtre au premier plan
+        if sys.platform.startswith("win"):
+            import pygetwindow as gw
+            gw.getWindowsWithTitle("Drawwy")[0].activate()
+
+        # Charger la police
+        icon = pygame.image.load("icon.png")
+        police = pygame.font.Font("PermanentMarker.ttf", 20)
+
+        while not self.connected:
+            # Gestion des événements pour éviter le crash
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     pygame.quit()
-                    return text  # Retourne le pseudo saisi
-                elif event.key == pygame.K_BACKSPACE:
-                    text = text[:-1]
-                else:
-                    text += event.unicode
+                    return
+            
+            # Dégradé de fond (orange -> jaune clair)
+            tools.draw_gradient(screen, (255, 150, 50), (255, 220, 100))
 
-        # Mise à jour visuelle
-        color = BLEU if active else BLEU_CLAIR
-        txt_surface = font.render(text, True, NOIR)
-        input_box.w = max(200, txt_surface.get_width() + 10)
-        screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
-        pygame.draw.rect(screen, color, input_box, 2)
+            # Affichage de l'icône
+            image = pygame.transform.scale(icon, (200, 200))
+            screen.blit(image, (75, 35))
 
-        pygame.display.flip()
-        clock.tick(30)
+            # Texte de connexion
+            text = police.render("Connexion au serveur...", True, (0, 0, 0))
+            screen.blit(text, text.get_rect(center=(screen.get_width() // 2 + 5, 235)))
+
+            # Mise à jour de l'affichage
+            pygame.display.flip()
+            clock.tick(30)
 
 
+    async def handle_connection_client(self):
+        global MultiplayersGame
 
-class gamePage:
+        async with websockets.connect("wss://"+NGROK_DOMAIN) as websocket:
+            # Demander un pseudo et s'enregistrer
+            
+            await websocket.send(json.dumps({"type": "join", "pseudo": player_data["pseudo"], "avatar": tools.load_bmp_to_matrix("avatar.bmp")}))
+            
+            gameVar.WS=websocket
+
+            # Recevoir les mises à jour et dessiner si c'est son tour
+            async for message in websocket:
+                data = json.loads(message)
+                
+                if data["type"] == "welcome":
+                    gameVar.ALL_FRAMES+=data["all_frames"]
+                    tools.update_canva_by_frames(data["all_frames"], delay=False)
+                    gameVar.PLAYER_ID=data["id"]
+                    gameVar.MESSAGES=data["messages"]
+                    gameVar.PLAYERS=data["players"]
+                elif data["type"] == "new_player":
+                    gameVar.PLAYERS.append(data["player"])
+                else:# update
+                    gameVar.CURRENT_SENTENCE=data["sentence"]
+                    gameVar.CURRENT_DRAWER=data["drawer_id"]
+
+                    if data["new_game"]:
+                        #save draw
+                        if gameVar.PLAYER_ID == gameVar.CURRENT_DRAWER and gameVar.CANVAS and gameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
+                            tools.save_canvas(gameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", gameVar.CURRENT_SENTENCE)
+                
+                        gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+                        gameVar.ALL_FRAMES=[]
+                        gameVar.FOUND=False
+                        gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
+                        gameVar.GAMESTART=datetime.fromisoformat(data["new_game"])
+                        
+                    if data["new_message"]:
+                        if data["new_message"]["player_id"] == gameVar.PLAYER_ID:
+                            gameVar.MESSAGES=gameVar.MESSAGES[:-1]
+                        gameVar.MESSAGES.append(data["new_message"])
+                        
+                        if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
+                            gameVar.FOUND=True
+                    if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
+                        gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
+                        gameVar.ROLL_BACK=0
+
+                        threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+
+                        num_steps=0
+                        for frame in gameVar.ALL_FRAMES:
+                            if frame["type"] in ["new_step", "shape"]:
+                                num_steps+=1
+                        gameVar.STEP_NUM=num_steps
+
+                    if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
+                        gameVar.ROLL_BACK=data["roll_back"]
+                        tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
+
     
     def timer(self):
             
@@ -117,35 +227,47 @@ class gamePage:
 
 
         dico_co = [
-            [(4/100*self.W,(12.5+i*7)/100*self.H),
-             (1/100*self.W, (11+i*7)/100*self.H, 18/100*self.W, 7/100*self.H),
-             (12/100*self.W,(14+i*7)/100*self.H),
-             (17.4/100*self.W,(13.2+i*7)/100*self.H),
-             (12/100*self.W,(12+i*7)/100*self.H)]
+            [(1/100*self.W, (11+i*7)/100*self.H, 18/100*self.W, 7/100*self.H),
+            (1.5/100*self.W,(12+i*7)/100*self.H),
+             (6/100*self.W,(12.5+i*7)/100*self.H),
+             (13/100*self.W,(14+i*7)/100*self.H),
+             (12/100*self.W,(12+i*7)/100*self.H),
+             (17.4/100*self.W,(13.2+i*7)/100*self.H)]
             for i in range(9)  # Génère 9 entrées automatiquement
         ]
         
         for y,player in enumerate(gameVar.PLAYERS):
-            text_color=(10,10,10) if player["id"] == gameVar.PLAYER_ID else (100,100,100)
 
-            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][1])
-            pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][1][0]+3,dico_co[y][1][1]+3,dico_co[y][1][2]-6,dico_co[y][1][3]-6))
+            #fond
+            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
+            pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+
+            #avatar
+            avatar=tools.matrix_to_image(player["avatar"])
+            avatar=pygame.transform.scale(avatar, (5/100*self.H, 5/100*self.H))
+            pygame.draw.circle(self.screen, BLEU, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
+            tools.apply_circular_mask(avatar)
+            self.screen.blit(avatar, dico_co[y][1])
+
+            #pseudo
+            text_color=(10,10,10) if player["id"] == gameVar.PLAYER_ID else (100,100,100)
             font = pygame.font.Font("PermanentMarker.ttf" ,30)
             image_texte = font.render ( player["pseudo"], 1 , text_color )
-            font = pygame.font.Font("PermanentMarker.ttf" ,20)
-            self.screen.blit(image_texte, dico_co[y][0])
-            image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
+            #points
+            font = pygame.font.Font("PermanentMarker.ttf" ,20)
+            image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
+            self.screen.blit(image_texte, dico_co[y][3])
 
             if player["id"] != gameVar.CURRENT_DRAWER:
                 image_texte = font.render ( "Trouvé ", 1 , text_color )
                 self.screen.blit(image_texte, dico_co[y][4])
                     
-                pygame.draw.circle(self.screen, text_color, dico_co[y][3], 7)
+                pygame.draw.circle(self.screen, text_color, dico_co[y][4], 7)
                 if player["found"]:
-                    pygame.draw.circle(self.screen, VERT,dico_co[y][3], 5)
+                    pygame.draw.circle(self.screen, VERT,dico_co[y][5], 5)
                 else:
-                    pygame.draw.circle(self.screen, ROUGE,dico_co[y][3], 5)
+                    pygame.draw.circle(self.screen, ROUGE,dico_co[y][5], 5)
     
     def sentence(self):
         pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.75 * self.H, 0.18 * self.W, 0.2 * self.H))
@@ -227,11 +349,6 @@ class gamePage:
                         gameVar.ROLL_BACK=0
                         self.second_draw_frames.append({"type":"new_step"})
                         gameVar.ALL_FRAMES.append({"type":"new_step"})
-
-                        print("mouse down")
-                        print("rollback",gameVar.ROLL_BACK)
-                        print("step num",gameVar.STEP_NUM)
-
                         
                     elif self.mouseDown and event.type == pygame.MOUSEMOTION:
                         if self.lastMouseDown and 0<self.game_remaining_time<config["game_duration"]:   # can draw    
@@ -255,10 +372,6 @@ class gamePage:
                     elif event.type == pygame.MOUSEBUTTONUP:
                         gameVar.STEP_NUM+=1
 
-                        print("mouse up")
-                        print("rollback",gameVar.ROLL_BACK)
-                        print("step num",gameVar.STEP_NUM)
-                                    
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Z
 
@@ -272,12 +385,6 @@ class gamePage:
                                 loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                                 asyncio.set_event_loop(loop)
                             asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
-
-
-
-                            print("undo")
-                            print("rollback",gameVar.ROLL_BACK)
-                            print("step num",gameVar.STEP_NUM)
 
                                 
                         elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
@@ -295,14 +402,9 @@ class gamePage:
                             asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
 
 
-                            print("redo")
-                            print("rollback",gameVar.ROLL_BACK)
-                            print("step num",gameVar.STEP_NUM)
-                    
 
         #send draw
         if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
-            print("envoi du draw", self.second_draw_frames)
             asyncio.run(tools.websocket_draw(gameVar.WS, self.second_draw_frames))  #send datas
             self.second_draw_frames=[]
         
@@ -461,90 +563,115 @@ class gamePage:
             y-=10
 
     
-    def __init__(self):
-        pygame.init()
-        pygame.display.set_icon(pygame.image.load("icon.png"))
-        
-        # Dimensions de la fenêtre
-        self.W, self.H = tools.get_screen_size()
-        self.screen = pygame.display.set_mode((self.W,self.H), pygame.RESIZABLE)
-        pygame.display.set_caption("Drawwy")
-        try:gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
-        except:pass
-        self.clock = pygame.time.Clock()
-        self.clock.tick(config["game_page_fps"])
-        
-        self.game_remaining_time=config["game_duration"]
-        
-        self.me={   "id": -1,
-                    "pseudo": "",
-                    "points": 0,
-                    "found":False,
-                    "is_drawer":False
-                    }
-        
-        #pen values
-        self.pen_color=(0,0,0)
-        self.pen_radius=6
-        self.mouseDown=False
-        self.lastMouseDown=False
-        self.last_canvas_click=None
-        
-        self.mouse_pos=(0,0)
-        
-        #for drawing
-        self.second_draw_frames=[]
-        
-        self.frame_num=0
-        
-        self.guess_input_active=False
-        self.guess=""
-        
-        self.running = True
-        while self.running:
-            self.clock.tick(config["game_page_fps"])
+    def __init__(self, W,H):
+        if not tools.is_connected():
+            return "Désolé, une connexion internet est requise."
 
-            for player in gameVar.PLAYERS:
-                if player["id"] == gameVar.PLAYER_ID:
-                    self.me=player
-                    self.me["is_drawer"]=gameVar.PLAYER_ID==gameVar.CURRENT_DRAWER
-                    break
+        self.connected=False
 
-            if self.frame_num%2==0:
-                self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
+        launch_page=threading.Thread(target=self.connection_page)
+        launch_page.start()
+
+        is_server=not asyncio.run(tools.test_server())
+
+        try:
+            if is_server:
+                # start the serv
+                import server
                 
-                if gameVar.GAMESTART:
-                    pass#print(gameVar.GAMESTART+timedelta(seconds=config["game_duration"]), datetime.now(), self.game_remaining_time)
-            
-            self.events=pygame.event.get()
-            
-            self.screen.fill(BEIGE)
+                server_thread = threading.Thread(target=server.start_server, daemon=True)
+                server_thread.start()
 
-            self.players()
-            self.sentence()
-            self.drawing()
-            self.chat()
-            if self.me["id"]==gameVar.PLAYER_ID:
-                self.couleurs()
-                self.slider_radius()
-            self.timer()
+                self.connected=True
+                launch_page.join()
+
+                while not server.server:
+                    time.sleep(0.1)
+            else:
+                self.connected=True
+                launch_page.join()
+
+            threading.Thread(target=lambda: asyncio.run(self.handle_connection_client()),daemon=True).start()# start the web connection
+
+            # Dimensions de la fenêtre
+            self.W, self.H = W,H
+            self.screen = pygame.display.set_mode((self.W,self.H), pygame.RESIZABLE)
+            self.clock = pygame.time.Clock()
+
+            self.game_remaining_time=config["game_duration"]
             
-            for event in self.events:
-                if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.mouseDown=True
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    self.mouseDown=False
-                    self.last_canvas_click=None
-                if event.type == pygame.MOUSEMOTION:
-                    self.mouse_pos=event.pos
-                    if self.mouseDown:
-                        self.lastMouseDown=self.mouseDown
-                if event.type == pygame.VIDEORESIZE:
-                    self.W, self.H = tools.get_screen_size()
+            self.me={   "id": -1,
+                        "pseudo": "",
+                        "points": 0,
+                        "found":False,
+                        "is_drawer":False
+                        }
             
-            pygame.display.flip()
+            #pen values
+            self.pen_color=(0,0,0)
+            self.pen_radius=6
+            self.mouseDown=False
+            self.lastMouseDown=False
+            self.last_canvas_click=None
             
-            self.frame_num=(self.frame_num+1)%config["game_page_fps"]
+            self.mouse_pos=(0,0)
+            
+            #for drawing
+            self.second_draw_frames=[]
+            
+            self.frame_num=0
+            
+            self.guess_input_active=False
+            self.guess=""
+            
+            while 1:
+                self.clock.tick(config["game_page_fps"])
+
+                for player in gameVar.PLAYERS:
+                    if player["id"] == gameVar.PLAYER_ID:
+                        self.me=player
+                        self.me["is_drawer"]=gameVar.PLAYER_ID==gameVar.CURRENT_DRAWER
+                        break
+
+                if self.frame_num%2==0:
+                    self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
+                
+                self.events=pygame.event.get()
+                
+                self.screen.fill(BEIGE)
+
+                self.players()
+                self.sentence()
+                self.drawing()
+                self.chat()
+                if self.me["id"]==gameVar.PLAYER_ID:
+                    self.couleurs()
+                    self.slider_radius()
+                self.timer()
+                
+                for event in self.events:
+                    if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
+                        if is_server:
+                            server.stop_server()
+                        return
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        self.mouseDown=True
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.mouseDown=False
+                        self.last_canvas_click=None
+                    if event.type == pygame.MOUSEMOTION:
+                        self.mouse_pos=event.pos
+                        if self.mouseDown:
+                            self.lastMouseDown=self.mouseDown
+                    if event.type == pygame.VIDEORESIZE:
+                        self.W, self.H = tools.get_screen_size()
+                
+                pygame.display.flip()
+                
+                self.frame_num=(self.frame_num+1)%config["game_page_fps"]
+
+        except KeyboardInterrupt:
+            if is_server:
+                server.stop_server()
+                time.sleep(0.1)
+            os._exit(0)

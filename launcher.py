@@ -12,12 +12,9 @@ def draw_gradient(screen, color1, color2):
         b = color1[2] + (color2[2] - color1[2]) * y // height
         pygame.draw.line(screen, (r, g, b), (0, y), (width, y))
 
-def launcher():
+def connection_page():
     global connected
 
-    pygame.init()
-    icon = pygame.image.load("icon.png")
-    pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((350, 300), pygame.NOFRAME)
     pygame.display.set_caption("Drawwy")
     clock = pygame.time.Clock()
@@ -28,6 +25,7 @@ def launcher():
         gw.getWindowsWithTitle("Drawwy")[0].activate()
 
     # Charger la police
+    icon=pygame.image.load("icon.png")
     police = pygame.font.Font("PermanentMarker.ttf", 20)
 
     while not connected:

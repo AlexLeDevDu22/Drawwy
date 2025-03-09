@@ -46,6 +46,56 @@ async def test_server():
     except:
         return False
 
+def load_bmp_to_matrix(file_path):
+    """Charge une image BMP et retourne une matrice de pixels."""
+    # Charger l'image avec Pygame
+    image = pygame.image.load(file_path).convert()
+    width, height = image.get_size()
+
+    # Extraire chaque pixel dans une matrice
+    pixel_matrix = []
+    for y in range(height):
+        row = []
+        for x in range(width):
+            color = image.get_at((x, y))  # Obtenir la couleur du pixel (x, y)
+            row.append((color.r, color.g, color.b))  # Ajouter (R, G, B)
+        pixel_matrix.append(row)
+    
+    return pixel_matrix
+
+def matrix_to_image(pixel_matrix):
+    """Affiche une matrice de pixels sur une surface Pygame."""
+    width = len(pixel_matrix[0])  # Largeur de la matrice
+    height = len(pixel_matrix)  # Hauteur de la matrice
+
+    # Créer une Surface avec un canal alpha pour la transparence
+    surface = pygame.Surface((width, height), pygame.SRCALPHA)
+
+    for y in range(height):
+        for x in range(width):
+            color = pixel_matrix[y][x]  # Récupérer la couleur RGBA (incluant alpha si besoin)
+            surface.set_at((x, y), color)  # Définir le pixel sur la surface
+
+    return surface
+
+def apply_circular_mask(image):
+    """Applique un masque circulaire avec transparence à une image Pygame."""
+    # Créer un masque avec canal alpha
+    mask = pygame.Surface(image.get_size(), pygame.SRCALPHA)
+    mask.fill((0, 0, 0, 0))  # Transparence totale
+
+    # Dessiner un cercle blanc opaque dans le masque
+    pygame.draw.circle(
+        mask,
+        (255, 255, 255, 255),  # Blanc opaque
+        (image.get_width() // 2, image.get_height() // 2),
+        image.get_width() // 2,
+    )
+
+    # Appliquer le masque sur l'image
+    image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+
 def get_random_sentence():
     with open("Max/phrases_droles_v2.json") as f:
         return random.choice(json.load(f))
@@ -57,7 +107,6 @@ def check_sentences(phrase1, phrase2):
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
-    print(score)
     return score>config["sentence_checker_seuil"]
     
 async def send_message(websocket, message, remaining_time):
@@ -88,9 +137,7 @@ def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False
     current_drawing_radius=1
     
     new_frames=frames.copy()
-    print(new_frames)
     new_frames=split_steps_by_roll_back(new_frames, gameVar.ROLL_BACK)
-    print(new_frames)
 
     for frame in new_frames[0]:#draw
         if frame["type"]=="draw":
@@ -183,6 +230,14 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
 
+def draw_gradient(screen, color1, color2):
+    """Crée un dégradé vertical"""
+    width, height = screen.get_size()
+    for y in range(height):
+        r = color1[0] + (color2[0] - color1[0]) * y // height
+        g = color1[1] + (color2[1] - color1[1]) * y // height
+        b = color1[2] + (color2[2] - color1[2]) * y // height
+        pygame.draw.line(screen, (r, g, b), (0, y), (width, y))
 
 def lines_return(text, font, max_largeur_pixels):
     mots = text.split()

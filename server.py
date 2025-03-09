@@ -37,7 +37,6 @@ server = None  # Référence du serveur WebSocket
 async def start_async_server():
     global server
     async with websockets.serve(handle_connection_server, "localhost", 8765) as server:
-        print(server)
         print("Serveur WebSocket démarré sur ws://localhost:8765")
         await asyncio.Event().wait()  # Garde la boucle en vie jusqu'à l'arrêt
 
@@ -46,7 +45,6 @@ async def send_update(frames=None, new_message=None, new_game=False):
     
     state = {
         "type": "update",
-        "players": [{"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]} for p in players],#players datas without ws key
         "frames": frames,
         "drawer_id": drawer_id,
         "new_message":new_message,
@@ -56,6 +54,9 @@ async def send_update(frames=None, new_message=None, new_game=False):
         "roll_back":roll_back
     }
     await broadcast(json.dumps(state))
+
+async def send_new_player(p):
+    await broadcast(json.dumps({"type": "new_player", "player": {"id": p["id"], "pseudo": p["pseudo"], "points": p["points"], "found":p["found"]}}))
 
 async def broadcast(message):
     """Envoie un message à tous les joueurs connectés."""
@@ -75,33 +76,33 @@ async def handle_connection_server(websocket):  # Correction ici
         data = json.loads(await websocket.recv())
 
         if data["type"] == "join": #! JOINING
-            pseudo = data["pseudo"]
             player_id = 0 if players==[] else players[-1]["id"] + 1 # ID unique
-            new_player = {
-                "id": player_id,
-                "pseudo": pseudo,
-                "points": 0,
-                "found":False,
-                "ws": websocket
-            }
-            players.append(new_player)
             
-
             # Envoyer l'ID du joueur et l'état initial du jeu
             await websocket.send(json.dumps({
                 "type": "welcome",
                 "id": player_id,
+                "players": [{"id": p["id"], "pseudo": p["pseudo"],"avatar": p["avatar"], "points": p["points"], "found":p["found"]} for p in players],
                 "all_frames": all_frames,
                 "messages":guess_list,
                 "new_game":last_game_start.isoformat() if last_game_start else False,
                 "roll_back": roll_back
             }))
 
+            players.append({
+                "id": player_id,
+                "pseudo": data["pseudo"],
+                "avatar": data["avatar"],
+                "points": 0,
+                "found":False,
+                "ws": websocket
+            })
+
+            await broadcast(json.dumps({"type": "new_player", "player": {"id": player_id, "pseudo": data["pseudo"],"avatar": data["avatar"],"points": 0, "found":False}}))
+
             if len(players)==2:
                 last_game_start=datetime.now()
                 await send_update(new_game=True)# Envoyer une mise à jour à tous
-            else:
-                await send_update()
 
         async for message in websocket:
             data = json.loads(message)
