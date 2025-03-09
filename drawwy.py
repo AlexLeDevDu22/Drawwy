@@ -46,7 +46,7 @@ GREEN = (50, 200, 50)
 TITLE_FONT = pygame.font.Font(None, 300)
 BUTTON_FONT = pygame.font.Font(None, 80)
 MEDIUM_FONT = pygame.font.Font(None, 50)
-SMALL_FONT = pygame.font.Font(pygame.font.match_font("dejavusans"), 26)
+SMALL_FONT = pygame.font.Font( pygame.font.match_font("segoeuisymbol" if sys.platform.startswith("win") else "dejavusans"), 26)
 VERY_SMALL_FONT = pygame.font.Font(None, 25)
 
 # Classe pour les effets de particules

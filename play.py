@@ -1,5 +1,6 @@
 import threading
 import pygame
+from pygame_emojis import load_emoji
 import sys
 import tools
 import gameVar
@@ -9,10 +10,12 @@ import asyncio
 import json
 from dotenv import load_dotenv
 import os
-import websockets
+import socketio
 import json
 from datetime import datetime, timedelta
 import time
+if sys.platform.startswith("win"):
+    import pygetwindow as gw
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -119,64 +122,77 @@ class MultiplayersGame:
 
 
     async def handle_connection_client(self):
+        sio = socketio.AsyncClient()
+        @sio.event
+        async def connect():
 
-        async with websockets.connect("wss://"+NGROK_DOMAIN) as websocket:
-            # Demander un pseudo et s'enregistrer
-            
-            await websocket.send(json.dumps({"type": "join", "pseudo": player_data["pseudo"], "avatar": tools.load_bmp_to_matrix("avatar.bmp")}))
-            
-            gameVar.WS=websocket
+                await sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
 
-            # Recevoir les mises à jour et dessiner si c'est son tour
-            async for message in websocket:
-                data = json.loads(message)
+                # Référencer le WebSocket dans gameVar
+                gameVar.WS = sio
+
+        @sio.event
+        async def disconnect():
+            print("Déconnecté du serveur WebSocket.")
+
+
+        @sio.on('welcome')
+        async def welcome(data):
+            gameVar.ALL_FRAMES+=data["all_frames"]
+            tools.update_canva_by_frames(data["all_frames"], delay=False)
+            gameVar.PLAYER_ID=data["id"]
+            gameVar.MESSAGES=data["messages"]
+            gameVar.PLAYERS=data["players"]
+
+        @sio.on("new_player")
+        async def new_player(data):
+            gameVar.PLAYERS.append(data["player"])
+
+
+        @sio.on("update")
+        async def update(data):
+            gameVar.CURRENT_SENTENCE=data["sentence"]
+            gameVar.CURRENT_DRAWER=data["drawer_id"]
+
+            if data["new_game"]:
+                #save draw
+                if gameVar.PLAYER_ID == gameVar.CURRENT_DRAWER and gameVar.CANVAS and gameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
+                    tools.save_canvas(gameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", gameVar.CURRENT_SENTENCE)
+        
+                gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+                gameVar.ALL_FRAMES=[]
+                gameVar.FOUND=False
+                gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
+                gameVar.GAMESTART=datetime.fromisoformat(data["new_game"])
                 
-                if data["type"] == "welcome":
-                    gameVar.ALL_FRAMES+=data["all_frames"]
-                    tools.update_canva_by_frames(data["all_frames"], delay=False)
-                    gameVar.PLAYER_ID=data["id"]
-                    gameVar.MESSAGES=data["messages"]
-                    gameVar.PLAYERS=data["players"]
-                elif data["type"] == "new_player":
-                    gameVar.PLAYERS.append(data["player"])
-                else:# update
-                    gameVar.CURRENT_SENTENCE=data["sentence"]
-                    gameVar.CURRENT_DRAWER=data["drawer_id"]
-
-                    if data["new_game"]:
-                        #save draw
-                        if gameVar.PLAYER_ID == gameVar.CURRENT_DRAWER and gameVar.CANVAS and gameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
-                            tools.save_canvas(gameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", gameVar.CURRENT_SENTENCE)
+            if data["new_message"]:
+                if data["new_message"]["player_id"] == gameVar.PLAYER_ID:
+                    gameVar.MESSAGES=gameVar.MESSAGES[:-1]
+                gameVar.MESSAGES.append(data["new_message"])
                 
-                        gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
-                        gameVar.ALL_FRAMES=[]
-                        gameVar.FOUND=False
-                        gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
-                        gameVar.GAMESTART=datetime.fromisoformat(data["new_game"])
-                        
-                    if data["new_message"]:
-                        if data["new_message"]["player_id"] == gameVar.PLAYER_ID:
-                            gameVar.MESSAGES=gameVar.MESSAGES[:-1]
-                        gameVar.MESSAGES.append(data["new_message"])
-                        
-                        if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
-                            gameVar.FOUND=True
-                    if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
-                        gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
-                        gameVar.ROLL_BACK=0
+                if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
+                    gameVar.FOUND=True
+            if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
+                gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
+                gameVar.ROLL_BACK=0
 
-                        threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+                threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
 
-                        num_steps=0
-                        for frame in gameVar.ALL_FRAMES:
-                            if frame["type"] in ["new_step", "shape"]:
-                                num_steps+=1
-                        gameVar.STEP_NUM=num_steps
+                num_steps=0
+                for frame in gameVar.ALL_FRAMES:
+                    if frame["type"] in ["new_step", "shape"]:
+                        num_steps+=1
+                gameVar.STEP_NUM=num_steps
 
-                    if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
-                        gameVar.ROLL_BACK=data["roll_back"]
-                        tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
+            if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
+                gameVar.ROLL_BACK=data["roll_back"]
+                tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
 
+                
+        await sio.connect(f"https://{NGROK_DOMAIN}")
+
+        # Boucle pour écouter et réagir aux messages
+        await sio.wait()
     
     def timer(self):
             
@@ -211,9 +227,6 @@ class MultiplayersGame:
                     asyncio.set_event_loop(loop)
                 asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
             gameVar.GAMESTART=datetime.now()
-            
-        if self.game_remaining_time%10==0 and self.frame_num>=config["game_page_fps"]-1:# for keep connection
-            if gameVar.WS: asyncio.run(gameVar.WS.ping())
     
     def players(self):
         pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H))
@@ -240,12 +253,20 @@ class MultiplayersGame:
             pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
             pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
-            #avatar
-            avatar=tools.matrix_to_image(player["avatar"])
-            avatar=pygame.transform.scale(avatar, (5/100*self.H, 5/100*self.H))
-            pygame.draw.circle(self.screen, BLEU, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
-            tools.apply_circular_mask(avatar)
-            self.screen.blit(avatar, dico_co[y][1])
+            #avatar TODO FOR EMOJI!!!!
+            if player["avatar"]["type"]=="matrix":
+                avatar=tools.matrix_to_image(player["avatar"]["matrix"])
+                avatar=pygame.transform.scale(avatar, (5/100*self.H, 5/100*self.H))
+                pygame.draw.circle(self.screen, BLEU, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
+                tools.apply_circular_mask(avatar)
+                self.screen.blit(avatar, dico_co[y][1])
+            else:# emoji
+
+                pygame.draw.circle(self.screen, BLEU, (dico_co[y][1][0]+5/100*self.H//2,dico_co[y][1][1]+5/100*self.H//2), 5/100*self.H//2+3)
+                pygame.draw.circle(self.screen, player["avatar"]["color"], (dico_co[y][1][0]+5/100*self.H//2,dico_co[y][1][1]+5/100*self.H//2), 5/100*self.H//2)
+
+                self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
+
 
             #pseudo
             text_color=(10,10,10) if player["id"] == gameVar.PLAYER_ID else (100,100,100)
@@ -583,7 +604,7 @@ class MultiplayersGame:
                 self.connected=True
                 launch_page.join()
 
-                while not server.server:
+                while not server.server_running:
                     time.sleep(0.1)
             else:
                 self.connected=True
