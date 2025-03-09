@@ -14,9 +14,9 @@
 
   <body>
     <!-- Login Overlay -->
-    <div class="login-overlay" id="login-overlay">
+    <div class="login-overlay" id="login-overlay" style="display: block">
       <form class="login-form" id="login-form">
-        <h1 class="login-title">Rejoingnez Drawwy Multiplayer</h1>
+        <h1 class="login-title">Rejoignez Drawwy Multiplayer</h1>
         <div class="input-group">
           <input
             type="text"
@@ -240,129 +240,128 @@
       <header class="header">
         <h1>Drawwy</h1>
       </header>
+      <div class="play-container">
+        <section class="players-section">
+          <h2>Joueurs</h2>
+          <ul class="player-list" id="player-list">
+            <!-- Players will be added here dynamically -->
+          </ul>
+        </section>
 
-      <section class="players-section">
-        <h2>Joueurs</h2>
-        <ul class="player-list" id="player-list">
-          <!-- Players will be added here dynamically -->
-        </ul>
-      </section>
-
-      <section class="game-section">
-        <div class="game-info">
-          <div class="word-display" id="word-display">
-            <span id="hint-text">En attente de joueurs...</span>
-          </div>
-          <div class="timer">
-            <span id="timer-text">2:00</span>
-            <div class="timer-bar">
-              <div class="timer-progress" id="timer-progress"></div>
+        <section class="game-section">
+          <div class="game-info">
+            <div class="word-display" id="word-display">
+              <span id="hint-text">En attente de joueurs...</span>
+            </div>
+            <div class="timer">
+              <span id="timer-text">2:00</span>
+              <div class="timer-bar">
+                <div class="timer-progress" id="timer-progress"></div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="canvas-container">
-          <canvas id="drawing-canvas"></canvas>
-          <div class="drawing-tools" id="drawing-tools">
-            <button class="tool-btn active" data-tool="pencil" title="Crayon">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button class="tool-btn" data-tool="line" title="Ligne">
-              <i class="fas fa-slash"></i>
-            </button>
-            <button class="tool-btn" data-tool="rectangle" title="Rectangle">
-              <i class="far fa-square"></i>
-            </button>
-            <button class="tool-btn" data-tool="circle" title="Cercle">
-              <i class="far fa-circle"></i>
-            </button>
-            <button class="tool-btn" data-tool="eraser" title="Gomme">
-              <i class="fas fa-eraser"></i>
-            </button>
-            <button class="tool-btn" data-tool="fill" title="Remplir">
-              <i class="fas fa-fill-drip"></i>
-            </button>
-            <div class="color-picker">
-              <div
-                class="color-option active"
-                style="background-color: #000000"
-                data-color="#000000"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #ff0000"
-                data-color="#FF0000"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #00ff00"
-                data-color="#00FF00"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #0000ff"
-                data-color="#0000FF"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #ffff00"
-                data-color="#FFFF00"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #ffa500"
-                data-color="#FFA500"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #800080"
-                data-color="#800080"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #ffc0cb"
-                data-color="#FFC0CB"
-              ></div>
-              <div
-                class="color-option"
-                style="background-color: #ffffff"
-                data-color="#FFFFFF"
-              ></div>
+          <div class="canvas-container">
+            <canvas id="drawing-canvas"></canvas>
+            <div class="drawing-tools" id="drawing-tools">
+              <button class="tool-btn active" data-tool="pencil" title="Crayon">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button class="tool-btn" data-tool="line" title="Ligne">
+                <i class="fas fa-slash"></i>
+              </button>
+              <button class="tool-btn" data-tool="rectangle" title="Rectangle">
+                <i class="far fa-square"></i>
+              </button>
+              <button class="tool-btn" data-tool="circle" title="Cercle">
+                <i class="far fa-circle"></i>
+              </button>
+              <button class="tool-btn" data-tool="eraser" title="Gomme">
+                <i class="fas fa-eraser"></i>
+              </button>
+              <button class="tool-btn" data-tool="fill" title="Remplir">
+                <i class="fas fa-fill-drip"></i>
+              </button>
+              <div class="color-picker">
+                <div
+                  class="color-option active"
+                  style="background-color: #000000"
+                  data-color="#000000"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ff0000"
+                  data-color="#FF0000"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #00ff00"
+                  data-color="#00FF00"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #0000ff"
+                  data-color="#0000FF"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffff00"
+                  data-color="#FFFF00"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffa500"
+                  data-color="#FFA500"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #800080"
+                  data-color="#800080"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffc0cb"
+                  data-color="#FFC0CB"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffffff"
+                  data-color="#FFFFFF"
+                ></div>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="20"
+                value="5"
+                class="size-slider"
+                id="size-slider"
+              />
+              <button class="tool-btn" data-tool="clear" title="Effacer tout">
+                <i class="fas fa-trash"></i>
+              </button>
+              <button class="tool-btn" data-tool="undo" title="Annuler">
+                <i class="fas fa-undo"></i>
+              </button>
             </div>
+          </div>
+        </section>
+
+        <section class="chat-section">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-container">
             <input
-              type="range"
-              min="1"
-              max="20"
-              value="5"
-              class="size-slider"
-              id="size-slider"
+              type="text"
+              class="chat-input"
+              id="chat-input"
+              placeholder="Devinez le mot..."
             />
-            <button class="tool-btn" data-tool="clear" title="Effacer tout">
-              <i class="fas fa-trash"></i>
-            </button>
-            <button class="tool-btn" data-tool="undo" title="Annuler">
-              <i class="fas fa-undo"></i>
+            <button class="send-btn" id="send-btn">
+              <i class="fas fa-paper-plane"></i>
             </button>
           </div>
-        </div>
-      </section>
-
-      <section class="chat-section">
-        <div class="chat-messages" id="chat-messages">
-          <div class="message system-message">Bienvenue !</div>
-        </div>
-        <div class="chat-input-container">
-          <input
-            type="text"
-            class="chat-input"
-            id="chat-input"
-            placeholder="Devinez le mot..."
-          />
-          <button class="send-btn" id="send-btn">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
 
     <!-- Game completion modal -->

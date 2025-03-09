@@ -58,23 +58,21 @@ def handle_disconnect():
     global players
     # Trouver le joueur qui s'est déconnecté
     player_sid = request.sid
+    player_id = None
     for i, player in enumerate(players):
         if player.get("sid") == player_sid:
             print(f"Joueur {player['pseudo']} déconnecté")
+            player_id = player["id"]
             players.pop(i)
             break
+
+    os.remove(f"web/players-avatars/{player_id}.bmp")
     
     # Envoyer la mise à jour des joueurs
-    emit('update', {
-        "type": "update",
-        "frames": None,
-        "drawer_id": drawer_id,
-        "new_message": None,
-        "sentence": sentences_list[-1],
-        "found": False,
-        "new_game": False,
-        "roll_back": roll_back
+    emit('player_disconnected', { 
+        "id": player_id
     }, broadcast=True)
+    
 
 @socketio.on('join')
 def handle_join(data):
@@ -85,7 +83,6 @@ def handle_join(data):
     
     # Envoyer l'ID du joueur et l'état initial du jeu
     emit('welcome', {
-        "type": "welcome",
         "id": player_id,
         "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
         "all_frames": all_frames,
@@ -103,31 +100,33 @@ def handle_join(data):
         "found": False,
         "sid": request.sid
     })
+
+    # enregistrer l'avatar
+    if data["avatar"]["type"] == "matrix":
+        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(player_id)+".bmp", sentences_list[-1])
     
     # Annoncer le nouveau joueur
     emit('new_player', {
-        "type": "new_player", 
-        "player": {
             "id": player_id, 
             "pseudo": data["pseudo"],
             "avatar": data["avatar"],
             "points": 0, 
             "found": False
-        }
     }, broadcast=True)
     
     # Démarrer un nouveau jeu si c'est le deuxième joueur
     if len(players) == 2:
         last_game_start = datetime.now()
         emit('update', {
-            "type": "update",
             "frames": None,
             "drawer_id": drawer_id,
             "new_message": None,
             "sentence": sentences_list[-1],
             "found": False,
             "new_game": last_game_start.isoformat(),
-            "roll_back": roll_back
+            "roll_back": roll_back,
+        "new_founder": None,
+        "new_points": None
         }, broadcast=True)
 
 @socketio.on('draw')
@@ -139,14 +138,17 @@ def handle_draw(data):
     
     # Envoyer la mise à jour
     emit('update', {
-        "type": "update",
         "frames": data["frames"],
         "drawer_id": drawer_id,
         "new_message": None,
         "sentence": sentences_list[-1],
         "found": False,
         "new_game": False,
-        "roll_back": roll_back
+        "roll_back": roll_back,
+        "new_founder": None,
+        "new_points": None,
+        "new_founder": None,
+        "new_points": None
     }, broadcast=True)
 
 @socketio.on('roll_back')
@@ -156,14 +158,15 @@ def handle_roll_back(data):
     roll_back = data["roll_back"]
     
     emit('update', {
-        "type": "update",
         "frames": None,
         "drawer_id": drawer_id,
         "new_message": None,
         "sentence": sentences_list[-1],
         "found": False,
         "new_game": False,
-        "roll_back": roll_back
+        "roll_back": roll_back,
+        "new_founder": None,
+        "new_points": None
     }, broadcast=True)
 
 @socketio.on('guess')
@@ -220,14 +223,15 @@ def handle_guess(data):
         guess_list = []
     
     emit('update', {
-        "type": "update",
         "frames": None,
         "drawer_id": drawer_id,
         "new_message": mess,
         "sentence": sentences_list[-1],
         "found": False,
         "new_game": last_game_start.isoformat() if new_game else False,
-        "roll_back": roll_back
+        "roll_back": roll_back,
+        "new_founder": data["player_id"] if succeed else None,
+        "new_points": [{"player_id": data["player_id"], "points": new_points}, {"player_id": drawer_id, "points": config["points_per_found"]}]
     }, broadcast=True)
 
 @socketio.on('game_finished')
@@ -254,14 +258,15 @@ def handle_game_finished():
     last_game_start = datetime.now()
     
     emit('update', {
-        "type": "update",
         "frames": None,
         "drawer_id": drawer_id,
         "new_message": None,
         "sentence": sentences_list[-1],
         "found": False,
         "new_game": last_game_start.isoformat(),
-        "roll_back": roll_back
+        "roll_back": roll_back,
+        "new_founder": None,
+        "new_points": None
     }, broadcast=True)
 
 def flask_worker():
@@ -311,6 +316,9 @@ def stop_server():
         socketio.emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
     except Exception as e:
         print(f"Erreur lors de l'envoi du message de fermeture: {e}")
+
+    for filename in os.listdir("web/players-avatars"):
+        os.remove(os.path.join("web/players-avatars", filename))
     
     # Marquer le serveur comme arrêté
     server_running = False

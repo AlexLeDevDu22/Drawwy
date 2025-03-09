@@ -1,8 +1,8 @@
 //! Game Configuration
 const gameConfig = {
-  gameDuration: 120, // seconds
-  canvasWidth: 800,
-  canvasHeight: 600,
+  gameDuration: 150, // seconds
+  canvasWidth: 200,
+  canvasHeight: 200,
   serverUrl: "https://vital-mastiff-publicly.ngrok-free.app",
 };
 
@@ -90,6 +90,31 @@ function handleConnection() {
   // Écouter l'événement 'welcome' pour recevoir l'état initial du jeu
   socket.on("welcome", (data) => {
     console.log("Bienvenue dans la partie :", data);
+    gameState.allFrames += data["all_frames"];
+    updateCanvasByFrames(data["all_frames"], canvas, false, false);
+    gameState.playerId = data["id"];
+    gameState.messages = data["messages"];
+    gameState.players = data["players"];
+    updatePlayerList();
+
+    gameState.gameStartTime = new Date(data.new_game);
+    startGameTimer();
+  });
+
+  socket.on("new_player", (data) => {
+    console.log("Nouveaux joueurs :", data);
+    gameState.players.push(data);
+    updatePlayerList();
+    addMessageToChat(gameState.pseudo + " viens de nous rejoindre!", "#63ff6c");
+  });
+
+  socket.on("player_disconnected", (data) => {
+    console.log("Joueur déconnecté :", data);
+    gameState.players = gameState.players.filter(
+      (player) => player.id !== data.id
+    );
+    updatePlayerList();
+    addMessageToChat(gameState.pseudo + " à quitté la partie.", "#fc6455");
   });
 
   // Écouter les mises à jour du jeu
@@ -97,42 +122,6 @@ function handleConnection() {
     console.log("Mise à jour du jeu :", data);
   });
 }
-
-// Handle welcome message
-function handleWelcome(data) {
-  gameState.playerId = data.id;
-  gameState.players = data.players;
-  gameState.messages = data.messages || [];
-
-  // Update player list
-  updatePlayerList();
-
-  // Add messages to chat
-  if (gameState.messages.length > 0) {
-    clearChat();
-    gameState.messages.forEach((message) => {
-      addMessageToChat(message);
-    });
-  }
-
-  // Set game start time if provided
-  if (data.new_game) {
-    gameState.gameStartTime = new Date(data.new_game);
-    startGameTimer();
-  }
-
-  addSystemMessage(
-    `Bienvenue dans le jeu, ${getPlayerById(gameState.playerId).pseudo} !`
-  );
-}
-
-// Handle new player message
-function handleNewPlayer(data) {
-  gameState.players.push(data.player);
-  updatePlayerList();
-  addSystemMessage(`${data.player.pseudo} a rejoint la partie !`);
-}
-
 // Handle update message
 function handleUpdate(data) {
   // Update drawer ID
@@ -140,7 +129,7 @@ function handleUpdate(data) {
 
   // Update drawing if we're not the drawer
   if (data.frames && gameState.playerId !== gameState.drawerId) {
-    updateCanvas(data.frames);
+    updateCanvasByFrames(data.frames, canvas);
   }
 
   // Update current sentence
@@ -151,22 +140,19 @@ function handleUpdate(data) {
 
   // Add new message if provided
   if (data.new_message) {
-    addMessageToChat(data.new_message);
-
-    // If this player found the word
-    if (
-      data.new_message.player_id === gameState.playerId &&
-      data.new_message.succeed
-    ) {
-      gameState.hasFound = true;
-      updatePlayerList(); // Update UI to show found status
-    }
+    let mess = data.new_message.succeed
+      ? data.new_message.pseudo + " à trouvé!"
+      : data.new_message.guess;
+    addMessageToChat(mess, data.new_message.succeed ? "#63ff6c" : null);
+    updatePlayerList();
   }
 
   // Handle new game
   if (data.new_game) {
     gameState.gameStartTime = new Date(data.new_game);
     gameState.hasFound = false;
+    gameState.currentSentence = data.sentence;
+    gameState.drawerId = data.drawer_id;
 
     // Clear the canvas
     initCanvas();
@@ -178,7 +164,6 @@ function handleUpdate(data) {
     drawingState.undoStack = [];
 
     // Update UI elements
-    updatePlayerList();
     updateWordDisplay();
 
     // Start the timer
@@ -194,8 +179,150 @@ function handleUpdate(data) {
     toggleDrawingTools();
   }
 
-  // Update player list to reflect current state
-  updatePlayerList();
+  if (data.new_founder) {
+    for (let i = 0; i < gameState.players.length; i++) {
+      if (gameState.players[i].id == data.new_founder)
+        gameState.players[i].found = true;
+    }
+  }
+
+  if (data.new_points) {
+    data.new_points.forEach((point) => {
+      for (let i = 0; i < gameState.players.length; i++) {
+        if (gameState.players[i].id == point.id)
+          gameState.players[i].points += point.points;
+      }
+    });
+  }
+}
+
+function updateCanvasByFrames(frames, canvas, reset = false, delay = true) {
+  if (reset) {
+    // Réinitialisation des données globales
+    gameState.ALL_FRAMES = [];
+    if (canvas) {
+      for (let y = 0; y < gameConfig.canvasHeight; y++) {
+        canvas[y] = Array(gameConfig.canvasWidth).fill(null);
+      }
+    } else {
+      gameState.CANVAS = Array(gameConfig.canvasHeight)
+        .fill()
+        .map(() => Array(gameConfig.canvasWidth).fill(null));
+    }
+  }
+
+  let currentDrawingColor = [0, 0, 0]; // Noir par défaut
+  let currentDrawingRadius = 1;
+
+  let newFrames = [...frames]; // Copie des frameSs
+  newFrames = splitStepsByRollback(newFrames, gametate.ROLL_BACK); // Gérer les rollbacks (implémentation non fournie ici)
+
+  // Phase 1 : dessiner
+  for (const frame of newFrames[0]) {
+    if (frame.type === "draw") {
+      const duration = delay ? 1 / frames.length : 0;
+
+      if (frame.color) currentDrawingColor = frame.color;
+      if (frame.radius) currentDrawingRadius = frame.radius;
+
+      if (canvas) {
+        canvas = drawBrushLine(
+          canvas,
+          frame.x1,
+          frame.y1,
+          frame.x2,
+          frame.y2,
+          currentDrawingColor,
+          currentDrawingRadius,
+          duration
+        );
+      } else {
+        gameState.CANVAS = drawBrushLine(
+          gameState.CANVAS,
+          frame.x1,
+          frame.y1,
+          frame.x2,
+          frame.y2,
+          currentDrawingColor,
+          currentDrawingRadius,
+          duration
+        );
+      }
+    }
+    S;
+    gametate.ALL_FRAMES.push(frame);
+  }
+
+  // Phase 2 : ajouter le reste des frames
+  for (const frame of newFrames[1]) {
+    S;
+    gametate.ALL_FRAMES.push(frame);
+  }
+
+  if (canvas) return canvas;
+}
+
+function drawBrushLine(canvas, x1, y1, x2, y2, color, radius, duration) {
+  const height = canvas.length;
+  const width = canvas[0].length;
+
+  // Vérifie si une position est dans les limites du canvas
+  function inBounds(x, y) {
+    return x >= 0 && x < width && y >= 0 && y < height;
+  }
+
+  // Dessine un cercle sur le canvas
+  function drawCircle(cx, cy) {
+    for (let i = -radius; i <= radius; i++) {
+      for (let j = -radius; j <= radius; j++) {
+        if (i ** 2 + j ** 2 <= radius ** 2) {
+          // Points dans un cercle
+          const nx = cx + i;
+          const ny = cy + j;
+          if (inBounds(nx, ny)) {
+            canvas[ny][nx] = color;
+          }
+        }
+      }
+    }
+  }
+
+  // Dessine une ligne épaisse et lisse
+  function drawThickLine(x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.max(Math.abs(dx), Math.abs(dy));
+
+    const stepDuration = duration / dist;
+    for (let step = 0; step <= dist; step++) {
+      const t = step / dist;
+      const x = Math.round(x1 + t * dx);
+      const y = Math.round(y1 + t * dy);
+      drawCircle(x, y); // Dessine un cercle autour de chaque point
+
+      // Ajoute un délai si nécessaire
+      if (stepDuration > 0) {
+        const delay = Math.max(0, stepDuration - 0.004); // Ajuste la durée du délai
+        sleep(delay);
+      }
+    }
+  }
+
+  // Dessine la ligne et les extrémités arrondies
+  drawThickLine(x1, y1, x2, y2);
+  drawCircle(x1, y1);
+  drawCircle(x2, y2);
+
+  return canvas;
+}
+
+// Fonction sleep (asynchrone pour simuler les délais)
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms * 1000));
+}
+
+function toggleDrawingTools() {
+  drawingTools.style.opacity = gameState.playerId == gameState.drawerId ? 1 : 0;
 }
 
 // Update player list UI
@@ -215,16 +342,22 @@ function updatePlayerList() {
       playerItem.classList.add("found");
     }
 
-    const avatarBg = getAvatarBackground(player.avatar);
-
-    playerItem.innerHTML = `
-            <div class="avatar" style="background-color: ${avatarBg}">
-                ${player.avatar || "👤"}
-            </div>
-            <div class="player-info">
-                <div class="player-name">${player.pseudo}${
-      player.id === gameState.playerId ? " (Vous)" : ""
-    }</div>
+    playerItem.innerHTML =
+      (player.avatar.type == "emoji"
+        ? `
+            <div class="avatar" style="background-color: rgb(${player.avatar.color[0]}, ${player.avatar.color[1]}, ${player.avatar.color[2]})">${player.avatar.emoji} </div>`
+        : `<img class="avatar" src="players-avatars/${player.id}.bmp">`) +
+      `<div class="player-info">
+                <div class="player-name-found">
+                    <div class="player-name">${player.pseudo}${
+        player.id === gameState.playerId ? " (Vous)" : ""
+      }</div>
+                    ${
+                      player.found
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#63ff6c"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>'
+                        : '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#333"><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>'
+                    }
+                </div>
                 <div class="player-score">${player.points} points</div>
             </div>
             <div>
@@ -243,6 +376,12 @@ function updatePlayerList() {
 
     playerList.appendChild(playerItem);
   });
+}
+
+function addMessageToChat(message, color) {
+  chatMessages.innerHTML += `<div class="message system-message" ${
+    'style="background-color: ' + (color || "#var(--light-color)") + '"'
+  }>${message}</div>`;
 }
 
 // Update word display based on current game state
@@ -333,11 +472,6 @@ loginForm.addEventListener("submit", (e) => {
     loginOverlay.style.pointerEvents = "none";
 
     gameState.pseudo = pseudoInput.value;
-
-    chatMessages.innerHTML +=
-      '<div class="message system-message" style="background-color: #63ff6c">Bienvenue ' +
-      gameState.pseudo +
-      "!</div>";
 
     handleConnection();
   }

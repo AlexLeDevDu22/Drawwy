@@ -146,8 +146,13 @@ class MultiplayersGame:
 
         @sio.on("new_player")
         async def new_player(data):
-            gameVar.PLAYERS.append(data["player"])
+            gameVar.PLAYERS.append(data)
 
+        @sio.on("player_disconnected")
+        async def player_disconnected(data):
+            for i in range(len(gameVar.PLAYERS)):
+                if gameVar.PLAYERS[i]["id"]==data["id"]:
+                    gameVar.PLAYERS.pop(i)
 
         @sio.on("update")
         async def update(data):
@@ -187,6 +192,17 @@ class MultiplayersGame:
             if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
                 gameVar.ROLL_BACK=data["roll_back"]
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
+
+            if data["new_founder"]:
+                for i in range(len(gameVar.PLAYERS)):
+                    if gameVar.PLAYERS[i]["id"]==data["new_founder"]:
+                        gameVar.PLAYERS[i]["founder"]=True
+
+            if data["new_points"]:
+                for e in data["new_points"]:
+                    for i in range(len(gameVar.PLAYERS)):
+                        if gameVar.PLAYERS[i]["id"]==data["new_points"][e]["player_id"]:
+                            gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
 
                 
         await sio.connect(f"https://{NGROK_DOMAIN}")
@@ -282,7 +298,7 @@ class MultiplayersGame:
                 image_texte = font.render ( "Trouvé ", 1 , text_color )
                 self.screen.blit(image_texte, dico_co[y][4])
                     
-                pygame.draw.circle(self.screen, text_color, dico_co[y][4], 7)
+                # pygame.draw.circle(self.screen, text_color, dico_co[y][4], 7)
                 if player["found"]:
                     pygame.draw.circle(self.screen, VERT,dico_co[y][5], 5)
                 else:
