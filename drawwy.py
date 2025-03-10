@@ -6,6 +6,7 @@ import pygame
 import sys
 import random
 import math
+from datetime import datetime
 
 if sys.platform.startswith("win"):
     import pygetwindow as gw
@@ -18,7 +19,7 @@ with open("players_data.json") as f:
 
 pygame.init()
 W, H = tools.get_screen_size()
-ecran = pygame.display.set_mode((W, H))
+screen = pygame.display.set_mode((W, H))
 pygame.display.set_icon(pygame.image.load("icon.png"))
 pygame.display.set_caption("Drawwy")
 
@@ -509,10 +510,13 @@ particles = []
 animation_counter = 0
 title_angle = 0
 
+connected=False
+last_sec_check_connection=datetime.now().second
+
 # État du jeu
 current_page = "menu"
 # Créer le gestionnaire d'avatar
-avatar_manager = AvatarManager(ecran)
+avatar_manager = AvatarManager(screen)
 
 clock = pygame.time.Clock()
 running = True
@@ -520,6 +524,10 @@ running = True
 while running:
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
+
+    if datetime.now().second==(last_sec_check_connection+2)%60:
+        last_sec_check_connection=datetime.now().second
+        connected=tools.is_connected()
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -557,15 +565,15 @@ while running:
     avatar_manager.update(mouse_pos, pygame.mouse.get_pressed())
     
     # Fond
-    ecran.fill(LIGHT_BLUE)
+    screen.fill(LIGHT_BLUE)
     
     # Dessiner les éléments de dessin en arrière-plan
     for element in drawing_elements:
-        element.draw(ecran)
+        element.draw(screen)
     
     # Dessiner les particules
     for particle in particles:
-        particle.draw(ecran)
+        particle.draw(screen)
     
     # === ÉCRAN DU MENU PRINCIPAL ===
     if current_page == "menu":
@@ -579,13 +587,13 @@ while running:
             main_panel_y = (H - main_panel_height) // 2
             
             # Ombre du panneau
-            pygame.draw.rect(ecran, DARK_BEIGE, 
+            pygame.draw.rect(screen, DARK_BEIGE, 
                             (main_panel_x + 15, main_panel_y + 15, 
                             main_panel_width, main_panel_height), 
                             border_radius=40)
             
             # Panneau principal
-            pygame.draw.rect(ecran, BEIGE, 
+            pygame.draw.rect(screen, BEIGE, 
                             (main_panel_x, main_panel_y, 
                             main_panel_width, main_panel_height), 
                             border_radius=40)
@@ -601,7 +609,7 @@ while running:
                         min(255, max(0, BEIGE[1] + color_variation)),
                         min(255, max(0, BEIGE[2] + color_variation))
                     )
-                    pygame.draw.circle(ecran, point_color, (px, py), 1)
+                    pygame.draw.circle(screen, point_color, (px, py), 1)
             
             # Titre avec effet d'animation
             title_scale = 1.0 + 0.05 * math.sin(title_angle * 2)
@@ -609,11 +617,11 @@ while running:
             TITLE_FONT_animated = pygame.font.SysFont(None, title_size)
             
             # Ombre du titre
-            draw_text("DRAWWY", TITLE_FONT_animated, GRAY, ecran, 
+            draw_text("DRAWWY", TITLE_FONT_animated, GRAY, screen, 
                     W // 2 + 8, main_panel_y + 150 + 8)
             
             # Titre
-            draw_text("DRAWWY", TITLE_FONT_animated, BLACK, ecran, 
+            draw_text("DRAWWY", TITLE_FONT_animated, BLACK, screen, 
                     W // 2, main_panel_y + 150)
             
             
@@ -632,13 +640,13 @@ while running:
                 
                 
                 # Dessiner l'ombre du bouton
-                pygame.draw.rect(ecran, DARK_BEIGE if not hover else GRAY, 
+                pygame.draw.rect(screen, DARK_BEIGE if not hover else GRAY, 
                             (button_x + buttons_offsets, button_y + buttons_offsets, button_width, button_height), 
                             border_radius=40)
                 
                 # Dessiner le bouton
                 button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
-                pygame.draw.rect(ecran, 
+                pygame.draw.rect(screen, 
                                 SOFT_ORANGE if hover else ORANGE, 
                                 button_rect, 
                                 border_radius=40)
@@ -646,7 +654,7 @@ while running:
 
                 # Texte du bouton avec un léger déplacement lorsqu'il est survolé
                 text_y_offset = 3 if hover else 0
-                draw_text(button_text, BUTTON_FONT, BLACK, ecran, 
+                draw_text(button_text, BUTTON_FONT, BLACK, screen, 
                         button_x + button_width // 2, 
                         button_y + button_height // 2 - text_y_offset)
                 
@@ -679,18 +687,18 @@ while running:
                 # Animation de survol du credit
                 hover_credit = math.sqrt((mouse_pos[0] - credit_button_x)**2 + (mouse_pos[1] - credit_button_y)**2) <= credit_button_radius
                 # Dessiner le cercle
-                pygame.draw.circle(ecran, 
+                pygame.draw.circle(screen, 
                                 DARK_BEIGE if not hover_credit else GRAY, 
                                 (credit_button_x + buttons_offsets-1, credit_button_y + buttons_offsets), 
                                 credit_button_radius)
-                pygame.draw.circle(ecran, 
+                pygame.draw.circle(screen, 
                                 SOFT_ORANGE if hover_credit else ORANGE,
                                 (credit_button_x, credit_button_y),
                                 credit_button_radius)
 
                 # Texte du bouton CREDit avec un léger déplacement lorsqu'il est survolé
                 credit_text_y_offset = 3 if hover_credit else 0
-                draw_text("CRÉDIT", VERY_SMALL_FONT, BLACK, ecran, 
+                draw_text("CRÉDIT", VERY_SMALL_FONT, BLACK, screen, 
                         credit_button_x, 
                         credit_button_y - credit_text_y_offset)
 
@@ -699,7 +707,7 @@ while running:
     # === ÉCRAN DE JEU ===
     elif current_page == "play":
         # Titre
-        draw_text("Mode de jeu", BUTTON_FONT, BLACK, ecran, W // 2, 100)
+        draw_text("Mode de jeu", BUTTON_FONT, BLACK, screen, W // 2, 100)
         
         # Options de jeu
         game_modes = ["Solo", "Multijoueur"]
@@ -715,19 +723,19 @@ while running:
             mode_rect = pygame.Rect(mode_x, modes_y, mode_width, mode_height)
             
             # Vérifier si la souris survole
-            hover = mode_rect.collidepoint(mouse_pos) and (mode=="Solo" or tools.is_connected())
+            hover = mode_rect.collidepoint(mouse_pos) and (mode=="Solo" or connected)
             
             # Dessiner l'ombre
-            pygame.draw.rect(ecran, DARK_BEIGE, 
+            pygame.draw.rect(screen, DARK_BEIGE, 
                             (mode_x + 10, modes_y + 10, mode_width, mode_height), 
                             border_radius=20)
             
             # Dessiner le fond
             color = SOFT_ORANGE if hover else BEIGE
-            pygame.draw.rect(ecran, color, mode_rect, border_radius=20)
+            pygame.draw.rect(screen, color, mode_rect, border_radius=20)
             
             # Dessiner le texte
-            draw_text(mode, SMALL_FONT, BLACK if mode=="Solo" or tools.is_connected() else RED, ecran, 
+            draw_text(mode, SMALL_FONT, BLACK if mode=="Solo" or connected else RED, screen, 
                      mode_x + mode_width // 2, modes_y + mode_height // 2)
             
             # Gérer le clic
@@ -736,12 +744,12 @@ while running:
                     pass
                     current_page = "menu"
                 elif mode=="Multijoueur" and tools.is_connected():
-                    play.MultiplayersGame(W,H)
+                    play.MultiplayersGame(screen,clock, W,H)
                     current_page = "menu"
         
         # Bouton de retour
         back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
-                                      200, 50, SMALL_FONT, BLACK, ORANGE, ecran, 25)
+                                      200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
         
         if mouse_click and back_button_rect.collidepoint(mouse_pos):
             current_page = "menu"
@@ -749,7 +757,7 @@ while running:
     # === ÉCRAN DES SUCCÈS ===
     elif current_page == "achievements":
         # Titre
-        draw_text("SUCCÈS", BUTTON_FONT, BLACK, ecran, W // 2, 100)
+        draw_text("SUCCÈS", BUTTON_FONT, BLACK, screen, W // 2, 100)
         
         # Panneau principal
         main_panel_width = 800
@@ -757,12 +765,12 @@ while running:
         main_panel_x = (W - main_panel_width) // 2
         main_panel_y = 180
         
-        pygame.draw.rect(ecran, DARK_BEIGE, 
+        pygame.draw.rect(screen, DARK_BEIGE, 
                         (main_panel_x + 10, main_panel_y + 10, 
                          main_panel_width, main_panel_height), 
                         border_radius=30)
         
-        pygame.draw.rect(ecran, BEIGE, 
+        pygame.draw.rect(screen, BEIGE, 
                         (main_panel_x, main_panel_y, 
                          main_panel_width, main_panel_height), 
                         border_radius=30)
@@ -782,37 +790,37 @@ while running:
         for achievement in achievements:
             # Fond
             color = PASTEL_GREEN if achievement["completed"] else LIGHT_GRAY
-            pygame.draw.rect(ecran, color, 
+            pygame.draw.rect(screen, color, 
                             (main_panel_x + 50, achievement_y, 
                              main_panel_width - 100, achievement_height), 
                             border_radius=15)
             
             # Texte
-            draw_text(achievement["name"], SMALL_FONT, BLACK, ecran, 
+            draw_text(achievement["name"], SMALL_FONT, BLACK, screen, 
                      main_panel_x + 400, achievement_y + 20)
             
             description_font = pygame.font.SysFont(None, 30)
-            draw_text(achievement["description"], description_font, GRAY, ecran, 
+            draw_text(achievement["description"], description_font, GRAY, screen, 
                      main_panel_x + 400, achievement_y + 50)
             
             # Icône
             if achievement["completed"]:
-                pygame.draw.circle(ecran, DARK_BLUE, 
+                pygame.draw.circle(screen, DARK_BLUE, 
                                   (main_panel_x + 100, achievement_y + achievement_height // 2), 
                                   20)
-                pygame.draw.line(ecran, WHITE, 
+                pygame.draw.line(screen, WHITE, 
                                 (main_panel_x + 90, achievement_y + achievement_height // 2), 
                                 (main_panel_x + 100, achievement_y + achievement_height // 2 + 10), 
                                 4)
-                pygame.draw.line(ecran, WHITE, 
+                pygame.draw.line(screen, WHITE, 
                                 (main_panel_x + 100, achievement_y + achievement_height // 2 + 10), 
                                 (main_panel_x + 115, achievement_y + achievement_height // 2 - 10), 
                                 4)
             else:
-                pygame.draw.circle(ecran, GRAY, 
+                pygame.draw.circle(screen, GRAY, 
                                   (main_panel_x + 100, achievement_y + achievement_height // 2), 
                                   20)
-                pygame.draw.circle(ecran, color, 
+                pygame.draw.circle(screen, color, 
                                   (main_panel_x + 100, achievement_y + achievement_height // 2), 
                                   16)
             
@@ -820,7 +828,7 @@ while running:
         
         # Bouton de retour
         back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
-                                      200, 50, SMALL_FONT, BLACK, ORANGE, ecran, 25)
+                                      200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
         
         if mouse_click and back_button_rect.collidepoint(mouse_pos):
             current_page = "menu"
@@ -830,10 +838,10 @@ while running:
     version_text = "DRAWWY v1.0"
     version_font = pygame.font.SysFont(None, 24)
     text_surface = version_font.render(version_text, True, BLACK)
-    ecran.blit(text_surface, (20, H - 30))
+    screen.blit(text_surface, (20, H - 30))
     
     pygame.display.flip()
-    clock.tick(60)  # Limiter à 60 FPS
+    clock.tick(config["game_page_fps"])
 
 pygame.quit()
 sys.exit()

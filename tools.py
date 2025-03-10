@@ -230,15 +230,6 @@ def flou(pygame_surface, blur_radius=3.5):
     blurred_surface = pygame.image.fromstring(blurred_str, (width, height), "RGBA")
     return blurred_surface
 
-def draw_gradient(screen, color1, color2):
-    """Crée un dégradé vertical"""
-    width, height = screen.get_size()
-    for y in range(height):
-        r = color1[0] + (color2[0] - color1[0]) * y // height
-        g = color1[1] + (color2[1] - color1[1]) * y // height
-        b = color1[2] + (color2[2] - color1[2]) * y // height
-        pygame.draw.line(screen, (r, g, b), (0, y), (width, y))
-
 def lines_return(text, font, max_largeur_pixels):
     mots = text.split()
     lignes = []

@@ -82,44 +82,20 @@ CYAN=(0,255,255)
 
 
 class MultiplayersGame:
-    def connection_page(self):
-        os.environ['SDL_VIDEO_CENTERED'] = '1'
+    def start_connexion(self):
 
-        screen = pygame.display.set_mode((350, 300), pygame.NOFRAME)
-        pygame.display.set_caption("Drawwy")
-        clock = pygame.time.Clock()
-
-        # Essayons de mettre la fenêtre au premier plan
-        if sys.platform.startswith("win"):
-            import pygetwindow as gw
-            gw.getWindowsWithTitle("Drawwy")[0].activate()
-
-        # Charger la police
-        icon = pygame.image.load("icon.png")
-        police = pygame.font.Font("PermanentMarker.ttf", 20)
-
-        while not self.connected:
-            # Gestion des événements pour éviter le crash
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
+        if not asyncio.run(tools.test_server()):# start the serv
             
-            # Dégradé de fond (orange -> jaune clair)
-            tools.draw_gradient(screen, (255, 150, 50), (255, 220, 100))
+            import server
+            self.server=server
+            
+            threading.Thread(target=server.start_server, daemon=True).start()
 
-            # Affichage de l'icône
-            image = pygame.transform.scale(icon, (200, 200))
-            screen.blit(image, (75, 35))
+            while not server.server_running:
+                time.sleep(0.1)
 
-            # Texte de connexion
-            text = police.render("Connexion au serveur...", True, (0, 0, 0))
-            screen.blit(text, text.get_rect(center=(screen.get_width() // 2 + 5, 235)))
-
-            # Mise à jour de l'affichage
-            pygame.display.flip()
-            clock.tick(30)
-
+        self.connected=True
+        asyncio.run(self.handle_connection_client())# start the web connection
 
     async def handle_connection_client(self):
         sio = socketio.AsyncClient()
@@ -598,40 +574,17 @@ class MultiplayersGame:
             y-=10
 
     
-    def __init__(self, W,H):
+    def __init__(self,screen,clock, W,H):
         if not tools.is_connected():
-            return "Désolé, une connexion internet est requise."
-
+            print( "Désolé, une connexion internet est requise.")
+            return
+        
+        self.screen, self.W, self.H=screen, W,H
         self.connected=False
-
-        launch_page=threading.Thread(target=self.connection_page)
-        launch_page.start()
-
-        is_server=not asyncio.run(tools.test_server())
-
+        self.server=None
+    
         try:
-            if is_server:
-                # start the serv
-                import server
-                
-                server_thread = threading.Thread(target=server.start_server, daemon=True)
-                server_thread.start()
-
-                self.connected=True
-                launch_page.join()
-
-                while not server.server_running:
-                    time.sleep(0.1)
-            else:
-                self.connected=True
-                launch_page.join()
-
-            threading.Thread(target=lambda: asyncio.run(self.handle_connection_client()),daemon=True).start()# start the web connection
-
-            # Dimensions de la fenêtre
-            self.W, self.H = W,H
-            self.screen = pygame.display.set_mode((self.W,self.H), pygame.RESIZABLE)
-            self.clock = pygame.time.Clock()
+            threading.Thread(target=self.start_connexion).start()
 
             self.game_remaining_time=config["game_duration"]
             
@@ -660,7 +613,7 @@ class MultiplayersGame:
             self.guess=""
             
             while 1:
-                self.clock.tick(config["game_page_fps"])
+                clock.tick(config["game_page_fps"])
 
                 for player in gameVar.PLAYERS:
                     if player["id"] == gameVar.PLAYER_ID:
@@ -683,11 +636,16 @@ class MultiplayersGame:
                     self.couleurs()
                     self.slider_radius()
                 self.timer()
+
+                if not self.connected:
+                    font = pygame.font.Font("PermanentMarker.ttf", 20)
+                    text = font.render("Connexion au serveur...", True, (0, 0, 0))
+                    self.screen.blit(text, text.get_rect(center=(self.W // 2 + 5, self.H // 2 -100)))
                 
                 for event in self.events:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                        if is_server:
-                            server.stop_server()
+                        if self.server:
+                            self.server.stop_server()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -706,7 +664,8 @@ class MultiplayersGame:
                 self.frame_num=(self.frame_num+1)%config["game_page_fps"]
 
         except KeyboardInterrupt:
-            if is_server:
-                server.stop_server()
+            if self.server:
+                self.server.stop_server()
                 time.sleep(0.1)
             os._exit(0)
+            return self.screen, clock

@@ -214,7 +214,7 @@ function updateCanvasByFrames(frames, canvas, reset = false, delay = true) {
   let currentDrawingColor = [0, 0, 0]; // Noir par défaut
   let currentDrawingRadius = 1;
 
-  let newFrames = [...frames]; // Copie des frameSs
+  let newFrames = [...frames]; // Copie des frames
   newFrames = splitStepsByRollback(newFrames, gametate.ROLL_BACK); // Gérer les rollbacks (implémentation non fournie ici)
 
   // Phase 1 : dessiner

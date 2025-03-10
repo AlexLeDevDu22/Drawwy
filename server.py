@@ -57,33 +57,30 @@ def handle_connect():
 def handle_disconnect():
     global players
     # Trouver le joueur qui s'est déconnecté
-    player_sid = request.sid
-    player_id = None
     for i, player in enumerate(players):
-        if player.get("sid") == player_sid:
+        if player.get("sid") == request.sid:
             print(f"Joueur {player['pseudo']} déconnecté")
-            player_id = player["id"]
             players.pop(i)
             break
 
-    os.remove(f"web/players-avatars/{player_id}.bmp")
+    if player["avatar"]["type"] == "matrix":
+        os.remove(f"web/players-avatars/{player["id"]}.bmp")
     
     # Envoyer la mise à jour des joueurs
     emit('player_disconnected', { 
-        "id": player_id
+        "id": player["id"]
     }, broadcast=True)
     
 
 @socketio.on('join')
 def handle_join(data):
-    print(data)
     global players, last_game_start
     
-    player_id = 0 if players == [] else players[-1]["id"] + 1
+    disconnected_player = 0 if players == [] else players[-1]["id"] + 1
     
     # Envoyer l'ID du joueur et l'état initial du jeu
     emit('welcome', {
-        "id": player_id,
+        "id": disconnected_player,
         "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
         "all_frames": all_frames,
         "messages": guess_list,
@@ -93,7 +90,7 @@ def handle_join(data):
     
     # Ajouter le joueur à la liste
     players.append({
-        "id": player_id,
+        "id": disconnected_player,
         "pseudo": data["pseudo"],
         "avatar": data["avatar"],
         "points": 0,
@@ -103,11 +100,11 @@ def handle_join(data):
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(player_id)+".bmp", sentences_list[-1])
+        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(disconnected_player)+".bmp", sentences_list[-1])
     
     # Annoncer le nouveau joueur
     emit('new_player', {
-            "id": player_id, 
+            "id": disconnected_player, 
             "pseudo": data["pseudo"],
             "avatar": data["avatar"],
             "points": 0, 
@@ -178,9 +175,9 @@ def handle_guess(data):
     mess = None
     
     for i, player in enumerate(players):
-        if player["id"] == data["player_id"]:
+        if player["id"] == data["disconnected_player"]:
             if player["id"] == drawer_id:
-                mess = {"guess": data["guess"], "player_id": player["id"], "pseudo": player["pseudo"], "succeed": False}
+                mess = {"guess": data["guess"], "disconnected_player": player["id"], "pseudo": player["pseudo"], "succeed": False}
             else:
                 succeed = tools.check_sentences(sentences_list[-1], data["guess"])
                 new_points = 0
@@ -196,7 +193,7 @@ def handle_guess(data):
                             players[j]["points"] += config["points_per_found"]
                             break
                 
-                mess = {"guess": data["guess"], "player_id": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
+                mess = {"guess": data["guess"], "disconnected_player": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
         
         if player["id"] != drawer_id:
             list_found.append(player["found"])
@@ -230,8 +227,8 @@ def handle_guess(data):
         "found": False,
         "new_game": last_game_start.isoformat() if new_game else False,
         "roll_back": roll_back,
-        "new_founder": data["player_id"] if succeed else None,
-        "new_points": [{"player_id": data["player_id"], "points": new_points}, {"player_id": drawer_id, "points": config["points_per_found"]}]
+        "new_founder": data["disconnected_player"] if succeed else None,
+        "new_points": [{"disconnected_player": data["disconnected_player"], "points": new_points}, {"disconnected_player": drawer_id, "points": config["points_per_found"]}]
     }, broadcast=True)
 
 @socketio.on('game_finished')
@@ -313,7 +310,7 @@ def stop_server():
     
     # Signaler aux clients la fermeture du serveur
     try:
-        socketio.emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
+        emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
     except Exception as e:
         print(f"Erreur lors de l'envoi du message de fermeture: {e}")
 
