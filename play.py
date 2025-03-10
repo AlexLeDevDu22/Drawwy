@@ -38,122 +38,75 @@ JAUNE=(255,255,0)
 MAGENTA=(255,0,255)
 CYAN=(0,255,255)
 
-# def input_pseudo():
-#     """Affiche une fenêtre pour entrer le pseudo"""
-#     pygame.init()
-#     pygame.display.set_icon(pygame.image.load("icon.png"))
-#     screen = pygame.display.set_mode((400, 200))
-#     pygame.display.set_caption("Entrez votre pseudo")
-#     font = pygame.font.Font(None, 36)
-#     input_box = pygame.Rect(100, 80, 200, 40)
-#     text = ''
-#     active = True
-#     clock = pygame.time.Clock()
-#     try:gw.getWindowsWithTitle("Entrez votre pseudo")[0].activate()  # First plan
-#     except:pass
-    
-#     while True:
-#         screen.fill(BLANC)
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 pygame.quit()
-#                 sys.exit()
-#             if event.type == pygame.MOUSEBUTTONDOWN:
-#                 active = input_box.collidepoint(event.pos)
-#             if event.type == pygame.KEYDOWN and active:
-#                 if event.key == pygame.K_RETURN and text.strip():
-#                     pygame.quit()
-#                     return text  # Retourne le pseudo saisi
-#                 elif event.key == pygame.K_BACKSPACE:
-#                     text = text[:-1]
-#                 else:
-#                     text += event.unicode
-
-#         # Mise à jour visuelle
-#         color = BLEU if active else BLEU_CLAIR
-#         txt_surface = font.render(text, True, NOIR)
-#         input_box.w = max(200, txt_surface.get_width() + 10)
-#         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
-#         pygame.draw.rect(screen, color, input_box, 2)
-
-#         pygame.display.flip()
-#         clock.tick(30)
-
-
-
 class MultiplayersGame:
     def start_connexion(self):
+        try:
 
-        if not asyncio.run(tools.test_server()):# start the serv
-            
-            import server
-            self.server=server
-            
-            threading.Thread(target=server.start_server, daemon=True).start()
+            if not asyncio.run(tools.test_server()):# start the serv
+                
+                import server
+                self.server=server
+                
+                self.server_thread = threading.Thread(target=server.start_server, daemon=True)
+                self.server_thread.start()
 
-            while not server.server_running:
-                time.sleep(0.1)
+                while not server.server_running:
+                    time.sleep(0.1)
 
-        self.connected=True
-        asyncio.run(self.handle_connection_client())# start the web connection
+            asyncio.run(self.handle_connection_client())# start the web connection
+
+        except KeyboardInterrupt:
+            pass
 
     async def handle_connection_client(self):
-        sio = socketio.AsyncClient()
-        @sio.event
-        async def connect():
+        self.sio = socketio.AsyncClient()
+        @self.sio.event
+        async def connect(): #joining the game
+            await self.sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
 
-                await sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
-
-                # Référencer le WebSocket dans gameVar
-                gameVar.WS = sio
-
-        @sio.event
+        @self.sio.event
         async def disconnect():
             print("Déconnecté du serveur WebSocket.")
 
 
-        @sio.on('welcome')
+        @self.sio.on('welcome')
         async def welcome(data):
+            self.connected=True
             gameVar.ALL_FRAMES+=data["all_frames"]
-            tools.update_canva_by_frames(data["all_frames"], delay=False)
             gameVar.PLAYER_ID=data["id"]
             gameVar.MESSAGES=data["messages"]
             gameVar.PLAYERS=data["players"]
+            tools.update_canva_by_frames(data["all_frames"], delay=False)
 
-        @sio.on("new_player")
+        @self.sio.on("new_player")
         async def new_player(data):
             gameVar.PLAYERS.append(data)
 
-        @sio.on("player_disconnected")
+        @self.sio.on("player_disconnected")
         async def player_disconnected(data):
             for i in range(len(gameVar.PLAYERS)):
                 if gameVar.PLAYERS[i]["id"]==data["id"]:
                     gameVar.PLAYERS.pop(i)
 
-        @sio.on("update")
-        async def update(data):
-            gameVar.CURRENT_SENTENCE=data["sentence"]
+        @self.sio.on("new_game")
+        def new_game(data):
+            #save draw
+            if gameVar.PLAYER_ID == gameVar.CURRENT_DRAWER and gameVar.CANVAS and gameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
+                tools.save_canvas(gameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", gameVar.CURRENT_SENTENCE)
+    
+            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+            gameVar.CURRENT_SENTENCE=data["new_sentence"]
+            gameVar.MESSAGES=[]
             gameVar.CURRENT_DRAWER=data["drawer_id"]
+            gameVar.ALL_FRAMES=[]
+            gameVar.FOUND=False
+            gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
+            gameVar.GAMESTART=datetime.fromisoformat(data["start_time"])
+            gameVar.ROLL_BACK=0
 
-            if data["new_game"]:
-                #save draw
-                if gameVar.PLAYER_ID == gameVar.CURRENT_DRAWER and gameVar.CANVAS and gameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
-                    tools.save_canvas(gameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", gameVar.CURRENT_SENTENCE)
-        
-                gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
-                gameVar.ALL_FRAMES=[]
-                gameVar.FOUND=False
-                gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
-                gameVar.GAMESTART=datetime.fromisoformat(data["new_game"])
-                
-            if data["new_message"]:
-                if data["new_message"]["player_id"] == gameVar.PLAYER_ID:
-                    gameVar.MESSAGES=gameVar.MESSAGES[:-1]
-                gameVar.MESSAGES.append(data["new_message"])
-                
-                if data["new_message"]["player_id"] == gameVar.PLAYER_ID and data["new_message"]["succeed"]:
-                    gameVar.FOUND=True
-            if data["frames"] and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #new pixels and not the drawer
+        @self.sio.on("draw")
+        async def draw(data):
+            if gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #not the drawer
                 gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
                 gameVar.ROLL_BACK=0
 
@@ -165,26 +118,36 @@ class MultiplayersGame:
                         num_steps+=1
                 gameVar.STEP_NUM=num_steps
 
+
+        @self.sio.on("new_message")
+        def new_message(data):
+            #ajouter à la liste de message
+            if data["message"]["pid"] == gameVar.PLAYER_ID:
+                gameVar.MESSAGES=gameVar.MESSAGES[:-1]
+            gameVar.MESSAGES.append(data["message"])
+            
+            #update found and points
+            if data["new_founder"]:
+                for i in range(len(gameVar.PLAYERS)):
+                    if gameVar.PLAYERS[i]["id"]==data["pid"]:
+                        gameVar.PLAYERS[i]["founder"]=True
+            
+                for e in data["new_points"]:
+                    for i in range(len(gameVar.PLAYERS)):
+                        if gameVar.PLAYERS[i]["id"]==data["new_points"][e]["pid"]:
+                            gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
+
+
+        @self.sio.on("update")
+        async def update(data):
             if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
                 gameVar.ROLL_BACK=data["roll_back"]
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
-
-            if data["new_founder"]:
-                for i in range(len(gameVar.PLAYERS)):
-                    if gameVar.PLAYERS[i]["id"]==data["new_founder"]:
-                        gameVar.PLAYERS[i]["founder"]=True
-
-            if data["new_points"]:
-                for e in data["new_points"]:
-                    for i in range(len(gameVar.PLAYERS)):
-                        if gameVar.PLAYERS[i]["id"]==data["new_points"][e]["player_id"]:
-                            gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
-
                 
-        await sio.connect(f"https://{NGROK_DOMAIN}")
+        await self.sio.connect(f"https://{NGROK_DOMAIN}")
 
         # Boucle pour écouter et réagir aux messages
-        await sio.wait()
+        await self.sio.wait()
     
     def timer(self):
             
@@ -217,7 +180,7 @@ class MultiplayersGame:
                 except RuntimeError:
                     loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                     asyncio.set_event_loop(loop)
-                asyncio.run(gameVar.WS.send(json.dumps({"type":"game_finished"})))
+                asyncio.run(self.sio.send(json.dumps({"type":"game_finished"})))
             gameVar.GAMESTART=datetime.now()
     
     def players(self):
@@ -395,7 +358,7 @@ class MultiplayersGame:
                             except RuntimeError:
                                 loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                                 asyncio.set_event_loop(loop)
-                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
+                            asyncio.run(self.sio.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
 
                                 
                         elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
@@ -410,13 +373,13 @@ class MultiplayersGame:
                             except RuntimeError:
                                 loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
                                 asyncio.set_event_loop(loop)
-                            asyncio.run(gameVar.WS.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
+                            asyncio.run(self.sio.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
 
 
 
         #send draw
         if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
-            asyncio.run(tools.websocket_draw(gameVar.WS, self.second_draw_frames))  #send datas
+            asyncio.run(tools.websocket_draw(self.sio, self.second_draw_frames))  #send datas
             self.second_draw_frames=[]
         
     def couleurs(self):
@@ -507,12 +470,7 @@ class MultiplayersGame:
                 self.guess_input_active = input_box.collidepoint(event.pos)
             if event.type == pygame.KEYDOWN and self.guess_input_active:
                 if event.key == pygame.K_RETURN and self.guess.strip():
-                    try:
-                        loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                    except RuntimeError:
-                        loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                        asyncio.set_event_loop(loop)
-                    asyncio.run(tools.send_message(gameVar.WS, self.guess,self.game_remaining_time))
+                    tools.emit_sio(self.sio, "guess", {"pid": gameVar.PLAYER_ID, "guess":self.guess, "game_remaining_time":self.game_remaining_time}) # send message
                     gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
@@ -646,6 +604,9 @@ class MultiplayersGame:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
                         if self.server:
                             self.server.stop_server()
+                            time.sleep(0.1)
+                            self.connexion_thread.kill()
+                            self.server_thread.join()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -666,6 +627,5 @@ class MultiplayersGame:
         except KeyboardInterrupt:
             if self.server:
                 self.server.stop_server()
-                time.sleep(0.1)
+                self.server_thread.join()
             os._exit(0)
-            return self.screen, clock

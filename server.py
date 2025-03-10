@@ -31,7 +31,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading", logge
 
 # Variables du jeu
 players = []
-drawer_id = 0
+drawer_id = -1
 guess_list = []
 sentences_list = [sentences.new_sentence()]
 last_game_start = None
@@ -75,56 +75,75 @@ def handle_disconnect():
 @socketio.on('join')
 def handle_join(data):
     global players, last_game_start
-    
-    disconnected_player = 0 if players == [] else players[-1]["id"] + 1
-    
-    # Envoyer l'ID du joueur et l'état initial du jeu
-    emit('welcome', {
-        "id": disconnected_player,
-        "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
-        "all_frames": all_frames,
-        "messages": guess_list,
-        "new_game": last_game_start.isoformat() if last_game_start else False,
-        "roll_back": roll_back
-    })
+
+    if len(players)>0:
+        pid=players[-1]["id"]+1
+    else:
+        pid=0
     
     # Ajouter le joueur à la liste
     players.append({
-        "id": disconnected_player,
+        "id": pid,
         "pseudo": data["pseudo"],
         "avatar": data["avatar"],
         "points": 0,
         "found": False,
         "sid": request.sid
     })
+    
+    # Envoyer l'ID du joueur et l'état initial du jeu
+    emit('welcome', {
+        "id": pid,
+        "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
+        "all_frames": all_frames,
+        "messages": guess_list,
+        "new_game": last_game_start.isoformat() if len(players)>1 and last_game_start else False,
+        "roll_back": roll_back
+    })
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(disconnected_player)+".bmp", sentences_list[-1])
+        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(pid)+".bmp", sentences_list[-1])
     
     # Annoncer le nouveau joueur
     emit('new_player', {
-            "id": disconnected_player, 
+            "id": pid,
             "pseudo": data["pseudo"],
             "avatar": data["avatar"],
             "points": 0, 
             "found": False
+    }, broadcast=True, skip_sid=request.sid)
+
+    if len(players) == 2:
+        handle_new_game()
+
+def handle_new_game():
+    global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
+    
+    guess_list = []
+    all_frames = []
+    roll_back = 0
+    last_game_start = datetime.now()
+    sentences_list.append(sentences.new_sentence())
+    
+    for i in range(len(players)):
+        players[i]["found"] = False
+    
+    # Changer de dessinateur
+    if drawer_id!=-1:
+        for i in range(len(players)):
+            if int(players[i]["id"]) == int(drawer_id):
+                drawer_id = players[(i + 1) % len(players)]["id"]
+                break
+    else:
+        drawer_id = players[0]["id"]
+
+    emit('new_game', {
+        "drawer_id": drawer_id,
+        "start_time": last_game_start.isoformat(),
+        "new_sentence": sentences_list[-1]
     }, broadcast=True)
     
-    # Démarrer un nouveau jeu si c'est le deuxième joueur
-    if len(players) == 2:
-        last_game_start = datetime.now()
-        emit('update', {
-            "frames": None,
-            "drawer_id": drawer_id,
-            "new_message": None,
-            "sentence": sentences_list[-1],
-            "found": False,
-            "new_game": last_game_start.isoformat(),
-            "roll_back": roll_back,
-        "new_founder": None,
-        "new_points": None
-        }, broadcast=True)
 
 @socketio.on('draw')
 def handle_draw(data):
@@ -134,18 +153,9 @@ def handle_draw(data):
     all_frames += data["frames"]
     
     # Envoyer la mise à jour
-    emit('update', {
+    emit('draw', {
         "frames": data["frames"],
-        "drawer_id": drawer_id,
-        "new_message": None,
-        "sentence": sentences_list[-1],
-        "found": False,
-        "new_game": False,
         "roll_back": roll_back,
-        "new_founder": None,
-        "new_points": None,
-        "new_founder": None,
-        "new_points": None
     }, broadcast=True)
 
 @socketio.on('roll_back')
@@ -168,6 +178,7 @@ def handle_roll_back(data):
 
 @socketio.on('guess')
 def handle_guess(data):
+    print("guess!!!!")
     global players, drawer_id, guess_list, sentences_list, last_game_start
     
     list_found = []
@@ -175,9 +186,9 @@ def handle_guess(data):
     mess = None
     
     for i, player in enumerate(players):
-        if player["id"] == data["disconnected_player"]:
+        if player["id"] == data["pid"]:
             if player["id"] == drawer_id:
-                mess = {"guess": data["guess"], "disconnected_player": player["id"], "pseudo": player["pseudo"], "succeed": False}
+                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
             else:
                 succeed = tools.check_sentences(sentences_list[-1], data["guess"])
                 new_points = 0
@@ -193,43 +204,23 @@ def handle_guess(data):
                             players[j]["points"] += config["points_per_found"]
                             break
                 
-                mess = {"guess": data["guess"], "disconnected_player": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
+                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
         
         if player["id"] != drawer_id:
             list_found.append(player["found"])
     
     guess_list.append(mess)
-    
+
+    emit('new_message', {
+        "message": mess,
+        "new_founder": data["pid"] if succeed else None,
+        "new_points": [{"pid": data["pid"], "points": new_points}, {"pid": drawer_id, "points": config["points_per_found"]}]   if succeed else None
+        }, broadcast=True) 
+
     # Vérifier si tous les joueurs ont trouvé
-    new_game = False
     if len(players) > 1 and all(list_found):
-        new_game = True
-        last_game_start = datetime.now()
-        
-        sentences_list.append(sentences.new_sentence())
-        
-        for i in range(len(players)):
-            players[i]["found"] = False
-        
-        # Changer de dessinateur
-        for i in range(len(players)):
-            if int(players[i]["id"]) == int(drawer_id):
-                drawer_id = players[(i + 1) % len(players)]["id"]
-                break
-        
-        guess_list = []
-    
-    emit('update', {
-        "frames": None,
-        "drawer_id": drawer_id,
-        "new_message": mess,
-        "sentence": sentences_list[-1],
-        "found": False,
-        "new_game": last_game_start.isoformat() if new_game else False,
-        "roll_back": roll_back,
-        "new_founder": data["disconnected_player"] if succeed else None,
-        "new_points": [{"disconnected_player": data["disconnected_player"], "points": new_points}, {"disconnected_player": drawer_id, "points": config["points_per_found"]}]
-    }, broadcast=True)
+        handle_new_game()
+
 
 @socketio.on('game_finished')
 def handle_game_finished():
@@ -281,19 +272,22 @@ def start_server():
     http_tunnel = ngrok.connect(8765, "http", domain=ngrok_domain, bind_tls=True)
     
     print(f"Serveur accessible via: {http_tunnel.public_url}")
-    print("ok2")
     
-    # Démarrer Flask dans un thread séparé
-    flask_thread = threading.Thread(target=flask_worker)
-    flask_thread.daemon = True
-    flask_thread.start()
-    
-    # Marquer le serveur comme en cours d'exécution
-    server_running = True
-    
-    # Attendre que le serveur soit arrêté
-    while not stop_event.is_set() and flask_thread.is_alive():
-        time.sleep(0.5)
+    try:
+        # Démarrer Flask dans un thread séparé
+        flask_thread = threading.Thread(target=flask_worker)
+        flask_thread.daemon = True
+        flask_thread.start()
+        
+        # Marquer le serveur comme en cours d'exécution
+        server_running = True
+        
+        # Attendre que le serveur soit arrêté
+        while not stop_event.is_set() and flask_thread.is_alive():
+            time.sleep(0.5)
+
+    except KeyboardInterrupt:
+        stop_server()
 def stop_server():
     """Arrête proprement le serveur Flask-SocketIO et Ngrok."""
     global server_running, http_tunnel, stop_event

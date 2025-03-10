@@ -11,6 +11,7 @@ from datetime import datetime
 import websockets
 import os
 import socket
+import asyncio
 
 load_dotenv()
 
@@ -109,8 +110,15 @@ def check_sentences(phrase1, phrase2):
     score = util.pytorch_cos_sim(emb1, emb2).item()
     return score>config["sentence_checker_seuil"]
     
-async def send_message(websocket, message, remaining_time):
-    await websocket.send(json.dumps({"type":"guess","player_id":gameVar.PLAYER_ID, "guess":message, "remaining_time":remaining_time}))
+def emit_sio(sio, event, data):
+    try:
+        loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+        loop.create_task(sio.emit(event, data))  # Crée une tâche si la boucle existe
+    except RuntimeError:
+        # Créer une nouvelle boucle si aucune n'existe
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(sio.emit(event, data))  # Exécuter directement l'événement
 
 async def websocket_draw(websocket, frames):
     #simplify frames

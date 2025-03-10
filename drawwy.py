@@ -510,7 +510,7 @@ particles = []
 animation_counter = 0
 title_angle = 0
 
-connected=False
+connected=tools.is_connected()
 last_sec_check_connection=datetime.now().second
 
 # État du jeu
