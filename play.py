@@ -1,6 +1,7 @@
 import threading
 import pygame
-from pygame_emojis import load_emoji
+try:from pygame_emojis import load_emoji
+except:import pygame.freetype 
 import sys
 import tools
 import gameVar
@@ -210,7 +211,14 @@ class MultiplayersGame:
                 pygame.draw.circle(self.screen, BLEU, (dico_co[y][1][0]+5/100*self.H//2,dico_co[y][1][1]+5/100*self.H//2), 5/100*self.H//2+3)
                 pygame.draw.circle(self.screen, player["avatar"]["color"], (dico_co[y][1][0]+5/100*self.H//2,dico_co[y][1][1]+5/100*self.H//2), 5/100*self.H//2)
 
-                self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
+                try:
+                    self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
+                    self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
+                except:
+                    seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 100)
+                    emoji, rect = seguisy80.render(player["avatar"]["emoji"], "black")
+                    rect.center = (dico_co[y][1][0],dico_co[y][1][1]+4)
+                    self.screen.blit(emoji, rect) 
 
 
             #pseudo
