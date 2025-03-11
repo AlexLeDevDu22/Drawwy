@@ -18,20 +18,14 @@ let gameState = {
   remainingTime: gameConfig.gameDuration,
   hasFound: false,
   allFrames: [],
+  undoStack: [],
+  drawingState: {
+    currentColor: "#000000",
+    lineWidth: 5,
+  },
 };
 
 // Drawing configuration
-let drawingState = {
-  isDrawing: false,
-  lastX: 0,
-  lastY: 0,
-  currentTool: "pencil",
-  currentColor: "#000000",
-  lineWidth: 5,
-  frames: [],
-  currentStep: 0,
-  undoStack: [],
-};
 
 //! DOM elements
 const loginOverlay = document.getElementById("login-overlay");
@@ -64,7 +58,7 @@ const continueBtn = document.getElementById("continue-btn");
 function clearCanvas() {
   // Set canvas size
   canvas.width = canvas.offsetWidth;
-  canvas.height = 400;
+  canvas.height = canvas.offsetWidth;
 
   // Clear the canvas
   ctx.fillStyle = "#FFFFFF";
@@ -72,8 +66,9 @@ function clearCanvas() {
 }
 
 //* Handle WebSocket connection
+var socket = null;
 function handleConnection() {
-  let socket = io(gameConfig.serverUrl);
+  socket = io(gameConfig.serverUrl);
 
   socket.on("connect", () => {
     console.log("Connecté au serveur WebSocket !");
@@ -97,9 +92,9 @@ function handleConnection() {
   // Écouter l'événement 'welcome' pour recevoir l'état initial du jeu
   socket.on("welcome", (data) => {
     console.log("Bienvenue dans la partie :", data);
-    gameState.allFrames += data["all_frames"];
-    if (data["all_frames"].length > 0)
-      updateCanvasByFrames(data["all_frames"], canvas, false, false);
+    gameState.allFrames += data.all_frames;
+    console.log("start frames", data.all_frames);
+    if (data.all_frames.length > 0) draw(data.all_frames, false);
     gameState.playerId = data["id"];
     data["messages"].forEach((message) => {
       addMessageToChat(
@@ -124,9 +119,21 @@ function handleConnection() {
     addMessageToChat(gameState.pseudo + " viens de nous rejoindre!", "#63ff6c");
   });
 
-  socket.on("draw", (data) => {
+  socket.on("draw", (frames) => {
     console.log("Mise à jour du dessin");
-    handleDraw(data);
+    gameState.allFrames += frames;
+    gameState.drawingState.undoStack = [];
+    draw(frames, true);
+  });
+
+  socket.on("roll_back", (roll_back) => {
+    console.log("Roll back");
+    //resplit frames and undo stacks
+    gameState.allFrames += gameState.drawingState.undoStack;
+    gameState.drawingState.undoStack = gameState.allFrames.slice(-roll_back);
+
+    clearCanvas();
+    draw(gameState.allFrames, false);
   });
 
   socket.on("new_message", (data) => {
@@ -166,7 +173,7 @@ function handleConnection() {
         gameState.players.find((p) => p.id == gameState.drawerId)["pseudo"] +
         " deviens le dessinateur !"
     );
-    gameState.gameStartTime = new Date(data["start_time"]);
+    gameState.gameStartTime = new Date(data.start_time);
 
     updateWordDisplay();
 
@@ -189,139 +196,42 @@ function handleConnection() {
   });
 }
 
-function handleDraw(data) {}
+function draw(frames, delay) {
+  if (!frames || frames.length === 0) return;
 
-// Handle update message
-function handleUpdate(data) {
-  // Update drawing if we're not the drawer
-  if (data.frames && gameState.playerId !== gameState.drawerId) {
-    updateCanvasByFrames(data.frames, canvas);
-  }
-}
+  const gameWidth = 200; // Taille logique du jeu
+  const gameHeight = 200;
 
-function updateCanvasByFrames(frames, canvas, reset = false, delay = true) {
-  if (reset) {
-    // Réinitialisation des données globales
-    gameState.ALL_FRAMES = [];
-    if (canvas) {
-      for (let y = 0; y < gameConfig.canvasHeight; y++) {
-        canvas[y] = Array(gameConfig.canvasWidth).fill(null);
-      }
-    } else {
-      gameState.CANVAS = Array(gameConfig.canvasHeight)
-        .fill()
-        .map(() => Array(gameConfig.canvasWidth).fill(null));
-    }
-  }
+  const realWidth = canvas.offsetWidth; // Taille réelle sur la page
+  const realHeight = canvas.offsetHeight;
 
-  let currentDrawingColor = [0, 0, 0]; // Noir par défaut
-  let currentDrawingRadius = 1;
+  const scaleX = realWidth / gameWidth; // Facteur d'échelle horizontal
+  const scaleY = realHeight / gameHeight; // Facteur d'échelle vertical
+  const scale = Math.min(scaleX, scaleY); // Assurer une échelle uniforme
 
-  let newFrames = [...frames]; // Copie des frames
-  newFrames = splitStepsByRollback(newFrames, gametate.ROLL_BACK); // Gérer les rollbacks (implémentation non fournie ici)
+  let totalDuration = 1000; // On suppose que ça a pris 1s pour faire tous les traits
+  let frameDuration = totalDuration / frames.length; // Temps moyen entre chaque trait
 
-  // Phase 1 : dessiner
-  for (const frame of newFrames[0]) {
-    if (frame.type === "draw") {
-      const duration = delay ? 1 / frames.length : 0;
+  let color = null;
 
-      if (frame.color) currentDrawingColor = frame.color;
-      if (frame.radius) currentDrawingRadius = frame.radius;
+  function drawLine(frame) {
+    if (frame.color) color = frame.color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = frame.radius * 2 * scale; // Adapter la taille du crayon
 
-      if (canvas) {
-        canvas = drawBrushLine(
-          canvas,
-          frame.x1,
-          frame.y1,
-          frame.x2,
-          frame.y2,
-          currentDrawingColor,
-          currentDrawingRadius,
-          duration
-        );
-      } else {
-        gameState.CANVAS = drawBrushLine(
-          gameState.CANVAS,
-          frame.x1,
-          frame.y1,
-          frame.x2,
-          frame.y2,
-          currentDrawingColor,
-          currentDrawingRadius,
-          duration
-        );
-      }
-    }
-    S;
-    gametate.ALL_FRAMES.push(frame);
+    ctx.beginPath();
+    ctx.moveTo(frame.x1 * scaleX, frame.y1 * scaleY);
+    ctx.lineTo(frame.x2 * scaleX, frame.y2 * scaleY);
+    ctx.stroke();
   }
 
-  // Phase 2 : ajouter le reste des frames
-  for (const frame of newFrames[1]) {
-    S;
-    gametate.ALL_FRAMES.push(frame);
+  if (delay) {
+    frames.forEach((frame, index) => {
+      setTimeout(() => drawLine(frame), index * frameDuration);
+    });
+  } else {
+    frames.forEach(drawLine);
   }
-
-  if (canvas) return canvas;
-}
-
-function drawBrushLine(canvas, x1, y1, x2, y2, color, radius, duration) {
-  const height = canvas.length;
-  const width = canvas[0].length;
-
-  // Vérifie si une position est dans les limites du canvas
-  function inBounds(x, y) {
-    return x >= 0 && x < width && y >= 0 && y < height;
-  }
-
-  // Dessine un cercle sur le canvas
-  function drawCircle(cx, cy) {
-    for (let i = -radius; i <= radius; i++) {
-      for (let j = -radius; j <= radius; j++) {
-        if (i ** 2 + j ** 2 <= radius ** 2) {
-          // Points dans un cercle
-          const nx = cx + i;
-          const ny = cy + j;
-          if (inBounds(nx, ny)) {
-            canvas[ny][nx] = color;
-          }
-        }
-      }
-    }
-  }
-
-  // Dessine une ligne épaisse et lisse
-  function drawThickLine(x1, y1, x2, y2) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const dist = Math.max(Math.abs(dx), Math.abs(dy));
-
-    const stepDuration = duration / dist;
-    for (let step = 0; step <= dist; step++) {
-      const t = step / dist;
-      const x = Math.round(x1 + t * dx);
-      const y = Math.round(y1 + t * dy);
-      drawCircle(x, y); // Dessine un cercle autour de chaque point
-
-      // Ajoute un délai si nécessaire
-      if (stepDuration > 0) {
-        const delay = Math.max(0, stepDuration - 0.004); // Ajuste la durée du délai
-        sleep(delay);
-      }
-    }
-  }
-
-  // Dessine la ligne et les extrémités arrondies
-  drawThickLine(x1, y1, x2, y2);
-  drawCircle(x1, y1);
-  drawCircle(x2, y2);
-
-  return canvas;
-}
-
-// Fonction sleep (asynchrone pour simuler les délais)
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms * 1000));
 }
 
 function toggleDrawingTools() {
@@ -425,6 +335,7 @@ function updateWordDisplay() {
 // Start game timer
 function startGameTimer() {
   gameState.remainingTime = gameConfig.gameDuration;
+  timerProgress.classList.remove("not-star");
   updateTimerDisplay();
 
   const timerInterval = setInterval(() => {
@@ -462,6 +373,8 @@ function updateTimerDisplay() {
     timerProgress.style.color = "#333";
   }
 }
+
+function handleGameEnd() {}
 
 //! Events Listeners
 
@@ -506,13 +419,13 @@ function sendMessage(message) {
 }
 
 sendBtn.addEventListener("click", () => {
-  if (messageInput.value == "") return;
-  sendMessage(messageInput.value);
-  messageInput.value = "";
+  if (chatInput.value == "") return;
+  sendMessage(chatInput.value);
+  chatInput.value = "";
 });
 
-messageInput.addEventListener("keypress", (key) => {
-  if (messageInput.value == "" || key.key != "Enter") return;
-  sendMessage(messageInput.value);
-  messageInput.value = "";
+chatInput.addEventListener("keypress", (key) => {
+  if (chatInput.value == "" || key.key != "Enter") return;
+  sendMessage(chatInput.value);
+  chatInput.value = "";
 });

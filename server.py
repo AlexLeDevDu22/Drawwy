@@ -117,6 +117,7 @@ def handle_join(data):
     if len(players) == 2:
         handle_new_game()
 
+@socketio.on('game_finished')
 def handle_new_game():
     global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
     
@@ -146,35 +147,24 @@ def handle_new_game():
     
 
 @socketio.on('draw')
-def handle_draw(data):
+def handle_draw(frames):
     global all_frames
     
     # Mise à jour du dessin
-    all_frames += data["frames"]
+    all_frames += frames
     
     # Envoyer la mise à jour
-    emit('draw', {
-        "frames": data["frames"],
-        "roll_back": roll_back,
-    }, broadcast=True)
+    emit('draw', frames, broadcast=True, skip_sid=request.sid)
 
 @socketio.on('roll_back')
-def handle_roll_back(data):
+def handle_roll_back(data_roll_back):
     global roll_back
     
-    roll_back = data["roll_back"]
+    roll_back = data_roll_back
     
-    emit('update', {
-        "frames": None,
-        "drawer_id": drawer_id,
-        "new_message": None,
-        "sentence": sentences_list[-1],
-        "found": False,
-        "new_game": False,
-        "roll_back": roll_back,
-        "new_founder": None,
-        "new_points": None
-    }, broadcast=True)
+    emit('roll_back', {
+        "roll_back": roll_back
+    }, broadcast=True, skip_sid=request.sid)
 
 @socketio.on('guess')
 def handle_guess(data):
@@ -220,42 +210,6 @@ def handle_guess(data):
     # Vérifier si tous les joueurs ont trouvé
     if len(players) > 1 and all(list_found):
         handle_new_game()
-
-
-@socketio.on('game_finished')
-def handle_game_finished():
-    global players, drawer_id, guess_list, sentences_list, last_game_start
-    
-    # Réinitialiser les joueurs
-    for i in range(len(players)):
-        players[i]["found"] = False
-    
-    # Changer de dessinateur
-    for i in range(len(players)):
-        if int(players[i]["id"]) == int(drawer_id):
-            drawer_id = players[(i + 1) % len(players)]["id"]
-            break
-    
-    # Nouvelle phrase
-    sentences_list.append(sentences.new_sentence())
-    
-    # Réinitialiser les suppositions
-    guess_list = []
-    
-    # Nouvelle heure de début
-    last_game_start = datetime.now()
-    
-    emit('update', {
-        "frames": None,
-        "drawer_id": drawer_id,
-        "new_message": None,
-        "sentence": sentences_list[-1],
-        "found": False,
-        "new_game": last_game_start.isoformat(),
-        "roll_back": roll_back,
-        "new_founder": None,
-        "new_points": None
-    }, broadcast=True)
 
 def flask_worker():
     """Fonction pour exécuter le serveur Flask dans un thread"""

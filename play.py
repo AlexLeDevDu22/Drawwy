@@ -172,16 +172,6 @@ class MultiplayersGame:
 
         # Afficher le texte du timer
         self.screen.blit(text_surface, text_rect)
-        
-        if self.game_remaining_time==0:
-            if self.me["is_drawer"]: #if game time over
-                try:
-                    loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                except RuntimeError:
-                    loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                    asyncio.set_event_loop(loop)
-                asyncio.run(self.sio.send(json.dumps({"type":"game_finished"})))
-            gameVar.GAMESTART=datetime.now()
     
     def players(self):
         pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H))
@@ -353,13 +343,7 @@ class MultiplayersGame:
                             
                             tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
 
-                            try:
-                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                            except RuntimeError:
-                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                                asyncio.set_event_loop(loop)
-                            asyncio.run(self.sio.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
-
+                            tools.emit_sio(self.sio, "roll_back", gameVar.ROLL_BACK)
                                 
                         elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
 
@@ -367,20 +351,15 @@ class MultiplayersGame:
                             
                             tools.update_canva_by_frames(gameVar.ALL_FRAMES, delay=False, reset=True)
 
-
-                            try:
-                                loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-                            except RuntimeError:
-                                loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
-                                asyncio.set_event_loop(loop)
-                            asyncio.run(self.sio.send(json.dumps({"type":"roll_back","roll_back":gameVar.ROLL_BACK})))
+                            tools.emit_sio(self.sio, "roll_back", gameVar.ROLL_BACK)
 
 
 
         #send draw
         if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
-            asyncio.run(tools.websocket_draw(self.sio, self.second_draw_frames))  #send datas
+            tools.emit_sio(self.sio, "draw", self.second_draw_frames)#send draw
             self.second_draw_frames=[]
+
         
     def couleurs(self):
         pygame.draw.rect(self.screen, BLANC, (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H))
@@ -580,7 +559,12 @@ class MultiplayersGame:
                         break
 
                 if self.frame_num%2==0:
-                    self.game_remaining_time=(gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"]
+                    self.game_remaining_time=max(0, (gameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if gameVar.GAMESTART else config["game_duration"])
+
+                    if self.game_remaining_time==0: #if game time over
+                        if self.me["is_drawer"]:
+                            tools.emit_sio(self.sio, "game_finished", None)
+                        gameVar.GAMESTART=datetime.now()
                 
                 self.events=pygame.event.get()
                 
