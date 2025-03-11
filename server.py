@@ -1,4 +1,4 @@
-import json
+import requests
 import os
 import yaml
 import sys
@@ -20,6 +20,7 @@ with open("config.yaml", "r") as f:
 load_dotenv()
 ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
 ngrok_domain = os.getenv("NGROK_DOMAIN")
+ngrok_api = os.getenv("NGROK_API")
 
 # Configuration de ngrok
 ngrok.set_auth_token(ngrok_token)
@@ -264,6 +265,11 @@ def stop_server():
 
     for filename in os.listdir("web/players-avatars"):
         os.remove(os.path.join("web/players-avatars", filename))
+
+    # Au cas ou...
+    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
+    if endpoints:
+        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
     
     # Marquer le serveur comme arrêté
     server_running = False

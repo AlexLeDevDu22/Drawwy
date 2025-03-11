@@ -145,7 +145,7 @@ class MultiplayersGame:
                 gameVar.ROLL_BACK=data["roll_back"]
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
                 
-        await self.sio.connect(f"https://{NGROK_DOMAIN}")
+        await self.sio.connect(f"https://{NGROK_DOMAIN}/")
 
         # Boucle pour écouter et réagir aux messages
         await self.sio.wait()

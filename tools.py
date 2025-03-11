@@ -44,7 +44,9 @@ async def test_server():
     try:
         async with websockets.connect("wss://"+NGROK_DOMAIN) as ws:
             return True
-    except:
+    except Exception as e:
+        from server import stop_server
+        stop_server()
         return False
 
 def load_bmp_to_matrix(file_path):
