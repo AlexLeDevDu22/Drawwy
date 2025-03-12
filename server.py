@@ -163,9 +163,7 @@ def handle_roll_back(data_roll_back):
     
     roll_back = data_roll_back
     
-    emit('roll_back', {
-        "roll_back": roll_back
-    }, broadcast=True, skip_sid=request.sid)
+    emit('roll_back', roll_back, broadcast=True, skip_sid=request.sid)
 
 @socketio.on('guess')
 def handle_guess(data):
@@ -258,10 +256,10 @@ def stop_server():
         ngrok.disconnect(http_tunnel.public_url)
     
     # Signaler aux clients la fermeture du serveur
-    try:
-        emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
-    except Exception as e:
-        print(f"Erreur lors de l'envoi du message de fermeture: {e}")
+    # try:
+    #     emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
+    # except Exception as e:
+    #     print(f"Erreur lors de l'envoi du message de fermeture: {e}")
 
     for filename in os.listdir("web/players-avatars"):
         os.remove(os.path.join("web/players-avatars", filename))

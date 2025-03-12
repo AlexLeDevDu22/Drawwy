@@ -15,8 +15,6 @@ import socketio
 import json
 from datetime import datetime, timedelta
 import time
-if sys.platform.startswith("win"):
-    import pygetwindow as gw
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -141,13 +139,13 @@ class MultiplayersGame:
                             gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
 
 
-        @self.sio.on("update")
-        async def update(data):
-            if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
-                gameVar.ROLL_BACK=data["roll_back"]
+        @self.sio.on("roll_back")
+        async def roll_back(roll_back):
+            if gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
+                gameVar.ROLL_BACK=roll_back
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
                 
-        await self.sio.connect(f"https://{NGROK_DOMAIN}/")
+        await self.sio.connect(f"https://{NGROK_DOMAIN}")
 
         # Boucle pour écouter et réagir aux messages
         await self.sio.wait()
