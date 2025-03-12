@@ -76,7 +76,7 @@ class MultiplayersGame:
             gameVar.MESSAGES=data["messages"]
             gameVar.PLAYERS=data["players"]
             gameVar.CURRENT_SENTENCE=data["sentence"]
-            gameVar.CURRENT_DRAWER=data["drawer"]
+            gameVar.CURRENT_DRAWER=data["drawer_id"]
             tools.update_canva_by_frames(data["all_frames"], delay=False)
 
         @self.sio.on("new_player")
