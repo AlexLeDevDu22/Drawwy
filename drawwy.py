@@ -6,6 +6,7 @@ import pygame
 import sys
 import random
 import math
+import Ui_histoire
 from datetime import datetime
 
 if sys.platform.startswith("win"):
@@ -741,7 +742,7 @@ while running:
             # Gérer le clic
             if mouse_click and hover:
                 if mode=="Solo":
-                    pass
+                    Ui_histoire.SoloGame(screen,clock, W,H)
                     current_page = "menu"
                 elif mode=="Multijoueur" and tools.is_connected():
                     play.MultiplayersGame(screen,clock, W,H)

@@ -58,7 +58,7 @@ class MultiplayersGame:
             pass
 
     async def handle_connection_client(self):
-        self.sio = socketio.AsyncClient()
+        self.sio = socketio.AsyncClient(logger=True, engineio_logger=True)
         @self.sio.event
         async def connect(): #joining the game
             await self.sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
@@ -619,4 +619,3 @@ class MultiplayersGame:
                 self.server.stop_server()
                 self.server_thread.join()
             os._exit(0)
-            
