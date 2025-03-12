@@ -15,8 +15,6 @@ import socketio
 import json
 from datetime import datetime, timedelta
 import time
-if sys.platform.startswith("win"):
-    import pygetwindow as gw
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -60,7 +58,7 @@ class MultiplayersGame:
             pass
 
     async def handle_connection_client(self):
-        self.sio = socketio.AsyncClient()
+        self.sio = socketio.AsyncClient(logger=True, engineio_logger=True)
         @self.sio.event
         async def connect(): #joining the game
             await self.sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
@@ -88,9 +86,9 @@ class MultiplayersGame:
         async def player_disconnected(data):
             for i in range(len(gameVar.PLAYERS)):
                 if gameVar.PLAYERS[i]["id"]==data["id"]:
-                    gameVar.PLAYERS.pop(i)
+                    player=gameVar.PLAYERS.pop(i)
 
-            gameVar.MESSAGES.append({"type":"system","message":data["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
+            gameVar.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
 
         @self.sio.on("new_game")
         def new_game(data):
@@ -108,12 +106,12 @@ class MultiplayersGame:
             gameVar.ROLL_BACK=0
 
         @self.sio.on("draw")
-        async def draw(data):
+        async def draw(frames):
             if gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #not the drawer
                 gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
                 gameVar.ROLL_BACK=0
 
-                threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+                threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":frames}).start() # update canvas in realtime
 
                 num_steps=0
                 for frame in gameVar.ALL_FRAMES:
@@ -141,13 +139,13 @@ class MultiplayersGame:
                             gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
 
 
-        @self.sio.on("update")
-        async def update(data):
-            if data["roll_back"]!=gameVar.ROLL_BACK and gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
-                gameVar.ROLL_BACK=data["roll_back"]
+        @self.sio.on("roll_back")
+        async def roll_back(roll_back):
+            if gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER:
+                gameVar.ROLL_BACK=roll_back
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
                 
-        await self.sio.connect(f"https://{NGROK_DOMAIN}/")
+        await self.sio.connect(f"https://{NGROK_DOMAIN}")
 
         # Boucle pour écouter et réagir aux messages
         await self.sio.wait()
@@ -199,7 +197,7 @@ class MultiplayersGame:
 
             #fond
             pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
-            pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+            pygame.draw.rect(self.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
             #avatar TODO FOR EMOJI!!!!
             if player["avatar"]["type"]=="matrix":
@@ -217,10 +215,10 @@ class MultiplayersGame:
                     self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
                     self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
                 except:
-                    seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 100)
+                    seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 30)
                     emoji, rect = seguisy80.render(player["avatar"]["emoji"], "black")
-                    rect.center = (dico_co[y][1][0],dico_co[y][1][1]+4)
-                    self.screen.blit(emoji, rect) 
+                    rect.center = (dico_co[y][1][0]+20,dico_co[y][1][1]+24)
+                    self.screen.blit(emoji, rect)
 
 
             #pseudo
@@ -621,4 +619,3 @@ class MultiplayersGame:
                 self.server.stop_server()
                 self.server_thread.join()
             os._exit(0)
-            

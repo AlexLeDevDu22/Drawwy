@@ -72,8 +72,8 @@ body {
   min-width: 20%;
 }
 
-@media screen  and (max-width: 768px){
-  .players-section{
+@media screen and (max-width: 768px) {
+  .players-section {
     max-height: 50vh;
     width: 90vw;
     align-self: center;
@@ -82,7 +82,7 @@ body {
 
 .player-list {
   list-style: none;
-  min-height: 1rem
+  min-height: 1rem;
 }
 
 .player-item {
@@ -169,7 +169,7 @@ body {
 }
 
 @media screen and (max-width: 768px) {
-  .game-section{
+  .game-section {
     max-width: none;
     max-height: none;
   }
@@ -313,7 +313,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-height: 5rem
+  min-height: 5rem;
 }
 
 .message {
@@ -421,6 +421,7 @@ body {
   background-color: white;
   padding: 2rem;
   margin: 6vh auto;
+  max-height: 88vh;
   align-self: center;
   border-radius: 10px;
   width: 90%;

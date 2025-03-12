@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import gameVar
 import time
 from datetime import datetime
-import websockets
+import socketio
 import os
 import socket
 import asyncio
@@ -42,12 +42,13 @@ def is_connected():
 async def test_server():
     NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
     try:
-        async with websockets.connect("wss://"+NGROK_DOMAIN) as ws:
-            return True
-    except Exception as e:
-        from server import stop_server
-        stop_server()
+        sio=socketio.AsyncClient()
+        await sio.connect(f"https://{NGROK_DOMAIN}")
+        return True
+    except:
         return False
+    
+asyncio.run(test_server())
 
 def load_bmp_to_matrix(file_path):
     """Charge une image BMP et retourne une matrice de pixels."""
