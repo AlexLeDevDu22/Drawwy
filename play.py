@@ -376,7 +376,7 @@ class MultiplayersGame:
         pygame.draw.rect(self.screen, NOIR, (0.81 * self.W, 0.04 * self.H, 0.18 * self.W, 0.25 * self.H), 1)
 
         """Affiche une palette de couleurs fixes et permet de sélectionner une couleur."""
-        palette_x, palette_y = int(0.81 * self.W), int(0.04 * self.H)+6
+        palette_x, palette_y = int(0.81 * self.W), int(0.04 * self.H)
         palette_w, palette_h = int(0.18 * self.W), int(0.25 * self.H)
 
         # Taille des carrés de couleur
@@ -388,7 +388,7 @@ class MultiplayersGame:
         for i, color in enumerate(config["drawing_colors"]):
             row = i // cols
             col = i % cols
-            x = palette_x + col * (square_size + spacing) + offset_x
+            x = palette_x + col * (square_size + spacing) + offset_x +5
             y = palette_y + row * (square_size + spacing)
             pygame.draw.rect(self.screen, color, (x, y, square_size, square_size))
             pygame.draw.rect(self.screen, (0, 0, 0), (x, y, square_size, square_size), 2)  # Bordure noire

@@ -48,7 +48,7 @@ CYAN=(0,255,255)
 
 
 
-def SoloGame(screen,clock, W,H):
+class SoloGame:
     
     def timer(self):
             
@@ -327,18 +327,7 @@ def SoloGame(screen,clock, W,H):
         self.connected=False
         self.server=None
     
-        try:
-            threading.Thread(target=self.start_connexion).start()
-
-            self.game_remaining_time=config["game_duration"]
-            
-            self.me={   "id": -1,
-                        "pseudo": "",
-                        "points": 0,
-                        "found":False,
-                        "is_drawer":False
-                        }
-            
+        try:           
             #pen values
             self.pen_color=(0,0,0)
             self.pen_radius=6
@@ -377,13 +366,8 @@ def SoloGame(screen,clock, W,H):
                 
                 self.screen.fill(BEIGE)
 
-                self.players()
-                self.sentence()
-                self.drawing()
-                self.chat()
-                if self.me["id"]==gameVar.PLAYER_ID:
-                    self.couleurs()
-                    self.slider_radius()
+                self.couleurs()
+                self.slider_radius()
                 self.timer()
 
                 if not self.connected:
