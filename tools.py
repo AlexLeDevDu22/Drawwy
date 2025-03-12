@@ -133,8 +133,6 @@ def simplify_frames(frames):
                 del frames[i]["color"]
             if frames[i]["radius"]==radius: 
                 del frames[i]["radius"]
-            del frames[i]["type"]
-    
     return frames
 
 def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
