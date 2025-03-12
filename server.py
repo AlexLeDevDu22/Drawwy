@@ -97,7 +97,7 @@ def handle_join(data):
     emit('welcome', {
         "id": pid,
         "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
-        "sentences": sentences_list[-1],
+        "sentence": sentences_list[-1],
         "drawer_id": drawer_id,
         "all_frames": all_frames,
         "messages": guess_list,
@@ -207,7 +207,6 @@ def handle_guess(guess):
     emit('new_message', guess, broadcast=True) 
 
     # Vérifier si tous les joueurs ont trouvé
-    print(list_found)
     if len(players) > 1 and all(list_found):
         handle_new_game()
 

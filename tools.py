@@ -221,6 +221,7 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
 def split_steps_by_roll_back(frames, roll_back):
     new_frames = frames.copy()
     for i in range(len(new_frames)-1,-1,-1):  # On parcourt à l'envers
+        print(frames)
 
         if frames[i]["type"] in {"new_step", "shape"}:
             roll_back-=1
