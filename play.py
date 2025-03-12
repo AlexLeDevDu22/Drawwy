@@ -86,9 +86,9 @@ class MultiplayersGame:
         async def player_disconnected(data):
             for i in range(len(gameVar.PLAYERS)):
                 if gameVar.PLAYERS[i]["id"]==data["id"]:
-                    gameVar.PLAYERS.pop(i)
+                    player=gameVar.PLAYERS.pop(i)
 
-            gameVar.MESSAGES.append({"type":"system","message":data["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
+            gameVar.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
 
         @self.sio.on("new_game")
         def new_game(data):
@@ -106,12 +106,12 @@ class MultiplayersGame:
             gameVar.ROLL_BACK=0
 
         @self.sio.on("draw")
-        async def draw(data):
+        async def draw(frames):
             if gameVar.PLAYER_ID != gameVar.CURRENT_DRAWER: #not the drawer
                 gameVar.ALL_FRAMES=tools.split_steps_by_roll_back(gameVar.ALL_FRAMES, gameVar.ROLL_BACK)[0]
                 gameVar.ROLL_BACK=0
 
-                threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":data["frames"]}).start() # update canvas in realtime
+                threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":frames}).start() # update canvas in realtime
 
                 num_steps=0
                 for frame in gameVar.ALL_FRAMES:

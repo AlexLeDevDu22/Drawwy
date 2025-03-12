@@ -2,6 +2,9 @@ pip freeze > requirements.txt
 
 Si on lance le script pour la première fois sur l'ordi, ya un long chargement
 
+SUR WINDOW!!!!
+pip install aiohttp
+
 Pour Pull depuis le lycée:
 installer git(dans le powershell):
 iwr -useb get.scoop.sh | iex
