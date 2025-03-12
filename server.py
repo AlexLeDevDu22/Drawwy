@@ -1,4 +1,4 @@
-import json
+import requests
 import os
 import yaml
 import sys
@@ -20,6 +20,7 @@ with open("config.yaml", "r") as f:
 load_dotenv()
 ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
 ngrok_domain = os.getenv("NGROK_DOMAIN")
+ngrok_api = os.getenv("NGROK_API")
 
 # Configuration de ngrok
 ngrok.set_auth_token(ngrok_token)
@@ -118,7 +119,7 @@ def handle_join(data):
         handle_new_game()
 
 @socketio.on('game_finished')
-def handle_new_game():
+def handle_new_game(data=None):
     global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
     
     guess_list = []
@@ -178,7 +179,7 @@ def handle_guess(data):
     for i, player in enumerate(players):
         if player["id"] == data["pid"]:
             if player["id"] == drawer_id:
-                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
+                mess = {"guess": data["guess"],"type":"guess", "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
             else:
                 succeed = tools.check_sentences(sentences_list[-1], data["guess"])
                 new_points = 0
@@ -194,7 +195,7 @@ def handle_guess(data):
                             players[j]["points"] += config["points_per_found"]
                             break
                 
-                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
+                mess = {"type":"guess", "guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
         
         if player["id"] != drawer_id:
             list_found.append(player["found"])
@@ -264,6 +265,11 @@ def stop_server():
 
     for filename in os.listdir("web/players-avatars"):
         os.remove(os.path.join("web/players-avatars", filename))
+
+    # Au cas ou...
+    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
+    if endpoints:
+        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
     
     # Marquer le serveur comme arrêté
     server_running = False

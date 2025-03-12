@@ -25,12 +25,12 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   height: 100vh;
 }
 
 .header {
-  width: 1000px;
+  width: 60%;
+  min-width: 150px;
   margin: 0 auto;
   text-align: center;
   padding: 1rem;
@@ -39,39 +39,50 @@ body {
   color: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0;
 }
 
 .play-container {
-  margin: 0 auto;
-  padding: 1rem;
+  margin: auto;
+  padding: 0 1rem;
   display: flex;
   justify-content: stretch;
   align-items: stretch;
   gap: 1rem;
-  max-height: 100vh;
-  height: 90vh;
+  max-height: 85vh;
+  margin-top: 1rem;
+  width: 100vw;
 }
 
 @media screen and (max-width: 768px) {
   .play-container {
-    flex-wrap: wrap;
+    flex-direction: column;
+    max-height: none;
   }
 }
 
 .players-section {
-  min-width: 300px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   overflow-y: auto;
-  max-height: 100%;
   position: relative;
   flex-grow: 1;
+  min-width: 20%;
+}
+
+@media screen  and (max-width: 768px){
+  .players-section{
+    max-height: 50vh;
+    width: 90vw;
+    align-self: center;
+  }
 }
 
 .player-list {
   list-style: none;
+  min-height: 1rem
 }
 
 .player-item {
@@ -153,6 +164,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin: auto;
+  max-height: 86vh;
+}
+
+@media screen and (max-width: 768px) {
+  .game-section{
+    max-width: none;
+    max-height: none;
+  }
 }
 
 .game-info {
@@ -168,6 +188,7 @@ body {
 .word-display {
   font-size: 1.5rem;
   font-weight: bold;
+  text-wrap: balance;
 }
 
 .hint-word {
@@ -219,6 +240,7 @@ body {
 
 .drawing-tools {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   padding: 1rem;
   gap: 1rem;
@@ -284,27 +306,29 @@ body {
   flex-direction: column;
 }
 
-.chat-messages {
+.chat-messages-container {
   flex-grow: 1;
   padding: 1rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  text-wrap: word-break;
-}
-
-.chat-pseudo {
-  font-weight: bold;
-  margin-top: 0.5rem;
-  margin-bottom: 0.2rem;
-  color: var(--main-color);
+  min-height: 5rem
 }
 
 .message {
   padding: 0.5rem 1rem;
   border-radius: 18px;
   max-width: 80%;
+  text-wrap: break-all;
+  margin: 0, 0.2rem;
+}
+
+.chat-pseudo {
+  font-weight: bold;
+  margin-top: 0.6rem;
+  margin-bottom: 0.1rem;
+  color: var(--secondary-color);
 }
 
 .system-message {
@@ -326,6 +350,12 @@ body {
   align-self: flex-end;
   background-color: var(--secondary-color);
   color: white;
+}
+
+.my-pseudo {
+  color: var(--secondary-color);
+  align-self: flex-end;
+  margin-right: 0.5rem;
 }
 
 .correct-guess {
@@ -390,12 +420,13 @@ body {
 .login-form {
   background-color: white;
   padding: 2rem;
-  margin: 8rem auto;
+  margin: 6vh auto;
   align-self: center;
   border-radius: 10px;
   width: 90%;
   max-width: 600px;
   text-align: center;
+  overflow-y: auto;
 }
 
 .login-title {
@@ -424,8 +455,8 @@ body {
 }
 
 .avatar-option {
-  width: 50px;
-  height: 50px;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   background-color: #ddd;
   cursor: pointer;

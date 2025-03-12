@@ -82,12 +82,15 @@ class MultiplayersGame:
         @self.sio.on("new_player")
         async def new_player(data):
             gameVar.PLAYERS.append(data)
+            gameVar.MESSAGES.append({"type":"system","message":data["pseudo"]+" viens de nous rejoindre!", "color": config["succeed_color"]})
 
         @self.sio.on("player_disconnected")
         async def player_disconnected(data):
             for i in range(len(gameVar.PLAYERS)):
                 if gameVar.PLAYERS[i]["id"]==data["id"]:
                     gameVar.PLAYERS.pop(i)
+
+            gameVar.MESSAGES.append({"type":"system","message":data["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
 
         @self.sio.on("new_game")
         def new_game(data):
@@ -97,11 +100,10 @@ class MultiplayersGame:
     
             gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
             gameVar.CURRENT_SENTENCE=data["new_sentence"]
-            gameVar.MESSAGES=[]
             gameVar.CURRENT_DRAWER=data["drawer_id"]
+            gameVar.MESSAGES=[{"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0], "color": config["succeed_color"]}]
             gameVar.ALL_FRAMES=[]
             gameVar.FOUND=False
-            gameVar.MESSAGES.append("Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in gameVar.PLAYERS if p["id"]==gameVar.CURRENT_DRAWER][0])
             gameVar.GAMESTART=datetime.fromisoformat(data["start_time"])
             gameVar.ROLL_BACK=0
 
@@ -145,7 +147,7 @@ class MultiplayersGame:
                 gameVar.ROLL_BACK=data["roll_back"]
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
                 
-        await self.sio.connect(f"https://{NGROK_DOMAIN}")
+        await self.sio.connect(f"https://{NGROK_DOMAIN}/")
 
         # Boucle pour écouter et réagir aux messages
         await self.sio.wait()
@@ -335,8 +337,8 @@ class MultiplayersGame:
 
                                 # Générer les points entre les deux
                                 gameVar.CANVAS = tools.draw_brush_line(gameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius, 0)
-                                self.second_draw_frames.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
-                                gameVar.ALL_FRAMES.append({"type":"draw","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+                                self.second_draw_frames.append({"type": "line", "x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+                                gameVar.ALL_FRAMES.append({"type": "type","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
 
                             # Mettre à jour la dernière position
                             self.last_canvas_click = (canvas_x, canvas_y)
@@ -361,11 +363,10 @@ class MultiplayersGame:
 
                             tools.emit_sio(self.sio, "roll_back", gameVar.ROLL_BACK)
 
-
-
         #send draw
         if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
-            tools.emit_sio(self.sio, "draw", self.second_draw_frames)#send draw
+            print("draw sended")
+            tools.emit_sio(self.sio, "draw", tools.simplify_frames(self.second_draw_frames))#send draw
             self.second_draw_frames=[]
 
         
@@ -458,7 +459,7 @@ class MultiplayersGame:
             if event.type == pygame.KEYDOWN and self.guess_input_active:
                 if event.key == pygame.K_RETURN and self.guess.strip():
                     tools.emit_sio(self.sio, "guess", {"pid": gameVar.PLAYER_ID, "guess":self.guess, "game_remaining_time":self.game_remaining_time}) # send message
-                    gameVar.MESSAGES.append({"pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
+                    gameVar.MESSAGES.append({"type":"guess","pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
                     self.guess = self.guess[:-1]
@@ -483,7 +484,7 @@ class MultiplayersGame:
         for mess in gameVar.MESSAGES[::-1]:
 
             font = pygame.font.Font("PermanentMarker.ttf" ,16)
-            if type(mess)==dict: #message formated
+            if mess["type"]=="guess": 
                 if mess["succeed"]:
 
                     text=f"{mess['pseudo']} à trouvé (+{mess['points']} points)!"
@@ -493,9 +494,9 @@ class MultiplayersGame:
 
                     text=mess["guess"]
                     color=(0,0,0)
-            elif type(mess)==str:
-                text=mess
-                color=(0,50,210)
+            else: #systeme message
+                text=mess["message"]
+                color=mess["color"]
 
             # write the message
             lines=tools.lines_return(text, font, 0.16 * self.W)
@@ -511,7 +512,7 @@ class MultiplayersGame:
                 break
 
             # write pseudo
-            if type(mess)==dict and not mess["succeed"]:
+            if mess["type"]=="guess" and not mess["succeed"]:
                 y-=20
                 image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
                 self.screen.blit(image_texte, (0.82 * self.W + 30,y))
@@ -597,7 +598,6 @@ class MultiplayersGame:
                         if self.server:
                             self.server.stop_server()
                             time.sleep(0.1)
-                            self.connexion_thread.kill()
                             self.server_thread.join()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:

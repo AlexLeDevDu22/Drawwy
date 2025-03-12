@@ -8,7 +8,7 @@ const gameConfig = {
 
 // Game state
 let gameState = {
-  playerId: null,
+  myId: null,
   players: [],
   drawerId: null,
   avatar: { emoji: null, color: null },
@@ -44,7 +44,7 @@ const ctx = canvas.getContext("2d");
 const toolButtons = document.querySelectorAll(".tool-btn");
 const colorOptions = document.querySelectorAll(".color-option");
 const sizeSlider = document.getElementById("size-slider");
-const chatMessages = document.getElementById("chat-messages");
+const chatMessages = document.getElementById("chat-messages-container");
 const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
 const drawingTools = document.getElementById("drawing-tools");
@@ -57,13 +57,14 @@ const continueBtn = document.getElementById("continue-btn");
 // Initialize the canvas
 function clearCanvas() {
   // Set canvas size
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetWidth;
+  canvas.width = gameConfig.canvasWidth;
+  canvas.height = gameConfig.canvasHeight;
 
   // Clear the canvas
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
+clearCanvas();
 
 //* Handle WebSocket connection
 var socket = null;
@@ -75,10 +76,13 @@ function handleConnection() {
 
     // Envoyer un événement 'join' avec le pseudo et l'avatar
     console.log(gameState.pseudo);
-    socket.emit("join", {
-      pseudo: gameState.pseudo,
-      avatar: gameState.avatar,
-    });
+    setTimeout(() => {
+      // etre connecté après python
+      socket.emit("join", {
+        pseudo: gameState.pseudo,
+        avatar: gameState.avatar,
+      });
+    }, 100);
   });
 
   socket.on("disconnect", () => {
@@ -95,7 +99,7 @@ function handleConnection() {
     gameState.allFrames += data.all_frames;
     console.log("start frames", data.all_frames);
     if (data.all_frames.length > 0) draw(data.all_frames, false);
-    gameState.playerId = data["id"];
+    gameState.myId = data["id"];
     data["messages"].forEach((message) => {
       addMessageToChat(
         message.guess,
@@ -109,7 +113,6 @@ function handleConnection() {
     updatePlayerList();
 
     gameState.gameStartTime = new Date(data.new_game);
-    startGameTimer();
   });
 
   socket.on("new_player", (data) => {
@@ -146,17 +149,16 @@ function handleConnection() {
       data.message.succeed
     );
 
-    if (data.new_founder) {
+    if (data.succeed) {
       for (let i = 0; i < gameState.players.length; i++) {
         if (gameState.players[i].id == data.new_founder)
           gameState.players[i].found = true;
-      }
-      data.new_points.forEach((point) => {
-        for (let i = 0; i < gameState.players.length; i++) {
+
+        data.points.forEach((point) => {
           if (gameState.players[i].id == point.id)
             gameState.players[i].points += point.points;
-        }
-      });
+        });
+      }
     }
   });
 
@@ -169,15 +171,16 @@ function handleConnection() {
     gameState.drawerId = data.drawer_id;
     gameState.hasFound = false;
     addMessageToChat(
-      "Nouvelle partie ! " +
+      "Nouvelle partie, " +
         gameState.players.find((p) => p.id == gameState.drawerId)["pseudo"] +
-        " deviens le dessinateur !"
+        " deviens le dessinateur !",
+      "#63ff6c"
     );
     gameState.gameStartTime = new Date(data.start_time);
 
+    startGameTimer();
     updateWordDisplay();
-
-    // If this player is the drawer, enable drawing tools
+    updatePlayerList();
     toggleDrawingTools();
   });
 
@@ -187,7 +190,7 @@ function handleConnection() {
       (player) => player.id !== data.id
     );
     updatePlayerList();
-    addMessageToChat(gameState.pseudo + " à quitté la partie.", "#fc6455");
+    addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
   });
 
   // Écouter les mises à jour du jeu
@@ -199,32 +202,37 @@ function handleConnection() {
 function draw(frames, delay) {
   if (!frames || frames.length === 0) return;
 
-  const gameWidth = 200; // Taille logique du jeu
-  const gameHeight = 200;
-
-  const realWidth = canvas.offsetWidth; // Taille réelle sur la page
-  const realHeight = canvas.offsetHeight;
-
-  const scaleX = realWidth / gameWidth; // Facteur d'échelle horizontal
-  const scaleY = realHeight / gameHeight; // Facteur d'échelle vertical
-  const scale = Math.min(scaleX, scaleY); // Assurer une échelle uniforme
-
   let totalDuration = 1000; // On suppose que ça a pris 1s pour faire tous les traits
   let frameDuration = totalDuration / frames.length; // Temps moyen entre chaque trait
 
   let color = null;
+  let radius = null;
 
   function drawLine(frame) {
-    if (frame.color) color = frame.color;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = frame.radius * 2 * scale; // Adapter la taille du crayon
+    if (frame.color)
+      color = `rgb(${frame.color[0]}, ${frame.color[1]}, ${frame.color[2]})`;
+    if (frame.radius) radius = frame.radius;
 
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1; // Adapter l'épaisseur du trait
+
+    // Tracer une ligne entre x1 et x2
     ctx.beginPath();
-    ctx.moveTo(frame.x1 * scaleX, frame.y1 * scaleY);
-    ctx.lineTo(frame.x2 * scaleX, frame.y2 * scaleY);
+    ctx.moveTo(frame.x1, frame.y1);
+    ctx.lineTo(frame.x2, frame.y2);
     ctx.stroke();
+
+    // Ajouter des cercles aux extrémités pour lisser et bien remplir
+    ctx.beginPath();
+    ctx.arc(frame.x1, frame.y1, radius, 0, 2 * Math.PI);
+    ctx.fill(); // Remplir le cercle
+    ctx.beginPath();
+    ctx.arc(frame.x2, frame.y2, radius, 0, 2 * Math.PI);
+    ctx.fill(); // Remplir le cercle
   }
 
+  console.log(frames);
   if (delay) {
     frames.forEach((frame, index) => {
       setTimeout(() => drawLine(frame), index * frameDuration);
@@ -235,7 +243,7 @@ function draw(frames, delay) {
 }
 
 function toggleDrawingTools() {
-  drawingTools.style.opacity = gameState.playerId == gameState.drawerId ? 1 : 0;
+  drawingTools.style.opacity = gameState.myId == gameState.drawerId ? 1 : 0;
 }
 
 // Update player list UI
@@ -247,9 +255,10 @@ function updatePlayerList() {
     playerItem.className = "player-item";
 
     // Add classes based on player status
-    if (player.id === gameState.drawerId) {
+    if (player.id == gameState.drawerId) {
       playerItem.classList.add("current-drawer");
     }
+    console.log(player.id, gameState.drawerId);
 
     if (player.found) {
       playerItem.classList.add("found");
@@ -263,7 +272,7 @@ function updatePlayerList() {
       `<div class="player-info">
                 <div class="player-name-found">
                     <div class="player-name">${player.pseudo}${
-        player.id === gameState.playerId ? " (Vous)" : ""
+        player.id === gameState.myId ? " (Vous)" : ""
       }</div>
                     ${
                       player.id != gameState.drawerId
@@ -294,10 +303,12 @@ function updatePlayerList() {
 }
 
 function addMessageToChat(message, color, messPseudo, pid, succeed) {
-  if (messPseudo) {
+  message = succeed ? messPseudo + " à trouvé!" : message;
+  if (messPseudo && !succeed) {
     let pseudo = document.createElement("p");
     pseudo.textContent = messPseudo;
     pseudo.className = "chat-pseudo";
+    if (pid == gameState.myId) pseudo.classList.add(`my-pseudo`);
     chatMessages.appendChild(pseudo);
   }
 
@@ -305,8 +316,8 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
   divMessage.textContent = message;
   divMessage.classList.add("message");
   divMessage.classList.add(messPseudo ? "player-message" : "system-message");
-  if (pid === gameState.playerId) divMessage.classList.add(`my-message`);
-  if (pid === gameState.drawerId) divMessage.classList.add(`message-author`);
+  if (pid == gameState.myId) divMessage.classList.add(`my-message`);
+  if (pid == gameState.drawerId) divMessage.classList.add(`message-author`);
   if (succeed) divMessage.classList.add(`correct-guess`);
 
   divMessage.style.backgroundColor = color || "#var(--light-color)";
@@ -323,7 +334,7 @@ function updateWordDisplay() {
     return;
   }
 
-  if (gameState.playerId === gameState.drawerId) {
+  if (gameState.myId === gameState.drawerId) {
     // If player is the drawer, show the full word
     hintText.textContent = `Dessinez : ${gameState.currentSentence}`;
   } else if (gameState.hasFound) {
@@ -337,7 +348,7 @@ function updateWordDisplay() {
 // Start game timer
 function startGameTimer() {
   gameState.remainingTime = gameConfig.gameDuration;
-  timerProgress.classList.remove("not-star");
+  timerProgress.classList.remove("not-started");
   updateTimerDisplay();
 
   const timerInterval = setInterval(() => {
@@ -376,7 +387,10 @@ function updateTimerDisplay() {
   }
 }
 
-function handleGameEnd() {}
+function handleGameEnd() {
+  clearCanvas();
+  if (gameState.myId == gameState.drawerId) socket.emit("game_finished", null);
+}
 
 //! Events Listeners
 
@@ -404,7 +418,6 @@ loginForm.addEventListener("submit", (e) => {
     loginOverlay.style.pointerEvents = "none";
 
     gameState.pseudo = pseudoInput.value;
-
     handleConnection();
   }
 });
@@ -413,7 +426,7 @@ loginForm.addEventListener("submit", (e) => {
 function sendMessage(message) {
   if (message) {
     socket.emit("guess", {
-      pid: gameState.playerId,
+      pid: gameState.myId,
       guess: message,
       game_remaining_time: gameState.remainingTime,
     });
