@@ -41,8 +41,8 @@ def compare_images(img1_path, img2_path):
     return score * 100
 
 # 🔥 Exemple d'utilisation (METTRE LES CHEMINS ABSOLUS)
-img1 = r"C:\Users\admloc\Desktop\Code\Python\Pour_le_concour_nsi\tests\test histoire\image1.png"
-img2 = r"C:\Users\admloc\Desktop\Code\Python\Pour_le_concour_nsi\tests\test histoire\image2.png"
+img1 = "tests/test_histoire/image1.png"
+img2 = "tests/test_histoire/image2.png"
 
 similarity = compare_images(img1, img2)
 

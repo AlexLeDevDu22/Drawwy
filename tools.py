@@ -44,7 +44,9 @@ async def test_server():
     try:
         async with websockets.connect("wss://"+NGROK_DOMAIN) as ws:
             return True
-    except:
+    except Exception as e:
+        from server import stop_server
+        stop_server()
         return False
 
 def load_bmp_to_matrix(file_path):
@@ -120,18 +122,18 @@ def emit_sio(sio, event, data):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(sio.emit(event, data))  # Exécuter directement l'événement
 
-async def websocket_draw(websocket, frames):
-    #simplify frames
+def simplify_frames(frames):
     
     color, radius=None, None
-    for frame in frames:
-        if frame["type"]=="draw":
-            if frame["color"]==color:
-                del frame["color"]
-            if frame["radius"]==radius: 
-                del frame["radius"]
+    for i in range(len(frames)):
+        if frames[i]["type"]=="frame":
+            if frames[i]["color"]==color:
+                del frames[i]["color"]
+            if frames[i]["radius"]==radius: 
+                del frames[i]["radius"]
+            del frames[i]["type"]
     
-    await websocket.send(json.dumps({"type":"draw","frames_types":"draw","frames":frames}))
+    return frames
 
 def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
     if reset:
