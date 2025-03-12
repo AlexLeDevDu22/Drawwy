@@ -197,7 +197,7 @@ class MultiplayersGame:
 
             #fond
             pygame.draw.rect(self.screen, (222,0,0) if player["id"]==gameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
-            pygame.draw.rect(self.screen, config["players_colors"][y],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+            pygame.draw.rect(self.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
             #avatar TODO FOR EMOJI!!!!
             if player["avatar"]["type"]=="matrix":
@@ -215,10 +215,10 @@ class MultiplayersGame:
                     self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
                     self.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*self.H, 4.6/100*self.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
                 except:
-                    seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 100)
+                    seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 30)
                     emoji, rect = seguisy80.render(player["avatar"]["emoji"], "black")
-                    rect.center = (dico_co[y][1][0],dico_co[y][1][1]+4)
-                    self.screen.blit(emoji, rect) 
+                    rect.center = (dico_co[y][1][0]+20,dico_co[y][1][1]+24)
+                    self.screen.blit(emoji, rect)
 
 
             #pseudo
