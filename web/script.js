@@ -102,7 +102,7 @@ function handleConnection() {
     gameState.myId = data["id"];
     data["messages"].forEach((message) => {
       addMessageToChat(
-        message.guess,
+        message.message,
         message.succeed ? "#63ff6c" : null,
         message.pseudo,
         message.pid,
@@ -110,9 +110,13 @@ function handleConnection() {
       );
     });
     gameState.players = data.players;
-    updatePlayerList();
-
+    gameState.currentSentence = data.sentence;
+    gameState.drawerId = data.drawer_id;
     gameState.gameStartTime = new Date(data.new_game);
+    updatePlayerList();
+    updateWordDisplay();
+    toggleDrawingTools();
+    startGameTimer();
   });
 
   socket.on("new_player", (data) => {
@@ -139,26 +143,28 @@ function handleConnection() {
     draw(gameState.allFrames, false);
   });
 
-  socket.on("new_message", (data) => {
-    console.log("Nouveau message :", data);
+  socket.on("new_message", (guess) => {
+    console.log("Nouveau guess :", guess);
     addMessageToChat(
-      data.message.guess,
-      data.succeed ? "#63ff6c" : null,
-      data.message.pseudo,
-      data.message.pid,
-      data.message.succeed
+      guess.message,
+      guess.succeed ? "#63ff6c" : null,
+      guess.pseudo,
+      guess.pid,
+      guess.succeed
     );
 
-    if (data.succeed) {
+    if (guess.succeed) {
       for (let i = 0; i < gameState.players.length; i++) {
-        if (gameState.players[i].id == data.new_founder)
+        if (gameState.players[i].id == guess.pid)
           gameState.players[i].found = true;
 
-        data.points.forEach((point) => {
-          if (gameState.players[i].id == point.id)
+        guess.new_points.forEach((point) => {
+          if (gameState.players[i].id == point.pid)
             gameState.players[i].points += point.points;
         });
       }
+
+      updatePlayerList();
     }
   });
 
@@ -170,6 +176,8 @@ function handleConnection() {
     gameState.currentSentence = data.new_sentence;
     gameState.drawerId = data.drawer_id;
     gameState.hasFound = false;
+    players.forEach((p) => (p.found = False));
+    console.log(gameState.players, gameState.drawerId);
     addMessageToChat(
       "Nouvelle partie, " +
         gameState.players.find((p) => p.id == gameState.drawerId)["pseudo"] +
@@ -178,7 +186,6 @@ function handleConnection() {
     );
     gameState.gameStartTime = new Date(data.start_time);
 
-    startGameTimer();
     updateWordDisplay();
     updatePlayerList();
     toggleDrawingTools();
@@ -187,7 +194,7 @@ function handleConnection() {
   socket.on("player_disconnected", (data) => {
     console.log("Joueur déconnecté :", data);
     gameState.players = gameState.players.filter(
-      (player) => player.id !== data.id
+      (player) => player.id !== data.pid
     );
     updatePlayerList();
     addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
@@ -211,7 +218,7 @@ function draw(frames, delay) {
   function drawLine(frame) {
     if (frame.color)
       color = `rgb(${frame.color[0]}, ${frame.color[1]}, ${frame.color[2]})`;
-    if (frame.radius) radius = frame.radius;
+    if (frame.radius) radius = frame.radius / 4;
 
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
@@ -271,9 +278,9 @@ function updatePlayerList() {
         : `<img class="avatar" src="players-avatars/${player.id}.bmp">`) +
       `<div class="player-info">
                 <div class="player-name-found">
-                    <div class="player-name">${player.pseudo}${
-        player.id === gameState.myId ? " (Vous)" : ""
-      }</div>
+                    <div class="player-name${
+                      player.id === gameState.myId ? " me" : ""
+                    }">${player.pseudo}</div>
                     ${
                       player.id != gameState.drawerId
                         ? player.found
@@ -303,7 +310,6 @@ function updatePlayerList() {
 }
 
 function addMessageToChat(message, color, messPseudo, pid, succeed) {
-  message = succeed ? messPseudo + " à trouvé!" : message;
   if (messPseudo && !succeed) {
     let pseudo = document.createElement("p");
     pseudo.textContent = messPseudo;
@@ -312,6 +318,7 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
     chatMessages.appendChild(pseudo);
   }
 
+  message = succeed ? messPseudo + " à trouvé!" : message;
   let divMessage = document.createElement("div");
   divMessage.textContent = message;
   divMessage.classList.add("message");
@@ -329,7 +336,7 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
 
 // Update word display based on current game state
 function updateWordDisplay() {
-  if (!gameState.currentSentence) {
+  if (gameState.players.length == 1) {
     hintText.textContent = "En attente de joueurs...";
     return;
   }
@@ -427,8 +434,9 @@ function sendMessage(message) {
   if (message) {
     socket.emit("guess", {
       pid: gameState.myId,
-      guess: message,
-      game_remaining_time: gameState.remainingTime,
+      pseudo: gameState.pseudo,
+      message: message,
+      remaining_time: gameState.remainingTime,
     });
   }
 }
