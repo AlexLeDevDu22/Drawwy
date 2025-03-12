@@ -32,3 +32,6 @@ drawing_colors:
   - [255, 20, 147] # Rose vif
   - [139, 69, 19] # Marron
   - [128, 128, 128] # Gris
+
+succeed_color: [99, 255, 108] #63ff6c
+bad_color: [252, 100, 85] #fc6455

@@ -119,7 +119,7 @@ def handle_join(data):
         handle_new_game()
 
 @socketio.on('game_finished')
-def handle_new_game():
+def handle_new_game(data=None):
     global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
     
     guess_list = []
@@ -179,7 +179,7 @@ def handle_guess(data):
     for i, player in enumerate(players):
         if player["id"] == data["pid"]:
             if player["id"] == drawer_id:
-                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
+                mess = {"guess": data["guess"],"type":"guess", "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
             else:
                 succeed = tools.check_sentences(sentences_list[-1], data["guess"])
                 new_points = 0
@@ -195,7 +195,7 @@ def handle_guess(data):
                             players[j]["points"] += config["points_per_found"]
                             break
                 
-                mess = {"guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
+                mess = {"type":"guess", "guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
         
         if player["id"] != drawer_id:
             list_found.append(player["found"])
