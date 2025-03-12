@@ -75,6 +75,8 @@ class MultiplayersGame:
             gameVar.PLAYER_ID=data["id"]
             gameVar.MESSAGES=data["messages"]
             gameVar.PLAYERS=data["players"]
+            gameVar.CURRENT_SENTENCE=data["sentence"]
+            gameVar.CURRENT_DRAWER=data["drawer"]
             tools.update_canva_by_frames(data["all_frames"], delay=False)
 
         @self.sio.on("new_player")
@@ -85,8 +87,9 @@ class MultiplayersGame:
         @self.sio.on("player_disconnected")
         async def player_disconnected(data):
             for i in range(len(gameVar.PLAYERS)):
-                if gameVar.PLAYERS[i]["id"]==data["id"]:
+                if gameVar.PLAYERS[i]["id"]==data["pid"]:
                     player=gameVar.PLAYERS.pop(i)
+                    break
 
             gameVar.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
 
@@ -121,22 +124,22 @@ class MultiplayersGame:
 
 
         @self.sio.on("new_message")
-        def new_message(data):
+        def new_message(guess):
             #ajouter à la liste de message
-            if data["message"]["pid"] == gameVar.PLAYER_ID:
+            if guess["pid"] == gameVar.PLAYER_ID:
                 gameVar.MESSAGES=gameVar.MESSAGES[:-1]
-            gameVar.MESSAGES.append(data["message"])
+            gameVar.MESSAGES.append(guess)
             
             #update found and points
-            if data["new_founder"]:
+            if guess["succeed"]:
                 for i in range(len(gameVar.PLAYERS)):
-                    if gameVar.PLAYERS[i]["id"]==data["pid"]:
-                        gameVar.PLAYERS[i]["founder"]=True
+                    if gameVar.PLAYERS[i]["id"]==guess["pid"]:
+                        gameVar.PLAYERS[i]["found"]=True
             
-                for e in data["new_points"]:
+                for e in guess["new_points"]:
                     for i in range(len(gameVar.PLAYERS)):
-                        if gameVar.PLAYERS[i]["id"]==data["new_points"][e]["pid"]:
-                            gameVar.PLAYERS[i]["points"]+=data["new_points"][e]["points"]
+                        if gameVar.PLAYERS[i]["id"]==e["pid"]:
+                            gameVar.PLAYERS[i]["points"]+=e["points"]
 
 
         @self.sio.on("roll_back")
@@ -456,8 +459,8 @@ class MultiplayersGame:
                 self.guess_input_active = input_box.collidepoint(event.pos)
             if event.type == pygame.KEYDOWN and self.guess_input_active:
                 if event.key == pygame.K_RETURN and self.guess.strip():
-                    tools.emit_sio(self.sio, "guess", {"pid": gameVar.PLAYER_ID, "guess":self.guess, "game_remaining_time":self.game_remaining_time}) # send message
-                    gameVar.MESSAGES.append({"type":"guess","pseudo":self.me["pseudo"], "guess":self.guess, "succeed":False})
+                    tools.emit_sio(self.sio, "guess", {"pid": gameVar.PLAYER_ID,"pseudo":self.me["pseudo"], "message":self.guess, "remaining_time":self.game_remaining_time}) # send message
+                    gameVar.MESSAGES.append({"type":"guess","pseudo":self.me["pseudo"], "message":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
                     self.guess = self.guess[:-1]
@@ -480,17 +483,16 @@ class MultiplayersGame:
         y=0.9533 * self.H-60 -len(guess_line)*20
 
         for mess in gameVar.MESSAGES[::-1]:
-
             font = pygame.font.Font("PermanentMarker.ttf" ,16)
             if mess["type"]=="guess": 
                 if mess["succeed"]:
 
-                    text=f"{mess['pseudo']} à trouvé (+{mess['points']} points)!"
+                    text=f"{mess['pseudo']} à trouvé (+{mess['new_points'][0]["points"]} points)!"
                     color=(0,255,0)
                 
                 else:
 
-                    text=mess["guess"]
+                    text=mess["message"]
                     color=(0,0,0)
             else: #systeme message
                 text=mess["message"]

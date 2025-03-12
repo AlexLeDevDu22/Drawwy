@@ -69,7 +69,8 @@ def handle_disconnect():
     
     # Envoyer la mise à jour des joueurs
     emit('player_disconnected', { 
-        "id": player["id"]
+        "pid": player["id"],
+        "pseudo": player["pseudo"]
     }, broadcast=True)
     
 
@@ -96,6 +97,8 @@ def handle_join(data):
     emit('welcome', {
         "id": pid,
         "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
+        "sentences": sentences_list[-1],
+        "drawer_id": drawer_id,
         "all_frames": all_frames,
         "messages": guess_list,
         "new_game": last_game_start.isoformat() if len(players)>1 and last_game_start else False,
@@ -166,47 +169,45 @@ def handle_roll_back(data_roll_back):
     emit('roll_back', roll_back, broadcast=True, skip_sid=request.sid)
 
 @socketio.on('guess')
-def handle_guess(data):
-    print("guess!!!!")
+def handle_guess(guess):
     global players, drawer_id, guess_list, sentences_list, last_game_start
     
     list_found = []
     succeed = False
     mess = None
+
+    guess["succeed"]=False
+    guess["type"]="guess"
     
     for i, player in enumerate(players):
-        if player["id"] == data["pid"]:
-            if player["id"] == drawer_id:
-                mess = {"guess": data["guess"],"type":"guess", "pid": player["id"], "pseudo": player["pseudo"], "succeed": False}
-            else:
-                succeed = tools.check_sentences(sentences_list[-1], data["guess"])
-                new_points = 0
-                if succeed:
-                    if not player["found"]:
-                        new_points = int((data["remaining_time"] / config["game_duration"]) * len(players) * config["points_per_found"])
-                        players[i]["points"] += new_points
-                    players[i]["found"] = True
-                    
-                    # Donner des points au dessinateur
-                    for j in range(len(players)):
-                        if players[j]["id"] == drawer_id:
-                            players[j]["points"] += config["points_per_found"]
-                            break
-                
-                mess = {"type":"guess", "guess": data["guess"], "pid": player["id"], "pseudo": player["pseudo"], "points": new_points, "succeed": succeed}
+        if guess["pid"]==player["id"] and player["id"] != drawer_id:
+            succeed = tools.check_sentences(sentences_list[-1], guess["message"])
+            if succeed and not player["found"]:
+                guess["succeed"]=True
+                # point au founder
+                founder_points = int((guess["remaining_time"] / config["game_duration"]) * len(players) * config["points_per_found"])
+                players[i]["points"] += founder_points
+                players[i]["found"] = True
+
+                # Donner des points au dessinateur
+                drawer_points=config["points_per_found"]
+                for j in range(len(players)):
+                    if players[j]["id"] == drawer_id:
+                        players[j]["points"] += drawer_points
+                        break
+
+                guess["new_points"]=[{"pid": player["id"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
+            break
         
         if player["id"] != drawer_id:
             list_found.append(player["found"])
     
     guess_list.append(mess)
 
-    emit('new_message', {
-        "message": mess,
-        "new_founder": data["pid"] if succeed else None,
-        "new_points": [{"pid": data["pid"], "points": new_points}, {"pid": drawer_id, "points": config["points_per_found"]}]   if succeed else None
-        }, broadcast=True) 
+    emit('new_message', guess, broadcast=True) 
 
     # Vérifier si tous les joueurs ont trouvé
+    print(list_found)
     if len(players) > 1 and all(list_found):
         handle_new_game()
 

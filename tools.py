@@ -111,6 +111,7 @@ def check_sentences(phrase1, phrase2):
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
+    print(score)
     return score>config["sentence_checker_seuil"]
     
 def emit_sio(sio, event, data):
@@ -127,7 +128,7 @@ def simplify_frames(frames):
     
     color, radius=None, None
     for i in range(len(frames)):
-        if frames[i]["type"]=="frame":
+        if frames[i]["type"]=="line":
             if frames[i]["color"]==color:
                 del frames[i]["color"]
             if frames[i]["radius"]==radius: 

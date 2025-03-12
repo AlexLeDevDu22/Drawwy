@@ -124,13 +124,18 @@ body {
 
 .player-name-found {
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
   margin: 0 0.5rem;
+  gap: 0.5rem;
 }
 
 .player-name {
   font-weight: bold;
+}
+.player-name.me {
+  font-style: italic;
+  color: var(--main-color);
 }
 
 .player-found-icon {
