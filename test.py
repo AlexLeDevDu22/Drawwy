@@ -21,7 +21,8 @@ def start_connexion():
             pass
 
 async def handle_connection_client():
-    sio = socketio.AsyncClient()
+    sio = socketio.AsyncClient(logger=True, engineio_logger=True)
+
     @sio.event
     async def connect(): #joining the game
         print("joined")
