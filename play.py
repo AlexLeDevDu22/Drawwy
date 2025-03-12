@@ -621,3 +621,4 @@ class MultiplayersGame:
                 self.server.stop_server()
                 self.server_thread.join()
             os._exit(0)
+            
