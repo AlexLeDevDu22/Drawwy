@@ -52,10 +52,10 @@ class MultiplayersGame:
                 while not server.server_running:
                     time.sleep(0.1)
 
-            self.async_connexion=asyncio.run(self.handle_connection_client())# start the web connection
-
-        except KeyboardInterrupt:
-            self.async_connexion.cancel()
+            asyncio.set_event_loop(self.connection_loop)
+            self.connection_loop.run_until_complete(self.handle_connection_client())
+        except RuntimeError:
+            print("connexion fermé")
 
     async def handle_connection_client(self):
         self.sio = socketio.AsyncClient(logger=True, engineio_logger=True)
@@ -148,10 +148,14 @@ class MultiplayersGame:
                 gameVar.ROLL_BACK=roll_back
                 tools.update_canva_by_frames(gameVar.ALL_FRAMES, reset=True, delay=False)
                 
-        await self.sio.connect(f"https://{NGROK_DOMAIN}")
 
-        # Boucle pour écouter et réagir aux messages
-        await self.sio.wait()
+        try:
+            await self.sio.connect(f"https://{NGROK_DOMAIN}")
+
+            # Boucle pour écouter et réagir aux messages
+            await self.sio.wait()
+        except asyncio.CancelledError:
+            print("déconnecté du server")
     
     def timer(self):
             
@@ -518,6 +522,16 @@ class MultiplayersGame:
                 self.screen.blit(image_texte, (0.82 * self.W + 30,y))
 
             y-=10
+
+    def disconnect(self):
+        self.sio.disconnect()
+        for task in asyncio.all_tasks(self.connection_loop):
+            task.cancel()
+        self.connection_loop.stop()
+        if self.server:
+            self.server.stop_server()
+        self.connexion_thread.join()
+        print("deco")
     
     def __init__(self,screen,clock, W,H):
         if not tools.is_connected():
@@ -529,6 +543,7 @@ class MultiplayersGame:
         self.server=None
     
         try:
+            self.connection_loop=asyncio.new_event_loop()
             self.connexion_thread=threading.Thread(target=self.start_connexion)
             self.connexion_thread.start()
 
@@ -597,15 +612,7 @@ class MultiplayersGame:
                 
                 for event in self.events:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                        try:
-                            loop = asyncio.get_running_loop()  # Récupère le loop actuel s'il existe
-                        except RuntimeError:
-                            loop = asyncio.new_event_loop()  # Sinon, crée un nouveau loop
-                            asyncio.set_event_loop(loop)
-
-                        loop.create_task(self.sio.disconnect())
-                        if self.server:
-                            threading.Thread(target=self.server.stop_server, daemon=True).start()
+                        threading.Thread(target=self.disconnect, daemon=True).start()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -624,13 +631,5 @@ class MultiplayersGame:
                 self.frame_num=(self.frame_num+1)%config["game_page_fps"]
 
         except KeyboardInterrupt:
-            try:
-                loop = asyncio.get_running_loop()  # Récupère le loop actuel s'il existe
-            except RuntimeError:
-                loop = asyncio.new_event_loop()  # Sinon, crée un nouveau loop
-                asyncio.set_event_loop(loop)
-
-            loop.create_task(self.sio.disconnect())
-            if self.server:
-                self.server.stop_server()
+            self.disconnect()
             os._exit(0)
