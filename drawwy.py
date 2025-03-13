@@ -3,6 +3,7 @@ from Menu.elements import *
 from Menu.pages import achievements
 from Menu.pages import play
 from Menu.pages import home
+from Menu.pages import credit
 from shared.common_utils import *
 
 import Menu.pages.play as play
@@ -130,6 +131,8 @@ while running:
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
             screen, current_page = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click)
+        elif current_page == "credits":
+            screen, current_page = credit.show_credit(screen, W,H, mouse_pos, mouse_click)
         
     # Afficher la version
     version_text = "DRAWWY v1.0"

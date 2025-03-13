@@ -129,6 +129,15 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                 credit_button_x, 
                 credit_button_y - credit_text_y_offset)
         
+        if hover_credit and mouse_click:
+            for _ in range(20):
+                particles.append(Particle(
+                    random.randint(credit_button_x - credit_button_radius, credit_button_x + credit_button_radius),
+                    credit_button_y,
+                    random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
+                ))
+            return screen, "credits", particles
+        
 
     # Effets de particules lors du clic
     if mouse_click:
