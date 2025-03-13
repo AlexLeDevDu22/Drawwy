@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
 # --- Charger l'image de profil ---
-AVATAR_PATH = "tests/avatar.bmp"
+AVATAR_PATH = "tests/assets/avatar.bmp"
 avatar_original = pygame.image.load(AVATAR_PATH).convert_alpha()  # Mets ton image ici
 avatar_original = pygame.transform.scale(avatar_original, (100, 100))  # Taille initiale
 avatar = avatar_original.copy()  # Copie pour modifications
@@ -125,7 +125,7 @@ while running:
                     brush_size = min(size_max, brush_size + 1)
 
                 elif validate_button_rect.collidepoint(mouse_x, mouse_y):  # ✔ Valider
-                    pygame.image.save(avatar, "tests/avatar.bmp")  # Enregistrer en .bmp
+                    pygame.image.save(avatar, "tests/assets/avatar.bmp")  # Enregistrer en .bmp
                     pseudo = input_text
                     show_buttons = False  # Cacher les boutons
                     pseudo_editable = False
@@ -145,7 +145,7 @@ while running:
 
         elif event.type == pygame.KEYDOWN and pseudo_editable:
             if event.key == pygame.K_RETURN:  # Valider avec ENTER
-                pygame.image.save(avatar, "tests/avatar.bmp")  # Enregistrer en .bmp
+                pygame.image.save(avatar, "tests/assets/avatar.bmp")  # Enregistrer en .bmp
                 pseudo = input_text
                 show_buttons = False  # Cacher les boutons
                 pseudo_editable = False

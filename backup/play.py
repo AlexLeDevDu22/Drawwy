@@ -19,7 +19,7 @@ import time
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
-with open("players_data.json") as f:
+with open("assets/players_data.json") as f:
     player_data = json.load(f)
 
 load_dotenv()
@@ -61,7 +61,7 @@ class MultiplayersGame:
         self.sio = socketio.AsyncClient(logger=True, engineio_logger=True)
         @self.sio.event
         async def connect(): #joining the game
-            await self.sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("avatar.bmp")}})
+            await self.sio.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("assets/avatar.bmp")}})
 
         @self.sio.event
         async def disconnect():
@@ -97,7 +97,7 @@ class MultiplayersGame:
         def new_game(data):
             #save draw
             if MultiGameVar.PLAYER_ID == MultiGameVar.CURRENT_DRAWER and MultiGameVar.CANVAS and MultiGameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
-                tools.save_canvas(MultiGameVar.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGameVar.CURRENT_SENTENCE)
+                tools.save_canvas(MultiGameVar.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGameVar.CURRENT_SENTENCE)
     
             MultiGameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
             MultiGameVar.CURRENT_SENTENCE=data["new_sentence"]
@@ -164,7 +164,7 @@ class MultiplayersGame:
         timer_text = f"{self.game_remaining_time//60}:{0 if self.game_remaining_time%60<10 else ''}{self.game_remaining_time%60}"
         
         # Créer un texte pour le timer
-        font = pygame.font.Font("PermanentMarker.ttf", 25)
+        font = pygame.font.Font("assets/PermanentMarker.ttf", 25)
         text_surface = font.render(timer_text, True, (0,0,0))
         
         # Calculer la taille du rectangle (qui sera juste la taille du texte)
@@ -185,7 +185,7 @@ class MultiplayersGame:
         pygame.draw.rect(self.screen, BLANC, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H))
         pygame.draw.rect(self.screen, NOIR, (0.01 * self.W, 0.04 * self.H, 0.18 * self.W, 0.7 * self.H), 1)
 
-        font = pygame.font.Font("PermanentMarker.ttf" ,20)
+        font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
         image_texte = font.render ( "Liste de joueurs:", 1 , (0,0,0) )
         self.screen.blit(image_texte, (5.5/100*self.W,6/100*self.H))
 
@@ -230,11 +230,11 @@ class MultiplayersGame:
 
             #pseudo
             text_color=(10,10,10) if player["id"] == MultiGameVar.PLAYER_ID else (100,100,100)
-            font = pygame.font.Font("PermanentMarker.ttf" ,30)
+            font = pygame.font.Font("assets/PermanentMarker.ttf" ,30)
             image_texte = font.render ( player["pseudo"], 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
             #points
-            font = pygame.font.Font("PermanentMarker.ttf" ,20)
+            font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
             image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][3])
 
@@ -255,7 +255,7 @@ class MultiplayersGame:
         text= "Phrase à faire deviner:"if self.me["is_drawer"] else "Phrase à trouver:"
         pygame.draw.rect(self.screen, VERT,(1/100*self.W,75/100*self.H, 18/100*self.W, 20/100*self.H) )
 
-        font = pygame.font.Font("PermanentMarker.ttf" ,22)
+        font = pygame.font.Font("assets/PermanentMarker.ttf" ,22)
         image_texte = font.render( text, True , (0,0,0) )
         self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
         
@@ -271,7 +271,7 @@ class MultiplayersGame:
             else:
                 font_size = FONT_SIZE_BASE - 4
 
-            font = pygame.font.Font("PermanentMarker.ttf", font_size)
+            font = pygame.font.Font("assets/PermanentMarker.ttf", font_size)
 
             lines=tools.lines_return(MultiGameVar.CURRENT_SENTENCE, font, 0.16 * self.W)
 
@@ -454,7 +454,7 @@ class MultiplayersGame:
 
     def chat(self):
 
-        font = pygame.font.Font("PermanentMarker.ttf" ,18)
+        font = pygame.font.Font("assets/PermanentMarker.ttf" ,18)
         guess_line=tools.lines_return(self.guess, font, 0.15 * self.W)
         input_box = pygame.Rect(0.82 * self.W, 0.9533 * self.H-45 -len(guess_line)*20, 0.16 * self.W, max(40,15+20*len(guess_line)))
         
@@ -487,7 +487,7 @@ class MultiplayersGame:
         y=0.9533 * self.H-60 -len(guess_line)*20
 
         for mess in MultiGameVar.MESSAGES[::-1]:
-            font = pygame.font.Font("PermanentMarker.ttf" ,16)
+            font = pygame.font.Font("assets/PermanentMarker.ttf" ,16)
             if mess["type"]=="guess": 
                 if mess["succeed"]:
 
@@ -606,7 +606,7 @@ class MultiplayersGame:
                 self.timer()
 
                 if not self.connected:
-                    font = pygame.font.Font("PermanentMarker.ttf", 20)
+                    font = pygame.font.Font("assets/PermanentMarker.ttf", 20)
                     text = font.render("Connexion au serveur...", True, (0, 0, 0))
                     self.screen.blit(text, text.get_rect(center=(self.W // 2 + 5, self.H // 2 -100)))
                 

@@ -16,9 +16,11 @@ PASTEL_GREEN = (193, 225, 193)
 PASTEL_YELLOW = (253, 253, 150)
 RED = (200, 50, 50)
 GREEN = (50, 200, 50)
+BLUE = (0,0,255)
 
 
 # Police personnalisée
+pygame.init()
 TITLE_FONT = pygame.font.Font(None, 300)
 BUTTON_FONT = pygame.font.Font(None, 80)
 MEDIUM_FONT = pygame.font.Font(None, 50)

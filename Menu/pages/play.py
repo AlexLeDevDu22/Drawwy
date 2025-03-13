@@ -7,7 +7,7 @@ def play_choicer(screen, W, H, mouse_pos, mouse_click, connected):
     draw_text("Mode de jeu", BUTTON_FONT, BLACK, screen, W // 2, 100)
     
     # Options de jeu
-    game_modes = ["SoloGame", "MultiGameVar"]
+    game_modes = ["SoloGame", "MultiGame"]
     mode_width = 300
     mode_height = 200
     modes_y = H // 2 - mode_height // 2

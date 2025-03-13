@@ -1,4 +1,4 @@
-from Code_bien_rangé.Menu.elements import *
+from Menu.elements import *
 from shared.tools import get_screen_size
 from shared.common_ui import *
 from shared.common_utils import *
