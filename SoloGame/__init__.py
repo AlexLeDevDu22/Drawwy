@@ -9,7 +9,7 @@ from shared.tools import *
 
 #les configs
 config = {
-    "game_page_fps": 30,
+    "game_page_fps": 120,
     "drawing_colors": [
         (255,0,0),   (0,255,0),   (0,0,255),   (255,255,0),
         (255,165,0), (128,0,128), (0,0,0),     (255,255,255),
@@ -22,6 +22,8 @@ def get_screen_size():
 
 class SoloGame:
     def __init__(self, screen):
+        self.last_mouse_pos = None 
+
         self.screen = screen
         self.W, self.H = screen.get_size()
 
