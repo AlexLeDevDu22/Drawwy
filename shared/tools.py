@@ -1,5 +1,9 @@
 import socket
 import pygame
+import random
+
+from Menu.ui.elements import Particle
+from shared.common_ui import *
 
 def is_connected():
     try:
@@ -29,3 +33,14 @@ def apply_circular_mask(image):
 
     # Appliquer le masque sur l'image
     image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+def generate_particles(n, x1,y1,x2,y2, colors=[SOFT_ORANGE, PASTEL_PINK, PASTEL_GREEN, PASTEL_YELLOW]):
+    particles=[]
+    for _ in range(n):
+        particles.append(Particle(
+            random.randint(x1,x2),
+            random.randint(y1,y2),
+            random.choice(colors)
+        ))
+
+    return particles

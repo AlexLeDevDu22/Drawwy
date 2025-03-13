@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 from Menu.ui.elements import *
-from shared.tools import get_screen_size
+from shared.tools import get_screen_size, generate_particles
 from shared.common_ui import *
 from shared.common_utils import *
 
@@ -190,12 +190,7 @@ class Menu:
                             button_sound.play()
                         
                         # Effets de particules lors du clic
-                        for _ in range(20):
-                            particles.append(Particle(
-                                random.randint(button_x, button_x + button_width),
-                                button_y + button_height // 2,
-                                random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
-                            ))
+                        particles.append(generate_particles(20, button_x, button_y,button_x + button_width // 2, button_y + button_height // 2, random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])))
                         
                         if button_text == "QUITTER":
                             running = False

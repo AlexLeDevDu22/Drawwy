@@ -76,12 +76,7 @@ while running:
         element.update()
     
     if mouse_click:
-        for _ in range(20):
-            particles.append(Particle(
-                random.randint(mouse_pos[0]-30, mouse_pos[0]+30),
-                random.randint(mouse_pos[1]-30, mouse_pos[1]+30),
-                random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
-            ))
+        particles.append(tools.generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30))
 
     # Mise à jour des particules
     for particle in particles[:]:

@@ -1,6 +1,6 @@
 from shared.common_ui import *
 from shared.common_utils import draw_text
-from Menu.ui.elements import Particle
+from shared.tools import generate_particles
 
 import pygame
 import math
@@ -88,12 +88,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
         
         # Gestion des clics
         if mouse_click and hover:
-            for _ in range(20):
-                particles.append(Particle(
-                    random.randint(button_x, button_x + button_width),
-                    button_y + button_height // 2,
-                    random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
-                ))
+            particles.append(generate_particles(20,button_x, button_y, button_x+button_width, button_y+button_height))
             
             if button_text == "QUITTER":
                 pygame.quit()
@@ -130,22 +125,12 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                 credit_button_y - credit_text_y_offset)
         
         if hover_credit and mouse_click:
-            for _ in range(20):
-                particles.append(Particle(
-                    random.randint(credit_button_x - credit_button_radius, credit_button_x + credit_button_radius),
-                    credit_button_y,
-                    random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
-                ))
+            particles.append(generate_particles(20,credit_button_x-credit_button_radius, credit_button_y-credit_button_radius, credit_button_x+credit_button_radius, credit_button_y+credit_button_radius))
             return screen, "credits", particles
         
 
     # Effets de particules lors du clic
     if mouse_click:
-        for _ in range(20):
-            particles.append(Particle(
-                random.randint(mouse_pos[0]-30, mouse_pos[0]+30),
-                random.randint(mouse_pos[1]-30, mouse_pos[1]+30),
-                random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
-            ))
+        particles.append(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
 
     return screen, "home", particles
