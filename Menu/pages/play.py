@@ -45,5 +45,5 @@ def play_choicer(screen, W, H, mouse_pos, mouse_click, connected):
                                     200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
     
     if mouse_click and back_button_rect.collidepoint(mouse_pos):
-        return screen, "menu"
+        return screen, "home"
     return screen, "play"
