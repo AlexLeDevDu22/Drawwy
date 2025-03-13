@@ -52,10 +52,10 @@ class MultiplayersGame:
                 while not server.server_running:
                     time.sleep(0.1)
 
-            asyncio.run(self.handle_connection_client())# start the web connection
+            self.async_connexion=asyncio.run(self.handle_connection_client())# start the web connection
 
         except KeyboardInterrupt:
-            pass
+            self.async_connexion.cancel()
 
     async def handle_connection_client(self):
         self.sio = socketio.AsyncClient(logger=True, engineio_logger=True)
@@ -118,7 +118,7 @@ class MultiplayersGame:
 
                 num_steps=0
                 for frame in gameVar.ALL_FRAMES:
-                    if frame["type"] in ["new_step", "shape"]:
+                    if frame["type"] == "new_step":
                         num_steps+=1
                 gameVar.STEP_NUM=num_steps
 
@@ -518,7 +518,6 @@ class MultiplayersGame:
                 self.screen.blit(image_texte, (0.82 * self.W + 30,y))
 
             y-=10
-
     
     def __init__(self,screen,clock, W,H):
         if not tools.is_connected():
@@ -530,7 +529,8 @@ class MultiplayersGame:
         self.server=None
     
         try:
-            threading.Thread(target=self.start_connexion).start()
+            self.connexion_thread=threading.Thread(target=self.start_connexion)
+            self.connexion_thread.start()
 
             self.game_remaining_time=config["game_duration"]
             
@@ -557,6 +557,8 @@ class MultiplayersGame:
             
             self.guess_input_active=False
             self.guess=""
+
+            gameVar.PLAYERS=[]
             
             while 1:
                 clock.tick(config["game_page_fps"])
@@ -595,10 +597,15 @@ class MultiplayersGame:
                 
                 for event in self.events:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
+                        try:
+                            loop = asyncio.get_running_loop()  # Récupère le loop actuel s'il existe
+                        except RuntimeError:
+                            loop = asyncio.new_event_loop()  # Sinon, crée un nouveau loop
+                            asyncio.set_event_loop(loop)
+
+                        loop.create_task(self.sio.disconnect())
                         if self.server:
-                            self.server.stop_server()
-                            time.sleep(0.1)
-                            self.server_thread.join()
+                            threading.Thread(target=self.server.stop_server, daemon=True).start()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -617,7 +624,13 @@ class MultiplayersGame:
                 self.frame_num=(self.frame_num+1)%config["game_page_fps"]
 
         except KeyboardInterrupt:
+            try:
+                loop = asyncio.get_running_loop()  # Récupère le loop actuel s'il existe
+            except RuntimeError:
+                loop = asyncio.new_event_loop()  # Sinon, crée un nouveau loop
+                asyncio.set_event_loop(loop)
+
+            loop.create_task(self.sio.disconnect())
             if self.server:
                 self.server.stop_server()
-                self.server_thread.join()
             os._exit(0)

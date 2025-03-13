@@ -55,23 +55,24 @@ def handle_connect():
     print("Nouveau client connecté")
 
 @socketio.on('disconnect')
-def handle_disconnect():
+def handle_disconnect(data=None):
     global players
-    # Trouver le joueur qui s'est déconnecté
-    for i, player in enumerate(players):
-        if player.get("sid") == request.sid:
-            print(f"Joueur {player['pseudo']} déconnecté")
-            players.pop(i)
-            break
+    if players:
+        # Trouver le joueur qui s'est déconnecté
+        for i, player in enumerate(players):
+            if player.get("sid") == request.sid:
+                print(f"Joueur {player['pseudo']} déconnecté")
+                players.pop(i)
+                break
 
-    if player["avatar"]["type"] == "matrix":
-        os.remove(f"web/players-avatars/{player["id"]}.bmp")
-    
-    # Envoyer la mise à jour des joueurs
-    emit('player_disconnected', { 
-        "pid": player["id"],
-        "pseudo": player["pseudo"]
-    }, broadcast=True)
+        if player["avatar"]["type"] == "matrix" and os.path.exists(f"web/players-avatars/{player['id']}.bmp"):
+            os.remove(f"web/players-avatars/{player["id"]}.bmp")
+        
+        # Envoyer la mise à jour des joueurs
+        emit('player_disconnected', { 
+            "pid": player["id"],
+            "pseudo": player["pseudo"]
+        }, broadcast=True)
     
 
 @socketio.on('join')
@@ -268,6 +269,11 @@ def stop_server():
     endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
     if endpoints:
         requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
+    
+    ngrok.kill()
+
+    from pyngrok import ngrok as ngrok2
+    ngrok2.get_tunnels()
     
     # Marquer le serveur comme arrêté
     server_running = False

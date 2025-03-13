@@ -7,22 +7,23 @@ const gameConfig = {
 };
 
 // Game state
-let gameState = {
-  myId: null,
-  players: [],
-  drawerId: null,
-  avatar: { emoji: null, color: null },
+let myId = null;
+let players = [];
+let drawerId = null;
+let avatar = { emoji: null, color: null };
+let currentSentence = "";
+let gameStartTime = null;
+let remainingTime = gameConfig.gameDuration;
+let hasFound = false;
+let allFrames = [];
+let undoStack = [];
+let drawingState = {
+  color: "#000000",
+  radius: 5,
   isDrawing: false,
-  currentSentence: "",
-  gameStartTime: null,
-  remainingTime: gameConfig.gameDuration,
-  hasFound: false,
-  allFrames: [],
-  undoStack: [],
-  drawingState: {
-    currentColor: "#000000",
-    lineWidth: 5,
-  },
+  lastPos: null,
+  currentStroke: [],
+  drawFrames: [],
 };
 
 // Drawing configuration
@@ -75,12 +76,12 @@ function handleConnection() {
     console.log("Connecté au serveur WebSocket !");
 
     // Envoyer un événement 'join' avec le pseudo et l'avatar
-    console.log(gameState.pseudo);
+    console.log(pseudo);
     setTimeout(() => {
       // etre connecté après python
       socket.emit("join", {
-        pseudo: gameState.pseudo,
-        avatar: gameState.avatar,
+        pseudo: pseudo,
+        avatar: avatar,
       });
     }, 100);
   });
@@ -96,10 +97,10 @@ function handleConnection() {
   // Écouter l'événement 'welcome' pour recevoir l'état initial du jeu
   socket.on("welcome", (data) => {
     console.log("Bienvenue dans la partie :", data);
-    gameState.allFrames += data.all_frames;
+    allFrames += data.all_frames;
     console.log("start frames", data.all_frames);
     if (data.all_frames.length > 0) draw(data.all_frames, false);
-    gameState.myId = data["id"];
+    myId = data["id"];
     data["messages"].forEach((message) => {
       addMessageToChat(
         message.message,
@@ -109,10 +110,10 @@ function handleConnection() {
         message.succeed
       );
     });
-    gameState.players = data.players;
-    gameState.currentSentence = data.sentence;
-    gameState.drawerId = data.drawer_id;
-    gameState.gameStartTime = new Date(data.new_game);
+    players = data.players;
+    currentSentence = data.sentence;
+    drawerId = data.drawer_id;
+    gameStartTime = new Date(data.new_game);
     updatePlayerList();
     updateWordDisplay();
     toggleDrawingTools();
@@ -121,26 +122,26 @@ function handleConnection() {
 
   socket.on("new_player", (data) => {
     console.log("Nouveaux joueurs :", data);
-    gameState.players.push(data);
+    players.push(data);
     updatePlayerList();
-    addMessageToChat(gameState.pseudo + " viens de nous rejoindre!", "#63ff6c");
+    addMessageToChat(pseudo + " viens de nous rejoindre!", "#63ff6c");
   });
 
   socket.on("draw", (frames) => {
     console.log("Mise à jour du dessin");
-    gameState.allFrames += frames;
-    gameState.drawingState.undoStack = [];
+    allFrames += frames;
+    drawingState.undoStack = [];
     draw(frames, true);
   });
 
   socket.on("roll_back", (roll_back) => {
     console.log("Roll back");
     //resplit frames and undo stacks
-    gameState.allFrames += gameState.drawingState.undoStack;
-    gameState.drawingState.undoStack = gameState.allFrames.slice(-roll_back);
+    allFrames += drawingState.undoStack;
+    drawingState.undoStack = allFrames.slice(-roll_back);
 
     clearCanvas();
-    draw(gameState.allFrames, false);
+    draw(allFrames, false);
   });
 
   socket.on("new_message", (guess) => {
@@ -154,13 +155,11 @@ function handleConnection() {
     );
 
     if (guess.succeed) {
-      for (let i = 0; i < gameState.players.length; i++) {
-        if (gameState.players[i].id == guess.pid)
-          gameState.players[i].found = true;
+      for (let i = 0; i < players.length; i++) {
+        if (players[i].id == guess.pid) players[i].found = true;
 
         guess.new_points.forEach((point) => {
-          if (gameState.players[i].id == point.pid)
-            gameState.players[i].points += point.points;
+          if (players[i].id == point.pid) players[i].points += point.points;
         });
       }
 
@@ -172,19 +171,19 @@ function handleConnection() {
     console.log("Nouvelle partie :", data);
 
     clearCanvas();
-    gameState.allFrames = [];
-    gameState.currentSentence = data.new_sentence;
-    gameState.drawerId = data.drawer_id;
-    gameState.hasFound = false;
-    players.forEach((p) => (p.found = False));
-    console.log(gameState.players, gameState.drawerId);
+    allFrames = [];
+    currentSentence = data.new_sentence;
+    drawerId = data.drawer_id;
+    hasFound = false;
+    players.forEach((p) => (p.found = false));
+    console.log(players, drawerId);
     addMessageToChat(
       "Nouvelle partie, " +
-        gameState.players.find((p) => p.id == gameState.drawerId)["pseudo"] +
+        players.find((p) => p.id == drawerId)["pseudo"] +
         " deviens le dessinateur !",
       "#63ff6c"
     );
-    gameState.gameStartTime = new Date(data.start_time);
+    gameStartTime = new Date(data.start_time);
 
     updateWordDisplay();
     updatePlayerList();
@@ -193,9 +192,7 @@ function handleConnection() {
 
   socket.on("player_disconnected", (data) => {
     console.log("Joueur déconnecté :", data);
-    gameState.players = gameState.players.filter(
-      (player) => player.id !== data.pid
-    );
+    players = players.filter((player) => player.id !== data.pid);
     updatePlayerList();
     addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
   });
@@ -215,57 +212,59 @@ function draw(frames, delay) {
   let color = null;
   let radius = null;
 
-  function drawLine(frame) {
-    if (frame.color)
-      color = `rgb(${frame.color[0]}, ${frame.color[1]}, ${frame.color[2]})`;
-    if (frame.radius) radius = frame.radius / 4;
-
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = 1; // Adapter l'épaisseur du trait
-
-    // Tracer une ligne entre x1 et x2
-    ctx.beginPath();
-    ctx.moveTo(frame.x1, frame.y1);
-    ctx.lineTo(frame.x2, frame.y2);
-    ctx.stroke();
-
-    // Ajouter des cercles aux extrémités pour lisser et bien remplir
-    ctx.beginPath();
-    ctx.arc(frame.x1, frame.y1, radius, 0, 2 * Math.PI);
-    ctx.fill(); // Remplir le cercle
-    ctx.beginPath();
-    ctx.arc(frame.x2, frame.y2, radius, 0, 2 * Math.PI);
-    ctx.fill(); // Remplir le cercle
-  }
-
   console.log(frames);
   if (delay) {
     frames.forEach((frame, index) => {
-      setTimeout(() => drawLine(frame), index * frameDuration);
+      setTimeout(() => {
+        if (frame.color)
+          color = `rgb(${frame.color[0]}, ${frame.color[1]}, ${frame.color[2]})`;
+        if (frame.radius) radius = frame.radius / 4;
+
+        drawLine(frame.x1, frame.y1, frame.x2, frame.y2, color, radius);
+      }, index * frameDuration);
     });
   } else {
     frames.forEach(drawLine);
   }
 }
 
+function drawLine(x1, y1, x2, y2, color, radius) {
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1; // Adapter l'épaisseur du trait
+
+  // Tracer une ligne entre x1 et x2
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+
+  // Ajouter des cercles aux extrémités pour lisser et bien remplir
+  ctx.beginPath();
+  ctx.arc(x1, y1, max(1, radius / 4), 0, 2 * Math.PI);
+  ctx.fill(); // Remplir le cercle
+  ctx.beginPath();
+  ctx.arc(x2, y2, max(1, radius / 4), 0, 2 * Math.PI);
+  ctx.fill(); // Remplir le cercle
+}
+
 function toggleDrawingTools() {
-  drawingTools.style.opacity = gameState.myId == gameState.drawerId ? 1 : 0;
+  drawingTools.style.opacity = myId == drawerId ? 1 : 0;
 }
 
 // Update player list UI
 function updatePlayerList() {
   playerList.innerHTML = "";
 
-  gameState.players.forEach((player) => {
+  players.forEach((player) => {
     const playerItem = document.createElement("li");
     playerItem.className = "player-item";
 
     // Add classes based on player status
-    if (player.id == gameState.drawerId) {
+    if (player.id == drawerId) {
       playerItem.classList.add("current-drawer");
     }
-    console.log(player.id, gameState.drawerId);
+    console.log(player.id, drawerId);
 
     if (player.found) {
       playerItem.classList.add("found");
@@ -279,10 +278,10 @@ function updatePlayerList() {
       `<div class="player-info">
                 <div class="player-name-found">
                     <div class="player-name${
-                      player.id === gameState.myId ? " me" : ""
+                      player.id === myId ? " me" : ""
                     }">${player.pseudo}</div>
                     ${
-                      player.id != gameState.drawerId
+                      player.id != drawerId
                         ? player.found
                           ? '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#63ff6c"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>'
                           : '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#333"><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>'
@@ -293,7 +292,7 @@ function updatePlayerList() {
             </div>
             <div>
                 ${
-                  player.id === gameState.drawerId
+                  player.id === drawerId
                     ? '<span class="player-status status-drawing">Dessine</span>'
                     : ""
                 }
@@ -314,7 +313,7 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
     let pseudo = document.createElement("p");
     pseudo.textContent = messPseudo;
     pseudo.className = "chat-pseudo";
-    if (pid == gameState.myId) pseudo.classList.add(`my-pseudo`);
+    if (pid == myId) pseudo.classList.add(`my-pseudo`);
     chatMessages.appendChild(pseudo);
   }
 
@@ -323,8 +322,8 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
   divMessage.textContent = message;
   divMessage.classList.add("message");
   divMessage.classList.add(messPseudo ? "player-message" : "system-message");
-  if (pid == gameState.myId) divMessage.classList.add(`my-message`);
-  if (pid == gameState.drawerId) divMessage.classList.add(`message-author`);
+  if (pid == myId) divMessage.classList.add(`my-message`);
+  if (pid == drawerId) divMessage.classList.add(`message-author`);
   if (succeed) divMessage.classList.add(`correct-guess`);
 
   divMessage.style.backgroundColor = color || "#var(--light-color)";
@@ -336,17 +335,17 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
 
 // Update word display based on current game state
 function updateWordDisplay() {
-  if (gameState.players.length == 1) {
+  if (players.length == 1) {
     hintText.textContent = "En attente de joueurs...";
     return;
   }
 
-  if (gameState.myId === gameState.drawerId) {
+  if (myId === drawerId) {
     // If player is the drawer, show the full word
-    hintText.textContent = `Dessinez : ${gameState.currentSentence}`;
-  } else if (gameState.hasFound) {
+    hintText.textContent = `Dessinez : ${currentSentence}`;
+  } else if (hasFound) {
     // If player has found the word
-    hintText.textContent = `Vous avez trouvé : ${gameState.currentSentence}`;
+    hintText.textContent = `Vous avez trouvé : ${currentSentence}`;
   } else {
     hintText.textContent = `A vous de deviner`;
   }
@@ -354,21 +353,18 @@ function updateWordDisplay() {
 
 // Start game timer
 function startGameTimer() {
-  gameState.remainingTime = gameConfig.gameDuration;
+  remainingTime = gameConfig.gameDuration;
   timerProgress.classList.remove("not-started");
   updateTimerDisplay();
 
   const timerInterval = setInterval(() => {
     const now = new Date();
-    const elapsedSeconds = Math.floor((now - gameState.gameStartTime) / 1000);
-    gameState.remainingTime = Math.max(
-      0,
-      gameConfig.gameDuration - elapsedSeconds
-    );
+    const elapsedSeconds = Math.floor((now - gameStartTime) / 1000);
+    remainingTime = Math.max(0, gameConfig.gameDuration - elapsedSeconds);
 
     updateTimerDisplay();
 
-    if (gameState.remainingTime <= 0) {
+    if (remainingTime <= 0) {
       clearInterval(timerInterval);
       handleGameEnd();
     }
@@ -377,13 +373,12 @@ function startGameTimer() {
 
 // Update timer display
 function updateTimerDisplay() {
-  const minutes = Math.floor(gameState.remainingTime / 60);
-  const seconds = gameState.remainingTime % 60;
+  const minutes = Math.floor(remainingTime / 60);
+  const seconds = remainingTime % 60;
   timerText.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
   // Update progress bar
-  const progressPercent =
-    (gameState.remainingTime / gameConfig.gameDuration) * 100;
+  const progressPercent = (remainingTime / gameConfig.gameDuration) * 100;
   timerProgress.style.width = `${progressPercent}%`;
 
   // Change color as time runs out
@@ -396,7 +391,7 @@ function updateTimerDisplay() {
 
 function handleGameEnd() {
   clearCanvas();
-  if (gameState.myId == gameState.drawerId) socket.emit("game_finished", null);
+  if (myId == drawerId) socket.emit("game_finished", null);
 }
 
 //! Events Listeners
@@ -407,7 +402,7 @@ avatarOptions.forEach((option) => {
   option.addEventListener("click", () => {
     if (selectedAvatar) selectedAvatar.classList.remove("selected");
 
-    gameState.avatar = {
+    avatar = {
       type: "emoji",
       emoji: option.getAttribute("data-avatar"),
       color: option.style.backgroundColor.match(/\d+/g).map(Number), // convert to rgb list
@@ -424,7 +419,7 @@ loginForm.addEventListener("submit", (e) => {
     loginOverlay.style.opacity = 0;
     loginOverlay.style.pointerEvents = "none";
 
-    gameState.pseudo = pseudoInput.value;
+    pseudo = pseudoInput.value;
     handleConnection();
   }
 });
@@ -433,10 +428,10 @@ loginForm.addEventListener("submit", (e) => {
 function sendMessage(message) {
   if (message) {
     socket.emit("guess", {
-      pid: gameState.myId,
-      pseudo: gameState.pseudo,
+      pid: myId,
+      pseudo: pseudo,
       message: message,
-      remaining_time: gameState.remainingTime,
+      remaining_time: remainingTime,
     });
   }
 }
@@ -451,4 +446,101 @@ chatInput.addEventListener("keypress", (key) => {
   if (chatInput.value == "" || key.key != "Enter") return;
   sendMessage(chatInput.value);
   chatInput.value = "";
+});
+
+//! draw
+
+canvas.addEventListener("mousedown", (e) => {
+  drawingState.isDrawing = true;
+  drawingState.lastPos = getMousePos(e);
+  drawingState.currentStroke.push({ type: "new_step" });
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!drawingState.isDrawing || myId != drawerId) return;
+
+  const pos = getMousePos(e);
+  if (drawingState.lastPos) {
+    console.log(pos);
+    drawLine(
+      drawingState.lastPos.x,
+      drawingState.lastPos.y,
+      pos.x,
+      pos.y,
+      drawingState.color,
+      drawingState.radius
+    );
+    const frame = {
+      type: "line",
+      x1: drawingState.lastPos.x,
+      y1: drawingState.lastPos.y,
+      x2: pos.x,
+      y2: pos.y,
+      color: drawingState.color,
+      radius: drawingState.radius,
+    };
+    drawingState.currentStroke.push(frame);
+    allFrames.push(frame);
+
+    drawingState.lastPos = pos;
+  }
+});
+
+canvas.addEventListener("mouseup", () => {
+  drawingState.isDrawing = false;
+  drawingState.lastPos = null;
+  if (drawingState.currentStroke.length > 1)
+    drawingState.drawFrames.push(...drawingState.currentStroke);
+  drawingState.currentStroke = [];
+});
+
+function getMousePos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: parseInt((canvas.width / canvas.clientWidth) * (e.clientX - rect.left)),
+    y: parseInt((canvas.height / canvas.clientHeight) * (e.clientY - rect.top)),
+  };
+}
+
+function parseFrames(frames) {
+  function hexToRGB(hex) {
+    let bigint = parseInt(hex.replace(/^#/, ""), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  }
+
+  let color = null,
+    radius = null;
+  frames.forEach((frame, i) => {
+    if (frame.type == "line") {
+      frame.color = hexToRGB(frame.color);
+      if (frame.color == color) delete frames[i].color;
+      if (frame.radius == radius) delete frames[i].radius;
+      color = frame.color;
+      radius = frame.radius;
+    }
+  });
+  return frames;
+}
+
+setInterval(() => {
+  if (drawingState.drawFrames.length > 0) {
+    const newFrames = parseFrames(drawingState.drawFrames);
+    console.log("Envoi du dessin", newFrames);
+    socket.emit("draw", newFrames);
+    drawingState.drawFrames = [];
+  }
+}, 1000);
+
+colorOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    drawingState.color = option.getAttribute("data-color");
+    colorOptions
+      .find((option) => option.classList.contains(".active"))
+      .classList.remove("active");
+    option.classList.add("active");
+  });
+});
+
+sizeSlider.addEventListener("input", (event) => {
+  drawingState.radius = parseInt(event.target.value);
 });

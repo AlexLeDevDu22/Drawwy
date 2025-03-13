@@ -232,7 +232,6 @@ body {
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 #drawing-canvas {
@@ -291,6 +290,11 @@ body {
   border-radius: 50%;
   border: 2px solid #ddd;
   cursor: pointer;
+  transition: transform 0.15s;
+
+  &:hover {
+    transform: scale(1.2);
+  }
 }
 
 .color-option.active {

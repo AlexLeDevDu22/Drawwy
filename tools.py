@@ -150,7 +150,7 @@ def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False
     new_frames=split_steps_by_roll_back(new_frames, gameVar.ROLL_BACK)
 
     for frame in new_frames[0]:#draw
-        if frame["type"]=="draw":
+        if frame["type"]=="line":
             if delay: 
                 duration=1/len(frames)
             else:
@@ -198,14 +198,15 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
         dist = max(abs(dx), abs(dy))
         
         # Interpolation linéaire pour créer la ligne
-        step_duration=duration/dist
-        for step in range(dist + 1):
-            t = step / dist
-            x = round(x1 + t * dx)
-            y = round(y1 + t * dy)
-            draw_circle(x, y)  # On dessine un cercle autour de chaque point
-            
-            time.sleep(max(0,step_duration-0.004))
+        if dist>0:
+            step_duration=duration/dist
+            for step in range(dist + 1):
+                t = step / dist
+                x = round(x1 + t * dx)
+                y = round(y1 + t * dy)
+                draw_circle(x, y)  # On dessine un cercle autour de chaque point
+                
+                time.sleep(max(0,step_duration-0.004))
 
     # Dessiner la ligne épaisse
     draw_thick_line(x1, y1, x2, y2)
@@ -219,7 +220,6 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
 def split_steps_by_roll_back(frames, roll_back):
     new_frames = frames.copy()
     for i in range(len(new_frames)-1,-1,-1):  # On parcourt à l'envers
-        print(frames)
 
         if frames[i]["type"] in {"new_step", "shape"}:
             roll_back-=1
