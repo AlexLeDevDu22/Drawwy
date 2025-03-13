@@ -1,6 +1,6 @@
 from shared.common_ui import *
 from shared.common_utils import draw_text
-from Menu.elements import Particle
+from Menu.ui.elements import Particle
 
 import pygame
 import math

@@ -1,5 +1,5 @@
-from Menu.avatar_manager import AvatarManager
-from Menu.elements import *
+from Menu.utils.avatar_manager import AvatarManager
+from Menu.ui.elements import *
 from Menu.pages import achievements
 from Menu.pages import play
 from Menu.pages import home

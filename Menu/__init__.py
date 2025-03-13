@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-from Menu.elements import *
+from Menu.ui.elements import *
 from shared.tools import get_screen_size
 from shared.common_ui import *
 from shared.common_utils import *

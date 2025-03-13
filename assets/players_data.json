@@ -1,1 +1,7 @@
-{ "pseudo": "Proutland" }
+{
+  "pseudo": "Proutland",
+  "achievements": [
+    { "title": "title", "explication": "explication", "succeed": false },
+    { "title": "title2", "explication": "explication2", "succeed": false }
+  ]
+}
