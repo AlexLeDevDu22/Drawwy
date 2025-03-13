@@ -1,2 +1,217 @@
+import pygame
+import sys
+import yaml
+import os
+from datetime import datetime
+
+pygame.init()
+
+# -- Couleurs
+NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
+BEIGE = (250, 240, 230)
+ROUGE = (255, 0, 0)
+
+# -- Exemple de config (pour la démo)
+config = {
+    "game_page_fps": 30,
+    "drawing_colors": [
+        (255,0,0),   (0,255,0),   (0,0,255),   (255,255,0),
+        (255,165,0), (128,0,128), (0,0,0),     (255,255,255),
+        (0,255,255), (255,0,255), (165,42,42), (128,128,128)
+    ]
+}
+
+def get_screen_size():
+    """Retourne la taille actuelle de l'écran."""
+    info = pygame.display.Info()
+    return info.current_w, info.current_h
+
+W, H = get_screen_size()
+screen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
+
 class SoloGame:
-    pass
+    def __init__(self, screen):
+        self.screen = screen
+        self.W, self.H = screen.get_size()
+
+        # Paramètres du pinceau
+        self.pen_color = NOIR
+        self.pen_radius = 6
+        
+        # État de la souris
+        self.mouseDown = False
+        self.mouse_pos = (0, 0)
+
+        # On va définir les rectangles d’interface
+        self.define_layout()
+
+        # Pour un vrai “canvas” persistant, stocke un Surface ou un tableau 2D.
+        # Ici, on va juste dessiner à la volée pour la démo.
+        self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
+        self.canvas_surf.fill(BLANC)
+
+        # Boucle principale
+        clock = pygame.time.Clock()
+        running = True
+        while running:
+            clock.tick(config["game_page_fps"])
+            self.events = pygame.event.get()
+
+            # Mise à jour de la taille si on redimensionne
+            self.W, self.H = screen.get_size()
+            self.define_layout()
+
+            # Gestion des événements
+            for event in self.events:
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.mouseDown = True
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    self.mouseDown = False
+                elif event.type == pygame.MOUSEMOTION:
+                    self.mouse_pos = event.pos
+
+            # Dessin de l’arrière-plan
+            self.screen.fill(BEIGE)
+
+            # Dessin du canvas au centre
+            self.draw_canvas()
+
+            # Dessin de la palette en haut à droite
+            self.draw_colors()
+
+            # Dessin du slider en dessous
+            self.draw_slider()
+
+            pygame.display.flip()
+
+        pygame.quit()
+        sys.exit()
+
+    def define_layout(self):
+        """
+        Définit la disposition générale :
+          - Un grand canvas au centre
+          - Une palette de couleurs en haut à droite
+          - Un slider en dessous de la palette
+        """
+        # On recalcule en fonction de la fenêtre courante
+        self.canvas_rect = pygame.Rect(
+            int(0.05 * self.W),     # 15% de la largeur en marge à gauche
+            int(0.05 * self.H),     # 5% de la hauteur en marge en haut
+            int(0.70 * self.W),     # 70% de la largeur (le “gros” canvas)
+            int(0.90 * self.H)      # 80% de la hauteur
+        )
+
+        # Palette : en haut à droite (15% de la largeur, 30% de la hauteur)
+        palette_width  = int(0.25 * self.W)
+        palette_height = int(0.30 * self.H)
+        self.colors_rect = pygame.Rect(
+            self.canvas_rect.right + 10,  # petit décalage à droite du canvas
+            int(0.05 * self.H),           # même marge en haut
+            palette_width - 20,           # laisse un petit offset sur la droite
+            palette_height
+        )
+
+        # Slider : sous la palette (15% de la largeur, 10% de la hauteur)
+        slider_width  = palette_width - 20
+        slider_height = int(0.10 * self.H)
+        self.slider_rect = pygame.Rect(
+            self.canvas_rect.right + 10,
+            self.colors_rect.bottom + 70,
+            slider_width,
+            slider_height
+        )
+
+    def draw_canvas(self):
+        """Dessine le canvas (Surface) et gère le dessin du pinceau."""
+        # Cadre du canvas
+        pygame.draw.rect(self.screen, NOIR, self.canvas_rect, 2)
+
+        # On blit la Surface du canvas
+        self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
+
+        # Si la souris est enfoncée dans la zone du canvas, on dessine
+        if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
+            # Coordonnées locales dans la surface
+            local_x = self.mouse_pos[0] - self.canvas_rect.x
+            local_y = self.mouse_pos[1] - self.canvas_rect.y
+            # Dessin d'un cercle
+            pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
+
+    def draw_colors(self):
+        """Dessine la palette de couleurs en carrés de taille fixe (même taille que précédemment)."""
+        # Fond + bordure
+        pygame.draw.rect(self.screen, (230,230,230), self.colors_rect)
+        pygame.draw.rect(self.screen, NOIR, self.colors_rect, 2)
+
+        # On dessine 12 couleurs (3x4), comme dans ton exemple
+        margin = 10
+        cols = 4
+        rows = 3
+        rect_w = (self.colors_rect.width - (cols+1)*margin) // cols
+        rect_h = (self.colors_rect.height - (rows+1)*margin) // rows
+
+        palette_colors = config["drawing_colors"]
+        
+        for i, color in enumerate(palette_colors[:12]):
+            r = i // cols
+            c = i % cols
+            x = self.colors_rect.x + margin + c*(rect_w+margin)
+            y = self.colors_rect.y + margin + r*(rect_h+margin)
+            rect_color = pygame.Rect(x, y, rect_w, rect_h)
+
+            # Dessin du carré de couleur
+            pygame.draw.rect(self.screen, color, rect_color)
+            pygame.draw.rect(self.screen, NOIR, rect_color, 2)
+
+            # Gestion du clic
+            if self.mouseDown and rect_color.collidepoint(self.mouse_pos):
+                self.pen_color = color
+
+        # Affiche la couleur sélectionnée en bas de la palette
+        color_bar = pygame.Rect(
+            self.colors_rect.x + margin,
+            self.colors_rect.bottom - margin+20,
+            self.colors_rect.width - 2*margin,
+            50
+        )
+        pygame.draw.rect(self.screen, self.pen_color, color_bar)
+        pygame.draw.rect(self.screen, NOIR, color_bar, 2)
+
+    def draw_slider(self):
+        """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
+        pygame.draw.rect(self.screen, (220,220,220), self.slider_rect)
+        pygame.draw.rect(self.screen, NOIR, self.slider_rect, 2)
+
+        # Barre
+        margin = 15
+        line_y = self.slider_rect.centery
+        line_start = (self.slider_rect.x + margin, line_y)
+        line_end   = (self.slider_rect.right - margin, line_y)
+        pygame.draw.line(self.screen, NOIR, line_start, line_end, 3)
+
+        # Bouton du slider
+        max_radius = 50  # Rayon max
+        total_width = line_end[0] - line_start[0]
+        ratio = self.pen_radius / max_radius
+        knob_x = int(line_start[0] + ratio * total_width)
+        knob_y = line_y
+        pygame.draw.circle(self.screen, ROUGE, (knob_x, knob_y), 10)
+
+        # Gestion du clic pour modifier le rayon
+        if self.mouseDown:
+            mx, my = self.mouse_pos
+            if self.slider_rect.collidepoint(mx, my):
+                # On borne le x du bouton entre line_start et line_end
+                knob_x = max(line_start[0], min(mx, line_end[0]))
+                self.pen_radius = int(((knob_x - line_start[0]) / total_width) * max_radius)
+                if self.pen_radius < 1:
+                    self.pen_radius = 1
+
+if __name__ == '__main__':
+    SoloGame(screen)
