@@ -4,7 +4,7 @@ import yaml
 import os
 from datetime import datetime
 
-pygame.init()
+
 
 # -- Couleurs
 NOIR = (0, 0, 0)
@@ -32,6 +32,7 @@ screen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
 
 class SoloGame:
     def __init__(self, screen):
+        pygame.init()
         self.screen = screen
         self.W, self.H = screen.get_size()
 
