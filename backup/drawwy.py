@@ -12,7 +12,7 @@ from datetime import datetime
 if sys.platform.startswith("win"):
     import pygetwindow as gw
 
-with open("config.yaml", "r") as f:
+with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 with open("assets/players_data.json") as f:

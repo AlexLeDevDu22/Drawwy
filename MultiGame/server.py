@@ -6,9 +6,9 @@ import threading
 import time
 from datetime import datetime
 import MultiGame.utils.sentences as sentences
-import tools
+import MultiGame.utils.tools as tools
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request
 from flask_socketio import SocketIO, emit, send
 from pyngrok import ngrok
 
@@ -26,7 +26,7 @@ ngrok_api = os.getenv("NGROK_API")
 ngrok.set_auth_token(ngrok_token)
 
 # Initialisation de Flask et SocketIO
-app = Flask(__name__, static_folder='./web', static_url_path='/')
+app = Flask(__name__, static_folder='MultiGame/web', static_url_path='/')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading", logger=False, engineio_logger=False, allow_unsafe_werkzeug=True)
 
@@ -65,8 +65,8 @@ def handle_disconnect(data=None):
                 players.pop(i)
                 break
 
-        if player["avatar"]["type"] == "matrix" and os.path.exists(f"web/players-avatars/{player['id']}.bmp"):
-            os.remove(f"web/players-avatars/{player["id"]}.bmp")
+        if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/players-avatars/{player['id']}.bmp"):
+            os.remove(f"MultiGame/web/players-avatars/{player["id"]}.bmp")
         
         # Envoyer la mise à jour des joueurs
         emit('player_disconnected', { 
@@ -108,7 +108,7 @@ def handle_join(data):
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(pid)+".bmp", sentences_list[-1])
+        tools.save_canvas(data["avatar"]["matrix"], "MultiGame/web/players-avatars/"+str(pid)+".bmp", sentences_list[-1])
     
     # Annoncer le nouveau joueur
     emit('new_player', {
@@ -262,8 +262,8 @@ def stop_server():
     # except Exception as e:
     #     print(f"Erreur lors de l'envoi du message de fermeture: {e}")
 
-    for filename in os.listdir("web/players-avatars"):
-        os.remove(os.path.join("web/players-avatars", filename))
+    for filename in os.listdir("MultiGame/web/players-avatars"):
+        os.remove(os.path.join("MultiGame/web/players-avatars", filename))
 
     # Au cas ou...
     endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]

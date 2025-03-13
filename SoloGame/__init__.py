@@ -4,6 +4,8 @@ import yaml
 import os
 from datetime import datetime
 
+from shared.common_utils import get_screen_size
+
 pygame.init()
 
 
@@ -22,18 +24,10 @@ config = {
     ]
 }
 
-def get_screen_size():
-    """Retourne la taille actuelle de l'écran."""
-    info = pygame.display.Info()
-    return info.current_w, info.current_h
-
-W, H = get_screen_size()
-screen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
-
 class SoloGame:
     def __init__(self, screen):
         self.screen = screen
-        self.W, self.H = screen.get_size()
+        self.W, self.H = get_screen_size()
 
         # Paramètres du pinceau
         self.pen_color = NOIR
@@ -237,4 +231,6 @@ class SoloGame:
             sys.exit()
 
 if __name__ == '__main__':
+    W, H = get_screen_size()
+    screen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
     SoloGame(screen)

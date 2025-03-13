@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drawwy</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="login-overlay" style="display: block">
+      <form class="login-form" id="login-form">
+        <h1 class="login-title">Rejoignez Drawwy Multiplayer</h1>
+        <div class="input-group">
+          <input
+            type="text"
+            class="login-input"
+            id="pseudo-input"
+            placeholder="Votre pseudo"
+            required
+          />
+        </div>
+        <div class="avatar-selection" id="avatar-selection">
+          <div
+            class="avatar-option"
+            data-avatar="🐸"
+            style="background-color: #7fff00"
+          >
+            🐸
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐰"
+            style="background-color: #ffe4b5"
+          >
+            🐰
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦉"
+            style="background-color: #b0c4de"
+          >
+            🦉
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐢"
+            style="background-color: #90ee90"
+          >
+            🐢
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦄"
+            style="background-color: #ffd700"
+          >
+            🦄
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐷"
+            style="background-color: #ff69b4"
+          >
+            🐷
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐒"
+            style="background-color: #ffe4c4"
+          >
+            🐒
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐻"
+            style="background-color: #ff8c00"
+          >
+            🐻
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦓"
+            style="background-color: #d3d3d3"
+          >
+            🦓
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦒"
+            style="background-color: #fffacd"
+          >
+            🦒
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦔"
+            style="background-color: #a0522d"
+          >
+            🦔
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐨"
+            style="background-color: #d8bfd8"
+          >
+            🐨
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐳"
+            style="background-color: #4682b4"
+          >
+            🐳
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦜"
+            style="background-color: #32cd32"
+          >
+            🦜
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦢"
+            style="background-color: #f5fffa"
+          >
+            🦢
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦘"
+            style="background-color: #f4a460"
+          >
+            🦘
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦩"
+            style="background-color: #ffc0cb"
+          >
+            🦩
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦭"
+            style="background-color: #87ceeb"
+          >
+            🦭
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐬"
+            style="background-color: #00ced1"
+          >
+            🐬
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦕"
+            style="background-color: #98fb98"
+          >
+            🦕
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦖"
+            style="background-color: #ff6347"
+          >
+            🦖
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐝"
+            style="background-color: #ffff00"
+          >
+            🐝
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐞"
+            style="background-color: #ff4500"
+          >
+            🐞
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦋"
+            style="background-color: #add8e6"
+          >
+            🦋
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦜"
+            style="background-color: #20b2aa"
+          >
+            🦜
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦏"
+            style="background-color: #a9a9a9"
+          >
+            🦏
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦧"
+            style="background-color: #cd853f"
+          >
+            🦧
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐍"
+            style="background-color: #228b22"
+          >
+            🐍
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🐙"
+            style="background-color: #ffb6c1"
+          >
+            🐙
+          </div>
+          <div
+            class="avatar-option"
+            data-avatar="🦊"
+            style="background-color: #fcc655"
+          >
+            🦊
+          </div>
+        </div>
+        <button type="submit" class="login-btn">Jouer</button>
+      </form>
+    </div>
+
+    <!-- Game interface -->
+    <div class="container">
+      <header class="header">
+        <h1>Drawwy</h1>
+      </header>
+      <div class="play-container">
+        <section class="players-section">
+          <h2>Joueurs</h2>
+          <ul class="player-list" id="player-list">
+            <!-- Players will be added here dynamically -->
+          </ul>
+        </section>
+
+        <section class="game-section">
+          <div class="game-info">
+            <div class="word-display" id="word-display">
+              <span id="hint-text">Connexion...</span>
+            </div>
+            <div class="timer">
+              <span id="timer-text"></span>
+              <div class="timer-bar">
+                <div
+                  class="timer-progress not-started"
+                  id="timer-progress"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="canvas-container">
+            <canvas id="drawing-canvas"></canvas>
+            <div class="drawing-tools" id="drawing-tools">
+              <button class="tool-btn active" data-tool="pencil" title="Crayon">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button class="tool-btn" data-tool="line" title="Ligne">
+                <i class="fas fa-slash"></i>
+              </button>
+              <button class="tool-btn" data-tool="rectangle" title="Rectangle">
+                <i class="far fa-square"></i>
+              </button>
+              <button class="tool-btn" data-tool="circle" title="Cercle">
+                <i class="far fa-circle"></i>
+              </button>
+              <button class="tool-btn" data-tool="eraser" title="Gomme">
+                <i class="fas fa-eraser"></i>
+              </button>
+              <button class="tool-btn" data-tool="fill" title="Remplir">
+                <i class="fas fa-fill-drip"></i>
+              </button>
+              <div class="color-picker">
+                <div
+                  class="color-option active"
+                  style="background-color: #000000"
+                  data-color="#000000"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ff0000"
+                  data-color="#FF0000"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #00ff00"
+                  data-color="#00FF00"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #0000ff"
+                  data-color="#0000FF"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffff00"
+                  data-color="#FFFF00"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffa500"
+                  data-color="#FFA500"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #800080"
+                  data-color="#800080"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffc0cb"
+                  data-color="#FFC0CB"
+                ></div>
+                <div
+                  class="color-option"
+                  style="background-color: #ffffff"
+                  data-color="#FFFFFF"
+                ></div>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="25"
+                value="5"
+                class="size-slider"
+                id="size-slider"
+              />
+              <button class="tool-btn" data-tool="clear" title="Effacer tout">
+                <i class="fas fa-trash"></i>
+              </button>
+              <button class="tool-btn" data-tool="undo" title="Annuler">
+                <i class="fas fa-undo"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="chat-section">
+          <div
+            class="chat-messages-container"
+            id="chat-messages-container"
+          ></div>
+          <div class="chat-input-container">
+            <input
+              type="text"
+              class="chat-input"
+              id="chat-input"
+              placeholder="Devinez la phrase..."
+            />
+            <button class="send-btn" id="send-btn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Game completion modal -->
+    <div class="modal" id="game-modal">
+      <div class="modal-content">
+        <h2 class="modal-title">Partie terminée !</h2>
+        <div class="result-info" id="result-info">
+          Tout le monde a trouvé la phrase !
+        </div>
+        <div class="word-reveal" id="word-reveal">Chien</div>
+        <button class="continue-btn" id="continue-btn">Continuer</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
