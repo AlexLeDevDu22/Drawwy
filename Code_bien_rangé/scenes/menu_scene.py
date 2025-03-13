@@ -389,7 +389,32 @@ while running:
                     current_screen = "play"
                 elif button_text == "SUCCÈS":
                     current_screen = "achievements"
-    
+            # Dessiner le bouton rond "crédit"
+            credit_button_radius = 50
+            credit_button_x = main_panel_x + main_panel_width - credit_button_radius - 10
+            credit_button_y = main_panel_y + main_panel_height- credit_button_radius - 10
+            buttons_offsets=4
+            
+            # Animation de survol du credit
+            hover_credit = math.sqrt((mouse_pos[0] - credit_button_x)**2 + (mouse_pos[1] - credit_button_y)**2) <= credit_button_radius
+            # Dessiner le cercle
+            pygame.draw.circle(screen, 
+                            DARK_BEIGE if not hover_credit else GRAY, 
+                            (credit_button_x + buttons_offsets-1, credit_button_y + buttons_offsets), 
+                            credit_button_radius)
+            pygame.draw.circle(screen, 
+                            SOFT_ORANGE if hover_credit else ORANGE,
+                            (credit_button_x, credit_button_y),
+                            credit_button_radius)
+
+            # Texte du bouton CREDit avec un léger déplacement lorsqu'il est survolé
+            credit_text_y_offset = 3 if hover_credit else 0
+            draw_text("CRÉDIT", VERY_SMALL_FONT, BLACK, screen, 
+                    credit_button_x, 
+                    credit_button_y - credit_text_y_offset)
+
+
+
 
     # === ÉCRAN DE JEU ===
     elif current_screen == "play":

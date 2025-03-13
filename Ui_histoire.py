@@ -71,7 +71,7 @@ class SoloGame:
         # Affichage du CANVAS
         for y in range(canvas_height):
             for x in range(canvas_width):
-                color = CANVAS[y][x]
+                color = CANVAS[y][x] if CANVAS[y][x] else BLANC
                 pygame.draw.rect(self.screen, color, (zone_x_min + x * self.pixel_width, zone_y_min + y * self.pixel_height, self.pixel_width, self.pixel_height))
 
         # Vérification de la zone de dessin
