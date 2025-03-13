@@ -79,7 +79,7 @@ async def handle_connection_client(MultiGame):
     def new_game(data):
         #save draw
         if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS and MultiGame.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
-            tools.save_canvas(MultiGame.CANVAS, f"your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE)
+            tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE)
 
         MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]

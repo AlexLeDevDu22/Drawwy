@@ -1,16 +1,8 @@
 import pygame
 import sys
-import yaml
-import os
-from datetime import datetime
 
+from shared.common_ui import *
 from shared.tools import get_screen_size
-
-
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-BEIGE = (250, 240, 230)
-ROUGE = (255, 0, 0)
 
 #les configs
 config = {
@@ -31,7 +23,7 @@ class SoloGame:
         self.W, self.H = screen.get_size()
 
         # Paramètres du pinceau
-        self.pen_color = NOIR
+        self.pen_color = BLACK
         self.pen_radius = 6
         
         # État de la souris
@@ -43,7 +35,7 @@ class SoloGame:
 
         # Canvas persistant (Surface)
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
-        self.canvas_surf.fill(BLANC)
+        self.canvas_surf.fill(WHITE)
 
         # Boucle principale
         clock = pygame.time.Clock()
@@ -85,9 +77,6 @@ class SoloGame:
             self.draw_validate_button()
 
             pygame.display.flip()
-
-        pygame.quit()
-        sys.exit()
 
     def define_layout(self):
 
@@ -131,7 +120,7 @@ class SoloGame:
 
     def draw_canvas(self):
         # Cadre du canvas
-        pygame.draw.rect(self.screen, NOIR, self.canvas_rect, 2)
+        pygame.draw.rect(self.screen, BLACK, self.canvas_rect, 2)
 
         # On blit la Surface du canvas
         self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
@@ -147,7 +136,7 @@ class SoloGame:
     def draw_colors(self):
         # Fond + bordure
         pygame.draw.rect(self.screen, (230,230,230), self.colors_rect)
-        pygame.draw.rect(self.screen, NOIR, self.colors_rect, 2)
+        pygame.draw.rect(self.screen, BLACK, self.colors_rect, 2)
 
         margin = 10
         cols = 4
@@ -166,7 +155,7 @@ class SoloGame:
 
             # Dessin du carré de couleur
             pygame.draw.rect(self.screen, color, rect_color)
-            pygame.draw.rect(self.screen, NOIR, rect_color, 2)
+            pygame.draw.rect(self.screen, BLACK, rect_color, 2)
 
             # Gestion du clic
             if self.mouseDown and rect_color.collidepoint(self.mouse_pos):
@@ -180,19 +169,19 @@ class SoloGame:
             50
         )
         pygame.draw.rect(self.screen, self.pen_color, color_bar)
-        pygame.draw.rect(self.screen, NOIR, color_bar, 2)
+        pygame.draw.rect(self.screen, BLACK, color_bar, 2)
 
     def draw_slider(self):
         """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
         pygame.draw.rect(self.screen, (220,220,220), self.slider_rect)
-        pygame.draw.rect(self.screen, NOIR, self.slider_rect, 2)
+        pygame.draw.rect(self.screen, BLACK, self.slider_rect, 2)
 
         # Barre du slider
         margin = 15
         line_y = self.slider_rect.centery
         line_start = (self.slider_rect.x + margin, line_y)
         line_end   = (self.slider_rect.right - margin, line_y)
-        pygame.draw.line(self.screen, NOIR, line_start, line_end, 3)
+        pygame.draw.line(self.screen, BLACK, line_start, line_end, 3)
 
         # Calcul de la position du bouton sur la barre
         max_radius = 50  # Rayon maximum pour le pinceau
@@ -203,7 +192,7 @@ class SoloGame:
 
         # Ici, le knob est directement proportionnel à la taille du pinceau
         knob_size = self.pen_radius  # Taille proportionnelle
-        pygame.draw.circle(self.screen, ROUGE, (knob_x, knob_y), knob_size)
+        pygame.draw.circle(self.screen, RED, (knob_x, knob_y), knob_size)
 
         # Gestion du clic pour modifier la taille du pinceau
         if self.mouseDown:
@@ -218,11 +207,11 @@ class SoloGame:
         # Fond du bouton
         pygame.draw.rect(self.screen, (0, 255, 0), self.validate_button_rect)
         # Bordure noire
-        pygame.draw.rect(self.screen, NOIR, self.validate_button_rect, 2)
+        pygame.draw.rect(self.screen, BLACK, self.validate_button_rect, 2)
 
         # Texte du bouton
         font = pygame.font.SysFont(None, 30)
-        text_surface = font.render("Valider", True, NOIR)
+        text_surface = font.render("Valider", True, BLACK)
         text_rect = text_surface.get_rect(center=self.validate_button_rect.center)
         self.screen.blit(text_surface, text_rect)
 

@@ -121,7 +121,7 @@ while running:
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
             screen, current_page = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected)
-        elif current_page == "Solo":
+        elif current_page == "SoloGame":
             SoloGame(screen)
             current_page="home"
         elif current_page == "MultiGame":

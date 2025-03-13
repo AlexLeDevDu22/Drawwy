@@ -6,7 +6,7 @@ import pygame
 import sys
 import random
 import math
-import Ui_histoire
+import SoloGame.Ui_histoire as Ui_histoire
 from datetime import datetime
 
 if sys.platform.startswith("win"):

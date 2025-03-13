@@ -4,19 +4,11 @@ import MultiGame.utils.connection as connection
 
 import threading
 import pygame
-try:from pygame_emojis import load_emoji
-except:import pygame.freetype 
-import sys
 import yaml
 import MultiGame.utils.tools as tools
 import asyncio
-import json
-from dotenv import load_dotenv
 import os
-import socketio
-import json
 from datetime import datetime, timedelta
-import time
 
 with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
