@@ -1,19 +1,20 @@
 from shared.common_utils import draw_text, draw_textbox
+from shared.common_ui import *
 
 
-def draw_credits_screen(ecran, largeur, hauteur, button_font, small_font, black, orange, mouse_clicked, mouse_pos):
+def show_credit(screen, W, H, mouse_pos, mouse_clicked):
 
-    draw_text("Crédits", button_font, black, ecran, largeur // 2, 100)
+    draw_text("Crédits", BUTTON_FONT, BLACK, screen, W // 2, 100)
 
-    draw_text("Développé par: [Ton Nom]", small_font, black, ecran, largeur // 2, 300)
-    draw_text("Musique et sons: [Nom du compositeur]", small_font, black, ecran, largeur // 2, 350)
-    draw_text("Merci d'avoir joué à DRAWWY !", small_font, black, ecran, largeur // 2, 400)
+    draw_text("Développé par: [Ton Nom]", SMALL_FONT, BLACK, screen, W // 2, 300)
+    draw_text("Musique et sons: [Nom du compositeur]", SMALL_FONT, BLACK, screen, W // 2, 350)
+    draw_text("Merci d'avoir joué à DRAWWY !", SMALL_FONT, BLACK, screen, W // 2, 400)
 
     # Bouton retour
-    back_button_rect = draw_textbox("RETOUR", largeur // 2 - 100, hauteur - 100, 
-                                    200, 50, small_font, black, orange, ecran, 25)
+    back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
+                                    200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
 
-    if mouse_clicked and back_button_rect.collidepoint(mouse_pos):
-        return "menu"
+    if mouse_clicked and back_button_rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+        return screen, "home"
 
-    return "credits"
+    return screen, "credits"
