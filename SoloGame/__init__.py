@@ -4,8 +4,6 @@ import yaml
 import os
 from datetime import datetime
 
-from shared.common_utils import get_screen_size
-
 pygame.init()
 
 
@@ -23,6 +21,9 @@ config = {
         (0,255,255), (255,0,255), (165,42,42), (128,128,128)
     ]
 }
+def get_screen_size():
+    info_ecran = pygame.display.Info()
+    return info_ecran.current_w, info_ecran.current_h
 
 class SoloGame:
     def __init__(self, screen):
