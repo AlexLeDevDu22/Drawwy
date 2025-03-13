@@ -1,8 +1,11 @@
 import pygame
 import sys
 
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from shared.common_ui import *
-from shared.tools import get_screen_size
+from shared.tools import *
 
 #les configs
 config = {

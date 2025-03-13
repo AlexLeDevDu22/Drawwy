@@ -1,5 +1,4 @@
-import play
-import tools
+
 import json
 import yaml
 import pygame
@@ -15,7 +14,7 @@ import socketio
 import threading
 import pygame
 import sys
-import tools
+
 import json
 from dotenv import load_dotenv
 import os
@@ -23,6 +22,8 @@ import socketio
 import json
 from datetime import datetime, timedelta
 import time
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
