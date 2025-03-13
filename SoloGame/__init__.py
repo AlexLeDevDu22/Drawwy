@@ -7,13 +7,12 @@ from datetime import datetime
 from shared.tools import get_screen_size
 
 
-# -- Couleurs
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 BEIGE = (250, 240, 230)
 ROUGE = (255, 0, 0)
 
-# -- Exemple de config (pour la démo)
+#les configs
 config = {
     "game_page_fps": 30,
     "drawing_colors": [
@@ -22,10 +21,12 @@ config = {
         (0,255,255), (255,0,255), (165,42,42), (128,128,128)
     ]
 }
+def get_screen_size():
+    info_ecran = pygame.display.Info()
+    return info_ecran.current_w, info_ecran.current_h
 
 class SoloGame:
     def __init__(self, screen):
-        pygame.init()
         self.screen = screen
         self.W, self.H = screen.get_size()
 
@@ -37,11 +38,10 @@ class SoloGame:
         self.mouseDown = False
         self.mouse_pos = (0, 0)
 
-        # On va définir les rectangles d’interface
+        # On définit les valeurs des rectangles d’interface
         self.define_layout()
 
-        # Pour un vrai “canvas” persistant, stocke un Surface ou un tableau 2D.
-        # Ici, on va juste dessiner à la volée pour la démo.
+        # Canvas persistant (Surface)
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(BLANC)
 
@@ -81,37 +81,35 @@ class SoloGame:
             # Dessin du slider en dessous
             self.draw_slider()
 
+            # Dessin du bouton "Valider" en bas à droite
+            self.draw_validate_button()
+
             pygame.display.flip()
 
         pygame.quit()
         sys.exit()
 
     def define_layout(self):
-        """
-        Définit la disposition générale :
-          - Un grand canvas au centre
-          - Une palette de couleurs en haut à droite
-          - Un slider en dessous de la palette
-        """
-        # On recalcule en fonction de la fenêtre courante
+
+        # Canvas 
         self.canvas_rect = pygame.Rect(
-            int(0.05 * self.W),     # 15% de la largeur en marge à gauche
-            int(0.05 * self.H),     # 5% de la hauteur en marge en haut
-            int(0.70 * self.W),     # 70% de la largeur (le “gros” canvas)
-            int(0.90 * self.H)      # 80% de la hauteur
+            int(0.05 * self.W),    # marge à gauche
+            int(0.05 * self.H),    # marge en haut
+            int(0.70 * self.W),    # 70% de la largeur
+            int(0.90 * self.H)     # 90% de la hauteur
         )
 
-        # Palette : en haut à droite (15% de la largeur, 30% de la hauteur)
+        # Palette 
         palette_width  = int(0.25 * self.W)
         palette_height = int(0.30 * self.H)
         self.colors_rect = pygame.Rect(
-            self.canvas_rect.right + 10,  # petit décalage à droite du canvas
-            int(0.05 * self.H),           # même marge en haut
-            palette_width - 20,           # laisse un petit offset sur la droite
+            self.canvas_rect.right + 10,
+            int(0.05 * self.H),
+            palette_width - 20,
             palette_height
         )
 
-        # Slider : sous la palette (15% de la largeur, 10% de la hauteur)
+        # Le truc qui permet de changer la taille
         slider_width  = palette_width - 20
         slider_height = int(0.10 * self.H)
         self.slider_rect = pygame.Rect(
@@ -121,8 +119,17 @@ class SoloGame:
             slider_height
         )
 
+        # Valider
+        validate_button_w = 365
+        validate_button_h = 50
+        self.validate_button_rect = pygame.Rect(
+            self.W - validate_button_w - 10,  # 20 px de marge à droite
+            self.H - validate_button_h -400,  # 20 px de marge en bas
+            validate_button_w,
+            validate_button_h
+        )
+
     def draw_canvas(self):
-        """Dessine le canvas (Surface) et gère le dessin du pinceau."""
         # Cadre du canvas
         pygame.draw.rect(self.screen, NOIR, self.canvas_rect, 2)
 
@@ -138,12 +145,10 @@ class SoloGame:
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
     def draw_colors(self):
-        """Dessine la palette de couleurs en carrés de taille fixe (même taille que précédemment)."""
         # Fond + bordure
         pygame.draw.rect(self.screen, (230,230,230), self.colors_rect)
         pygame.draw.rect(self.screen, NOIR, self.colors_rect, 2)
 
-        # On dessine 12 couleurs (3x4), comme dans ton exemple
         margin = 10
         cols = 4
         rows = 3
@@ -167,10 +172,10 @@ class SoloGame:
             if self.mouseDown and rect_color.collidepoint(self.mouse_pos):
                 self.pen_color = color
 
-        # Affiche la couleur sélectionnée en bas de la palette
+        # Affiche la couleur sélectionnée sous la palette (vous pouvez essaye de le mettre dedans mais j'ai un peu galere...)
         color_bar = pygame.Rect(
             self.colors_rect.x + margin,
-            self.colors_rect.bottom - margin+20,
+            self.colors_rect.bottom - margin + 20,
             self.colors_rect.width - 2*margin,
             50
         )
@@ -182,30 +187,49 @@ class SoloGame:
         pygame.draw.rect(self.screen, (220,220,220), self.slider_rect)
         pygame.draw.rect(self.screen, NOIR, self.slider_rect, 2)
 
-        # Barre
+        # Barre du slider
         margin = 15
         line_y = self.slider_rect.centery
         line_start = (self.slider_rect.x + margin, line_y)
         line_end   = (self.slider_rect.right - margin, line_y)
         pygame.draw.line(self.screen, NOIR, line_start, line_end, 3)
 
-        # Bouton du slider
-        max_radius = 50  # Rayon max
+        # Calcul de la position du bouton sur la barre
+        max_radius = 50  # Rayon maximum pour le pinceau
         total_width = line_end[0] - line_start[0]
         ratio = self.pen_radius / max_radius
         knob_x = int(line_start[0] + ratio * total_width)
         knob_y = line_y
-        pygame.draw.circle(self.screen, ROUGE, (knob_x, knob_y), 10)
 
-        # Gestion du clic pour modifier le rayon
+        # Ici, le knob est directement proportionnel à la taille du pinceau
+        knob_size = self.pen_radius  # Taille proportionnelle
+        pygame.draw.circle(self.screen, ROUGE, (knob_x, knob_y), knob_size)
+
+        # Gestion du clic pour modifier la taille du pinceau
         if self.mouseDown:
             mx, my = self.mouse_pos
             if self.slider_rect.collidepoint(mx, my):
-                # On borne le x du bouton entre line_start et line_end
+                # On borne la position entre line_start et line_end
                 knob_x = max(line_start[0], min(mx, line_end[0]))
                 self.pen_radius = int(((knob_x - line_start[0]) / total_width) * max_radius)
                 if self.pen_radius < 1:
                     self.pen_radius = 1
+    def draw_validate_button(self):
+        # Fond du bouton
+        pygame.draw.rect(self.screen, (0, 255, 0), self.validate_button_rect)
+        # Bordure noire
+        pygame.draw.rect(self.screen, NOIR, self.validate_button_rect, 2)
+
+        # Texte du bouton
+        font = pygame.font.SysFont(None, 30)
+        text_surface = font.render("Valider", True, NOIR)
+        text_rect = text_surface.get_rect(center=self.validate_button_rect.center)
+        self.screen.blit(text_surface, text_rect)
+
+        # Si on clique sur le bouton, on quitte (c ce truc a changer pour se rediriger mais pour l'instant il y a rien a rediriger)
+        if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
+            pygame.quit()
+            sys.exit()
 
 if __name__ == '__main__':
     W, H = get_screen_size()
