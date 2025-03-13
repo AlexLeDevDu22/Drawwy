@@ -5,7 +5,7 @@ import yaml
 import pygame
 from PIL import Image, ImageFilter
 from dotenv import load_dotenv
-import gameVar
+import MultiGameVar
 import time
 from datetime import datetime
 import socketio
@@ -137,20 +137,20 @@ def simplify_frames(frames):
 
 def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
     if reset:
-        gameVar.ALL_FRAMES=[]
+        MultiGameVar.ALL_FRAMES=[]
         if specified_canva:
             specified_canva=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
         else:
-            gameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+            MultiGameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
             
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
     
     new_frames=frames.copy()
-    new_frames=split_steps_by_roll_back(new_frames, gameVar.ROLL_BACK)
+    new_frames=split_steps_by_roll_back(new_frames, MultiGameVar.ROLL_BACK)
 
     for frame in new_frames[0]:#draw
-        if frame["type"]=="draw":
+        if frame["type"]=="line":
             if delay: 
                 duration=1/len(frames)
             else:
@@ -164,12 +164,12 @@ def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False
             if specified_canva:
                 specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
             else:
-                gameVar.CANVAS=draw_brush_line(gameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
+                MultiGameVar.CANVAS=draw_brush_line(MultiGameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
 
-        gameVar.ALL_FRAMES.append(frame)
+        MultiGameVar.ALL_FRAMES.append(frame)
 
     for frame in new_frames[1]:
-        gameVar.ALL_FRAMES.append(frame)
+        MultiGameVar.ALL_FRAMES.append(frame)
             
     if specified_canva:
         return specified_canva
@@ -198,14 +198,15 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
         dist = max(abs(dx), abs(dy))
         
         # Interpolation linéaire pour créer la ligne
-        step_duration=duration/dist
-        for step in range(dist + 1):
-            t = step / dist
-            x = round(x1 + t * dx)
-            y = round(y1 + t * dy)
-            draw_circle(x, y)  # On dessine un cercle autour de chaque point
-            
-            time.sleep(max(0,step_duration-0.004))
+        if dist>0:
+            step_duration=duration/dist
+            for step in range(dist + 1):
+                t = step / dist
+                x = round(x1 + t * dx)
+                y = round(y1 + t * dy)
+                draw_circle(x, y)  # On dessine un cercle autour de chaque point
+                
+                time.sleep(max(0,step_duration-0.004))
 
     # Dessiner la ligne épaisse
     draw_thick_line(x1, y1, x2, y2)
@@ -219,7 +220,6 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
 def split_steps_by_roll_back(frames, roll_back):
     new_frames = frames.copy()
     for i in range(len(new_frames)-1,-1,-1):  # On parcourt à l'envers
-        print(frames)
 
         if frames[i]["type"] in {"new_step", "shape"}:
             roll_back-=1

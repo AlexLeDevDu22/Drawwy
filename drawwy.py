@@ -637,7 +637,7 @@ while running:
                 button_y = button_y_start + i * 1.3 * button_height
                 
                 # Animation de survol
-                hover = mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height
+                hover = button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height
                 
                 
                 # Dessiner l'ombre du bouton
@@ -661,8 +661,6 @@ while running:
                 
                 # Gestion des clics
                 if mouse_click and hover:
-                    
-                    # Effets de particules lors du clic
                     for _ in range(20):
                         particles.append(Particle(
                             random.randint(button_x, button_x + button_width),
@@ -702,6 +700,16 @@ while running:
                 draw_text("CRÉDIT", VERY_SMALL_FONT, BLACK, screen, 
                         credit_button_x, 
                         credit_button_y - credit_text_y_offset)
+                
+
+            # Effets de particules lors du clic
+            if mouse_click:
+                for _ in range(20):
+                    particles.append(Particle(
+                        random.randint(mouse_pos[0]-30, mouse_pos[0]+30),
+                        random.randint(mouse_pos[1]-30, mouse_pos[1]+30),
+                        random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])
+                    ))
 
     
 
