@@ -19,7 +19,7 @@ from MultiGame import MultiGame
 if sys.platform.startswith("win"):
     import pygetwindow as gw
 
-with open("config.yaml", "r") as f:
+with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 pygame.init()
@@ -122,7 +122,7 @@ while running:
         elif current_page == "play":
             screen, current_page = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected)
         elif current_page == "Solo":
-            SoloGame()
+            SoloGame(screen)
             current_page="home"
         elif current_page == "MultiGame":
             MultiGame(screen, clock, W, H)

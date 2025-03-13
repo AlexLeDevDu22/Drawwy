@@ -5,7 +5,7 @@ import yaml
 import pygame
 from PIL import Image, ImageFilter
 from dotenv import load_dotenv
-import MultiGameVar
+import MultiGame
 import time
 from datetime import datetime
 import socketio
@@ -27,7 +27,7 @@ CYAN=(0,255,255)
 
 
 
-with open("config.yaml", "r") as f:
+with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 def is_connected():
@@ -137,17 +137,17 @@ def simplify_frames(frames):
 
 def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False):
     if reset:
-        MultiGameVar.ALL_FRAMES=[]
+        MultiGame.ALL_FRAMES=[]
         if specified_canva:
             specified_canva=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
         else:
-            MultiGameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+            MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
             
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
     
     new_frames=frames.copy()
-    new_frames=split_steps_by_roll_back(new_frames, MultiGameVar.ROLL_BACK)
+    new_frames=split_steps_by_roll_back(new_frames, MultiGame.ROLL_BACK)
 
     for frame in new_frames[0]:#draw
         if frame["type"]=="line":
@@ -164,12 +164,12 @@ def update_canva_by_frames(frames, specified_canva=None, delay=True, reset=False
             if specified_canva:
                 specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
             else:
-                MultiGameVar.CANVAS=draw_brush_line(MultiGameVar.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
+                MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
 
-        MultiGameVar.ALL_FRAMES.append(frame)
+        MultiGame.ALL_FRAMES.append(frame)
 
     for frame in new_frames[1]:
-        MultiGameVar.ALL_FRAMES.append(frame)
+        MultiGame.ALL_FRAMES.append(frame)
             
     if specified_canva:
         return specified_canva

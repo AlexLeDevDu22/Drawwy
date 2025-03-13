@@ -4,7 +4,7 @@ try:from pygame_emojis import load_emoji
 except:import pygame.freetype 
 import sys
 import tools
-import MultiGameVar
+import MultiGame
 import yaml
 import tools
 import asyncio
@@ -16,7 +16,7 @@ import json
 from datetime import datetime, timedelta
 import time
 
-with open("config.yaml", "r") as f:
+with open("assets/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 with open("assets/players_data.json") as f:
@@ -71,82 +71,82 @@ class MultiplayersGame:
         @self.sio.on('welcome')
         async def welcome(data):
             self.connected=True
-            MultiGameVar.ALL_FRAMES+=data["all_frames"]
-            MultiGameVar.PLAYER_ID=data["id"]
-            MultiGameVar.MESSAGES=data["messages"]
-            MultiGameVar.PLAYERS=data["players"]
-            MultiGameVar.CURRENT_SENTENCE=data["sentence"]
-            MultiGameVar.CURRENT_DRAWER=data["drawer_id"]
+            MultiGame.ALL_FRAMES+=data["all_frames"]
+            MultiGame.PLAYER_ID=data["id"]
+            MultiGame.MESSAGES=data["messages"]
+            MultiGame.PLAYERS=data["players"]
+            MultiGame.CURRENT_SENTENCE=data["sentence"]
+            MultiGame.CURRENT_DRAWER=data["drawer_id"]
             tools.update_canva_by_frames(data["all_frames"], delay=False)
 
         @self.sio.on("new_player")
         async def new_player(data):
-            MultiGameVar.PLAYERS.append(data)
-            MultiGameVar.MESSAGES.append({"type":"system","message":data["pseudo"]+" viens de nous rejoindre!", "color": config["succeed_color"]})
+            MultiGame.PLAYERS.append(data)
+            MultiGame.MESSAGES.append({"type":"system","message":data["pseudo"]+" viens de nous rejoindre!", "color": config["succeed_color"]})
 
         @self.sio.on("player_disconnected")
         async def player_disconnected(data):
-            for i in range(len(MultiGameVar.PLAYERS)):
-                if MultiGameVar.PLAYERS[i]["id"]==data["pid"]:
-                    player=MultiGameVar.PLAYERS.pop(i)
+            for i in range(len(MultiGame.PLAYERS)):
+                if MultiGame.PLAYERS[i]["id"]==data["pid"]:
+                    player=MultiGame.PLAYERS.pop(i)
                     break
 
-            MultiGameVar.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
+            MultiGame.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
 
         @self.sio.on("new_game")
         def new_game(data):
             #save draw
-            if MultiGameVar.PLAYER_ID == MultiGameVar.CURRENT_DRAWER and MultiGameVar.CANVAS and MultiGameVar.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
-                tools.save_canvas(MultiGameVar.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGameVar.CURRENT_SENTENCE)
+            if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS and MultiGame.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
+                tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE)
     
-            MultiGameVar.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
-            MultiGameVar.CURRENT_SENTENCE=data["new_sentence"]
-            MultiGameVar.CURRENT_DRAWER=data["drawer_id"]
-            MultiGameVar.MESSAGES=[{"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGameVar.PLAYERS if p["id"]==MultiGameVar.CURRENT_DRAWER][0], "color": config["succeed_color"]}]
-            MultiGameVar.ALL_FRAMES=[]
-            MultiGameVar.FOUND=False
-            MultiGameVar.GAMESTART=datetime.fromisoformat(data["start_time"])
-            MultiGameVar.ROLL_BACK=0
+            MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+            MultiGame.CURRENT_SENTENCE=data["new_sentence"]
+            MultiGame.CURRENT_DRAWER=data["drawer_id"]
+            MultiGame.MESSAGES=[{"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": config["succeed_color"]}]
+            MultiGame.ALL_FRAMES=[]
+            MultiGame.FOUND=False
+            MultiGame.GAMESTART=datetime.fromisoformat(data["start_time"])
+            MultiGame.ROLL_BACK=0
 
         @self.sio.on("draw")
         async def draw(frames):
-            if MultiGameVar.PLAYER_ID != MultiGameVar.CURRENT_DRAWER: #not the drawer
-                MultiGameVar.ALL_FRAMES=tools.split_steps_by_roll_back(MultiGameVar.ALL_FRAMES, MultiGameVar.ROLL_BACK)[0]
-                MultiGameVar.ROLL_BACK=0
+            if MultiGame.PLAYER_ID != MultiGame.CURRENT_DRAWER: #not the drawer
+                MultiGame.ALL_FRAMES=tools.split_steps_by_roll_back(MultiGame.ALL_FRAMES, MultiGame.ROLL_BACK)[0]
+                MultiGame.ROLL_BACK=0
 
                 threading.Thread(target=tools.update_canva_by_frames, kwargs={"frames":frames}).start() # update canvas in realtime
 
                 num_steps=0
-                for frame in MultiGameVar.ALL_FRAMES:
+                for frame in MultiGame.ALL_FRAMES:
                     if frame["type"] == "new_step":
                         num_steps+=1
-                MultiGameVar.STEP_NUM=num_steps
+                MultiGame.STEP_NUM=num_steps
 
 
         @self.sio.on("new_message")
         def new_message(guess):
             #ajouter à la liste de message
-            if guess["pid"] == MultiGameVar.PLAYER_ID:
-                MultiGameVar.MESSAGES=MultiGameVar.MESSAGES[:-1]
-            MultiGameVar.MESSAGES.append(guess)
+            if guess["pid"] == MultiGame.PLAYER_ID:
+                MultiGame.MESSAGES=MultiGame.MESSAGES[:-1]
+            MultiGame.MESSAGES.append(guess)
             
             #update found and points
             if guess["succeed"]:
-                for i in range(len(MultiGameVar.PLAYERS)):
-                    if MultiGameVar.PLAYERS[i]["id"]==guess["pid"]:
-                        MultiGameVar.PLAYERS[i]["found"]=True
+                for i in range(len(MultiGame.PLAYERS)):
+                    if MultiGame.PLAYERS[i]["id"]==guess["pid"]:
+                        MultiGame.PLAYERS[i]["found"]=True
             
                 for e in guess["new_points"]:
-                    for i in range(len(MultiGameVar.PLAYERS)):
-                        if MultiGameVar.PLAYERS[i]["id"]==e["pid"]:
-                            MultiGameVar.PLAYERS[i]["points"]+=e["points"]
+                    for i in range(len(MultiGame.PLAYERS)):
+                        if MultiGame.PLAYERS[i]["id"]==e["pid"]:
+                            MultiGame.PLAYERS[i]["points"]+=e["points"]
 
 
         @self.sio.on("roll_back")
         async def roll_back(roll_back):
-            if MultiGameVar.PLAYER_ID != MultiGameVar.CURRENT_DRAWER:
-                MultiGameVar.ROLL_BACK=roll_back
-                tools.update_canva_by_frames(MultiGameVar.ALL_FRAMES, reset=True, delay=False)
+            if MultiGame.PLAYER_ID != MultiGame.CURRENT_DRAWER:
+                MultiGame.ROLL_BACK=roll_back
+                tools.update_canva_by_frames(MultiGame.ALL_FRAMES, reset=True, delay=False)
                 
 
         try:
@@ -159,7 +159,7 @@ class MultiplayersGame:
     
     def timer(self):
             
-        if len(MultiGameVar.PLAYERS)==1: return
+        if len(MultiGame.PLAYERS)==1: return
             
         timer_text = f"{self.game_remaining_time//60}:{0 if self.game_remaining_time%60<10 else ''}{self.game_remaining_time%60}"
         
@@ -200,10 +200,10 @@ class MultiplayersGame:
             for i in range(9)  # Génère 9 entrées automatiquement
         ]
         
-        for y,player in enumerate(MultiGameVar.PLAYERS):
+        for y,player in enumerate(MultiGame.PLAYERS):
 
             #fond
-            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==MultiGameVar.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
+            pygame.draw.rect(self.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
             pygame.draw.rect(self.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
             #avatar TODO FOR EMOJI!!!!
@@ -229,7 +229,7 @@ class MultiplayersGame:
 
 
             #pseudo
-            text_color=(10,10,10) if player["id"] == MultiGameVar.PLAYER_ID else (100,100,100)
+            text_color=(10,10,10) if player["id"] == MultiGame.PLAYER_ID else (100,100,100)
             font = pygame.font.Font("assets/PermanentMarker.ttf" ,30)
             image_texte = font.render ( player["pseudo"], 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][2])
@@ -238,7 +238,7 @@ class MultiplayersGame:
             image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
             self.screen.blit(image_texte, dico_co[y][3])
 
-            if player["id"] != MultiGameVar.CURRENT_DRAWER:
+            if player["id"] != MultiGame.CURRENT_DRAWER:
                 image_texte = font.render ( "Trouvé ", 1 , text_color )
                 self.screen.blit(image_texte, dico_co[y][4])
                     
@@ -259,21 +259,21 @@ class MultiplayersGame:
         image_texte = font.render( text, True , (0,0,0) )
         self.screen.blit(image_texte, (2/100*self.W,77/100*self.H))
         
-        if len(MultiGameVar.CURRENT_SENTENCE) >0:
+        if len(MultiGame.CURRENT_SENTENCE) >0:
             FONT_SIZE_BASE = 20  # Taille de base de la font
             Y_START = 77 / 100 * self.H +36 # Position de départ
 
             # Choisir la taille de font en fonction de la longueur du texte
-            if len(MultiGameVar.CURRENT_SENTENCE) <= 30:
+            if len(MultiGame.CURRENT_SENTENCE) <= 30:
                 font_size = FONT_SIZE_BASE
-            elif len(MultiGameVar.CURRENT_SENTENCE) <= 60:
+            elif len(MultiGame.CURRENT_SENTENCE) <= 60:
                 font_size = FONT_SIZE_BASE - 2
             else:
                 font_size = FONT_SIZE_BASE - 4
 
             font = pygame.font.Font("assets/PermanentMarker.ttf", font_size)
 
-            lines=tools.lines_return(MultiGameVar.CURRENT_SENTENCE, font, 0.16 * self.W)
+            lines=tools.lines_return(MultiGame.CURRENT_SENTENCE, font, 0.16 * self.W)
 
             # Affichage ligne par ligne
             for i, ligne in enumerate(lines):
@@ -285,7 +285,7 @@ class MultiplayersGame:
     def drawing(self):
 
         """Permet de dessiner uniquement dans la zone de dessin."""
-        if not MultiGameVar.CANVAS:
+        if not MultiGame.CANVAS:
             return
         
         
@@ -294,8 +294,8 @@ class MultiplayersGame:
         zone_y_min = int(0.04 * self.H)+2   # Commence en haut de la fenêtre
         zone_y_max = int(0.96 * self.H)-4   # Remplie toute la hauteur de la fenêtre
         
-        canvas_width = len(MultiGameVar.CANVAS[0])
-        canvas_height = len(MultiGameVar.CANVAS)
+        canvas_width = len(MultiGame.CANVAS[0])
+        canvas_height = len(MultiGame.CANVAS)
 
         # Affichage du CANVAS à l'écran
         self.pixel_width = (zone_x_max - zone_x_min) // canvas_width
@@ -311,7 +311,7 @@ class MultiplayersGame:
         #! show
         for y in range(canvas_height):
             for x in range(canvas_width):
-                color = MultiGameVar.CANVAS[y][x] if MultiGameVar.CANVAS[y][x] else BLANC
+                color = MultiGame.CANVAS[y][x] if MultiGame.CANVAS[y][x] else BLANC
                 pygame.draw.rect(self.screen, color, (zone_x_min + x * self.pixel_width, zone_y_min + y * self.pixel_height, self.pixel_width, self.pixel_height))
 
         #! drawing
@@ -319,15 +319,15 @@ class MultiplayersGame:
             if zone_x_min <= self.mouse_pos[0] <= zone_x_max and zone_y_min <= self.mouse_pos[1] <= zone_y_max:# Vérifier si le clic est dans la zone de dessin
                 for event in self.events:
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        MultiGameVar.ALL_FRAMES=tools.split_steps_by_roll_back(MultiGameVar.ALL_FRAMES, MultiGameVar.ROLL_BACK)[0]
-                        MultiGameVar.STEP_NUM=0
-                        for frame in MultiGameVar.ALL_FRAMES:
+                        MultiGame.ALL_FRAMES=tools.split_steps_by_roll_back(MultiGame.ALL_FRAMES, MultiGame.ROLL_BACK)[0]
+                        MultiGame.STEP_NUM=0
+                        for frame in MultiGame.ALL_FRAMES:
                             if frame["type"] in ["new_step", "shape"]:
-                                MultiGameVar.STEP_NUM+=1
+                                MultiGame.STEP_NUM+=1
                         
-                        MultiGameVar.ROLL_BACK=0
+                        MultiGame.ROLL_BACK=0
                         self.second_draw_frames.append({"type":"new_step"})
-                        MultiGameVar.ALL_FRAMES.append({"type":"new_step"})
+                        MultiGame.ALL_FRAMES.append({"type":"new_step"})
                         
                     elif self.mouseDown and event.type == pygame.MOUSEMOTION:
                         if self.lastMouseDown and 0<self.game_remaining_time<config["game_duration"]:   # can draw    
@@ -341,32 +341,32 @@ class MultiplayersGame:
                                 x2, y2 = canvas_x, canvas_y
 
                                 # Générer les points entre les deux
-                                MultiGameVar.CANVAS = tools.draw_brush_line(MultiGameVar.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius, 0)
+                                MultiGame.CANVAS = tools.draw_brush_line(MultiGame.CANVAS, x1, y1, x2, y2, self.pen_color, self.pen_radius, 0)
                                 self.second_draw_frames.append({"type": "line", "x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
-                                MultiGameVar.ALL_FRAMES.append({"type": "type","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
+                                MultiGame.ALL_FRAMES.append({"type": "type","x1": x1, "y1": y1, "x2": x2, "y2": y2, "color": self.pen_color, "radius": self.pen_radius})
 
                             # Mettre à jour la dernière position
                             self.last_canvas_click = (canvas_x, canvas_y)
                                     
                     elif event.type == pygame.MOUSEBUTTONUP:
-                        MultiGameVar.STEP_NUM+=1
+                        MultiGame.STEP_NUM+=1
 
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_z and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Z
 
-                            MultiGameVar.ROLL_BACK=min(MultiGameVar.STEP_NUM,MultiGameVar.ROLL_BACK+1)
+                            MultiGame.ROLL_BACK=min(MultiGame.STEP_NUM,MultiGame.ROLL_BACK+1)
                             
-                            tools.update_canva_by_frames(MultiGameVar.ALL_FRAMES, delay=False, reset=True)
+                            tools.update_canva_by_frames(MultiGame.ALL_FRAMES, delay=False, reset=True)
 
-                            tools.emit_sio(self.sio, "roll_back", MultiGameVar.ROLL_BACK)
+                            tools.emit_sio(self.sio, "roll_back", MultiGame.ROLL_BACK)
                                 
                         elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):# CTRL+Y
 
-                            MultiGameVar.ROLL_BACK=max(0,MultiGameVar.ROLL_BACK-1)
+                            MultiGame.ROLL_BACK=max(0,MultiGame.ROLL_BACK-1)
                             
-                            tools.update_canva_by_frames(MultiGameVar.ALL_FRAMES, delay=False, reset=True)
+                            tools.update_canva_by_frames(MultiGame.ALL_FRAMES, delay=False, reset=True)
 
-                            tools.emit_sio(self.sio, "roll_back", MultiGameVar.ROLL_BACK)
+                            tools.emit_sio(self.sio, "roll_back", MultiGame.ROLL_BACK)
 
         #send draw
         if self.frame_num==config["game_page_fps"]-1 and self.second_draw_frames!=[]:
@@ -463,8 +463,8 @@ class MultiplayersGame:
                 self.guess_input_active = input_box.collidepoint(event.pos)
             if event.type == pygame.KEYDOWN and self.guess_input_active:
                 if event.key == pygame.K_RETURN and self.guess.strip():
-                    tools.emit_sio(self.sio, "guess", {"pid": MultiGameVar.PLAYER_ID,"pseudo":self.me["pseudo"], "message":self.guess, "remaining_time":self.game_remaining_time}) # send message
-                    MultiGameVar.MESSAGES.append({"type":"guess","pseudo":self.me["pseudo"], "message":self.guess, "succeed":False})
+                    tools.emit_sio(self.sio, "guess", {"pid": MultiGame.PLAYER_ID,"pseudo":self.me["pseudo"], "message":self.guess, "remaining_time":self.game_remaining_time}) # send message
+                    MultiGame.MESSAGES.append({"type":"guess","pseudo":self.me["pseudo"], "message":self.guess, "succeed":False})
                     self.guess=""
                 elif event.key == pygame.K_BACKSPACE:
                     self.guess = self.guess[:-1]
@@ -486,7 +486,7 @@ class MultiplayersGame:
         #chat
         y=0.9533 * self.H-60 -len(guess_line)*20
 
-        for mess in MultiGameVar.MESSAGES[::-1]:
+        for mess in MultiGame.MESSAGES[::-1]:
             font = pygame.font.Font("assets/PermanentMarker.ttf" ,16)
             if mess["type"]=="guess": 
                 if mess["succeed"]:
@@ -573,24 +573,24 @@ class MultiplayersGame:
             self.guess_input_active=False
             self.guess=""
 
-            MultiGameVar.PLAYERS=[]
+            MultiGame.PLAYERS=[]
             
             while 1:
                 clock.tick(config["game_page_fps"])
 
-                for player in MultiGameVar.PLAYERS:
-                    if player["id"] == MultiGameVar.PLAYER_ID:
+                for player in MultiGame.PLAYERS:
+                    if player["id"] == MultiGame.PLAYER_ID:
                         self.me=player
-                        self.me["is_drawer"]=MultiGameVar.PLAYER_ID==MultiGameVar.CURRENT_DRAWER
+                        self.me["is_drawer"]=MultiGame.PLAYER_ID==MultiGame.CURRENT_DRAWER
                         break
 
                 if self.frame_num%2==0:
-                    self.game_remaining_time=max(0, (MultiGameVar.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if MultiGameVar.GAMESTART else config["game_duration"])
+                    self.game_remaining_time=max(0, (MultiGame.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if MultiGame.GAMESTART else config["game_duration"])
 
                     if self.game_remaining_time==0: #if game time over
                         if self.me["is_drawer"]:
                             tools.emit_sio(self.sio, "game_finished", None)
-                        MultiGameVar.GAMESTART=datetime.now()
+                        MultiGame.GAMESTART=datetime.now()
                 
                 self.events=pygame.event.get()
                 
@@ -600,7 +600,7 @@ class MultiplayersGame:
                 self.sentence()
                 self.drawing()
                 self.chat()
-                if self.me["id"]==MultiGameVar.PLAYER_ID:
+                if self.me["id"]==MultiGame.PLAYER_ID:
                     self.couleurs()
                     self.slider_radius()
                 self.timer()
