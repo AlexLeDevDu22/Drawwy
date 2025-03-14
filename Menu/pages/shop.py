@@ -7,10 +7,11 @@ import math
 import random
 import json
 import os
+particles = []
+
 
 def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
     """Affiche l'interface de la boutique des objets de décoration"""
-    
     # Panneau principal (effet papier)
     main_panel_width = 900
     main_panel_height = 750
@@ -205,8 +206,8 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
                 item_x + 220, item_y + 40)
         
         # Description de l'item
-        draw_text(item["description"], SMALL_FONT, GRAY, screen,
-                item_x + 220, item_y + 80)
+        draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
+                item_x + 240, item_y + 80)
         
         # Prix ou statut
         if item["purchased"]:
@@ -337,7 +338,7 @@ def load_items():
             "id": 1,
             "name": "Étoile Rose",
             "price": 100,
-            "description": "Une jolie étoile rose pour décorer",
+            "description": "Une jolie étoile rose",
             "image_path": "assets/decorations/star_pink.png",
             "category": "stars",
             "purchased": False,
