@@ -130,6 +130,7 @@ class ImageCarousel:
         self.selected_image = None
         self.max_spin_speed = 40
         self.particles=[]
+        self.images_opacity=0
         
     def start_spin(self):
         self.is_spinning = True
@@ -142,6 +143,7 @@ class ImageCarousel:
             self.current_offset += self.spin_speed
             self.current_offset %= len(self.images) * 200  # Boucle continue
             current_time = time.time()
+            self.images_opacity = min(1, self.images_opacity + 0.01)
 
             if current_time >= self.selection_time:
                 distance_to_target = (100-self.current_offset%200)%200
@@ -165,7 +167,7 @@ class ImageCarousel:
                             angle = random.uniform(0, 2 * math.pi)
                             speed = random.uniform(2, 6)
                             size = random.uniform(3, 8)
-                            life = random.uniform(20, 60)
+                            life = random.uniform(70, 100)
                             color = random.choice([YELLOW, PINK, GREEN, BLUE])
                             self.particles.append({
                                 'x': self.rect.centerx,
@@ -197,7 +199,7 @@ class ImageCarousel:
 
             pos_x = (i * 200 - self.current_offset + center_x) % (len(self.images) * 200) - 100
             scale_factor = max(0.5, 1 - abs(center_x - pos_x) / 400)
-            alpha = max(50, 255 * scale_factor)
+            alpha = max(0, 255 * scale_factor* self.images_opacity)
 
             scaled_img = pygame.transform.scale(img, (int(200 * scale_factor), int(200 * scale_factor)))
             img_surface = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
@@ -238,7 +240,7 @@ class ImageCarousel:
 
         # Dessiner les particules
         for particle in self.particles:
-            alpha = int(255 * (particle['life'] / 60))
+            alpha = int(255 * (particle['life'] / 100))
             particle_color = (*particle['color'], alpha)
             gfxdraw.filled_circle(
                 surface, 
@@ -488,7 +490,7 @@ def image_selection_page(selected_theme, difficulty):
                     scale = 1.0 + 0.2 * math.sin(elapsed * 10)
                     countdown_text = pygame.transform.scale(
                         countdown_text, 
-                        (int(countdown_rect.W * scale), int(countdown_rect.H * scale))
+                        (int(countdown_rect.w * scale), int(countdown_rect.h * scale))
                     )
                     countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
                     

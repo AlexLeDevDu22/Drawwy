@@ -83,7 +83,7 @@ class MultiGame:
 
                     if self.game_remaining_time==0: #if game time over
                         if self.me["is_drawer"]:
-                            tools.emit_sio(self.sio, "game_finished", None)
+                            tools.emit_sio(self.SIO, "game_finished", None)
                         self.GAMESTART=datetime.now()
                 
                 self.events=pygame.event.get()
