@@ -61,7 +61,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
     button_y_start = main_panel_y + 320
     buttons_offsets=5
     for i, button_text in enumerate(buttons):
-        button_y = button_y_start + i * 1.3 * button_height
+        button_y = int(button_y_start + i * 1.3 * button_height)
         
         # Animation de survol
         hover = button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height
@@ -88,7 +88,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
         
         # Gestion des clics
         if mouse_click and hover:
-            particles.append(generate_particles(20,button_x, button_y, button_x+button_width, button_y+button_height))
+            particles+=generate_particles(20,button_x, button_y, button_x+button_width, button_y+button_height)
             
             if button_text == "QUITTER":
                 pygame.quit()
@@ -125,7 +125,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                 credit_button_y - credit_text_y_offset)
         
         if hover_credit and mouse_click:
-            particles.append(generate_particles(20,credit_button_x-credit_button_radius, credit_button_y-credit_button_radius, credit_button_x+credit_button_radius, credit_button_y+credit_button_radius))
+            particles+=generate_particles(20,credit_button_x-credit_button_radius, credit_button_y-credit_button_radius, credit_button_x+credit_button_radius, credit_button_y+credit_button_radius)
             return screen, "credits", particles
         
 

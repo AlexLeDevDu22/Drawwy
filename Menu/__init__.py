@@ -190,7 +190,7 @@ class Menu:
                             button_sound.play()
                         
                         # Effets de particules lors du clic
-                        particles.append(generate_particles(20, button_x, button_y,button_x + button_width // 2, button_y + button_height // 2, random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW])))
+                        particles+=generate_particles(20, button_x, button_y,button_x + button_width // 2, button_y + button_height // 2, random.choice([ORANGE, SOFT_ORANGE, PASTEL_YELLOW]))
                         
                         if button_text == "QUITTER":
                             running = False

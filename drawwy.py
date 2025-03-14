@@ -76,7 +76,7 @@ while running:
         element.update()
     
     if mouse_click:
-        particles.append(tools.generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30))
+        particles+=tools.generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
 
     # Mise à jour des particules
     for particle in particles[:]:
@@ -86,17 +86,22 @@ while running:
     
     # Ajouter de nouvelles particules occasionnellement
     if animation_counter % 5 == 0 and len(particles) < 200:
-        particles.append(Particle(
-            random.randint(0, W),
-            H + 10,
-            random.choice([SOFT_ORANGE, PASTEL_PINK, PASTEL_GREEN, PASTEL_YELLOW])
-        ))
+        particles+=tools.generate_particles(10,0, H+10, W, H+10)
     
     # Mise à jour du gestionnaire d'avatar
     avatar_manager.update(mouse_pos, pygame.mouse.get_pressed())
     
     # Fond
     screen.fill(LIGHT_BLUE)
+
+    # Dégradé de fond
+    for y in range(H):
+        # Interpolation entre deux couleurs pour créer un dégradé
+        color = [
+            int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / H))
+            for i in range(3)
+        ]
+        pygame.draw.line(screen, color, (0, y), (W, y))
     
     # Dessiner les éléments de dessin en arrière-plan
     for element in drawing_elements:
