@@ -128,10 +128,11 @@ class ImageCarousel:
         self.selection_delay = 3  # Temps avant l'arrêt
         self.shake_intensity = 0
         self.selected_image = None
+        self.max_spin_speed = 40
         
     def start_spin(self):
         self.is_spinning = True
-        self.spin_speed = 40  # Relancer avec la vitesse max
+        self.spin_speed = self.max_spin_speed  # Relancer avec la vitesse max
         self.selection_time = time.time() + self.selection_delay
         self.target_index = random.randint(0, len(self.images) - 1)
     
@@ -163,33 +164,41 @@ class ImageCarousel:
     def draw(self, surface):
         center_x = self.rect.centerx
         for i, img in enumerate(self.images):
+            shake_x = random.uniform(-self.shake_intensity//2, self.shake_intensity//2)
+            shake_y = random.uniform(-self.shake_intensity*(self.max_spin_speed//self.spin_speed), self.shake_intensity*(self.max_spin_speed//self.spin_speed))
+
             pos_x = (i * 200 - self.current_offset + center_x) % (len(self.images) * 200) - 100
             scale_factor = max(0.5, 1 - abs(center_x - pos_x) / 400)
             alpha = max(50, 255 * scale_factor)
 
-            scaled_img = pygame.transform.scale(img, (int(150 * scale_factor), int(150 * scale_factor)))
+            scaled_img = pygame.transform.scale(img, (int(180 * scale_factor), int(180 * scale_factor)))
             img_surface = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
             img_surface.fill((255, 255, 255, int(alpha)))
-            img_surface.blit(scaled_img, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            img_surface.blit(scaled_img, (shake_x, shake_y), special_flags=pygame.BLEND_RGBA_MULT)
 
             surface.blit(img_surface, (pos_x - scaled_img.get_width() // 2, self.rect.centery - scaled_img.get_height() // 2))
 
         transparent_surface = pygame.Surface((200, 200), pygame.SRCALPHA)  # Taille du rectangle
         transparent_surface.fill((0, 0, 0, 0))  # Totalement transparent
 
-        # Coordonnées du rectangle avec "shake"
+        main_frame_rect = pygame.Rect(
+            self.rect.centerx - 100,
+            self.rect.centery - 100,
+            200,
+            200
+        )
+        # Appliquer les tremblements
         shake_x = random.uniform(-self.shake_intensity, self.shake_intensity)
         shake_y = random.uniform(-self.shake_intensity, self.shake_intensity)
-        main_frame_rect = pygame.Rect(0, 0, 200, 200)  # Rectangle local à la surface
-        main_frame_rect.center = (self.W + shake_x, self.H + shake_y)
+        main_frame_rect.x += shake_x
+        main_frame_rect.y += shake_y
 
-        # Dessin des bordures blanches sur la surface
-        pygame.draw.rect(transparent_surface, WHITE, main_frame_rect, width=4, border_radius=20)
+        # Dessiner le rectangle avec des bordures uniquement (intérieur transparent)
+        border_color = (255, 255, 255)  # Blanc
+        border_radius = 20  # Coins arrondis
+        border_width = 5  # Épaisseur des bordures
 
-        # Affichage de la surface transparente sur l'écran
-        screen.blit(transparent_surface, (main_frame_rect.x, main_frame_rect.y))
-
-
+        pygame.draw.rect(surface, border_color, main_frame_rect, width=border_width, border_radius=border_radius)
 
 class Button:
     def __init__(self, x, y, W, H, text, color, hover_color, text_color=WHITE, border_radius=15):

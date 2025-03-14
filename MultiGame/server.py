@@ -5,10 +5,8 @@ import sys
 import threading
 import time
 from datetime import datetime
-# import MultiGame.utils.sentences as sentences
-# import MultiGame.utils.tools as tools
-import utils.sentences as sentences
-import utils.tools as tools
+import MultiGame.utils.sentences as sentences
+import MultiGame.utils.tools as tools
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, send
