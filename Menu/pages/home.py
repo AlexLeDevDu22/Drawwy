@@ -128,9 +128,40 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
             particles+=generate_particles(20,credit_button_x-credit_button_radius, credit_button_y-credit_button_radius, credit_button_x+credit_button_radius, credit_button_y+credit_button_radius)
             return screen, "credits", particles
         
+        # Charger l'image du logo (assure-toi que le chemin est correct)
+        shop_icon = pygame.image.load("assets/icon_shop.png")
+        shop_icon = pygame.transform.smoothscale(shop_icon, (70, 70))  # Ajuste la taille si besoin
+
+        # Dessiner le bouton rond "Shop"
+        shop_button_radius = 50
+        shop_button_x = main_panel_x + shop_button_radius + 10
+        shop_button_y = main_panel_y + main_panel_height - shop_button_radius - 10
+
+        # Animation de survol du shop
+        hover_shop = math.sqrt((mouse_pos[0] - shop_button_x) ** 2 + (mouse_pos[1] - shop_button_y) ** 2) <= shop_button_radius
+
+        # Dessiner le cercle
+        pygame.draw.circle(screen, 
+                        DARK_BEIGE if not hover_shop else GRAY, 
+                        (shop_button_x + buttons_offsets - 1, shop_button_y + buttons_offsets), 
+                        shop_button_radius)
+        pygame.draw.circle(screen, 
+                        SOFT_ORANGE if hover_shop else ORANGE, 
+                        (shop_button_x, shop_button_y), 
+                        shop_button_radius)
+
+        # Afficher le logo au centre du bouton
+        shop_icon_rect = shop_icon.get_rect(center=(shop_button_x, shop_button_y))
+        screen.blit(shop_icon, shop_icon_rect)
+
+        if hover_shop and mouse_click:
+            particles += generate_particles(20, shop_button_x - shop_button_radius, shop_button_y - shop_button_radius, shop_button_x + shop_button_radius, shop_button_y + shop_button_radius)
+            return screen, "shop", particles
+
+        
 
     # Effets de particules lors du clic
     if mouse_click:
-        particles.append(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
+        particles+=generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
 
     return screen, "home", particles

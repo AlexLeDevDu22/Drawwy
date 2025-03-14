@@ -4,6 +4,7 @@ from Menu.pages import achievements
 from Menu.pages import play
 from Menu.pages import home
 from Menu.pages import credit
+from Menu.pages import shop
 from shared.common_utils import *
 
 import Menu.pages.play as play
@@ -64,7 +65,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button in (1,3):
             mouse_click = True
             
         # Donner priorité aux événements d'avatar s'il est en cours d'édition
@@ -133,6 +134,8 @@ while running:
             screen, current_page = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click)
         elif current_page == "credits":
             screen, current_page = credit.show_credit(screen, W,H, mouse_pos, mouse_click)
+        elif current_page == "shop":
+             screen, current_page = shop.show_shop(screen, W,H, mouse_pos, mouse_click)
         
     # Afficher la version
     version_text = "DRAWWY v1.0"
