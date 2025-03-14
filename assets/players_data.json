@@ -4,4 +4,6 @@
   {"title": "Maitre du crayon", "explication": "Dessinez 50 dessins", "succeed": false}, 
   {"title": "Collaborateur", "explication": "Jouez en multijoueur 5 fois", "succeed": false},
    {"title": "Perfectionniste", "explication": "Obtenez un score parfait", "succeed": false}],
-  "nombre_game": 0}
+  "nombre_game": 0,
+  "points": 0
+}

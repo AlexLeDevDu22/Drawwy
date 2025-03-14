@@ -87,7 +87,7 @@ while running:
     
     # Ajouter de nouvelles particules occasionnellement
     if animation_counter % 5 == 0 and len(particles) < 200:
-        particles+=tools.generate_particles(10,0, H+10, W, H+10)
+        particles+=tools.generate_particles(10,0, H+10, W, H+10 )
     
     # Mise à jour du gestionnaire d'avatar
     avatar_manager.update(mouse_pos, pygame.mouse.get_pressed())
