@@ -5,8 +5,10 @@ import sys
 import threading
 import time
 from datetime import datetime
-import MultiGame.utils.sentences as sentences
-import MultiGame.utils.tools as tools
+# import MultiGame.utils.sentences as sentences
+# import MultiGame.utils.tools as tools
+import utils.sentences as sentences
+import utils.tools as tools
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, send
@@ -26,8 +28,7 @@ ngrok_api = os.getenv("NGROK_API")
 ngrok.set_auth_token(ngrok_token)
 
 # Initialisation de Flask et SocketIO
-app = Flask(__name__, static_folder='MultiGame/web', static_url_path='/')
-app.config['SECRET_KEY'] = 'secret!'
+app = Flask(__name__, static_folder='web', static_url_path='/')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading", logger=False, engineio_logger=False, allow_unsafe_werkzeug=True)
 
 # Variables du jeu

@@ -114,8 +114,8 @@ def generate_placeholder_images(theme_index, count=10):
 
 class ImageCarousel:
     def __init__(self, X, Y, images):
-        self.x = X
-        self.y = Y
+        self.W = W
+        self.H = H
         self.size = 0.6 * H
         self.rect = pygame.Rect((X - self.size) // 2, (Y - self.size) // 2, self.size, self.size)
         self.images = images
@@ -181,7 +181,7 @@ class ImageCarousel:
         shake_x = random.uniform(-self.shake_intensity, self.shake_intensity)
         shake_y = random.uniform(-self.shake_intensity, self.shake_intensity)
         main_frame_rect = pygame.Rect(0, 0, 200, 200)  # Rectangle local à la surface
-        main_frame_rect.center = (self.w + shake_x, self.h + shake_y)
+        main_frame_rect.center = (self.W + shake_x, self.H + shake_y)
 
         # Dessin des bordures blanches sur la surface
         pygame.draw.rect(transparent_surface, WHITE, main_frame_rect, width=4, border_radius=20)
@@ -241,8 +241,8 @@ class Button:
         self.is_hovered = self.rect.collidepoint(pos)
         return self.is_hovered != previous_hover
     
-    def is_clicked(self, pos, mouse_pressed):
-        return self.rect.collidepoint(pos) and mouse_pressed[0]
+    def is_clicked(self, pos):
+        return self.rect.collidepoint(pos)
 
 class FloatingObject:
     def __init__(self, x, y, size, color, speed):
@@ -318,7 +318,6 @@ def image_selection_page(selected_theme, difficulty):
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
-        mouse_pressed = pygame.mouse.get_pressed()
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -328,11 +327,11 @@ def image_selection_page(selected_theme, difficulty):
             
             if event.type == pygame.MOUSEBUTTONDOWN and intro_stage >= 2:
                 # Vérifier le clic sur le bouton de rotation
-                if spin_button.is_clicked(mouse_pos, mouse_pressed) and not image_roulette.is_spinning:
+                if spin_button.is_clicked(mouse_pos) and not image_roulette.is_spinning:
                     image_roulette.start_spin()
                 
                 # Vérifier le clic sur le bouton de dessin
-                if start_drawing_button.is_clicked(mouse_pos, mouse_pressed) and image_roulette.selected_image:
+                if start_drawing_button.is_clicked(mouse_pos) and image_roulette.selected_image:
                     # Lancer le compte à rebours
                     if not show_countdown:
                         show_countdown = True
