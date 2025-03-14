@@ -80,6 +80,20 @@ class AvatarManager:
                                               self.avatar_start_pos[1] + size_button_height // 2 - 10, 
                                               size_button_width, size_button_height)
         
+        # Ajouter l'affichage de la bordure actuelle
+        self.border_icon = None
+        try:
+            self.border_icon = pygame.image.load("assets/bordures/bordures_profil/bronze_border.png").convert_alpha()
+            self.border_icon = pygame.transform.scale(self.border_icon, (70, 70))
+        except:
+            # Créer une icône par défaut si l'image n'est pas disponible
+            self.border_icon = pygame.Surface((30, 30), pygame.SRCALPHA)
+            pygame.draw.circle(self.border_icon, ORANGE, (15, 15), 15, width=3)
+            
+        # Modification: Déplacer la position du texte et de l'icône de bordure au milieu à gauche
+        self.border_text_pos = (20, self.H // 2 - 15)  # Position du texte au milieu à gauche
+        self.border_icon_pos = (self.border_text_pos[0] + 350, self.border_text_pos[1] - 5)  # Icône à côté du texte
+        
     def save_state(self):
         self.history.append(self.avatar.copy())
         if len(self.history) > 20:  # Limite historique
@@ -267,6 +281,13 @@ class AvatarManager:
         
         # Afficher les boutons et contrôles d'édition si activés
         if self.show_buttons:
+            # Afficher le texte "Bordure actuelle de l'avatar:"
+            border_text = SMALL_FONT.render("Bordure actuelle de l'avatar:", True, WHITE)
+            self.screen.blit(border_text, self.border_text_pos)
+            
+            # Afficher l'icône de bordure (PNG)
+            self.screen.blit(self.border_icon, self.border_icon_pos)
+            
             # Palette de couleurs
             for i, rect in enumerate(self.color_rects):
                 pygame.draw.rect(self.screen, self.colors[i], rect, border_radius=8)
@@ -293,4 +314,3 @@ class AvatarManager:
             
             self.screen.blit(validate_text, (self.validate_button_rect.x + 20, self.validate_button_rect.y + 10))
             self.screen.blit(cancel_text, (self.cancel_button_rect.x + 20, self.cancel_button_rect.y + 10))
-            

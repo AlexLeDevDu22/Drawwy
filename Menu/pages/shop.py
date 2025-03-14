@@ -44,9 +44,9 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
             pygame.draw.circle(screen, point_color, (px, py), 1)
     
     # Titre
-    draw_text("BOUTIQUE", TITLE_FONT, GRAY, screen, 
+    draw_text("BOUTIQUE", MEDIUM_FONT, GRAY, screen, 
             W // 2 + 4, main_panel_y + 80 + 4)
-    draw_text("BOUTIQUE", TITLE_FONT, BLACK, screen, 
+    draw_text("BOUTIQUE", MEDIUM_FONT, BLACK, screen, 
             W // 2, main_panel_y + 80)
     
     # Charger les données
