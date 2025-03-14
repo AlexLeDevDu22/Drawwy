@@ -131,6 +131,6 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
 
     # Effets de particules lors du clic
     if mouse_click:
-        particles.append(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
+        particles+=generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
 
     return screen, "home", particles
