@@ -10,7 +10,7 @@ import os
 particles = []
 
 
-def show_shop(screen, W, H, mouse_pos, mouse_click):
+def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -321,7 +321,7 @@ def show_shop(screen, W, H, mouse_pos, mouse_click):
     if mouse_click:
         particles += generate_particles(10, mouse_pos[0] - 20, mouse_pos[1] - 20, mouse_pos[0] + 20, mouse_pos[1] + 20)
     
-    return screen, "shop"
+    return screen, "shop", particles
 
 def load_items():
     """Charge les objets de décoration depuis un fichier JSON ou crée des objets par défaut"""
