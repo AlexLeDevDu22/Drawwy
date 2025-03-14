@@ -1,0 +1,13 @@
+- [ ] Couleurs
+- [ ] skin souris
+- [ ] Bordure pdp
+- [ ] Badge apres pseudo
+- [ ] Emojis speciaux
+- [ ] Shop
+- [ ] Rendre moins "fade" l'ui drawer
+- [ ] easter egg
+- [ ] Achievement
+- [ ] Stocker points
+- [ ] Si ts les achievements, courone sur la pdp
+- [ ] 1 achievement égal une couleur pour la pp
+- [ ] Possibilité de régénére une phrase (1 fois par game)
