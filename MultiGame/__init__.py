@@ -106,7 +106,7 @@ class MultiGame:
                 
                 for event in self.events:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                        threading.Thread(target=self.disconnect, daemon=True).start()
+                        threading.Thread(target=connection.disconnect, daemon=True).start()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -125,5 +125,5 @@ class MultiGame:
                 self.frame_num=(self.frame_num+1)%config["game_page_fps"]
 
         except KeyboardInterrupt:
-            threading.Thread(target=self.disconnect, daemon=True).start()
+            threading.Thread(target=connection.disconnect, daemon=True).start()
             os._exit(0)

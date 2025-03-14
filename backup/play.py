@@ -43,7 +43,7 @@ class MultiplayersGame:
 
             if not asyncio.run(tools.test_server()):# start the serv
                 
-                import server
+                import MultiGame.server as server
                 self.server=server
                 
                 self.server_thread = threading.Thread(target=server.start_server, daemon=True)
