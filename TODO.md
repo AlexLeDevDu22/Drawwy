@@ -11,3 +11,4 @@
 - [ ] Si ts les achievements, courone sur la pdp
 - [ ] 1 achievement égal une couleur pour la pp
 - [ ] Possibilité de régénére une phrase (1 fois par game)
+- [ ] Rajouté ALT F4
