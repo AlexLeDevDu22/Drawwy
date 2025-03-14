@@ -3,7 +3,7 @@
 - [ ] Bordure pdp
 - [ ] Badge apres pseudo
 - [ ] Emojis speciaux
-- [ ] Shop
+- [ ] Réglé les bugs visuel du shop
 - [ ] Rendre moins "fade" l'ui drawer
 - [ ] easter egg
 - [ ] Achievement
@@ -11,4 +11,4 @@
 - [ ] Si ts les achievements, courone sur la pdp
 - [ ] 1 achievement égal une couleur pour la pp
 - [ ] Possibilité de régénére une phrase (1 fois par game)
-- [ ] Rajouté ALT F4
+- [ ] Réglé les bugs lié au particule dans le shop

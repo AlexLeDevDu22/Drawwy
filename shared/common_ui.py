@@ -18,7 +18,8 @@ PASTEL_YELLOW = (253, 253, 150)
 RED = (200, 50, 50)
 GREEN = (50, 200, 50)
 BLUE = (50, 50, 200)
-
+LIGHT_BEIGE = (239, 231, 219)
+LIGHT_ORANGE = (255, 219, 187)
 
 # Police personnalisée
 pygame.init()
