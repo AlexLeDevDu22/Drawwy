@@ -1,5 +1,5 @@
 from shared.common_ui import *
-from shared.common_utils import draw_text, draw_textbox
+from shared.common_utils import draw_text, draw_textbox, draw_texte_achievement
 import json
 
 def show_achievements(screen,W,H, mouse_pos, mouse_click):
@@ -83,6 +83,7 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click):
     back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
                                     200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
     
+
     if mouse_click and back_button_rect.collidepoint(mouse_pos):
         return screen, "home"
     return screen, "achievements"

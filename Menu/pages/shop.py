@@ -207,7 +207,7 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
         
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
-                item_x + 240, item_y + 80)
+                item_x + 260, item_y + 80)
         
         # Prix ou statut
         if item["purchased"]:
@@ -336,7 +336,7 @@ def load_items():
     default_items = [
         {
             "id": 1,
-            "name": "Étoile Rose",
+            "name": "Étoile caca",
             "price": 100,
             "description": "Une jolie étoile rose",
             "image_path": "assets/decorations/star_pink.png",
