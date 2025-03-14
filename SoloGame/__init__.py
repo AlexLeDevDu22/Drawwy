@@ -2,6 +2,8 @@ import pygame
 import sys
 import json
 import os
+import time
+from shared.common_utils import draw_texte_achievement
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 with open("assets/players_data.json") as f:
@@ -83,7 +85,7 @@ class SoloGame:
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
 
-            #Achievement Premier tracé
+
 
 
 
@@ -147,6 +149,7 @@ class SoloGame:
             #achievement
             if players_data["achievements"][0]["succeed"]== False:
                 players_data["achievements"][0]["succeed"] = True
+                achievement_button_rect = draw_texte_achievement("Premier Tracé","Tracé quelque chose",self.H,self.W,self.screen,SMALL_FONT,)
                 with open("assets/players_data.json", "w") as f:
                     json.dump(players_data, f)
         

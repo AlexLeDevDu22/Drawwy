@@ -11,6 +11,8 @@ import socketio
 import os
 import socket
 import asyncio
+with open("assets/players_data.json") as f:
+    players_data = json.load(f)
 
 load_dotenv()
 
@@ -213,6 +215,12 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
     # Dessiner les extrémités arrondies
     draw_circle(x1, y1)
     draw_circle(x2, y2)
+
+    #achievement
+    if players_data["achievements"][0]["succeed"]== False:
+        players_data["achievements"][0]["succeed"] = True
+        with open("assets/players_data.json", "w") as f:
+            json.dump(players_data, f)
 
     return canvas  # Retourne le canvas mis à jour
 
