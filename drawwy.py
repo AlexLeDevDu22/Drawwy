@@ -65,7 +65,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button in (1,3):
-            print(55)
             mouse_click = True
             
         # Donner priorité aux événements d'avatar s'il est en cours d'édition

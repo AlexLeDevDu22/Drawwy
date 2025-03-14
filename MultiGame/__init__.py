@@ -125,5 +125,5 @@ class MultiGame:
                 self.frame_num=(self.frame_num+1)%config["game_page_fps"]
 
         except KeyboardInterrupt:
-            self.disconnect()
+            threading.Thread(target=self.disconnect, daemon=True).start()
             os._exit(0)
