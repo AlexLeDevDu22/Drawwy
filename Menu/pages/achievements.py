@@ -1,8 +1,11 @@
 from shared.common_ui import *
 from shared.common_utils import draw_text, draw_textbox
-
+import json
 
 def show_achievements(screen,W,H, mouse_pos, mouse_click):
+    
+
+
     # Titre
     draw_text("SUCCÈS", BUTTON_FONT, BLACK, screen, W // 2, 100)
     
@@ -23,12 +26,15 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click):
                     border_radius=30)
     
     # Liste de succès fictifs
+    with open("assets/players_data.json") as f:
+        players_data = json.load(f)
+
     achievements = [
-        {"name": "Premier dessin", "description": "Complétez votre premier dessin", "completed": True},
-        {"name": "Artiste en herbe", "description": "Dessinez 10 dessins", "completed": True},
-        {"name": "Maître du crayon", "description": "Dessinez 50 dessins", "completed": False},
-        {"name": "Collaborateur", "description": "Jouez en multijoueur 5 fois", "completed": False},
-        {"name": "Perfectionniste", "description": "Obtenez un score parfait", "completed": False}
+        {"name": "Premier Tracé", "description": "Tracé quelque chose", "completed": players_data["achievements"][0]["succeed"]},
+        {"name": "Artiste en herbe", "description": "Dessinez 10 dessins", "completed": players_data["achievements"][1]["succeed"]},
+        {"name": "Maître du crayon", "description": "Dessinez 50 dessins", "completed": players_data["achievements"][2]["succeed"]},
+        {"name": "Collaborateur", "description": "Jouez en multijoueur 5 fois", "completed": players_data["achievements"][3]["succeed"]},
+        {"name": "Perfectionniste", "description": "Obtenez un score parfait", "completed": players_data["achievements"][4]["succeed"]}
     ]
     
     achievement_y = main_panel_y + 60

@@ -8,10 +8,14 @@ from Menu.ui.elements import *
 from shared.tools import get_screen_size, generate_particles
 from shared.common_ui import *
 from shared.common_utils import *
-
+import json
 import pygame
 import random
 import math
+
+with open("assets/players_data.json") as f:
+    player_data = json.load(f)
+
 
 class Menu:
     def __init__(self, screen):
@@ -272,7 +276,7 @@ class Menu:
                 
                 # Liste de succès fictifs
                 achievements = [
-                    {"name": "Premier dessin", "description": "Complétez votre premier dessin", "completed": True},
+                    {"name": "Premier dessin", "description": "Complétez votre premier dessin", "completed": player_data},
                     {"name": "Artiste en herbe", "description": "Dessinez 10 dessins", "completed": True},
                     {"name": "Maître du crayon", "description": "Dessinez 50 dessins", "completed": False},
                     {"name": "Collaborateur", "description": "Jouez en multijoueur 5 fois", "completed": False},

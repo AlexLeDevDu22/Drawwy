@@ -1,9 +1,11 @@
 import pygame
 import sys
-
+import json
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+with open("assets/players_data.json") as f:
+    players_data = json.load(f)
 from shared.common_ui import *
 from shared.tools import *
 
@@ -81,6 +83,10 @@ class SoloGame:
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
 
+            #Achievement Premier tracé
+
+
+
             pygame.display.flip()
 
     def define_layout(self):
@@ -138,6 +144,12 @@ class SoloGame:
             # Dessin d'un cercle
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
+            #achievement
+            if players_data["achievements"][0]["succeed"]== False:
+                players_data["achievements"][0]["succeed"] = True
+                with open("assets/players_data.json", "w") as f:
+                    json.dump(players_data, f)
+        
     def draw_colors(self):
         # Fond + bordure
         pygame.draw.rect(self.screen, (230,230,230), self.colors_rect)

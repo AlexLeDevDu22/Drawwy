@@ -1,7 +1,7 @@
-{
-  "pseudo": "Proutland",
-  "achievements": [
-    { "title": "title", "explication": "explication", "succeed": false },
-    { "title": "title2", "explication": "explication2", "succeed": false }
-  ]
-}
+{"pseudo": "Proutland",
+ "achievements": [{"title": "Premier Trace", "explication": "Trace quelque chose", "succeed": false},
+  {"title": "Artiste en herbe", "explication": "Dessinez 10 dessins", "succeed": false}, 
+  {"title": "Maitre du crayon", "explication": "Dessinez 50 dessins", "succeed": false}, 
+  {"title": "Collaborateur", "explication": "Jouez en multijoueur 5 fois", "succeed": false},
+   {"title": "Perfectionniste", "explication": "Obtenez un score parfait", "succeed": false}],
+  "nombre_game": 0}
