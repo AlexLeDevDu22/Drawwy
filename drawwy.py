@@ -135,7 +135,7 @@ while running:
         elif current_page == "credits":
             screen, current_page = credit.show_credit(screen, W,H, mouse_pos, mouse_click)
         elif current_page == "shop":
-             screen, current_page = shop.show_shop(screen, W,H, mouse_pos, mouse_click)
+             screen, current_page, particles = shop.show_shop(screen, W,H, mouse_pos, mouse_click, particles)
         
     # Afficher la version
     version_text = "DRAWWY v1.0"

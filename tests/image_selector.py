@@ -129,6 +129,7 @@ class ImageCarousel:
         self.shake_intensity = 0
         self.selected_image = None
         self.max_spin_speed = 40
+        self.particles=[]
         
     def start_spin(self):
         self.is_spinning = True
@@ -159,23 +160,58 @@ class ImageCarousel:
                         self.selected_image = self.images[self.target_index]
                         self.shake_intensity = 0
 
+                        # Ajouter des particules pour célébrer la sélection
+                        for _ in range(50):
+                            angle = random.uniform(0, 2 * math.pi)
+                            speed = random.uniform(2, 6)
+                            size = random.uniform(3, 8)
+                            life = random.uniform(20, 60)
+                            color = random.choice([YELLOW, PINK, GREEN, BLUE])
+                            self.particles.append({
+                                'x': self.rect.centerx,
+                                'y': self.rect.centery,
+                                'vx': math.cos(angle) * speed,
+                                'vy': math.sin(angle) * speed,
+                                'size': size,
+                                'life': life,
+                                'color': color
+                            })
+
             self.shake_intensity = max(0, self.shake_intensity - 0.1) if not self.is_spinning else min(10, self.shake_intensity + 0.2)
+
+        # Mettre à jour les particules
+        for i, particle in enumerate(self.particles):
+            particle['x'] += particle['vx']
+            particle['y'] += particle['vy']
+            particle['vy'] += 0.1  # Gravité
+            particle['life'] -= 1
+        
+        # Supprimer les particules expirées
+        self.particles = [p for p in self.particles if p['life'] > 0]
 
     def draw(self, surface):
         center_x = self.rect.centerx
         for i, img in enumerate(self.images):
-            shake_x = random.uniform(-self.shake_intensity//2, self.shake_intensity//2)
-            shake_y = random.uniform(-self.shake_intensity*(self.max_spin_speed//self.spin_speed), self.shake_intensity*(self.max_spin_speed//self.spin_speed))
+            shake_x = random.uniform(-self.shake_intensity*(self.spin_speed/self.max_spin_speed), self.shake_intensity*(self.spin_speed/self.max_spin_speed))
+            shake_y = random.uniform(-self.shake_intensity*(self.spin_speed/self.max_spin_speed), self.shake_intensity*(self.spin_speed/self.max_spin_speed))
 
             pos_x = (i * 200 - self.current_offset + center_x) % (len(self.images) * 200) - 100
             scale_factor = max(0.5, 1 - abs(center_x - pos_x) / 400)
             alpha = max(50, 255 * scale_factor)
 
-            scaled_img = pygame.transform.scale(img, (int(180 * scale_factor), int(180 * scale_factor)))
+            scaled_img = pygame.transform.scale(img, (int(200 * scale_factor), int(200 * scale_factor)))
             img_surface = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
-            img_surface.fill((255, 255, 255, int(alpha)))
-            img_surface.blit(scaled_img, (shake_x, shake_y), special_flags=pygame.BLEND_RGBA_MULT)
 
+            # Créer un rectangle avec des coins arrondis pour le masque
+            mask = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
+            pygame.draw.rect(mask, (255, 255, 255), mask.get_rect(), border_radius=20)
+
+            # Appliquer le masque arrondi à l'image
+            img_surface.fill((255, 255, 255, int(alpha)))
+            img_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+            img_surface.blit(scaled_img, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+            # Blitter l'image arrondie sur la surface principale
             surface.blit(img_surface, (pos_x - scaled_img.get_width() // 2, self.rect.centery - scaled_img.get_height() // 2))
 
         transparent_surface = pygame.Surface((200, 200), pygame.SRCALPHA)  # Taille du rectangle
@@ -188,8 +224,8 @@ class ImageCarousel:
             200
         )
         # Appliquer les tremblements
-        shake_x = random.uniform(-self.shake_intensity, self.shake_intensity)
-        shake_y = random.uniform(-self.shake_intensity, self.shake_intensity)
+        shake_x = random.uniform(-self.shake_intensity*(self.spin_speed/self.max_spin_speed), self.shake_intensity*(self.spin_speed/self.max_spin_speed))
+        shake_y = random.uniform(-self.shake_intensity*(self.spin_speed/self.max_spin_speed), self.shake_intensity*(self.spin_speed/self.max_spin_speed))
         main_frame_rect.x += shake_x
         main_frame_rect.y += shake_y
 
@@ -199,6 +235,18 @@ class ImageCarousel:
         border_width = 5  # Épaisseur des bordures
 
         pygame.draw.rect(surface, border_color, main_frame_rect, width=border_width, border_radius=border_radius)
+
+        # Dessiner les particules
+        for particle in self.particles:
+            alpha = int(255 * (particle['life'] / 60))
+            particle_color = (*particle['color'], alpha)
+            gfxdraw.filled_circle(
+                surface, 
+                int(particle['x']), 
+                int(particle['y']), 
+                int(particle['size']), 
+                particle_color
+            )
 
 class Button:
     def __init__(self, x, y, W, H, text, color, hover_color, text_color=WHITE, border_radius=15):
