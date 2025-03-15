@@ -15,8 +15,8 @@ class achievement_popup:
         self.width = 500
         self.height = 100
         self.W=W
-        self.self.H=H
-        self.self.surface=surface
+        self.H=H
+        self.surface=surface
         self.text = text
         self.description = description
 
