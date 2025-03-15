@@ -168,7 +168,7 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
         screen.blit(item_img, img_rect)
         
         # Nom de l'item
-        draw_text(item["name"], MEDIUM_FONT, BLACK, screen,
+        draw_text(item["name"], SMALL_FONT, BLACK, screen,
                 item_x + 220, item_y + 40)
         
         # Description de l'item
@@ -321,7 +321,7 @@ def load_items():
             "name": "Bordure de bronze",
             "price": 150,
             "description": "Une bordure quelconque",
-            "image_path": "assets/decorations/bronze_border.png",
+            "image_path": "assets/bordures/bordures_profil/bronze_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
@@ -331,7 +331,7 @@ def load_items():
             "name": "Cœur Rouge",
             "price": 120,
             "description": "Un cœur rouge brillant",
-            "image_path": "assets/decorations/heart_red.png",
+            "image_path": "assets/bodecorations/heart_red.png",
             "category": "Skin",
             "purchased": False,
             "selected": False
@@ -351,17 +351,17 @@ def load_items():
             "name": "Bordure en diamant",
             "price": 140,
             "description": "Une bordure brillante",
-            "image_path": "assets/decorations/diamond_border.png",
+            "image_path": "assets/bordures/bordures_profil/diamond_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
         },
         {
             "id": 6,
-            "name": "bordure en or",
+            "name": "Bordure en or",
             "price": 120,
             "description": "Une bordure dore",
-            "image_path": "assets/decorations/gold_border.png",
+            "image_path": "assets/bordures/bordures_profil/gold_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
@@ -371,7 +371,7 @@ def load_items():
             "name": "Bordure de grand maitre",
             "price": 140,
             "description": "Pour etre le GOAT de Drawwy",
-            "image_path": "assets/decorations/grandmaster_border.png",
+            "image_path": "assets/bordures/bordures_profil/grandmaster_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
@@ -381,7 +381,7 @@ def load_items():
             "name": "Bordure du maitre",
             "price": 140,
             "description": "Pour montrer sa puissance",
-            "image_path": "assets/decorations/master_border.png",
+            "image_path": "assets/bordures/bordures_profil/master_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
