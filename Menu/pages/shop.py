@@ -377,11 +377,41 @@ def load_items():
             "selected": False
         },      
         {     
-            "id": 7,
+            "id": 8,
             "name": "Bordure du maitre",
             "price": 140,
             "description": "Pour montrer sa puissance",
             "image_path": "assets/bordures/bordures_profil/master_border.png",
+            "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },
+        {     
+            "id": 9,
+            "name": "Bordure mythique",
+            "price": 140,
+            "description": "Pour montrer son talent ",
+            "image_path": "assets/bordures/bordures_profil/mythic_border.png",
+            "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },
+        {     
+            "id": 10,
+            "name": "Bordure platine",
+            "price": 140,
+            "description": "L'un des meilleurs ",
+            "image_path": "assets/bordures/bordures_profil/platinum_border.png",
+            "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },
+        {     
+            "id": 11,
+            "name": "Bordure argent",
+            "price": 140,
+            "description": "Meilleur qu'hier ",
+            "image_path": "assets/bordures/bordures_profil/silver_border.png",
             "category": "Bordures",
             "purchased": False,
             "selected": False
