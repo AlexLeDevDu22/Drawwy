@@ -3,15 +3,15 @@ from shared.tools import get_screen_size, apply_circular_mask
 import json
 import pygame
 
-with open("data/players_data.json") as f:
-    player_data = json.load(f)
 # Classe pour la gestion de l'avatar
 class AvatarManager:
     def __init__(self, screen):
         self.screen = screen
         self.W, self.H = get_screen_size()
         self.avatar_size = 100
-        self.input_text = player_data["pseudo"]
+        with open("data/players_data.json") as f:
+            self.player_data = json.load(f)
+        self.input_text = self.player_data["pseudo"]
         
         # Charger ou créer l'avatar
         self.avatar_path = "assets/avatar.bmp"
@@ -53,13 +53,11 @@ class AvatarManager:
         self.size_min = 5
         self.size_max = 40
         
-        with open("assets/players_data.json") as f:
-            player_data = json.load(f)
         self.colors = [ (255, 255, 255), (0, 0, 0)]
         # Palette de couleurs pour l'édition d'avatar
         for i in range(5):
-            if player_data["achievements"][i]["succeed"]== True:
-                self.colors.append(player_data["achievements"][i]["couleurs"])
+            if self.player_data["achievements"][i]["succeed"]== True:
+                self.colors.append(self.player_data["achievements"][i]["couleurs"])
 
 
 
@@ -129,7 +127,7 @@ class AvatarManager:
             if not self.show_buttons:  # Si pas déjà en mode édition
                 if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
                    self.avatar_start_pos[1] < mouse_pos[1] < self.avatar_start_pos[1] + self.avatar_size:
-                    self.input_text = player_data["pseudo"]
+                    self.input_text = self.player_data["pseudo"]
                     self.is_expanding = True
                     self.pseudo_editable = True
                     return True
@@ -144,12 +142,12 @@ class AvatarManager:
 
                 elif self.validate_button_rect.collidepoint(mouse_pos):  # Valider
                     pygame.image.save(self.avatar, self.avatar_path)
-                    player_data["pseudo"] = self.input_text
+                    self.player_data["pseudo"] = self.input_text
                     self.show_buttons = False
                     self.pseudo_editable = False
                     self.is_retracting = True
                     with open("data/players_data.json", "w") as f:
-                        json.dump(player_data, f)
+                        json.dump(self.player_data, f)
 
                     return True
 
@@ -184,12 +182,12 @@ class AvatarManager:
         elif event.type == pygame.KEYDOWN and self.pseudo_editable:
             if event.key == pygame.K_RETURN:  # Valider avec ENTER
                 pygame.image.save(self.avatar, self.avatar_path)
-                player_data["pseudo"] = self.input_text
+                self.player_data["pseudo"] = self.input_text
                 self.show_buttons = False
                 self.pseudo_editable = False
                 self.is_retracting = True
                 with open("data/players_data.json", "w") as f:
-                    json.dump(player_data, f)
+                    json.dump(self.player_data, f)
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC
                 self.avatar = self.avatar_original.copy()
@@ -283,7 +281,7 @@ class AvatarManager:
         self.screen.blit(temp_avatar, avatar_pos)
         
         # Afficher le pseudo
-        pseudo_surf = MEDIUM_FONT.render(self.input_text + "|" if self.pseudo_editable else player_data["pseudo"], True, WHITE)
+        pseudo_surf = MEDIUM_FONT.render(self.input_text + "|" if self.pseudo_editable else self.player_data["pseudo"], True, WHITE)
         self.screen.blit(pseudo_surf, pseudo_pos)
         
         # Afficher les boutons et contrôles d'édition si activés

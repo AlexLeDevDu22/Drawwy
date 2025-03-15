@@ -75,7 +75,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
 
     # Shop
     button_radius = 50
-    shop_button=Button(main_panel_x + button_radius - 10,
+    shop_button=Button(main_panel_x + button_radius + 10,
                         main_panel_y + main_panel_height- button_radius*2 - 10,
                         radius=button_radius,
                         circle=True,
@@ -86,9 +86,8 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
         return screen, "shop", particles
     shop_button.draw(screen)
 
-
     # Crédits
-    credit_button=Button(main_panel_x + main_panel_width - button_radius*2 - 10,
+    credit_button=Button(main_panel_x + main_panel_width - button_radius - 10,
                         main_panel_y + main_panel_height- button_radius*2 - 10,
                         text="CRÉDIT",
                         radius=button_radius,
