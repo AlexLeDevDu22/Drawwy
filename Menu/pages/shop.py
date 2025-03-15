@@ -218,33 +218,44 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
         nav_y = main_panel_y + main_panel_height - 100
         
         # Bouton précédent
+        next_hover = next_x <= mouse_pos[0] <= next_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
+        next_color = SOFT_ORANGE if next_hover else ORANGE
+        
+        if show_shop.state["current_page"] > 0:
+            # Ombre
+            pygame.draw.circle(screen, DARK_BEIGE, (next_x + nav_width // 2+4,   nav_y + nav_height // 2+ 4), nav_width // 2)
+            # Cercle
+            pygame.draw.circle(screen, next_color, (next_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
+            # Flèche
+            fleche_gauche = pygame.image.load("assets/fleche_gauche.png")
+            fleche_gauche= pygame.transform.scale(fleche_gauche, (40, 40))
+            fleche_gauche_rect = fleche_gauche.get_rect(center=(next_x + nav_width // 2,   nav_y + nav_height // 2))
+            screen.blit(fleche_gauche, fleche_gauche_rect)
+            
+            if mouse_click and next_hover:
+                show_shop.state["current_page"] -= 1
+        
+        # Bouton suivant
+        # Bouton précédent
         prev_hover = prev_x <= mouse_pos[0] <= prev_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
         prev_color = SOFT_ORANGE if prev_hover else ORANGE
         
-        if show_shop.state["current_page"] > 0:
+        
+        if show_shop.state["current_page"] < total_pages - 1:
             # Ombre
             pygame.draw.circle(screen, DARK_BEIGE, (prev_x + nav_width // 2 + 4, nav_y + nav_height // 2 + 4), nav_width // 2)
             # Cercle
             pygame.draw.circle(screen, prev_color, (prev_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
             # Flèche
-            draw_text("←", MEDIUM_FONT, BLACK, screen, prev_x + nav_width // 2, nav_y + nav_height // 2)
+            fleche_droite = pygame.image.load("assets/fleche_droite.png")
+            fleche_droite= pygame.transform.scale(fleche_droite, (40, 40))
+            fleche_droite_rect = fleche_droite.get_rect(center=(prev_x + nav_width // 2,  nav_y + nav_height // 2))
+            screen.blit(fleche_droite, fleche_droite_rect)
+
+
             
+
             if mouse_click and prev_hover:
-                show_shop.state["current_page"] -= 1
-        
-        # Bouton suivant
-        next_hover = next_x <= mouse_pos[0] <= next_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
-        next_color = SOFT_ORANGE if next_hover else ORANGE
-        
-        if show_shop.state["current_page"] < total_pages - 1:
-            # Ombre
-            pygame.draw.circle(screen, DARK_BEIGE, (next_x + nav_width // 2 + 4, nav_y + nav_height // 2 + 4), nav_width // 2)
-            # Cercle
-            pygame.draw.circle(screen, next_color, (next_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
-            # Flèche
-            draw_text("→", MEDIUM_FONT, BLACK, screen, next_x + nav_width // 2, nav_y + nav_height // 2)
-            
-            if mouse_click and next_hover:
                 show_shop.state["current_page"] += 1
         
         # Afficher numéro de page
