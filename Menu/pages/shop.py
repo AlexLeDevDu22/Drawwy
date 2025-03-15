@@ -111,41 +111,11 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
             show_shop.state["selected_category"] = category
             show_shop.state["current_page"] = 0
     
-    # Bouton mode (sélection/achat)
-    mode_width = 160
-    mode_height = 50
-    mode_x = main_panel_x + main_panel_width - mode_width - 40
-    mode_y = main_panel_y + 140
+
     
-    # Animation de survol
-    hover_mode = mode_x <= mouse_pos[0] <= mode_x + mode_width and mode_y <= mouse_pos[1] <= mode_y + mode_height
-    
-    # Couleur basée sur mode actuel et survol
-    if show_shop.state["selection_mode"]:
-        mode_color = (100, 200, 100) if not hover_mode else (120, 220, 120)
-        mode_text = "SÉLECTION"
-    else:
-        mode_color = (200, 100, 100) if not hover_mode else (220, 120, 120)
-        mode_text = "ACHAT"
-    
-    # Dessiner l'ombre du bouton
-    pygame.draw.rect(screen, DARK_BEIGE,
-                    (mode_x + 4, mode_y + 4, mode_width, mode_height),
-                    border_radius=25)
-    
-    # Dessiner le bouton
-    pygame.draw.rect(screen, mode_color,
-                    (mode_x, mode_y, mode_width, mode_height),
-                    border_radius=25)
-    
-    # Texte du bouton
-    draw_text(mode_text, SMALL_FONT, BLACK, screen,
-            mode_x + mode_width // 2, mode_y + mode_height // 2)
-    
-    # Gestion des clics sur le bouton de mode
-    if mouse_click and hover_mode:
-        show_shop.state["selection_mode"] = not show_shop.state["selection_mode"]
-    
+
+
+
     # Filtrer les items selon la catégorie sélectionnée
     filtered_items = [item for item in items if show_shop.state["selected_category"] == "tous" or item["category"] == show_shop.state["selected_category"]]
     
@@ -219,7 +189,7 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
         # Gestion des clics sur les items
         if mouse_click and hover_item:
             
-            if show_shop.state["selection_mode"]:
+
                 if item["purchased"]:
                     # Basculer la sélection
                     item["selected"] = not item["selected"]
@@ -231,9 +201,8 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
                             player_data["selected_items"].remove(item["id"])
                     save_player_data(player_data)
                     save_items(items)
-            else:
-                # Mode achat
-                if not item["purchased"] and coins >= item["price"]:
+
+                elif not item["purchased"] and coins >= item["price"]:
                     coins -= item["price"]
                     item["purchased"] = True
                     player_data["coins"] = coins
