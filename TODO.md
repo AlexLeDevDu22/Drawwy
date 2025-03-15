@@ -12,3 +12,4 @@
 - [x] 1 achievement égal une couleur pour la pp
 - [ ] Possibilité de régénére une phrase (1 fois par game)
 - [x] Réglé les bugs lié au particule dans le shop
+- [ ] Déf un nombre de joueurs limités
