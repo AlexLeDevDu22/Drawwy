@@ -57,6 +57,7 @@ class AvatarManager:
         
         self.colors = [ (255, 255, 255), (0, 0, 0)]
         # Palette de couleurs pour l'édition d'avatar
+
         for i in range(5):
             if self.player_data["achievements"][i]["succeed"]== True:
                 self.colors.append(self.player_data["achievements"][i]["couleurs"])
