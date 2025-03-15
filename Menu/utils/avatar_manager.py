@@ -53,9 +53,16 @@ class AvatarManager:
         self.size_min = 5
         self.size_max = 40
         
+        with open("assets/players_data.json") as f:
+            player_data = json.load(f)
+        self.colors = [ (255, 255, 255), (0, 0, 0)]
         # Palette de couleurs pour l'édition d'avatar
-        self.colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), 
-                       (255, 165, 0), (255, 255, 255), (0, 0, 0)]
+        for i in range(5):
+            if player_data["achievements"][i]["succeed"]== True:
+                self.colors.append(player_data["achievements"][i]["couleurs"])
+
+
+
         self.brush_color = self.colors[0]
         
         # Créer les recttitle_scales pour la palette de couleurs
