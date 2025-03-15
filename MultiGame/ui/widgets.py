@@ -56,7 +56,7 @@ def players(MultiGame):
 
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
-        pygame.draw.rect(MultiGame.screen, config["data/players_colors"][y%len(config["data/players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, config["player_colors"][y%len(config["player_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
         #avatar TODO FOR EMOJI!!!!
         if player["avatar"]["type"]=="matrix":
