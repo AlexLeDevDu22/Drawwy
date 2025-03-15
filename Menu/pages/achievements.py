@@ -29,8 +29,10 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click):
     with open("data/players_data.json") as f:
         players_data = json.load(f)
 
+ 
+
     achievements = [
-        {"name": "Premier Tracé", "description": "Tracé quelque chose", "completed": players_data["achievements"][0]["succeed"]},
+        {"name": "Premier Tracé", "description": "Tracé quelque chose", "completed": True},
         {"name": "Artiste en herbe", "description": "Dessinez 10 dessins", "completed": players_data["achievements"][1]["succeed"]},
         {"name": "Maître du crayon", "description": "Dessinez 50 dessins", "completed": players_data["achievements"][2]["succeed"]},
         {"name": "Collaborateur", "description": "Jouez en multijoueur 5 fois", "completed": players_data["achievements"][3]["succeed"]},

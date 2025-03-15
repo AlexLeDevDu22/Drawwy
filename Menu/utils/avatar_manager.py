@@ -2,11 +2,12 @@ from shared.ui.common_ui import *
 from shared.tools import get_screen_size, apply_circular_mask
 import json
 import pygame
-
 with open("data/players_data.json") as f:
-    player_data = json.load(f)
+        player_data = json.load(f)
+
 # Classe pour la gestion de l'avatar
 class AvatarManager:
+    
     def __init__(self, screen):
         self.screen = screen
         self.W, self.H = get_screen_size()
@@ -53,8 +54,6 @@ class AvatarManager:
         self.size_min = 5
         self.size_max = 40
         
-        with open("assets/players_data.json") as f:
-            player_data = json.load(f)
         self.colors = [ (255, 255, 255), (0, 0, 0)]
         # Palette de couleurs pour l'édition d'avatar
         for i in range(5):
