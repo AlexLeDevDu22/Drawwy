@@ -218,49 +218,52 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
         nav_y = main_panel_y + main_panel_height - 100
         
         # Bouton précédent
+        prev_hover = prev_x <= mouse_pos[0] <= prev_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
+        prev_color = SOFT_ORANGE if prev_hover else ORANGE
+        
+        if show_shop.state["current_page"] > 0:
+            # Ombre
+            pygame.draw.circle(screen, DARK_BEIGE, (prev_x + nav_width // 2 + 4, nav_y + nav_height // 2 + 4), nav_width // 2)
+            # Cercle
+            pygame.draw.circle(screen, prev_color, (prev_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
+            
+            # Flèche
+            fleche_gauche = pygame.image.load("assets/fleche_gauche.png")
+            fleche_gauche= pygame.transform.scale(fleche_gauche, (40, 40))
+            fleche_gauche_rect = fleche_gauche.get_rect(center=(prev_x + nav_width // 2, nav_y + nav_height // 2))
+            screen.blit(fleche_gauche, fleche_gauche_rect)
+            
+
+            
+            if mouse_click and prev_hover:
+                show_shop.state["current_page"] -= 1
+        
+        # Bouton suivant
+        # Bouton précédent
         next_hover = next_x <= mouse_pos[0] <= next_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
         next_color = SOFT_ORANGE if next_hover else ORANGE
         
-        if show_shop.state["current_page"] > 0:
+        
+        if show_shop.state["current_page"] < total_pages - 1:
             # Ombre
             pygame.draw.circle(screen, DARK_BEIGE, (next_x + nav_width // 2+4,   nav_y + nav_height // 2+ 4), nav_width // 2)
             # Cercle
             pygame.draw.circle(screen, next_color, (next_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
             # Flèche
-            fleche_gauche = pygame.image.load("assets/fleche_gauche.png")
-            fleche_gauche= pygame.transform.scale(fleche_gauche, (40, 40))
-            fleche_gauche_rect = fleche_gauche.get_rect(center=(next_x + nav_width // 2,   nav_y + nav_height // 2))
-            screen.blit(fleche_gauche, fleche_gauche_rect)
-            
-            if mouse_click and next_hover:
-                show_shop.state["current_page"] -= 1
-        
-        # Bouton suivant
-        # Bouton précédent
-        prev_hover = prev_x <= mouse_pos[0] <= prev_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
-        prev_color = SOFT_ORANGE if prev_hover else ORANGE
-        
-        
-        if show_shop.state["current_page"] < total_pages - 1:
-            # Ombre
-            pygame.draw.circle(screen, DARK_BEIGE, (prev_x + nav_width // 2 + 4, nav_y + nav_height // 2 + 4), nav_width // 2)
-            # Cercle
-            pygame.draw.circle(screen, prev_color, (prev_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
-            # Flèche
             fleche_droite = pygame.image.load("assets/fleche_droite.png")
             fleche_droite= pygame.transform.scale(fleche_droite, (40, 40))
-            fleche_droite_rect = fleche_droite.get_rect(center=(prev_x + nav_width // 2,  nav_y + nav_height // 2))
+            fleche_droite_rect = fleche_droite.get_rect(center=(next_x + nav_width // 2,  nav_y + nav_height // 2))
             screen.blit(fleche_droite, fleche_droite_rect)
 
 
             
 
-            if mouse_click and prev_hover:
+            if mouse_click and next_hover:
                 show_shop.state["current_page"] += 1
         
         # Afficher numéro de page
         draw_text(f"Page {show_shop.state['current_page'] + 1}/{total_pages}", SMALL_FONT, BLACK, screen,
-                main_panel_x + main_panel_width // 2, nav_y + nav_height + 30)
+                main_panel_x + main_panel_width // 2, nav_y + nav_height + 10 )
     
     # Bouton retour
     back_width = 180
@@ -309,77 +312,77 @@ def load_items():
             "price": 100,
             "description": "Une jolie étoile rose",
             "image_path": "assets/decorations/star_pink.png",
-            "category": "stars",
+            "category": "Badges",
             "purchased": False,
             "selected": False
         },
         {
             "id": 2,
-            "name": "Nuage Bleu",
+            "name": "Bordure de bronze",
             "price": 150,
-            "description": "Un nuage bleu ciel",
-            "image_path": "assets/decorations/cloud_blue.png",
-            "category": "clouds",
+            "description": "Une bordure quelconque",
+            "image_path": "assets/decorations/bronze_border.png",
+            "category": "Bordures",
             "purchased": False,
             "selected": False
         },
         {
             "id": 3,
-            "name": "Fleur Jaune",
-            "price": 200,
-            "description": "Une fleur jaune lumineuse",
-            "image_path": "assets/decorations/flower_yellow.png",
-            "category": "flowers",
+            "name": "Cœur Rouge",
+            "price": 120,
+            "description": "Un cœur rouge brillant",
+            "image_path": "assets/decorations/heart_red.png",
+            "category": "Skin",
             "purchased": False,
             "selected": False
         },
         {
             "id": 4,
-            "name": "Cœur Rouge",
-            "price": 120,
-            "description": "Un cœur rouge brillant",
-            "image_path": "assets/decorations/heart_red.png",
-            "category": "hearts",
+            "name": "Étoile Verte",
+            "price": 100,
+            "description": "Une étoile verte scintillante",
+            "image_path": "assets/decorations/star_green.png",
+            "category": "Badges",
             "purchased": False,
             "selected": False
         },
         {
             "id": 5,
-            "name": "Étoile Verte",
-            "price": 100,
-            "description": "Une étoile verte scintillante",
-            "image_path": "assets/decorations/star_green.png",
-            "category": "stars",
+            "name": "Bordure en diamant",
+            "price": 140,
+            "description": "Une bordure brillante",
+            "image_path": "assets/decorations/diamond_border.png",
+            "category": "Bordures",
             "purchased": False,
             "selected": False
         },
         {
             "id": 6,
-            "name": "Nuage Blanc",
-            "price": 140,
-            "description": "Un nuage blanc duveteux",
-            "image_path": "assets/decorations/cloud_white.png",
-            "category": "clouds",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 7,
-            "name": "Fleur Rose",
-            "price": 180,
-            "description": "Une fleur rose délicate",
-            "image_path": "assets/decorations/flower_pink.png",
-            "category": "flowers",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 8,
-            "name": "Cœur Vert",
+            "name": "bordure en or",
             "price": 120,
-            "description": "Un cœur vert émeraude",
-            "image_path": "assets/decorations/heart_green.png",
-            "category": "hearts",
+            "description": "Une bordure dore",
+            "image_path": "assets/decorations/gold_border.png",
+            "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },
+                {
+            "id": 7,
+            "name": "Bordure de grand maitre",
+            "price": 140,
+            "description": "Pour etre le GOAT de Drawwy",
+            "image_path": "assets/decorations/grandmaster_border.png",
+            "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },      
+        {     
+            "id": 7,
+            "name": "Bordure du maitre",
+            "price": 140,
+            "description": "Pour montrer sa puissance",
+            "image_path": "assets/decorations/master_border.png",
+            "category": "Bordures",
             "purchased": False,
             "selected": False
         }
