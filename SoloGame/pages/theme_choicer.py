@@ -1,39 +1,14 @@
+from shared.ui.common_ui import *
+
 import pygame
 import sys
 import math
 import random
 from pygame import gfxdraw
+import yaml
 
-# Constantes
-WIDTH, HEIGHT = 1280, 720
-TITLE = "Drawwy - Le jeu de dessin"
-FPS = 60
-
-# Couleurs
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PURPLE = (130, 94, 196)
-LIGHT_PURPLE = (157, 127, 211)
-DARK_PURPLE = (103, 72, 158)
-PINK = (255, 130, 186)
-YELLOW = (255, 223, 97)
-BLUE = (97, 190, 255)
-GREEN = (97, 255, 162)
-LIGHT_BLUE = (119, 181, 254)
-VERY_LIGHT_BLUE= (160, 205, 255)
-
-# Chargement des polices
-try:
-    title_font = pygame.font.Font(None, 120)
-    subtitle_font = pygame.font.Font(None, 70)
-    theme_font = pygame.font.Font(None, 50)
-    button_font = pygame.font.Font(None, 40)
-except:
-    print("Erreur lors du chargement des polices. Utilisation des polices par défaut.")
-    title_font = pygame.font.SysFont('Arial', 120)
-    subtitle_font = pygame.font.SysFont('Arial', 70)
-    theme_font = pygame.font.SysFont('Arial', 50)
-    button_font = pygame.font.SysFont('Arial', 40)
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 # Définition des thèmes
 themes = [
@@ -45,6 +20,8 @@ themes = [
 
 # Définition des niveaux de difficulté
 difficulties = ["Facile", "Moyen", "Difficile"]
+
+W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 class Button:
     def __init__(self, x, y, width, height, text, color, hover_color, text_color=WHITE, border_radius=15):
@@ -87,14 +64,9 @@ class Button:
         pygame.draw.rect(surface, color, scaled_rect, border_radius=self.border_radius)
         
         # Dessiner le texte
-        text_surf = button_font.render(self.text, True, self.text_color)
+        text_surf = BUTTON_FONT.render(self.text, True, self.text_color)
         text_rect = text_surf.get_rect(center=scaled_rect.center)
         surface.blit(text_surf, text_rect)
-    
-    def check_hover(self, pos):
-        previous_hover = self.is_hovered
-        self.is_hovered = self.rect.collidepoint(pos)
-        return self.is_hovered != previous_hover
     
     def is_clicked(self, pos, mouse_pressed):
         return self.rect.collidepoint(pos) and mouse_pressed[0]
@@ -149,7 +121,7 @@ class ThemeCard:
             particle['x'] += particle['vx']
             particle['y'] += particle['vy']
             particle['life'] -= 1
-            alpha = int(255 * (particle['life'] / 40))
+            alpha = int(255 * (abs(particle['life']) / 40))
             particle_color = (*particle['color'], alpha)
             
             gfxdraw.filled_circle(surface, 
@@ -198,19 +170,15 @@ class ThemeCard:
         pygame.draw.rect(surface, color, scaled_rect, border_radius=15)
         
         # Dessiner l'icône
-        icone_texte = theme_font.render(self.theme_info["icone"], True, WHITE)
+        icone_texte = MEDIUM_FONT.render(self.theme_info["icone"], True, WHITE)
         icone_rect = icone_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery - 30))
         surface.blit(icone_texte, icone_rect)
         
         # Dessiner le nom du thème
-        nom_texte = theme_font.render(self.theme_info["nom"], True, WHITE)
+        nom_texte = MEDIUM_FONT.render(self.theme_info["nom"], True, WHITE)
         nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 30))
         surface.blit(nom_texte, nom_rect)
     
-    def check_hover(self, pos):
-        previous_hover = self.is_hovered
-        self.is_hovered = self.rect.collidepoint(pos)
-        return self.is_hovered != previous_hover
 
 class DifficultySelector:
     def __init__(self, x, y, width, height):
@@ -244,16 +212,9 @@ class DifficultySelector:
                 )
                 pygame.draw.rect(surface, WHITE, indicator_rect, border_radius=3)
     
-    def check_hover(self, pos):
-        hover_changed = False
-        for button in self.buttons:
-            if button.check_hover(pos):
-                hover_changed = True
-        return hover_changed
-    
-    def check_click(self, pos, mouse_pressed):
+    def check_click(self, pos):
         for i, button in enumerate(self.buttons):
-            if button.collidepoint(pos):
+            if button.rect.collidepoint(pos):
                 self.selected_difficulty = i
                 return True
         return False
@@ -275,7 +236,7 @@ class FloatingObject:
         self.phase += 0.02
         self.y = self.orig_y + math.sin(self.phase) * self.amplitude
         
-        if self.x > WIDTH + 100:
+        if self.x > W + 100:
             self.x = -100
     
     def draw(self, surface):
@@ -287,13 +248,13 @@ class FloatingObject:
 
 def draw_background(surface):
     # Dégradé de fond
-    for y in range(HEIGHT):
+    for y in range(H):
         # Interpolation entre deux couleurs pour créer un dégradé
         color = [
-            int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / HEIGHT))
+            int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / H))
             for i in range(3)
         ]
-        pygame.draw.line(surface, color, (0, y), (WIDTH, y))
+        pygame.draw.line(surface, color, (0, y), (W, y))
 
 def theme_choicer(screen):
     # Créer les cartes de thèmes
@@ -301,21 +262,21 @@ def theme_choicer(screen):
     theme_cards = []
     
     for i, theme in enumerate(themes):
-        x = WIDTH // 2 - (len(themes) * (theme_width + 30)) // 2 + i * (theme_width + 30)
-        y = HEIGHT // 2 - 50
+        x = W // 2 - (len(themes) * (theme_width + 30)) // 2 + i * (theme_width + 30)
+        y = H // 2 - 50
         theme_cards.append(ThemeCard(x, y, theme_width, theme_height, theme))
     
     # Créer le sélecteur de difficulté
-    difficulty_selector = DifficultySelector(WIDTH // 2 - 300, HEIGHT // 2 + 200, 600, 60)
+    difficulty_selector = DifficultySelector(W // 2 - 300, H // 2 + 200, 600, 60)
     
     # Créer le bouton de démarrage
-    start_button = Button(WIDTH // 2 - 100, HEIGHT // 2 + 300, 200, 60, "Commencer", PURPLE, LIGHT_PURPLE)
+    start_button = Button(W // 2 - 100, H // 2 + 300, 200, 60, "Commencer", PURPLE, LIGHT_PURPLE)
     
     # Créer des objets flottants pour l'arrière-plan
     floating_objects = []
     for _ in range(15):
-        x = random.randint(-100, WIDTH+100)
-        y = random.randint(0, HEIGHT)
+        x = random.randint(-100, W+100)
+        y = random.randint(0, H)
         size = random.randint(5, 15)
         color_choice = random.choice([PINK, YELLOW, BLUE, GREEN])
         speed = random.uniform(0.2, 0.8)
@@ -344,7 +305,7 @@ def theme_choicer(screen):
             if event.type == pygame.MOUSEBUTTONDOWN and intro_stage >= 2:
                 # Vérifier les clics sur les cartes de thèmes
                 for i, card in enumerate(theme_cards):
-                    if card.collidepoint(mouse_pos):
+                    if card.rect.collidepoint(mouse_pos):
                         # Désélectionner toutes les cartes
                         for c in theme_cards:
                             c.is_selected = False
@@ -356,18 +317,18 @@ def theme_choicer(screen):
                 difficulty_selector.check_click(mouse_pos)
                 
                 # Vérifier le clic sur le bouton de démarrage
-                if start_button.collidepoint(mouse_pos) and selected_theme is not None:
+                if start_button.rect.collidepoint(mouse_pos) and selected_theme is not None:
                     print(f"Thème sélectionné: {themes[selected_theme]['nom']}")
                     print(f"Difficulté: {difficulties[difficulty_selector.selected_difficulty]}")
-                    return screen, "images"
+                    return screen, "images", themes[selected_theme], difficulties[difficulty_selector.selected_difficulty]
         
         # Mettre à jour les survols
         if intro_stage >= 2:
             for card in theme_cards:
-                card.check_hover(mouse_pos)
+                card.rect.collidepoint(mouse_pos)
             
-            difficulty_selector.check_hover(mouse_pos)
-            start_button.check_hover(mouse_pos)
+            difficulty_selector.rect.collidepoint(mouse_pos)
+            start_button.rect.collidepoint(mouse_pos)
         
         # Mettre à jour les objets flottants
         for obj in floating_objects:
@@ -390,7 +351,7 @@ def theme_choicer(screen):
                 intro_timer = 60  # Attendre 1 seconde
             
             # Dessiner un rectangle noir qui disparaît
-            intro_surf = pygame.Surface((WIDTH, HEIGHT))
+            intro_surf = pygame.Surface((W, H))
             intro_surf.fill(BLACK)
             intro_surf.set_alpha(intro_alpha)
             screen.blit(intro_surf, (0, 0))
@@ -405,17 +366,17 @@ def theme_choicer(screen):
             # Animation terminée, afficher l'interface
             
             # Dessiner le titre avec une ombre
-            title_shadow = title_font.render("DRAWWY", True, BLACK)
-            title_shadow_rect = title_shadow.get_rect(center=(WIDTH//2+4, 104))
+            title_shadow = TITLE_FONT.render("DRAWWY", True, BLACK)
+            title_shadow_rect = title_shadow.get_rect(center=(W//2+4, 104))
             screen.blit(title_shadow, title_shadow_rect)
             
-            title = title_font.render("DRAWWY", True, WHITE)
-            title_rect = title.get_rect(center=(WIDTH//2, 100))
+            title = TITLE_FONT.render("DRAWWY", True, WHITE)
+            title_rect = title.get_rect(center=(W//2, 100))
             screen.blit(title, title_rect)
             
             # Dessiner le sous-titre
-            subtitle = subtitle_font.render("Sélectionne un thème", True, WHITE)
-            subtitle_rect = subtitle.get_rect(center=(WIDTH//2, 200))
+            subtitle = BUTTON_FONT.render("Sélectionne un thème", True, WHITE)
+            subtitle_rect = subtitle.get_rect(center=(W//2, 200))
             screen.blit(subtitle, subtitle_rect)
             
             # Dessiner les cartes de thèmes
@@ -423,8 +384,8 @@ def theme_choicer(screen):
                 card.draw(screen)
             
             # Dessiner le texte de difficulté
-            diff_text = subtitle_font.render("Difficulté", True, WHITE)
-            diff_rect = diff_text.get_rect(center=(WIDTH//2, HEIGHT//2 + 150))
+            diff_text = BUTTON_FONT.render("Difficulté", True, WHITE)
+            diff_rect = diff_text.get_rect(center=(W//2, H//2 + 150))
             screen.blit(diff_text, diff_rect)
             
             # Dessiner le sélecteur de difficulté
@@ -435,4 +396,4 @@ def theme_choicer(screen):
         
         # Mettre à jour l'affichage
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(config["fps"])

@@ -4,44 +4,14 @@ import math
 import random
 from pygame import gfxdraw
 import time
+import yaml
 
-# Constantes
-W, H = pygame.display.Info().current_w, pygame.display.Info().current_h
-TITLE = "Drawwy - Le jeu de dessin"
-FPS = 60
+from shared.ui.common_ui import *
 
-# Couleurs
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PURPLE = (130, 94, 196)
-LIGHT_PURPLE = (157, 127, 211)
-DARK_PURPLE = (103, 72, 158)
-PINK = (255, 130, 186)
-YELLOW = (255, 223, 97)
-BLUE = (97, 190, 255)
-GREEN = (97, 255, 162)
-LIGHT_BLUE = (119, 181, 254)
-VERY_LIGHT_BLUE = (160, 205, 255)
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
-# Configuration de la fenêtre
-screen = pygame.display.set_mode((W, H))
-pygame.display.set_caption(TITLE)
-clock = pygame.time.Clock()
-
-# Chargement des polices
-try:
-    title_font = pygame.font.Font(None, 120)
-    subtitle_font = pygame.font.Font(None, 70)
-    theme_font = pygame.font.Font(None, 50)
-    button_font = pygame.font.Font(None, 40)
-    info_font = pygame.font.Font(None, 30)
-except:
-    print("Erreur lors du chargement des polices. Utilisation des polices par défaut.")
-    title_font = pygame.font.SysFont('Arial', 120)
-    subtitle_font = pygame.font.SysFont('Arial', 70)
-    theme_font = pygame.font.SysFont('Arial', 50)
-    button_font = pygame.font.SysFont('Arial', 40)
-    info_font = pygame.font.SysFont('Arial', 30)
+W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 # Définition des thèmes et des données d'exemple d'images
 themes = [
@@ -288,7 +258,7 @@ class Button:
         pygame.draw.rect(surface, color, scaled_rect, border_radius=self.border_radius)
         
         # Dessiner le texte
-        text_surf = button_font.render(self.text, True, self.text_color)
+        text_surf = BUTTON_FONT.render(self.text, True, self.text_color)
         text_rect = text_surf.get_rect(center=scaled_rect.center)
         surface.blit(text_surf, text_rect)
     
@@ -337,8 +307,7 @@ def draw_background(surface):
         ]
         pygame.draw.line(surface, color, (0, y), (W, y))
 
-def image_selector(selected_theme, difficulty):
-    W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
+def image_selector(screen, selected_theme, difficulty):
     # Générer des images d'exemple pour le thème sélectionné
     images = generate_placeholder_images(selected_theme, 15)
     
@@ -368,6 +337,8 @@ def image_selector(selected_theme, difficulty):
     image_selected = False
     countdown_start_time = 0
     show_countdown = False
+
+    clock=pygame.time.Clock()
     
     # Animation d'introduction
     intro_alpha = 255
@@ -447,21 +418,21 @@ def image_selector(selected_theme, difficulty):
             # Animation terminée, afficher l'interface
             
             # Dessiner le titre avec une ombre
-            title_shadow = title_font.render("DRAWWY", True, BLACK)
+            title_shadow = TITLE_FONT.render("DRAWWY", True, BLACK)
             title_shadow_rect = title_shadow.get_rect(center=(W//2+4, 104))
             screen.blit(title_shadow, title_shadow_rect)
             
-            title = title_font.render("DRAWWY", True, WHITE)
+            title = TITLE_FONT.render("DRAWWY", True, WHITE)
             title_rect = title.get_rect(center=(W//2, 100))
             screen.blit(title, title_rect)
             
             # Dessiner le sous-titre avec le thème sélectionné
-            subtitle = subtitle_font.render(f"Thème: {themes[selected_theme]['nom']}", True, WHITE)
+            subtitle = BUTTON_FONT.render(f"Thème: {themes[selected_theme]['nom']}", True, WHITE)
             subtitle_rect = subtitle.get_rect(center=(W//2, 170))
             screen.blit(subtitle, subtitle_rect)
             
             # Afficher la difficulté
-            diff_text = theme_font.render(f"Difficulté: {['Facile', 'Moyen', 'Difficile'][difficulty]}", True, WHITE)
+            diff_text = MEDIUM_FONT.render(f"Difficulté: {['Facile', 'Moyen', 'Difficile'][difficulty]}", True, WHITE)
             diff_rect = diff_text.get_rect(topleft=(50, 50))
             screen.blit(diff_text, diff_rect)
             
@@ -481,7 +452,7 @@ def image_selector(selected_theme, difficulty):
                 elapsed = time.time() - countdown_start_time
                 if elapsed < 3:
                     countdown_value = 3 - int(elapsed)
-                    countdown_text = title_font.render(str(countdown_value), True, WHITE)
+                    countdown_text = TITLE_FONT.render(str(countdown_value), True, WHITE)
                     countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
                     
                     # Ajouter un effet de pulsation
@@ -503,6 +474,6 @@ def image_selector(selected_theme, difficulty):
         
         # Mettre à jour l'affichage
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(config["fps"])
     
     return None  # À remplacer par un retour vers la page suivante

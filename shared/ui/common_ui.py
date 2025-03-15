@@ -20,6 +20,10 @@ GREEN = (50, 200, 50)
 BLUE = (50, 50, 200)
 LIGHT_BEIGE = (239, 231, 219)
 LIGHT_ORANGE = (255, 219, 187)
+PINK = (255, 130, 186)
+YELLOW = (255, 223, 97)
+PURPLE = (130, 94, 196)
+LIGHT_PURPLE = (157, 127, 211)
 
 # Police personnalisée
 pygame.init()

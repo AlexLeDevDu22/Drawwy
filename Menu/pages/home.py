@@ -1,5 +1,5 @@
-from shared.common_ui import *
-from shared.common_utils import draw_text
+from shared.ui.common_ui import *
+from shared.utils.common_utils import draw_text
 from shared.tools import generate_particles
 
 import pygame

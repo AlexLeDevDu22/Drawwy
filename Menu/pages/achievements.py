@@ -1,5 +1,5 @@
-from shared.common_ui import *
-from shared.common_utils import draw_text, draw_textbox, draw_texte_achievement
+from shared.ui.common_ui import *
+from shared.utils.common_utils import draw_text, draw_textbox, draw_texte_achievement
 import json
 
 def show_achievements(screen,W,H, mouse_pos, mouse_click):
@@ -26,7 +26,7 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click):
                     border_radius=30)
     
     # Liste de succès fictifs
-    with open("assets/players_data.json") as f:
+    with open("data/players_data.json") as f:
         players_data = json.load(f)
 
     achievements = [

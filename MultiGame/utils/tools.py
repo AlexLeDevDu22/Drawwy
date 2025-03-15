@@ -11,7 +11,7 @@ import socketio
 import os
 import socket
 import asyncio
-with open("assets/players_data.json") as f:
+with open("data/players_data.json") as f:
     players_data = json.load(f)
 
 load_dotenv()
@@ -28,7 +28,7 @@ CYAN=(0,255,255)
 
 
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 def is_connected():
@@ -219,7 +219,7 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
     #achievement
     if players_data["achievements"][0]["succeed"]== False:
         players_data["achievements"][0]["succeed"] = True
-        with open("assets/players_data.json", "w") as f:
+        with open("data/players_data.json", "w") as f:
             json.dump(players_data, f)
 
     return canvas  # Retourne le canvas mis à jour

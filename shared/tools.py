@@ -2,8 +2,8 @@ import socket
 import pygame
 import random
 
-from Menu.ui.elements import Particle
-from shared.common_ui import *
+from shared.ui.elements import Particle
+from shared.ui.common_ui import *
 
 def is_connected():
     try:

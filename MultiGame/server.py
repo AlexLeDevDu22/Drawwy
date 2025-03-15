@@ -13,7 +13,7 @@ from flask_socketio import SocketIO, emit, send
 from pyngrok import ngrok
 
 # Charger config
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # Charger le token ngrok depuis .env

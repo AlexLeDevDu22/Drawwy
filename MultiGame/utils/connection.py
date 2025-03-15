@@ -9,7 +9,7 @@ import yaml
 import json
 from datetime import datetime
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 connection_loop=None
@@ -40,7 +40,7 @@ async def handle_connection_client(MultiGame):
     MultiGame.SIO = socketio.AsyncClient(logger=True, engineio_logger=True)
     @MultiGame.SIO.event
     async def connect(): #joining the game
-        with open("assets/players_data.json") as f:
+        with open("data/players_data.json") as f:
             player_data = json.load(f)
 
         await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("assets/avatar.bmp")}})
