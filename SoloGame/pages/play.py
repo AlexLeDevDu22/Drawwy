@@ -2,7 +2,7 @@ import pygame
 import sys
 import json
 import yaml
-from shared.utils.common_utils import draw_texte_achievement
+from shared.utils.common_utils import achievement_popup
 
 with open("data/players_data.json") as f:
     players_data = json.load(f)
@@ -79,6 +79,8 @@ class SoloPlay:
 
             pygame.display.flip()
 
+        return screen, "exit"
+
     def define_layout(self):
 
         # Canvas 
@@ -137,7 +139,7 @@ class SoloPlay:
             #achievement
             if players_data["achievements"][0]["succeed"]== False:
                 players_data["achievements"][0]["succeed"] = True
-                achievement_button_rect = draw_texte_achievement("Premier Tracé","Tracé quelque chose",self.H,self.W,self.screen,SMALL_FONT,)
+                achievement_button_rect = achievement_popup(players_data["achievements"][0]["title"],players_data["achievements"][0]["explication"],self.H,self.W,self.screen)
                 with open("data/players_data.json", "w") as f:
                     json.dump(players_data, f)
         

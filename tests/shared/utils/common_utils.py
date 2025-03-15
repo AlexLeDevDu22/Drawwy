@@ -8,7 +8,7 @@ def draw_text(text, font, color, surface, x, y):
     textrect.center = (x, y)
     surface.blit(textobj, textrect)
 
-def draw_texte_achievement(text,description,H,W,surface,font):
+def achievement_popup(text,description,H,W,surface,font):
     #dessiner la boite
     width = 500
     height = 100

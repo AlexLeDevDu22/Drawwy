@@ -8,27 +8,34 @@ def draw_text(text, font, color, surface, x, y):
     textrect.center = (x, y)
     surface.blit(textobj, textrect)
 
-def draw_texte_achievement(text,description,H,W,surface,font):
-    #dessiner la boite
-    width = 500
-    height = 100
-    box_rect_achievement = pygame.Rect(50,H-165,width,height)
-    pygame.draw.rect(surface,PASTEL_GREEN,box_rect_achievement,border_radius=15)
-    #rond valide
-    pygame.draw.circle(surface, DARK_BLUE, 
-                            ( 100, H-165+ height // 2), 
-                            20)
-    pygame.draw.line(surface, WHITE, 
-                        ( 90, H-165 + height // 2), 
-                        ( 100, H-165 + height // 2 + 10), 
-                        4)
-    pygame.draw.line(surface, WHITE, 
-                        ( 100, H-165 + height // 2 + 10), 
-                        ( 115, H-165 + height // 2 - 10), 
-                        4)
+class achievement_popup:
 
-    #dessiner le texte
-    draw_text(text,font,BLACK,surface,50 + width // 2, H-180 + height // 2)
-    draw_text(description,font,LIGHT_GRAY,surface,50 + width // 2, H-150 + height // 2)
+    def __init__(self, text,description,H,W,surface):
+        #dessiner la boite
+        self.width = 500
+        self.height = 100
+        self.W=W
+        self.self.H=H
+        self.self.surface=surface
+        self.text = text
+        self.description = description
 
-    
+    def draw(self):
+        box_rect_achievement = pygame.Rect(50,self.H-165,self.width,self.height)
+        pygame.draw.rect(self.surface,PASTEL_GREEN,box_rect_achievement,border_radius=15)
+        #rond valide
+        pygame.draw.circle(self.surface, DARK_BLUE, 
+                                ( 100, self.H-165+ self.height // 2), 
+                                20)
+        pygame.draw.line(self.surface, WHITE, 
+                            ( 90, self.H-165 + self.height // 2), 
+                            ( 100, self.H-165 + self.height // 2 + 10), 
+                            4)
+        pygame.draw.line(self.surface, WHITE, 
+                            ( 100, self.H-165 + self.height // 2 + 10), 
+                            ( 115, self.H-165 + self.height // 2 - 10), 
+                            4)
+
+        #dessiner le texte
+        draw_text(self.text,SMALL_FONT,BLACK,self.surface,50 + self.width // 2, self.H-180 + self.height // 2)
+        draw_text(self.description,SMALL_FONT,LIGHT_GRAY,self.surface,50 + self.width // 2, self.H-150 + self.height // 2)

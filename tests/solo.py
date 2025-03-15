@@ -83,6 +83,7 @@ class FloatingObject:
         for i in range(5):
             radius = self.size - i
             alpha = 100 - i * 20
+            print((*self.color, alpha))
             gfxdraw.filled_circle(surface, int(self.x), int(self.y), radius, (*self.color, alpha))
 
 # Supposons que Button et FloatingObject sont importés d'un autre fichier
@@ -254,9 +255,7 @@ class DrawingPage:
             self.validate_button_rect.y,
             self.validate_button_rect.width,
             self.validate_button_rect.height,
-            "Valider",
-            GREEN,
-            (150, 255, 150)
+            text="Valider"
         )
         
         # Bouton gomme
@@ -266,9 +265,7 @@ class DrawingPage:
             self.tools_rect.y,
             eraser_width,
             self.tools_rect.height,
-            "Gomme",
-            LIGHT_GREY,
-            WHITE
+            text="Gomme"
         )
         
         # Bouton effacer tout
@@ -278,9 +275,7 @@ class DrawingPage:
             self.tools_rect.y,
             clear_width,
             self.tools_rect.height,
-            "Effacer",
-            LIGHT_GREY,
-            WHITE
+            text="Effacer"
         )
         
         # Bouton pour annuler l'effacement
@@ -289,9 +284,7 @@ class DrawingPage:
             HEIGHT // 2 + 40,
             100,
             50,
-            "Non",
-            RED,
-            (255, 150, 150)
+            text="Non"
         )
         
         # Bouton pour confirmer l'effacement
@@ -300,9 +293,7 @@ class DrawingPage:
             HEIGHT // 2 + 40,
             100,
             50,
-            "Oui",
-            GREEN,
-            (150, 255, 150)
+            text="Oui"
         )
 
     def handle_events(self):
