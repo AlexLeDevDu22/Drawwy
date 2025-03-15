@@ -43,7 +43,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
     title_img = pygame.image.load("assets/logo.png").convert_alpha()
     
     # Animation de l'image du titre (échelle)
-    title_scale = 1.0 + 0.05 * math.sin(title_angle * 2)
+    title_scale = 2.5 + 0.1 * math.sin(title_angle * 2)
     orig_width, orig_height = title_img.get_size()
     scaled_width = int(orig_width * title_scale)
     scaled_height = int(orig_height * title_scale)
@@ -51,12 +51,12 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
     
     # Position de l'image (centrée)
     title_x = W // 2 - scaled_width // 2
-    title_y = main_panel_y + 100
+    title_y = main_panel_y + 85
     
     # Ombre du titre (optionnel)
     shadow_img = title_img_scaled.copy()
     shadow_img.fill((100, 100, 100, 150), None, pygame.BLEND_RGBA_MULT)
-    screen.blit(shadow_img, (title_x + 8, title_y + 8))
+    screen.blit(shadow_img, (title_x + 6, title_y + 6))
     
     # Affichage du titre
     screen.blit(title_img_scaled, (title_x, title_y))

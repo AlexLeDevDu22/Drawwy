@@ -145,9 +145,7 @@ while running:
              screen, current_page, buttons = shop.show_shop(screen, W,H, mouse_pos, mouse_click, buttons)
         
     # Afficher la version
-    version_text = "DRAWWY v1.0"
-    text_surface = VERY_SMALL_FONT.render(version_text, True, BLACK)
-    screen.blit(text_surface, (20, H - 30))
+    draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
     
     pygame.display.flip()
     clock.tick(config["fps"])

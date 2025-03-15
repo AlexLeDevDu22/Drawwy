@@ -77,7 +77,6 @@ class SoloPlay:
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
 
-
             pygame.display.flip()
 
     def define_layout(self):

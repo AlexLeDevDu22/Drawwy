@@ -1,4 +1,5 @@
 from shared.ui.common_ui import *
+from shared.utils.common_utils import draw_text
 from shared.tools import get_screen_size, apply_circular_mask
 import json
 import pygame

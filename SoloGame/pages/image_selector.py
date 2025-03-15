@@ -264,7 +264,7 @@ def image_selector(screen, theme_index):
     image_roulette = ImageCarousel(W,H, images)
     
     # Créer le bouton pour lancer la roulette
-    spin_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+50))//2, H*0.7, text="Tourner")
+    spin_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+90))//2, H*0.7, text="Tourner")
     
     # Créer le bouton pour commencer à dessiner (initialement désactivé)
     start_drawing_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+80))//2+BUTTON_FONT.size("Tourner")[0]+40, H *0.7,w=100, h=100, image="assets/valid.svg")

@@ -72,7 +72,6 @@ def players(MultiGame):
 
             try:
                 MultiGame.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*MultiGame.H, 4.6/100*MultiGame.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
-                MultiGame.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*MultiGame.H, 4.6/100*MultiGame.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
             except:
                 seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 30)
                 emoji, rect = seguisy80.render(player["avatar"]["emoji"], "black")

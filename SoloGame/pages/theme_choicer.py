@@ -6,6 +6,8 @@ import sys
 import math
 import random
 from pygame import gfxdraw
+try:from pygame_emojis import load_emoji
+except:import pygame.freetype 
 import yaml
 
 with open("config.yaml", "r") as f:
@@ -18,10 +20,6 @@ themes = [
     {"nom": "Animaux", "couleur": BLUE, "icone": "🦁"},
     {"nom": "Mode", "couleur": PINK, "icone": "👗"},
 ]
-
-# Définition des niveaux de difficulté
-difficulties = ["Facile", "Moyen", "Difficile"]
-
 W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 class ThemeCard:
@@ -41,7 +39,7 @@ class ThemeCard:
     def lighten_color(self, color, amount):
         return tuple(min(255, c + amount) for c in color)
     
-    def draw(self, surface):
+    def draw(self, screen):
         # Animation de survol
         if (self.is_hovered or self.is_selected) and self.animation_progress < 1:
             self.animation_progress += 0.1
@@ -78,7 +76,7 @@ class ThemeCard:
             alpha = int(255 * (abs(particle['life']) / 40))
             particle_color = (*particle['color'], alpha)
             
-            gfxdraw.filled_circle(surface, 
+            gfxdraw.filled_circle(screen, 
                                  int(particle['x']), 
                                  int(particle['y']), 
                                  int(particle['size']), 
@@ -105,7 +103,7 @@ class ThemeCard:
         # Dessiner la bordure si sélectionnée
         if self.is_selected:
             border_rect = pygame.Rect(scaled_x-10, scaled_y-10, scaled_width+20, scaled_height+20)
-            pygame.draw.rect(surface, WHITE, border_rect, border_radius=20)
+            pygame.draw.rect(screen, WHITE, border_rect, border_radius=20)
             
             # Effet de brillance autour de la carte
             for i in range(5):
@@ -117,21 +115,33 @@ class ThemeCard:
                     border_rect.height + glow_size * 2
                 )
                 glow_color = (*self.light_color, 50 - i*10)
-                pygame.draw.rect(surface, glow_color, glow_rect, border_radius=25, width=2)
+                pygame.draw.rect(screen, glow_color, glow_rect, border_radius=25, width=2)
         
         # Dessiner la carte
         scaled_rect = pygame.Rect(scaled_x, scaled_y, scaled_width, scaled_height)
-        pygame.draw.rect(surface, color, scaled_rect, border_radius=15)
+        pygame.draw.rect(screen, color, scaled_rect, border_radius=15)
         
         # Dessiner l'icône
         icone_texte = MEDIUM_FONT.render(self.theme_info["icone"], True, WHITE)
         icone_rect = icone_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery - 30))
-        surface.blit(icone_texte, icone_rect)
+        screen.blit(icone_texte, icone_rect)
+
+        try: # pygame emojis
+            screen.blit(load_emoji(self.theme_info["icone"], (16/100*H, 16/100*H)), (scaled_rect.centerx-85, scaled_rect.centery - 108))
+        except: # pygame freetype
+            seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 135)
+            emoji, rect = seguisy80.render(self.theme_info["icone"], "black")
+            rect.center = (scaled_rect.centerx, scaled_rect.centery - 135)
+            screen.blit(emoji, rect)
         
         # Dessiner le nom du thème
+        nom_texte = MEDIUM_FONT.render(self.theme_info["nom"], True, SOFT_ORANGE)
+        nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx+2, scaled_rect.centery + 62))
+        screen.blit(nom_texte, nom_rect)
+
         nom_texte = MEDIUM_FONT.render(self.theme_info["nom"], True, WHITE)
-        nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 30))
-        surface.blit(nom_texte, nom_rect)
+        nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 60))
+        screen.blit(nom_texte, nom_rect)
     
 class FloatingObject:
     def __init__(self, x, y, size, color, speed):
@@ -153,14 +163,14 @@ class FloatingObject:
         if self.x > W + 100:
             self.x = -100
     
-    def draw(self, surface):
+    def draw(self, screen):
         # Dessiner un cercle flou
         for i in range(5):
             radius = self.size - i
             alpha = 100 - i * 20
-            gfxdraw.filled_circle(surface, int(self.x), int(self.y), radius, (*self.color, alpha))
+            gfxdraw.filled_circle(screen, int(self.x), int(self.y), radius, (*self.color, alpha))
 
-def draw_background(surface):
+def draw_background(screen):
     # Dégradé de fond
     for y in range(H):
         # Interpolation entre deux couleurs pour créer un dégradé
@@ -168,7 +178,7 @@ def draw_background(surface):
             int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / H))
             for i in range(3)
         ]
-        pygame.draw.line(surface, color, (0, y), (W, y))
+        pygame.draw.line(screen, color, (0, y), (W, y))
 
 def theme_choicer(screen):
     # Créer les cartes de thèmes
