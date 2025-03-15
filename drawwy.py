@@ -152,8 +152,10 @@ while running:
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
             screen, current_page, buttons = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click, buttons)
+        # === ÉCRAN DES Crédits ===
         elif current_page == "credits":
             screen, current_page, buttons = credit.show_credit(screen, W,H, mouse_pos, mouse_click, buttons)
+        #=== ÉCRAN DU SHOP ===
         elif current_page == "shop":
              screen, current_page, buttons = shop.show_shop(screen, W,H, mouse_pos, mouse_click, buttons)
         
