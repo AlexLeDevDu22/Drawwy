@@ -12,7 +12,8 @@ def soloGame(screen):
         elif soloPage=="images":
             screen, soloPage, image=image_selector(screen, theme)
         elif soloPage=="play":
-            screen, soloPage=SoloPlay(screen, theme, image)
+            SoloPlay(screen, theme, image)
+            return screen, "home"
         elif soloPage=="exit":
             return screen, "home"
                 

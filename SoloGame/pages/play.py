@@ -77,7 +77,7 @@ class SoloPlay:
             self.draw_validate_button()
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
-                return self.screen, "exit"
+                return
 
             pygame.display.flip()
 
