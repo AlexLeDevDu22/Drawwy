@@ -1,14 +1,14 @@
-- [ ] Couleurs
+- [x] Couleurs
 - [ ] skin souris
 - [ ] Bordure pdp
 - [ ] Badge apres pseudo
 - [ ] Emojis speciaux
-- [ ] Réglé les bugs visuel du shop
+- [x] Réglé les bugs visuel du shop
 - [ ] Rendre moins "fade" l'ui drawer
 - [ ] easter egg
-- [ ] Achievement
+- [x] Achievement
 - [ ] Stocker points
 - [ ] Si ts les achievements, courone sur la pdp
-- [ ] 1 achievement égal une couleur pour la pp
+- [x] 1 achievement égal une couleur pour la pp
 - [ ] Possibilité de régénére une phrase (1 fois par game)
-- [X] Réglé les bugs lié au particule dans le shop
+- [x] Réglé les bugs lié au particule dans le shop
