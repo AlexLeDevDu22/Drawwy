@@ -1,4 +1,5 @@
 from shared.ui.common_ui import *
+from shared.ui.elements import *
 
 import pygame
 import sys
@@ -23,58 +24,6 @@ difficulties = ["Facile", "Moyen", "Difficile"]
 
 W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
-class Button:
-    def __init__(self, x, y, W, H, text, color, hover_color, text_color=WHITE, border_radius=15):
-        self.rect = pygame.Rect(x, y, W, H)
-        self.text = text
-        self.color = color
-        self.hover_color = hover_color
-        self.text_color = text_color
-        self.border_radius = border_radius
-        self.is_hovered = False
-        self.animation_progress = 0
-        self.scale = 1.0
-        
-    def draw(self, surface):
-        # Animation de survol
-        if self.is_hovered and self.animation_progress < 1:
-            self.animation_progress += 0.1
-        elif not self.is_hovered and self.animation_progress > 0:
-            self.animation_progress -= 0.1
-        
-        self.animation_progress = max(0, min(1, self.animation_progress))
-        
-        # color interpolée
-        color = [
-            int(self.color[i] + (self.hover_color[i] - self.color[i]) * self.animation_progress)
-            for i in range(3)
-        ]
-        
-        # Échelle pour effet de survol
-        self.scale = 1.0 + 0.05 * self.animation_progress
-        scaled_W = int(self.rect.w * self.scale)
-        scaled_H = int(self.rect.h * self.scale)
-        
-        # Position centrée pour l'animation
-        scaled_x = self.rect.x + (self.rect.w - scaled_W) // 2
-        scaled_y = self.rect.y + (self.rect.h - scaled_H) // 2
-        
-        # Dessiner le bouton arrondi
-        scaled_rect = pygame.Rect(scaled_x, scaled_y, scaled_W, scaled_H)
-        pygame.draw.rect(surface, color, scaled_rect, border_radius=self.border_radius)
-        
-        # Dessiner le texte
-        text_surf = BUTTON_FONT.render(self.text, True, self.text_color)
-        text_rect = text_surf.get_rect(center=scaled_rect.center)
-        surface.blit(text_surf, text_rect)
-    
-    def check_hover(self, pos):
-        previous_hover = self.is_hovered
-        self.is_hovered = self.rect.collidepoint(pos)
-        return self.is_hovered != previous_hover
-    
-    def is_clicked(self, pos):
-        return self.rect.collidepoint(pos)
 class ThemeCard:
     def __init__(self, x, y, width, height, theme_info):
         self.rect = pygame.Rect(x, y, width, height)
@@ -94,9 +43,9 @@ class ThemeCard:
     
     def draw(self, surface):
         # Animation de survol
-        if self.is_hovered and self.animation_progress < 1:
+        if (self.is_hovered or self.is_selected) and self.animation_progress < 1:
             self.animation_progress += 0.1
-        elif not self.is_hovered and self.animation_progress > 0:
+        elif not self.is_hovered and not self.is_selected and self.animation_progress > 0:
             self.animation_progress -= 0.1
         
         self.animation_progress = max(0, min(1, self.animation_progress))
@@ -231,8 +180,8 @@ def theme_choicer(screen):
         y = H // 3
         theme_cards.append(ThemeCard(x, y, theme_width, theme_height, theme))
     # Créer le bouton de démarrage
-    start_button = Button(W // 2 - 170, H // 3*2, 340, 70, "Commencer", PURPLE, LIGHT_PURPLE)
-    quit_button = Button(W // 2 - 145, H // 3*2+110, 290, 70, "Quitter", PURPLE, LIGHT_PURPLE)
+    start_button = Button("center", H // 3*2-20, text="Commencer", active=False)
+    quit_button = Button("center", H // 3*2+110, text="Quitter")
     
     # Créer des objets flottants pour l'arrière-plan
     floating_objects = []
@@ -257,6 +206,12 @@ def theme_choicer(screen):
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
+
+        for i, card in enumerate(theme_cards):
+            if card.rect.collidepoint(mouse_pos):
+                card.is_hovered = True
+            else:
+                card.is_hovered = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -267,13 +222,15 @@ def theme_choicer(screen):
             if event.type == pygame.MOUSEBUTTONDOWN and intro_stage >= 2:
                 # Vérifier les clics sur les cartes de thèmes
                 for i, card in enumerate(theme_cards):
-                    if card.rect.collidepoint(mouse_pos):
+                    if card.is_hovered:
                         # Désélectionner toutes les cartes
                         for c in theme_cards:
                             c.is_selected = False
                         # Sélectionner la carte cliquée
                         card.is_selected = True
                         selected_theme = i
+
+                        start_button.active=True
                 
                 
                 # Vérifier le clic sur le bouton de démarrage

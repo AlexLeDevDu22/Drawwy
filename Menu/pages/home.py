@@ -7,7 +7,7 @@ import pygame
 import math
 import random
 
-def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
+def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
     
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -56,26 +56,28 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
     
     # Boutons
     for i, button_text in enumerate(["JOUER", "SUCCÈS", "QUITTER"]):
-        button=Button("center",
-                           int(main_panel_y + 320 + i * 1.3 * 80),
+        if button_text not in buttons.keys():
+            buttons[button_text] = Button("center",
+                           int(main_panel_y + 315 + i * 1.3 * 80),
                            w=500,
+                           h=80,
                            text=button_text)
         
         # Gestion des clics
-        if button.check_hover(mouse_pos) and mouse_click:
+        if buttons[button_text].check_hover(mouse_pos) and mouse_click:
             if button_text == "QUITTER":
                 pygame.quit()
                 sys.exit()
             elif button_text == "JOUER":
-                return screen, "play", particles
+                return screen, "play",buttons
             elif button_text == "SUCCÈS":
-                return screen, "achievements", particles
+                return screen, "achievements", buttons
         
-        button.draw(screen)
+        buttons[button_text].draw(screen)
 
     # Shop
     button_radius = 50
-    shop_button=Button(main_panel_x + button_radius + 10,
+    shop_button=Button(main_panel_x + 10,
                         main_panel_y + main_panel_height- button_radius*2 - 10,
                         radius=button_radius,
                         circle=True,
@@ -83,11 +85,11 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                         image="assets/icon_shop.png")
                         
     if shop_button.check_hover(mouse_pos) and mouse_click:
-        return screen, "shop", particles
+        return screen, "shop",buttons
     shop_button.draw(screen)
 
     # Crédits
-    credit_button=Button(main_panel_x + main_panel_width - button_radius - 10,
+    credit_button=Button(main_panel_x + main_panel_width - button_radius*2 - 10,
                         main_panel_y + main_panel_height- button_radius*2 - 10,
                         text="CRÉDIT",
                         radius=button_radius,
@@ -95,12 +97,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                         text_font=VERY_SMALL_FONT)
                         
     if credit_button.check_hover(mouse_pos) and mouse_click:
-        return screen, "credits", particles
+        return screen, "credits"
     credit_button.draw(screen)
 
-
-    # Effets de particules lors du clic
-    if mouse_click:
-        particles+=generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
-
-    return screen, "home", particles
+    return screen, "home",buttons

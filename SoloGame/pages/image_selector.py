@@ -1,3 +1,6 @@
+from shared.ui.common_ui import *
+from shared.ui.elements import Button
+
 import pygame
 import sys
 import math
@@ -7,7 +10,6 @@ import time
 import yaml
 import os
 
-from shared.ui.common_ui import *
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -114,9 +116,9 @@ class ImageCarousel:
             if current_time >= self.selection_time:
                 distance_to_target = (self.carousel_height//2-self.current_offset%self.carousel_height)%self.carousel_height
                 if self.spin_speed > 0:
-                    self.spin_speed = max(0, self.spin_speed - self.deceleration)
+                    self.spin_speed = max(0, self.spin_speed - random.uniform(self.deceleration, self.deceleration * 2))
                     if distance_to_target < 10 and self.spin_speed < 5:
-                        self.spin_speed = max(0.5, self.spin_speed - random.randint(0.1,0.5))
+                        self.spin_speed = max(0.5, self.spin_speed - 0.5)
                 else:
                     if distance_to_target>1:
                         if distance_to_target<=self.carousel_height//2:
@@ -217,59 +219,6 @@ class ImageCarousel:
                 particle_color
             )
 
-class Button:
-    def __init__(self, x, y, W, H, text, color, hover_color, text_color=WHITE, border_radius=15):
-        self.rect = pygame.Rect(x, y, W, H)
-        self.text = text
-        self.color = color
-        self.hover_color = hover_color
-        self.text_color = text_color
-        self.border_radius = border_radius
-        self.is_hovered = False
-        self.animation_progress = 0
-        self.scale = 1.0
-        
-    def draw(self, surface):
-        # Animation de survol
-        if self.is_hovered and self.animation_progress < 1:
-            self.animation_progress += 0.1
-        elif not self.is_hovered and self.animation_progress > 0:
-            self.animation_progress -= 0.1
-        
-        self.animation_progress = max(0, min(1, self.animation_progress))
-        
-        # color interpolée
-        color = [
-            int(self.color[i] + (self.hover_color[i] - self.color[i]) * self.animation_progress)
-            for i in range(3)
-        ]
-        
-        # Échelle pour effet de survol
-        self.scale = 1.0 + 0.05 * self.animation_progress
-        scaled_W = int(self.rect.w * self.scale)
-        scaled_H = int(self.rect.h * self.scale)
-        
-        # Position centrée pour l'animation
-        scaled_x = self.rect.x + (self.rect.w - scaled_W) // 2
-        scaled_y = self.rect.y + (self.rect.h - scaled_H) // 2
-        
-        # Dessiner le bouton arrondi
-        scaled_rect = pygame.Rect(scaled_x, scaled_y, scaled_W, scaled_H)
-        pygame.draw.rect(surface, color, scaled_rect, border_radius=self.border_radius)
-        
-        # Dessiner le texte
-        text_surf = BUTTON_FONT.render(self.text, True, self.text_color)
-        text_rect = text_surf.get_rect(center=scaled_rect.center)
-        surface.blit(text_surf, text_rect)
-    
-    def check_hover(self, pos):
-        previous_hover = self.is_hovered
-        self.is_hovered = self.rect.collidepoint(pos)
-        return self.is_hovered != previous_hover
-    
-    def is_clicked(self, pos):
-        return self.rect.collidepoint(pos)
-
 class FloatingObject:
     def __init__(self, x, y, size, color, speed):
         self.x = x
@@ -315,12 +264,12 @@ def image_selector(screen, theme_index):
     image_roulette = ImageCarousel(W,H, images)
     
     # Créer le bouton pour lancer la roulette
-    spin_button = Button(W // 2 - 100, H*0.7, 200, 60, "Tourner", themes[theme_index]["color"], LIGHT_PURPLE)
+    spin_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+50))//2, H*0.7, text="Tourner")
     
     # Créer le bouton pour commencer à dessiner (initialement désactivé)
-    start_drawing_button = Button(W // 2 - 100, H *0.7+80, 200, 60, "Dessiner", PURPLE, LIGHT_PURPLE)
+    start_drawing_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+80))//2+BUTTON_FONT.size("Tourner")[0]+40, H *0.7,w=100, h=100, image="assets/valid.svg")
     
-    back_button = Button(W // 2 - 100, H *0.7+200, 200, 60, "Retour", PURPLE, LIGHT_PURPLE)
+    back_button = Button("center", H *0.7+130, text="Retour")
     
     # Créer des objets flottants pour l'arrière-plan
     floating_objects = []
@@ -351,11 +300,11 @@ def image_selector(screen, theme_index):
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Vérifier le clic sur le bouton de rotation
-                if spin_button.is_clicked(mouse_pos) and not image_roulette.is_spinning:
+                if spin_button.check_hover(mouse_pos) and not image_roulette.is_spinning:
                     image_roulette.start_spin()
                 
                 # Vérifier le clic sur le bouton de dessin
-                if start_drawing_button.is_clicked(mouse_pos) and image_roulette.selected_image:
+                if start_drawing_button.check_hover(mouse_pos) and image_roulette.selected_image and not image_roulette.is_spinning:
                     # Lancer le compte à rebours
                     if not show_countdown:
                         show_countdown = True
@@ -363,13 +312,14 @@ def image_selector(screen, theme_index):
                     # Si on voulait passer à la page suivante, ce serait ici
                     print("Lancement de l'interface de dessin...")
 
-                if back_button.is_clicked(mouse_pos):
+                if back_button.check_hover(mouse_pos):
                     return screen ,"theme"
         
         # Mettre à jour les survols
         spin_button.check_hover(mouse_pos)
-        if image_roulette.selected_image:
-            start_drawing_button.check_hover(mouse_pos)
+
+        start_drawing_button.active=image_roulette.selected_image and not image_roulette.is_spinning
+        start_drawing_button.check_hover(mouse_pos)
 
         back_button.check_hover(mouse_pos)
         
@@ -412,6 +362,8 @@ def image_selector(screen, theme_index):
         # Dessiner le bouton de dessin si une image est sélectionnée
         if image_roulette.selected_image:
             start_drawing_button.draw(screen)
+
+        back_button.draw(screen)
         
         # Afficher le compte à rebours si actif
         if show_countdown:

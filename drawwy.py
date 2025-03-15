@@ -33,6 +33,8 @@ pygame.display.set_caption("Drawwy")
 try:gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
 except:pass
 
+buttons={}
+
 # Créer quelques éléments de dessin flottants
 drawing_elements = [BackgroundElement(random.randint(0, W), random.randint(0, H)) for _ in range(50)]
 
@@ -47,6 +49,7 @@ connected=tools.is_connected()
 last_sec_check_connection=datetime.now().second
 
 # État du jeu
+last_current_page = "home"
 current_page = "home"
 # Créer le gestionnaire d'avatar
 avatar_manager = AvatarManager(screen)
@@ -112,6 +115,10 @@ while running:
     for particle in particles:
         particle.draw(screen)
 
+    if last_current_page != current_page:
+        buttons={}
+        last_current_page = current_page
+
     avatar_manager.draw()
     if not (avatar_manager.show_buttons or avatar_manager.is_expanding or avatar_manager.is_retracting):
         # === ÉCRAN DU MENU PRINCIPAL ===
@@ -119,23 +126,23 @@ while running:
             # Mise à jour de l'animation
             animation_counter += 1
             title_angle += 0.02
-            screen, current_page, particles = home.show_home(screen, W, H, mouse_pos, mouse_click, title_angle, particles)
+            screen, current_page, buttons = home.show_home(screen, W, H, mouse_pos, mouse_click, title_angle,buttons)
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
-            screen, current_page = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected)
-        elif current_page == "SoloGame":
+            screen, current_page, buttons = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected, buttons)
+        elif current_page == "Solo":
             soloGame(screen)
             current_page="home"
-        elif current_page == "MultiGame":
+        elif current_page == "Multijoueurs":
             MultiGame(screen, clock, W, H)
             current_page="home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
-            screen, current_page = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click)
+            screen, current_page, buttons = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click, buttons)
         elif current_page == "credits":
-            screen, current_page = credit.show_credit(screen, W,H, mouse_pos, mouse_click)
+            screen, current_page, buttons = credit.show_credit(screen, W,H, mouse_pos, mouse_click, buttons)
         elif current_page == "shop":
-             screen, current_page = shop.show_shop(screen, W,H, mouse_pos, mouse_click)
+             screen, current_page, buttons = shop.show_shop(screen, W,H, mouse_pos, mouse_click, buttons)
         
     # Afficher la version
     version_text = "DRAWWY v1.0"

@@ -1,16 +1,14 @@
 from shared.ui.common_ui import *
 from shared.utils.common_utils import draw_text
-from shared.tools import generate_particles
 
 import pygame
 import math
 import random
 import json
 import os
-particles = []
 
 
-def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
+def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -112,7 +110,6 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
         if mouse_click and hover:
             show_shop.state["selected_category"] = category
             show_shop.state["current_page"] = 0
-            particles += generate_particles(10, tab_x, tab_y, tab_x + tab_width, tab_y + tab_height)
     
     # Bouton mode (sélection/achat)
     mode_width = 160
@@ -148,7 +145,6 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
     # Gestion des clics sur le bouton de mode
     if mouse_click and hover_mode:
         show_shop.state["selection_mode"] = not show_shop.state["selection_mode"]
-        particles += generate_particles(10, mode_x, mode_y, mode_x + mode_width, mode_y + mode_height)
     
     # Filtrer les items selon la catégorie sélectionnée
     filtered_items = [item for item in items if show_shop.state["selected_category"] == "tous" or item["category"] == show_shop.state["selected_category"]]
@@ -222,7 +218,6 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
         
         # Gestion des clics sur les items
         if mouse_click and hover_item:
-            particles += generate_particles(15, item_x, item_y, item_x + item_width, item_y + item_height)
             
             if show_shop.state["selection_mode"]:
                 if item["purchased"]:
@@ -267,7 +262,6 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
             
             if mouse_click and prev_hover:
                 show_shop.state["current_page"] -= 1
-                particles += generate_particles(10, prev_x, nav_y, prev_x + nav_width, nav_y + nav_height)
         
         # Bouton suivant
         next_hover = next_x <= mouse_pos[0] <= next_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
@@ -283,7 +277,6 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
             
             if mouse_click and next_hover:
                 show_shop.state["current_page"] += 1
-                particles += generate_particles(10, next_x, nav_y, next_x + nav_width, nav_y + nav_height)
         
         # Afficher numéro de page
         draw_text(f"Page {show_shop.state['current_page'] + 1}/{total_pages}", SMALL_FONT, BLACK, screen,
@@ -314,14 +307,10 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, particles):
     
     # Gestion du clic sur le bouton retour
     if mouse_click and hover_back:
-        particles += generate_particles(15, back_x, back_y, back_x + back_width, back_y + back_height)
-        return screen, "home", particles
+        return screen, "home", buttons
     
-    # Effets de particules lors du clic
-    if mouse_click:
-        particles += generate_particles(10, mouse_pos[0] - 20, mouse_pos[1] - 20, mouse_pos[0] + 20, mouse_pos[1] + 20)
     
-    return screen, "shop", particles
+    return screen, "shop", buttons
 
 def load_items():
     """Charge les objets de décoration depuis un fichier JSON ou crée des objets par défaut"""

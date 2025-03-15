@@ -78,9 +78,6 @@ class SoloPlay:
             self.draw_validate_button()
 
 
-
-
-
             pygame.display.flip()
 
     def define_layout(self):

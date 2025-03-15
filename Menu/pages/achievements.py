@@ -1,11 +1,10 @@
 from shared.ui.common_ui import *
-from shared.utils.common_utils import draw_text, draw_textbox, draw_texte_achievement
+from shared.utils.common_utils import draw_text
+from shared.ui.elements import Button
 import json
 
-def show_achievements(screen,W,H, mouse_pos, mouse_click):
+def show_achievements(screen,W,H, mouse_pos, mouse_click, buttons):
     
-
-
     # Titre
     draw_text("SUCCÈS", BUTTON_FONT, BLACK, screen, W // 2, 100)
     
@@ -80,11 +79,11 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click):
         achievement_y += achievement_height + 10
     
     # Bouton de retour
-    back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
-                                    200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
-    
 
-    if mouse_click and back_button_rect.collidepoint(mouse_pos):
-        return screen, "home"
-    return screen, "achievements"
+    if "back" not in buttons:
+        buttons["back"] = Button("center", H * 0.8, text="RETOUR")
+    if buttons["back"].check_hover(mouse_pos) and mouse_click:
+        return screen, "home", buttons
+    buttons["back"].draw(screen)
+    return screen, "achievements", buttons
     

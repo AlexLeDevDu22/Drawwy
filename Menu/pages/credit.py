@@ -1,8 +1,9 @@
-from shared.utils.common_utils import draw_text, draw_textbox
+from shared.utils.common_utils import draw_text
 from shared.ui.common_ui import *
+from shared.ui.elements import Button
 
 
-def show_credit(screen, W, H, mouse_pos, mouse_clicked):
+def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
 
     draw_text("Crédits", BUTTON_FONT, BLACK, screen, W // 2, 100)
 
@@ -11,10 +12,10 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked):
     draw_text("Merci d'avoir joué à DRAWWY !", SMALL_FONT, BLACK, screen, W // 2, 400)
 
     # Bouton retour
-    back_button_rect = draw_textbox("RETOUR", W // 2 - 100, H - 100, 
-                                    200, 50, SMALL_FONT, BLACK, ORANGE, screen, 25)
+    if "back" not in buttons:
+        buttons["back"] = Button("center", H * 0.8, text="RETOUR")
+    if buttons["back"].check_hover(mouse_pos) and mouse_clicked:
+        return screen, "home", buttons
+    buttons["back"].draw(screen)
 
-    if mouse_clicked and back_button_rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-        return screen, "home"
-
-    return screen, "credits"
+    return screen, "credits", buttons
