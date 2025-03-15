@@ -5,7 +5,7 @@ from Menu.pages import play
 from Menu.pages import home
 from Menu.pages import credit
 from Menu.pages import shop
-from shared.common_utils import *
+from shared.utils.common_utils import *
 
 import Menu.pages.play as play
 import shared.tools as tools
@@ -14,14 +14,14 @@ import pygame
 import sys
 import random
 from datetime import datetime
-from shared.common_ui import *
-from SoloGame import SoloGame
+from shared.ui.common_ui import *
 from MultiGame import MultiGame
+from SoloGame import soloGame
 
 if sys.platform.startswith("win"):
     import pygetwindow as gw
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 pygame.init()
@@ -124,7 +124,7 @@ while running:
         elif current_page == "play":
             screen, current_page = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected)
         elif current_page == "SoloGame":
-            SoloGame(screen)
+            soloGame(screen)
             current_page="home"
         elif current_page == "MultiGame":
             MultiGame(screen, clock, W, H)
@@ -143,7 +143,7 @@ while running:
     screen.blit(text_surface, (20, H - 30))
     
     pygame.display.flip()
-    clock.tick(config["game_page_fps"])
+    clock.tick(config["fps"])
 
 pygame.quit()
 sys.exit()

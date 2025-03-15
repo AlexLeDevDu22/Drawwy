@@ -1,9 +1,9 @@
-from shared.common_ui import *
+from shared.ui.common_ui import *
 from shared.tools import get_screen_size, apply_circular_mask
 import json
 import pygame
 
-with open("assets/players_data.json") as f:
+with open("data/players_data.json") as f:
     player_data = json.load(f)
 # Classe pour la gestion de l'avatar
 class AvatarManager:
@@ -141,7 +141,7 @@ class AvatarManager:
                     self.show_buttons = False
                     self.pseudo_editable = False
                     self.is_retracting = True
-                    with open("assets/players_data.json", "w") as f:
+                    with open("data/players_data.json", "w") as f:
                         json.dump(player_data, f)
 
                     return True
@@ -181,7 +181,7 @@ class AvatarManager:
                 self.show_buttons = False
                 self.pseudo_editable = False
                 self.is_retracting = True
-                with open("assets/players_data.json", "w") as f:
+                with open("data/players_data.json", "w") as f:
                     json.dump(player_data, f)
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC

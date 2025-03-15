@@ -1,11 +1,11 @@
 import pygame, yaml
 import MultiGame.utils.tools as tools
-from shared.common_ui import *
+from shared.ui.common_ui import *
 
 try:from pygame_emojis import load_emoji
 except:import pygame.freetype 
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 
@@ -56,7 +56,7 @@ def players(MultiGame):
 
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, config["data/players_colors"][y%len(config["data/players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
         #avatar TODO FOR EMOJI!!!!
         if player["avatar"]["type"]=="matrix":
@@ -221,7 +221,7 @@ def drawing(MultiGame):
                         tools.emit_sio(MultiGame.SIO, "roll_back", MultiGame.ROLL_BACK)
 
     #send draw
-    if MultiGame.frame_num==config["game_page_fps"]-1 and MultiGame.second_draw_frames!=[]:
+    if MultiGame.frame_num==config["fps"]-1 and MultiGame.second_draw_frames!=[]:
         print("draw sended")
         tools.emit_sio(MultiGame.SIO, "draw", tools.simplify_frames(MultiGame.second_draw_frames))#send draw
         MultiGame.second_draw_frames=[]

@@ -1,5 +1,5 @@
-from shared.common_ui import *
-from shared.common_utils import *
+from shared.ui.common_ui import *
+from shared.utils.common_utils import *
 from shared.tools import is_connected
 
 def play_choicer(screen, W, H, mouse_pos, mouse_click, connected):

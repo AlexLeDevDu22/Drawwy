@@ -1,19 +1,15 @@
 import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-
 from Menu.ui.elements import *
 from shared.tools import get_screen_size, generate_particles
-from shared.common_ui import *
-from shared.common_utils import *
+from shared.ui.common_ui import *
+from shared.utils.common_utils import *
+from shared.ui.elements import Particle
 import json
 import pygame
 import random
 import math
 
-with open("assets/players_data.json") as f:
+with open("data/players_data.json") as f:
     player_data = json.load(f)
 
 

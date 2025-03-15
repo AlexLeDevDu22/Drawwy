@@ -25,7 +25,7 @@ import time
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 
@@ -202,7 +202,7 @@ class SoloGame:
         self.guess=""
         
         while 1:
-            clock.tick(config["game_page_fps"])
+            clock.tick(config["fps"])
 
 
             

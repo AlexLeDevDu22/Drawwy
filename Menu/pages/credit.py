@@ -1,5 +1,5 @@
-from shared.common_utils import draw_text, draw_textbox
-from shared.common_ui import *
+from shared.utils.common_utils import draw_text, draw_textbox
+from shared.ui.common_ui import *
 
 
 def show_credit(screen, W, H, mouse_pos, mouse_clicked):

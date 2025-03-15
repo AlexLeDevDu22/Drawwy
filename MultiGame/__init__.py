@@ -1,4 +1,4 @@
-from shared.common_ui import *
+from shared.ui.common_ui import *
 from MultiGame.ui.widgets import *
 import MultiGame.utils.connection as connection
 
@@ -10,7 +10,7 @@ import asyncio
 import os
 from datetime import datetime, timedelta
 
-with open("assets/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 class MultiGame:
@@ -70,7 +70,7 @@ class MultiGame:
             self.PLAYERS=[]
             
             while 1:
-                clock.tick(config["game_page_fps"])
+                clock.tick(config["fps"])
 
                 for player in self.PLAYERS:
                     if player["id"] == self.PLAYER_ID:
@@ -122,7 +122,7 @@ class MultiGame:
                 
                 pygame.display.flip()
                 
-                self.frame_num=(self.frame_num+1)%config["game_page_fps"]
+                self.frame_num=(self.frame_num+1)%config["fps"]
 
         except KeyboardInterrupt:
             threading.Thread(target=connection.disconnect, daemon=True).start()
