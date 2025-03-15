@@ -31,7 +31,7 @@ def show_achievements(screen,W,H, mouse_pos, mouse_click, buttons):
  
 
     achievements = [
-        {"name": "Premier Tracé", "description": "Tracé quelque chose", "completed": True},
+        {"name": "Premier Tracé", "description": "Tracé quelque chose", "completed": players_data["achievements"][0]["succeed"]},
         {"name": "Artiste en herbe", "description": "Dessinez 10 dessins", "completed": players_data["achievements"][1]["succeed"]},
         {"name": "Maître du crayon", "description": "Dessinez 50 dessins", "completed": players_data["achievements"][2]["succeed"]},
         {"name": "Collaborateur", "description": "Jouez en multijoueur 5 fois", "completed": players_data["achievements"][3]["succeed"]},
