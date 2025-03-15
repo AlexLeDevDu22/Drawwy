@@ -282,19 +282,17 @@ def image_selector(screen, theme_index):
         floating_objects.append(FloatingObject(x, y, size, color_choice, speed))
     
     # Variables d'état
-    running = True
     countdown_start_time = 0
     show_countdown = False
 
     clock=pygame.time.Clock()
     
     
-    while running:
+    while True:
         mouse_pos = pygame.mouse.get_pos()
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 pygame.quit()
                 sys.exit()
             
@@ -313,7 +311,7 @@ def image_selector(screen, theme_index):
                     print("Lancement de l'interface de dessin...")
 
                 if back_button.check_hover(mouse_pos):
-                    return screen ,"theme"
+                    return screen ,"themes", image_roulette.selected_image
         
         # Mettre à jour les survols
         spin_button.check_hover(mouse_pos)
@@ -393,5 +391,3 @@ def image_selector(screen, theme_index):
         # Mettre à jour l'affichage
         pygame.display.flip()
         clock.tick(config["fps"])
-    
-    return None  # À remplacer par un retour vers la page suivante
