@@ -1,3 +1,6 @@
+from shared.ui.common_ui import *
+from shared.ui.elements import Button
+
 import pygame
 import sys
 import math
@@ -5,8 +8,8 @@ import random
 from pygame import gfxdraw
 import time
 import yaml
+import os
 
-from shared.ui.common_ui import *
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -15,22 +18,22 @@ W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 # Définition des thèmes et des données d'exemple d'images
 themes = [
-    {"nom": "Paysage", "couleur": GREEN, "icone": "🏞️"},
-    {"nom": "Nourriture", "couleur": YELLOW, "icone": "🍔"},
-    {"nom": "Animaux", "couleur": BLUE, "icone": "🦁"},
-    {"nom": "Mode", "couleur": PINK, "icone": "👗"},
+    {"name": "Paysage", "color": GREEN, "icon": "🏞️"},
+    {"name": "Nourriture", "color": YELLOW, "icon": "🍔"},
+    {"name": "Animaux", "color": BLUE, "icon": "🦁"},
+    {"name": "Mode", "color": PINK, "icon": "👗"},
 ]
 
 # Images fictives pour chaque thème (normalement chargées depuis Internet)
-def generate_placeholder_images(theme_index, count=10):
-    # theme_color = themes[theme_index]["couleur"]
+def generate_placeholder_images(theme, theme_index, count=10):
+    # theme_color = themes[theme_index]["color"]
     # images = []
     
     # for i in range(count):
     #     # Créer une surface pour représenter une image
     #     img_surface = pygame.Surface((300, 300))
         
-    #     # Remplir avec la couleur du thème
+    #     # Remplir avec la color du thème
     #     img_surface.fill(theme_color)
         
     #     # Ajouter des formes aléatoires pour différencier chaque image
@@ -71,8 +74,8 @@ def generate_placeholder_images(theme_index, count=10):
     #     images.append(img_surface)
 
     images=[]
-    for i in range(1,11):
-        image=pygame.image.load(f"tests/{i}.jpeg")
+    for i in range(len(os.listdir(f"assets/soloImages/{themes[theme]['name']}"))):
+        image=pygame.image.load(f"assets/soloImages/{themes[theme]["name"]}/{i}.jpeg")
         images.append(image)
     
     return images
@@ -89,21 +92,19 @@ class ImageCarousel:
         self.current_offset = 0  # Position actuelle des images
         self.deceleration = 0.2  # Décélération progressive
         self.is_spinning = False
-        self.target_index = None
         self.selection_time = 0
         self.selection_delay = 3  # Temps avant l'arrêt
         self.shake_intensity = 0
         self.selected_image = None
         self.spin_speed=0
-        self.max_spin_speed = 30
+        self.max_spin_speed = 40
         self.particles=[]
         self.images_opacity=0
         
     def start_spin(self):
         self.is_spinning = True
-        self.spin_speed = random.randint(self.max_spin_speed-10, self.max_spin_speed)  # Relancer avec la vitesse max
+        self.spin_speed = random.randint(self.max_spin_speed-20, self.max_spin_speed)  # Relancer avec la vitesse max
         self.selection_time = time.time() + self.selection_delay
-        self.target_index = random.randint(0, len(self.images) - 1)
     
     def update(self):
         if self.is_spinning:
@@ -115,7 +116,7 @@ class ImageCarousel:
             if current_time >= self.selection_time:
                 distance_to_target = (self.carousel_height//2-self.current_offset%self.carousel_height)%self.carousel_height
                 if self.spin_speed > 0:
-                    self.spin_speed = max(0, self.spin_speed - self.deceleration)
+                    self.spin_speed = max(0, self.spin_speed - random.uniform(self.deceleration, self.deceleration * 2))
                     if distance_to_target < 10 and self.spin_speed < 5:
                         self.spin_speed = max(0.5, self.spin_speed - 0.5)
                 else:
@@ -126,7 +127,8 @@ class ImageCarousel:
                             self.current_offset-=math.sqrt(distance_to_target)
                     else:
                         self.is_spinning = False
-                        self.selected_image = self.images[self.target_index]
+                        self.selected_image = (round(self.current_offset / self.carousel_height)+1) % len(self.images)
+
                         self.shake_intensity = 0
 
                         # Ajouter des particules pour célébrer la sélection
@@ -217,59 +219,6 @@ class ImageCarousel:
                 particle_color
             )
 
-class Button:
-    def __init__(self, x, y, W, H, text, color, hover_color, text_color=WHITE, border_radius=15):
-        self.rect = pygame.Rect(x, y, W, H)
-        self.text = text
-        self.color = color
-        self.hover_color = hover_color
-        self.text_color = text_color
-        self.border_radius = border_radius
-        self.is_hovered = False
-        self.animation_progress = 0
-        self.scale = 1.0
-        
-    def draw(self, surface):
-        # Animation de survol
-        if self.is_hovered and self.animation_progress < 1:
-            self.animation_progress += 0.1
-        elif not self.is_hovered and self.animation_progress > 0:
-            self.animation_progress -= 0.1
-        
-        self.animation_progress = max(0, min(1, self.animation_progress))
-        
-        # Couleur interpolée
-        color = [
-            int(self.color[i] + (self.hover_color[i] - self.color[i]) * self.animation_progress)
-            for i in range(3)
-        ]
-        
-        # Échelle pour effet de survol
-        self.scale = 1.0 + 0.05 * self.animation_progress
-        scaled_W = int(self.rect.w * self.scale)
-        scaled_H = int(self.rect.h * self.scale)
-        
-        # Position centrée pour l'animation
-        scaled_x = self.rect.x + (self.rect.w - scaled_W) // 2
-        scaled_y = self.rect.y + (self.rect.h - scaled_H) // 2
-        
-        # Dessiner le bouton arrondi
-        scaled_rect = pygame.Rect(scaled_x, scaled_y, scaled_W, scaled_H)
-        pygame.draw.rect(surface, color, scaled_rect, border_radius=self.border_radius)
-        
-        # Dessiner le texte
-        text_surf = BUTTON_FONT.render(self.text, True, self.text_color)
-        text_rect = text_surf.get_rect(center=scaled_rect.center)
-        surface.blit(text_surf, text_rect)
-    
-    def check_hover(self, pos):
-        previous_hover = self.is_hovered
-        self.is_hovered = self.rect.collidepoint(pos)
-        return self.is_hovered != previous_hover
-    
-    def is_clicked(self, pos):
-        return self.rect.collidepoint(pos)
-
 class FloatingObject:
     def __init__(self, x, y, size, color, speed):
         self.x = x
@@ -300,27 +249,27 @@ class FloatingObject:
 def draw_background(surface):
     # Dégradé de fond bleu clair
     for y in range(H):
-        # Interpolation entre deux couleurs pour créer un dégradé
+        # Interpolation entre deux colors pour créer un dégradé
         color = [
             int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / H))
             for i in range(3)
         ]
         pygame.draw.line(surface, color, (0, y), (W, y))
 
-def image_selector(screen, selected_theme, difficulty):
+def image_selector(screen, theme_index):
     # Générer des images d'exemple pour le thème sélectionné
-    images = generate_placeholder_images(selected_theme, 15)
+    images = generate_placeholder_images(theme_index, 15)
     
     # Créer la roulette d'images
     image_roulette = ImageCarousel(W,H, images)
     
     # Créer le bouton pour lancer la roulette
-    spin_button = Button(W // 2 - 100, H*0.7, 200, 60, "Tourner", themes[selected_theme]["couleur"], LIGHT_PURPLE)
+    spin_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+90))//2, H*0.7, text="Tourner")
     
     # Créer le bouton pour commencer à dessiner (initialement désactivé)
-    start_drawing_button = Button(W // 2 - 100, H *0.7+80, 200, 60, "Dessiner", PURPLE, LIGHT_PURPLE)
+    start_drawing_button = Button((W-(BUTTON_FONT.size("Tourner")[0]+80))//2+BUTTON_FONT.size("Tourner")[0]+40, H *0.7,w=100, h=100, image="assets/valid.svg")
     
-    back_button = Button(W // 2 - 100, H *0.7+200, 200, 60, "Retour", PURPLE, LIGHT_PURPLE)
+    back_button = Button("center", H *0.7+130, text="Retour")
     
     # Créer des objets flottants pour l'arrière-plan
     floating_objects = []
@@ -334,16 +283,11 @@ def image_selector(screen, selected_theme, difficulty):
     
     # Variables d'état
     running = True
-    image_selected = False
     countdown_start_time = 0
     show_countdown = False
 
     clock=pygame.time.Clock()
     
-    # Animation d'introduction
-    intro_alpha = 255
-    intro_stage = 0
-    intro_timer = 0
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
@@ -354,13 +298,13 @@ def image_selector(screen, selected_theme, difficulty):
                 pygame.quit()
                 sys.exit()
             
-            if event.type == pygame.MOUSEBUTTONDOWN and intro_stage >= 2:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 # Vérifier le clic sur le bouton de rotation
-                if spin_button.is_clicked(mouse_pos) and not image_roulette.is_spinning:
+                if spin_button.check_hover(mouse_pos) and not image_roulette.is_spinning:
                     image_roulette.start_spin()
                 
                 # Vérifier le clic sur le bouton de dessin
-                if start_drawing_button.is_clicked(mouse_pos) and image_roulette.selected_image:
+                if start_drawing_button.check_hover(mouse_pos) and image_roulette.selected_image and not image_roulette.is_spinning:
                     # Lancer le compte à rebours
                     if not show_countdown:
                         show_countdown = True
@@ -368,14 +312,14 @@ def image_selector(screen, selected_theme, difficulty):
                     # Si on voulait passer à la page suivante, ce serait ici
                     print("Lancement de l'interface de dessin...")
 
-                if back_button.is_clicked(mouse_pos):
+                if back_button.check_hover(mouse_pos):
                     return screen ,"theme"
         
         # Mettre à jour les survols
-        if intro_stage >= 2:
-            spin_button.check_hover(mouse_pos)
-            if image_roulette.selected_image:
-                start_drawing_button.check_hover(mouse_pos)
+        spin_button.check_hover(mouse_pos)
+
+        start_drawing_button.active=image_roulette.selected_image and not image_roulette.is_spinning
+        start_drawing_button.check_hover(mouse_pos)
 
         back_button.check_hover(mouse_pos)
         
@@ -392,85 +336,59 @@ def image_selector(screen, selected_theme, difficulty):
         # Dessiner les objets flottants
         for obj in floating_objects:
             obj.draw(screen)
+       
         
-        # Animation d'introduction
-        if intro_stage == 0:
-            # Fondu d'entrée
-            intro_alpha -= 3
-            if intro_alpha <= 0:
-                intro_alpha = 0
-                intro_stage = 1
-                intro_timer = 60  # Attendre 1 seconde
-            
-            # Dessiner un rectangle noir qui disparaît
-            intro_surf = pygame.Surface((W, H))
-            intro_surf.fill(BLACK)
-            intro_surf.set_alpha(intro_alpha)
-            screen.blit(intro_surf, (0, 0))
+        # Dessiner le titre avec une ombre
+        title_shadow = TITLE_FONT.render("DRAWWY", True, BLACK)
+        title_shadow_rect = title_shadow.get_rect(center=(W//2+4, 104))
+        screen.blit(title_shadow, title_shadow_rect)
         
-        elif intro_stage == 1:
-            # Attendre un moment
-            intro_timer -= 1
-            if intro_timer <= 0:
-                intro_stage = 2
+        title = TITLE_FONT.render("DRAWWY", True, WHITE)
+        title_rect = title.get_rect(center=(W//2, 100))
+        screen.blit(title, title_rect)
         
-        else:
-            # Animation terminée, afficher l'interface
-            
-            # Dessiner le titre avec une ombre
-            title_shadow = TITLE_FONT.render("DRAWWY", True, BLACK)
-            title_shadow_rect = title_shadow.get_rect(center=(W//2+4, 104))
-            screen.blit(title_shadow, title_shadow_rect)
-            
-            title = TITLE_FONT.render("DRAWWY", True, WHITE)
-            title_rect = title.get_rect(center=(W//2, 100))
-            screen.blit(title, title_rect)
-            
-            # Dessiner le sous-titre avec le thème sélectionné
-            subtitle = BUTTON_FONT.render(f"Thème: {themes[selected_theme]['nom']}", True, WHITE)
-            subtitle_rect = subtitle.get_rect(center=(W//2, 170))
-            screen.blit(subtitle, subtitle_rect)
-            
-            # Afficher la difficulté
-            diff_text = MEDIUM_FONT.render(f"Difficulté: {['Facile', 'Moyen', 'Difficile'][difficulty]}", True, WHITE)
-            diff_rect = diff_text.get_rect(topleft=(50, 50))
-            screen.blit(diff_text, diff_rect)
-            
-            # Dessiner la roulette d'images
-            image_roulette.draw(screen)
-            
-            # Dessiner le bouton de rotation
-            if not image_roulette.selected_image or not image_roulette.is_spinning:
-                spin_button.draw(screen)
-            
-            # Dessiner le bouton de dessin si une image est sélectionnée
-            if image_roulette.selected_image:
-                start_drawing_button.draw(screen)
-            
-            # Afficher le compte à rebours si actif
-            if show_countdown:
-                elapsed = time.time() - countdown_start_time
-                if elapsed < 3:
-                    countdown_value = 3 - int(elapsed)
-                    countdown_text = TITLE_FONT.render(str(countdown_value), True, WHITE)
-                    countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
-                    
-                    # Ajouter un effet de pulsation
-                    scale = 1.0 + 0.2 * math.sin(elapsed * 10)
-                    countdown_text = pygame.transform.scale(
-                        countdown_text, 
-                        (int(countdown_rect.w * scale), int(countdown_rect.h * scale))
-                    )
-                    countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
-                    
-                    # Dessiner un cercle d'arrière-plan
-                    pygame.draw.circle(screen, PURPLE, (W//2, H//2), 80 * scale, 0)
-                    screen.blit(countdown_text, countdown_rect)
-                else:
-                    # Le compte à rebours est terminé, on lancerait normalement la prochaine page
-                    show_countdown = False
-                    
-                    return screen, "game"
+        # Dessiner le sous-titre avec le thème sélectionné
+        subtitle = BUTTON_FONT.render(f"Thème: {themes[theme_index]['name']}", True, WHITE)
+        subtitle_rect = subtitle.get_rect(center=(W//2, 220))
+        screen.blit(subtitle, subtitle_rect)
+        
+        # Dessiner la roulette d'images
+        image_roulette.draw(screen)
+        
+        # Dessiner le bouton de rotation
+        if not image_roulette.selected_image or not image_roulette.is_spinning:
+            spin_button.draw(screen)
+        
+        # Dessiner le bouton de dessin si une image est sélectionnée
+        if image_roulette.selected_image:
+            start_drawing_button.draw(screen)
+
+        back_button.draw(screen)
+        
+        # Afficher le compte à rebours si actif
+        if show_countdown:
+            elapsed = time.time() - countdown_start_time
+            if elapsed < 3:
+                countdown_value = 3 - int(elapsed)
+                countdown_text = BUTTON_FONT.render(str(countdown_value), True, WHITE)
+                countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
+                
+                # Ajouter un effet de pulsation
+                scale = 1.0 + 0.2 * math.sin(elapsed * 10)
+                countdown_text = pygame.transform.scale(
+                    countdown_text, 
+                    (int(countdown_rect.w * scale), int(countdown_rect.h * scale))
+                )
+                countdown_rect = countdown_text.get_rect(center=(W//2, H//2))
+                
+                # Dessiner un cercle d'arrière-plan
+                pygame.draw.circle(screen, PURPLE, (W//2, H//2), 80 * scale, 0)
+                screen.blit(countdown_text, countdown_rect)
+            else:
+                # Le compte à rebours est terminé, on lancerait normalement la prochaine page
+                show_countdown = False
+                
+                return screen, "play", image_roulette.selected_image
         
         # Mettre à jour l'affichage
         pygame.display.flip()

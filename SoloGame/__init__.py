@@ -5,14 +5,14 @@ from SoloGame.pages.play import SoloPlay
 import pygame
 
 def soloGame(screen):
-    soloPage="theme"
+    soloPage="themes"
     while True:
-        if soloPage=="theme":
-            screen, soloPage, theme, difficulty=theme_choicer(screen)
-        elif soloPage=="image":
-            screen, soloPage=image_selector(screen, theme, difficulty)
-        elif soloPage=="image":
-            screen, soloPage=SoloPlay(screen)
+        if soloPage=="themes":
+            screen, soloPage, theme=theme_choicer(screen)
+        elif soloPage=="images":
+            screen, soloPage, image=image_selector(screen, theme)
+        elif soloPage=="play":
+            screen, soloPage=SoloPlay(screen, theme, image)
         elif soloPage=="exit":
             return screen, "home"
                 

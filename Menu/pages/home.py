@@ -1,31 +1,31 @@
 from shared.ui.common_ui import *
 from shared.utils.common_utils import draw_text
+from shared.ui.elements import Button
 from shared.tools import generate_particles
-
 import pygame
 import math
 import random
 
-def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
+def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
     
     # Panneau principal (effet papier)
     main_panel_width = 900
     main_panel_height = 750
     main_panel_x = (W - main_panel_width) // 2
     main_panel_y = (H - main_panel_height) // 2
-    
+   
     # Ombre du panneau
-    pygame.draw.rect(screen, DARK_BEIGE, 
-                    (main_panel_x + 15, main_panel_y + 15, 
-                    main_panel_width, main_panel_height), 
+    pygame.draw.rect(screen, DARK_BEIGE,
+                    (main_panel_x + 15, main_panel_y + 15,
+                    main_panel_width, main_panel_height),
                     border_radius=40)
-    
+   
     # Panneau principal
-    pygame.draw.rect(screen, BEIGE, 
-                    (main_panel_x, main_panel_y, 
-                    main_panel_width, main_panel_height), 
+    pygame.draw.rect(screen, BEIGE,
+                    (main_panel_x, main_panel_y,
+                    main_panel_width, main_panel_height),
                     border_radius=40)
-    
+   
     # Texture du papier (points aléatoires)
     for _ in range(500):
         px = random.randint(main_panel_x, main_panel_x + main_panel_width)
@@ -38,130 +38,73 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle, particles):
                 min(255, max(0, BEIGE[2] + color_variation))
             )
             pygame.draw.circle(screen, point_color, (px, py), 1)
+   
+    # Chargement et affichage de l'image du titre
+    title_img = pygame.image.load("assets/logo.png").convert_alpha()
     
-    # Titre avec effet d'animation
-    title_scale = 1.0 + 0.05 * math.sin(title_angle * 2)
-    title_size = int(280 * title_scale)
-    TITLE_FONT_animated = pygame.font.SysFont(None, title_size)
+    # Animation de l'image du titre (échelle)
+    title_scale = 2.5 + 0.1 * math.sin(title_angle * 2)
+    orig_width, orig_height = title_img.get_size()
+    scaled_width = int(orig_width * title_scale)
+    scaled_height = int(orig_height * title_scale)
+    title_img_scaled = pygame.transform.scale(title_img, (scaled_width, scaled_height))
     
-    # Ombre du titre
-    draw_text("DRAWWY", TITLE_FONT_animated, GRAY, screen, 
-            W // 2 + 8, main_panel_y + 150 + 8)
+    # Position de l'image (centrée)
+    title_x = W // 2 - scaled_width // 2
+    title_y = main_panel_y + 85
     
-    # Titre
-    draw_text("DRAWWY", TITLE_FONT_animated, BLACK, screen, 
-            W // 2, main_panel_y + 150)
+    # Ombre du titre (optionnel)
+    shadow_img = title_img_scaled.copy()
+    shadow_img.fill((100, 100, 100, 150), None, pygame.BLEND_RGBA_MULT)
+    screen.blit(shadow_img, (title_x + 6, title_y + 6))
     
-    
+    # Affichage du titre
+    screen.blit(title_img_scaled, (title_x, title_y))
+   
     # Boutons
-    buttons = ["JOUER", "SUCCÈS", "QUITTER"]
-    button_width = 500
-    button_height = 80
-    button_x = (W - button_width) // 2
-    button_y_start = main_panel_y + 320
-    buttons_offsets=5
-    for i, button_text in enumerate(buttons):
-        button_y = int(button_y_start + i * 1.3 * button_height)
-        
-        # Animation de survol
-        hover = button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height
-        
-        
-        # Dessiner l'ombre du bouton
-        pygame.draw.rect(screen, DARK_BEIGE if not hover else GRAY, 
-                    (button_x + buttons_offsets, button_y + buttons_offsets, button_width, button_height), 
-                    border_radius=40)
-        
-        # Dessiner le bouton
-        button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
-        pygame.draw.rect(screen, 
-                        SOFT_ORANGE if hover else ORANGE, 
-                        button_rect, 
-                        border_radius=40)
-        
-
-        # Texte du bouton avec un léger déplacement lorsqu'il est survolé
-        text_y_offset = 3 if hover else 0
-        draw_text(button_text, BUTTON_FONT, BLACK, screen, 
-                button_x + button_width // 2, 
-                button_y + button_height // 2 - text_y_offset)
-        
+    for i, button_text in enumerate(["JOUER", "SUCCÈS", "QUITTER"]):
+        if button_text not in buttons.keys():
+            buttons[button_text] = Button("center",
+                           int(main_panel_y + 315 + i * 1.3 * 80),
+                           w=500,
+                           h=80,
+                           text=button_text)
+       
         # Gestion des clics
-        if mouse_click and hover:
-            particles+=generate_particles(20,button_x, button_y, button_x+button_width, button_y+button_height)
-            
+        if buttons[button_text].check_hover(mouse_pos) and mouse_click:
             if button_text == "QUITTER":
                 pygame.quit()
                 sys.exit()
             elif button_text == "JOUER":
-                return screen, "play", particles
+                return screen, "play",buttons
             elif button_text == "SUCCÈS":
-                return screen, "achievements", particles
-
-        # Crédits
-
-        # Dessiner le bouton rond "crédit"
-        credit_button_radius = 50
-        credit_button_x = main_panel_x + main_panel_width - credit_button_radius - 10
-        credit_button_y = main_panel_y + main_panel_height- credit_button_radius - 10
-        buttons_offsets=4
+                return screen, "achievements", buttons
         
-        # Animation de survol du credit
-        hover_credit = math.sqrt((mouse_pos[0] - credit_button_x)**2 + (mouse_pos[1] - credit_button_y)**2) <= credit_button_radius
-        # Dessiner le cercle
-        pygame.draw.circle(screen, 
-                        DARK_BEIGE if not hover_credit else GRAY, 
-                        (credit_button_x + buttons_offsets-1, credit_button_y + buttons_offsets), 
-                        credit_button_radius)
-        pygame.draw.circle(screen, 
-                        SOFT_ORANGE if hover_credit else ORANGE,
-                        (credit_button_x, credit_button_y),
-                        credit_button_radius)
+        buttons[button_text].draw(screen)
 
-        # Texte du bouton CREDit avec un léger déplacement lorsqu'il est survolé
-        credit_text_y_offset = 3 if hover_credit else 0
-        draw_text("CRÉDIT", VERY_SMALL_FONT, BLACK, screen, 
-                credit_button_x, 
-                credit_button_y - credit_text_y_offset)
-        
-        if hover_credit and mouse_click:
-            particles+=generate_particles(20,credit_button_x-credit_button_radius, credit_button_y-credit_button_radius, credit_button_x+credit_button_radius, credit_button_y+credit_button_radius)
-            return screen, "credits", particles
-        
-        # Charger l'image du logo (assure-toi que le chemin est correct)
-        shop_icon = pygame.image.load("assets/icon_shop.png")
-        shop_icon = pygame.transform.smoothscale(shop_icon, (70, 70))  # Ajuste la taille si besoin
+    # Shop
+    button_radius = 50
+    shop_button=Button(main_panel_x + 10,
+                        main_panel_y + main_panel_height- button_radius*2 - 10,
+                        radius=button_radius,
+                        circle=True,
+                        text_font=VERY_SMALL_FONT,
+                        image="assets/icon_shop.png")
+                       
+    if shop_button.check_hover(mouse_pos) and mouse_click:
+        return screen, "shop",buttons
+    shop_button.draw(screen)
+    
+    # Crédits
+    credit_button=Button(main_panel_x + main_panel_width - button_radius*2 - 10,
+                        main_panel_y + main_panel_height- button_radius*2 - 10,
+                        text="CRÉDIT",
+                        radius=button_radius,
+                        circle=True,
+                        text_font=VERY_SMALL_FONT)
+                       
+    if credit_button.check_hover(mouse_pos) and mouse_click:
+        return screen, "credits"
+    credit_button.draw(screen)
 
-        # Dessiner le bouton rond "Shop"
-        shop_button_radius = 50
-        shop_button_x = main_panel_x + shop_button_radius + 10
-        shop_button_y = main_panel_y + main_panel_height - shop_button_radius - 10
-
-        # Animation de survol du shop
-        hover_shop = math.sqrt((mouse_pos[0] - shop_button_x) ** 2 + (mouse_pos[1] - shop_button_y) ** 2) <= shop_button_radius
-
-        # Dessiner le cercle
-        pygame.draw.circle(screen, 
-                        DARK_BEIGE if not hover_shop else GRAY, 
-                        (shop_button_x + buttons_offsets - 1, shop_button_y + buttons_offsets), 
-                        shop_button_radius)
-        pygame.draw.circle(screen, 
-                        SOFT_ORANGE if hover_shop else ORANGE, 
-                        (shop_button_x, shop_button_y), 
-                        shop_button_radius)
-
-        # Afficher le logo au centre du bouton
-        shop_icon_rect = shop_icon.get_rect(center=(shop_button_x, shop_button_y))
-        screen.blit(shop_icon, shop_icon_rect)
-
-        if hover_shop and mouse_click:
-            particles += generate_particles(20, shop_button_x - shop_button_radius, shop_button_y - shop_button_radius, shop_button_x + shop_button_radius, shop_button_y + shop_button_radius)
-            return screen, "shop", particles
-
-        
-
-    # Effets de particules lors du clic
-    if mouse_click:
-        particles+=generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
-
-    return screen, "home", particles
+    return screen, "home",buttons

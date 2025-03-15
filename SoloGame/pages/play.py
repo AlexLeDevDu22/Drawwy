@@ -17,7 +17,7 @@ def get_screen_size():
     return info_ecran.current_w, info_ecran.current_h
 
 class SoloPlay:
-    def __init__(self, screen):
+    def __init__(self, screen, theme_index, image):
         self.last_mouse_pos = None 
 
         self.screen = screen
@@ -76,10 +76,6 @@ class SoloPlay:
 
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
-
-
-
-
 
             pygame.display.flip()
 
