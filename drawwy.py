@@ -18,9 +18,9 @@ from shared.ui.common_ui import *
 from MultiGame import MultiGame
 from SoloGame import soloGame
 import json
-with open("data/players_data.json") as f:
+with open("data/player_data.json") as f:
         player_data = json.load(f)
-players_data = player_data
+player_data = player_data
 
 if sys.platform.startswith("win"):
     import pygetwindow as gw
@@ -66,12 +66,12 @@ while running:
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
     
-    with open("data/players_data.json") as f:
+    with open("data/player_data.json") as f:
         player_data = json.load(f)
     
-    if players_data != player_data:
+    if player_data != player_data:
         avatar_manager = AvatarManager(screen)
-        players_data = player_data
+        player_data = player_data
 
     if datetime.now().second==(last_sec_check_connection+2)%60:
         last_sec_check_connection=datetime.now().second

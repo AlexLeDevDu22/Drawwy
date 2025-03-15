@@ -11,7 +11,7 @@ class AvatarManager:
         self.screen = screen
         self.W, self.H = get_screen_size()
         self.avatar_size = 100
-        with open("data/players_data.json") as f:
+        with open("data/player_data.json") as f:
             self.player_data = json.load(f)
         self.input_text = self.player_data["pseudo"]
         
@@ -58,18 +58,7 @@ class AvatarManager:
         self.colors = [ (255, 255, 255), (0, 0, 0)]
         # Palette de couleurs pour l'édition d'avatar
 
-        for i in range(5):
-            if self.player_data["achievements"][i]["succeed"]== True:
-                self.colors.append(self.player_data["achievements"][i]["couleurs"])
-
-
-
         self.brush_color = self.colors[0]
-        
-        # Créer les recttitle_scales pour la palette de couleurs
-        self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60, 
-                            self.avatar_target_pos[1] - 70, 50, 50) 
-                            for i in range(len(self.colors))]
         
         # Boutons
         button_width, button_height = 160, 50
@@ -149,7 +138,7 @@ class AvatarManager:
                     self.show_buttons = False
                     self.pseudo_editable = False
                     self.is_retracting = True
-                    with open("data/players_data.json", "w") as f:
+                    with open("data/player_data.json", "w") as f:
                         json.dump(self.player_data, f)
 
                     return True
@@ -189,7 +178,7 @@ class AvatarManager:
                 self.show_buttons = False
                 self.pseudo_editable = False
                 self.is_retracting = True
-                with open("data/players_data.json", "w") as f:
+                with open("data/player_data.json", "w") as f:
                     json.dump(self.player_data, f)
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC
@@ -243,6 +232,15 @@ class AvatarManager:
                 self.is_expanding = False
                 self.show_buttons = True
                 self.pseudo_editable = True
+
+                for i in range(len(self.player_data["achievements"])):
+                    if self.player_data["achievements"][i]["succeed"]:
+                        if not self.player_data["achievements"][i]["couleurs"] in self.colors:
+                            self.colors.append(self.player_data["achievements"][i]["couleurs"])
+
+                            self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60, 
+                                self.avatar_target_pos[1] - 70, 50, 50) 
+                                for i in range(len(self.colors))]
                 
         # Animation Retrait
         if self.is_retracting:

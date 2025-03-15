@@ -422,9 +422,9 @@ def save_items(items):
 
 def load_player_data():
     """Charge les données du joueur"""
-    if os.path.exists("data/players_data.json"):
+    if os.path.exists("data/player_data.json"):
         try:
-            with open("data/players_data.json", "r", encoding="utf-8") as file:
+            with open("data/player_data.json", "r", encoding="utf-8") as file:
                 return json.load(file)
         except:
             pass
@@ -436,7 +436,7 @@ def load_player_data():
     os.makedirs("data", exist_ok=True)
     
     # Sauvegarder les données par défaut
-    with open("data/players_data.json", "w", encoding="utf-8") as file:
+    with open("data/player_data.json", "w", encoding="utf-8") as file:
         json.dump(default_data, file, ensure_ascii=False, indent=4)
     
     return default_data
@@ -444,5 +444,5 @@ def load_player_data():
 def save_player_data(player_data):
     """Sauvegarde les données du joueur"""
     os.makedirs("data", exist_ok=True)
-    with open("data/players_data.json", "w", encoding="utf-8") as file:
+    with open("data/player_data.json", "w", encoding="utf-8") as file:
         json.dump(player_data, file, ensure_ascii=False, indent=4)

@@ -4,8 +4,8 @@ import json
 import yaml
 from shared.utils.common_utils import achievement_popup
 
-with open("data/players_data.json") as f:
-    players_data = json.load(f)
+with open("data/player_data.json") as f:
+    player_data = json.load(f)
 from shared.ui.common_ui import *
 from shared.tools import *
 
@@ -37,6 +37,8 @@ class SoloPlay:
         # Canvas persistant (Surface)
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
+
+        self.achievement_popup = achievement_popup(player_data["achievements"][0]["title"],player_data["achievements"][0]["explication"],self.H,self.W,self.screen)
 
         # Boucle principale
         clock = pygame.time.Clock()
@@ -75,6 +77,7 @@ class SoloPlay:
 
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
+            self.achievement_popup.draw_if_active()
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
                 return
@@ -137,11 +140,11 @@ class SoloPlay:
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
             #achievement
-            if players_data["achievements"][0]["succeed"]== False:
-                players_data["achievements"][0]["succeed"] = True
-                achievement_button_rect = achievement_popup(players_data["achievements"][0]["title"],players_data["achievements"][0]["explication"],self.H,self.W,self.screen)
-                with open("data/players_data.json", "w") as f:
-                    json.dump(players_data, f)
+            if player_data["achievements"][0]["succeed"]== False:
+                player_data["achievements"][0]["succeed"] = True
+                self.achievement_popup.start()
+                with open("data/player_data.json", "w") as f:
+                    json.dump(player_data, f)
         
     def draw_colors(self):
         # Fond + bordure

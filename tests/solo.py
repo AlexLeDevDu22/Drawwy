@@ -81,9 +81,8 @@ class FloatingObject:
     def draw(self, surface):
         # Dessiner un cercle flou
         for i in range(5):
-            radius = self.size - i
+            radius = max(1,self.size - i)
             alpha = 100 - i * 20
-            print((*self.color, alpha))
             gfxdraw.filled_circle(surface, int(self.x), int(self.y), radius, (*self.color, alpha))
 
 # Supposons que Button et FloatingObject sont importés d'un autre fichier
@@ -94,7 +93,6 @@ pygame.init()
 pygame.font.init()
 
 # Constantes
-WIDTH, HEIGHT = 1280, 720
 TITLE = "Drawwy - Le jeu de dessin"
 FPS = 60
 
@@ -116,7 +114,7 @@ LIGHT_GREY = (230, 230, 230)
 DARK_GREY = (100, 100, 100)
 
 # Configuration de la fenêtre
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((W, H))
 pygame.display.set_caption(TITLE)
 clock = pygame.time.Clock()
 
@@ -139,8 +137,8 @@ except:
 
 class DrawingPage:
     def __init__(self, model_image, theme_name, theme_color):
-        self.W = WIDTH
-        self.H = HEIGHT
+        self.W = W
+        self.H = H
         self.screen = screen
         self.model_image = model_image
         self.theme_name = theme_name
@@ -184,8 +182,8 @@ class DrawingPage:
         # Objets flottants pour l'animation
         self.floating_objects = []
         for _ in range(10):
-            x = random.randint(-100, WIDTH+100)
-            y = random.randint(0, HEIGHT)
+            x = random.randint(-100, W+100)
+            y = random.randint(0, H)
             size = random.randint(3, 10)
             color_choice = theme_color
             speed = random.uniform(0.1, 0.5)
@@ -280,8 +278,8 @@ class DrawingPage:
         
         # Bouton pour annuler l'effacement
         self.cancel_clear_button = Button(
-            WIDTH // 2 - 120,
-            HEIGHT // 2 + 40,
+            W // 2 - 120,
+            H // 2 + 40,
             100,
             50,
             text="Non"
@@ -289,8 +287,8 @@ class DrawingPage:
         
         # Bouton pour confirmer l'effacement
         self.confirm_clear_button = Button(
-            WIDTH // 2 + 20,
-            HEIGHT // 2 + 40,
+            W // 2 + 20,
+            H // 2 + 40,
             100,
             50,
             text="Oui"
@@ -495,9 +493,9 @@ class DrawingPage:
         self.screen.blit(timer_text, (self.timer_rect.x + 10, self.timer_rect.y + 10))
 
     def draw_clear_confirmation(self):
-        pygame.draw.rect(self.screen, LIGHT_GREY, (WIDTH//2 - 150, HEIGHT//2 - 50, 300, 150), border_radius=10)
+        pygame.draw.rect(self.screen, LIGHT_GREY, (W//2 - 150, H//2 - 50, 300, 150), border_radius=10)
         confirm_text = info_font.render("Effacer le dessin ?", True, BLACK)
-        self.screen.blit(confirm_text, (WIDTH//2 - 100, HEIGHT//2 - 30))
+        self.screen.blit(confirm_text, (W//2 - 100, H//2 - 30))
         self.cancel_clear_button.draw(self.screen)
         self.confirm_clear_button.draw(self.screen)
 
@@ -512,5 +510,5 @@ class DrawingPage:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    game = DrawingPage("model.png", "Chat mignon", PURPLE)
+    game = DrawingPage("tests/model.png", "Chat mignon", PURPLE)
     game.run()
