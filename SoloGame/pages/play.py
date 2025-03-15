@@ -52,9 +52,8 @@ class SoloPlay:
             # Gestion des événements
             for event in self.events:
                 if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    running = False
+                    pygame.quit()
+                    sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown = True
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -77,9 +76,10 @@ class SoloPlay:
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
 
-            pygame.display.flip()
+            if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
+                return self.screen, "exit"
 
-        return screen, "exit"
+            pygame.display.flip()
 
     def define_layout(self):
 
@@ -224,11 +224,6 @@ class SoloPlay:
         text_surface = font.render("Valider", True, BLACK)
         text_rect = text_surface.get_rect(center=self.validate_button_rect.center)
         self.screen.blit(text_surface, text_rect)
-
-        # Si on clique sur le bouton, on quitte (c ce truc a changer pour se rediriger mais pour l'instant il y a rien a rediriger)
-        if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
-            pygame.quit()
-            sys.exit()
 
 if __name__ == '__main__':
     W, H = get_screen_size()
