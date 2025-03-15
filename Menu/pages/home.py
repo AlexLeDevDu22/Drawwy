@@ -104,7 +104,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
                         text_font=VERY_SMALL_FONT)
                        
     if credit_button.check_hover(mouse_pos) and mouse_click:
-        return screen, "credits"
+        return screen, "credits", buttons
     credit_button.draw(screen)
 
     return screen, "home",buttons

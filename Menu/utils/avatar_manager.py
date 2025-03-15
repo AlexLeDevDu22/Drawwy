@@ -79,13 +79,9 @@ class AvatarManager:
         
         # Ajouter l'affichage de la bordure actuelle
         self.border_icon = None
-        try:
-            self.border_icon = pygame.image.load("assets/bordures/bordures_profil/bronze_border.png").convert_alpha()
-            self.border_icon = pygame.transform.scale(self.border_icon, (70, 70))
-        except:
-            # Créer une icône par défaut si l'image n'est pas disponible
-            self.border_icon = pygame.Surface((30, 30), pygame.SRCALPHA)
-            pygame.draw.circle(self.border_icon, ORANGE, (15, 15), 15, width=3)
+        self.border_icon = pygame.image.load("assets/bordures/bordures_profil/bronze_border.png").convert_alpha()
+        self.border_icon = pygame.transform.scale(self.border_icon, (70, 70))
+
             
         # Modification: Déplacer la position du texte et de l'icône de bordure au milieu à gauche
         self.border_text_pos = (20, self.H // 2 - 15)  # Position du texte au milieu à gauche
@@ -272,9 +268,23 @@ class AvatarManager:
         pseudo_pos = self.get_current_pseudo_position()
         
         # Contour ORANGE de l'avatar
-        pygame.draw.circle(self.screen, ORANGE, 
-                          (avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2), 
-                          avatar_size // 2 + 4 + (8 * self.anim_progress))
+        with open("data/shop_items.json") as f:
+            self.shop_item = json.load(f)
+
+        for i in range(len(self.shop_item)):
+            if self.shop_item[i]["category"] == "bordures" and self.shop_item[i]["selected"] == True:
+                bordure = pygame.image.load(self.shop_item[i]["image_path"])
+                bordure = pygame.transform.scale(bordure,avatar_size // 2 + 4 + (8 * self.anim_progress) )
+                self.screen.blit(bordure,avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2)
+
+
+
+
+
+
+        #pygame.draw.circle(self.screen, ORANGE, 
+         #                 (avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2), 
+          #                avatar_size // 2 + 4 + (8 * self.anim_progress))
         
         # Afficher l'avatar avec masque circulaire
         temp_avatar = pygame.transform.scale(self.avatar, (avatar_size, avatar_size))
