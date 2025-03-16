@@ -1,34 +1,13 @@
 from sentence_transformers import SentenceTransformer, util
-import json
-import random
-import yaml
+from shared.utils.data_manager import *
+from shared.ui.common_ui import *
 import pygame
 from PIL import Image, ImageFilter
-from dotenv import load_dotenv
 import time
 import socketio
 import os
 import socket
 import asyncio
-with open("data/player_data.json") as f:
-    player_data = json.load(f)
-
-load_dotenv()
-
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-BEIGE = (250, 240, 230)
-VERT = (0,255,0)
-ROUGE= (255,0,0)
-BLEU= (0,0,255)
-JAUNE=(255,255,0)
-MAGENTA=(255,0,255)
-CYAN=(0,255,255)
-
-
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 def is_connected():
     try:
@@ -82,10 +61,6 @@ def matrix_to_image(pixel_matrix):
 
     return surface
 
-def get_random_sentence():
-    with open("Max/phrases_droles_v2.json") as f:
-        return random.choice(json.load(f))
-    
 model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")  # Gère plusieurs langues
 
 def check_sentences(phrase1, phrase2):
@@ -94,7 +69,7 @@ def check_sentences(phrase1, phrase2):
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
     print(phrase1, phrase2,score)
-    return score>config["sentence_checker_seuil"]
+    return score>CONFIG["sentence_checker_seuil"]
     
 def emit_sio(sio, event, data):
     try:
@@ -121,9 +96,9 @@ def update_canva_by_frames(MultiGame, frames, specified_canva=None, delay=True, 
     if reset:
         MultiGame.ALL_FRAMES=[]
         if specified_canva:
-            specified_canva=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+            specified_canva=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]
         else:
-            MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]
+            MultiGame.CANVAS=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]
             
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
@@ -198,10 +173,9 @@ def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
     draw_circle(x2, y2)
 
     #achievement
-    if player_data["achievements"][0]["succeed"]== False:
-        player_data["achievements"][0]["succeed"] = True
-        with open("data/player_data.json", "w") as f:
-            json.dump(player_data, f)
+    if PLAYER_DATA["achievements"][0]["succeed"]== False:
+        PLAYER_DATA["achievements"][0]["succeed"] = True
+        save_data("PLAYER_DATA")
 
     return canvas  # Retourne le canvas mis à jour
 

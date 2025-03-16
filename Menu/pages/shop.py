@@ -1,11 +1,9 @@
 from shared.ui.common_ui import *
 from shared.utils.common_utils import draw_text
+from shared.utils.data_manager import *
 
 import pygame
-import math
 import random
-import json
-import os
 
 
 def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
@@ -47,12 +45,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     draw_text("BOUTIQUE", MEDIUM_FONT, BLACK, screen, 
             W // 2, main_panel_y + 80)
     
-    # Charger les données
-    with open("data/shop_items.json", "r", encoding="utf-8") as file:
-        items = json.load(file)
-    with open("data/player_data.json", "r", encoding="utf-8") as file:
-        player_data = json.load(file)
-    coins = player_data.get("coins", 0)
+    coins = PLAYER_DATA.get("coins", 0)
     
     # Afficher le solde
     coin_icon = pygame.image.load("assets/icon_coin.png")
@@ -72,8 +65,8 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
             "selection_mode": False
         }
     
-    items_per_page = 4
-    categories = ["tous"] + list(set(item["category"] for item in items))
+    SHOP_ITEMS_per_page = 4
+    categories = ["tous"] + list(set(item["category"] for item in SHOP_ITEMS))
     
     # Dessiner les onglets de catégories
     tab_width = 160
@@ -118,23 +111,23 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
 
 
 
-    # Filtrer les items selon la catégorie sélectionnée
-    filtered_items = [item for item in items if show_shop.state["selected_category"] == "tous" or item["category"] == show_shop.state["selected_category"]]
+    # Filtrer les SHOP_ITEMS selon la catégorie sélectionnée
+    filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if show_shop.state["selected_category"] == "tous" or item["category"] == show_shop.state["selected_category"]]
     
     # Calculer le nombre total de pages
-    total_pages = max(1, (len(filtered_items) - 1) // items_per_page + 1)
+    total_pages = max(1, (len(filtered_SHOP_ITEMS) - 1) // SHOP_ITEMS_per_page + 1)
     
     # Limiter la page courante
     show_shop.state["current_page"] = min(show_shop.state["current_page"], total_pages - 1)
     
-    # Afficher les items
-    start_idx = show_shop.state["current_page"] * items_per_page
+    # Afficher les SHOP_ITEMS
+    start_idx = show_shop.state["current_page"] * SHOP_ITEMS_per_page
     item_width = 380
     item_height = 180
     item_margin = 30
     
-    for i in range(min(items_per_page, len(filtered_items) - start_idx)):
-        item = filtered_items[start_idx + i]
+    for i in range(min(SHOP_ITEMS_per_page, len(filtered_SHOP_ITEMS) - start_idx)):
+        item = filtered_SHOP_ITEMS[start_idx + i]
         item_x = main_panel_x + (i % 2) * (item_width + item_margin) + 70
         item_y = main_panel_y + 220 + (i // 2) * (item_height + item_margin)
         
@@ -188,19 +181,19 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
             draw_text(f"{item['price']} pièces", SMALL_FONT, price_color, screen,
                     item_x + 220, item_y + 130)
         
-        # Gestion des clics sur les items
+        # Gestion des clics sur les SHOP_ITEMS
         if mouse_click and hover_item:
             if item["purchased"]:
-                cursor_= toggle_select(item, player_data, items)
+                cursor_= toggle_select(item, PLAYER_DATA, SHOP_ITEMS)
                 if cursor_:
                     cursor = cursor_
 
             elif not item["purchased"] and coins >= item["price"]:
                 coins -= item["price"]
                 item["purchased"] = True
-                player_data["coins"] = coins
-                save_items(items)
-                save_player_data(player_data)
+                PLAYER_DATA["coins"] = coins
+                save_data("SHOP_ITEMS")
+                save_data("PLAYER_DATA")
     
     # Boutons de pagination
     if total_pages > 1:
@@ -288,33 +281,21 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     
     return screen, cursor, "shop", buttons
 
-def toggle_select(item, player_data, items):
+def toggle_select(item, PLAYER_DATA, SHOP_ITEMS):
     # Basculer la sélection
-    if item["selected"]:
-        item["selected"] = False
-        if item["category"] in ["Bordures", "Curseurs"]:
-            player_data["selected_items"].remove(item["id"])
-    else:
-        for player_item in player_data["selected_items"]:
-            if items[player_item]["category"] in ["Bordures", "Curseurs"]:
-                if items[player_item]["category"] == item["category"]:
-                    items[player_item]["selected"] = False
-                    player_data["selected_items"].remove(player_item)
+    if item["selected"]: # unselect
+        if item["category"] not in ["Bordures", "Curseurs"]:
+            item["selected"] = False
+            PLAYER_DATA["selected_items"][item["category"]].remove(item["id"])
+    elif item["category"] in ["Bordures", "Curseurs"]: # select
+        PLAYER_DATA["selected_items"][item["category"]] = item["id"]
+
+        for i in range(len(SHOP_ITEMS)):
+            if SHOP_ITEMS[i]["category"] == item["category"]:
+                SHOP_ITEMS[i]["selected"] = False
         item["selected"] = True
-        player_data["selected_items"].append(item["id"])
-    save_player_data(player_data)
-    save_items(items)
+    save_data("PLAYER_DATA")
+    save_data("SHOP_ITEMS")
 
     if item["category"] == "Curseurs":
         return CustomCursor(item["image_path"])
-def save_items(items):
-    """Sauvegarde les items dans un fichier JSON"""
-    os.makedirs("data", exist_ok=True)
-    with open("data/shop_items.json", "w", encoding="utf-8") as file:
-        json.dump(items, file, ensure_ascii=False, indent=4)
-
-def save_player_data(player_data):
-    """Sauvegarde les données du joueur"""
-    os.makedirs("data", exist_ok=True)
-    with open("data/player_data.json", "w", encoding="utf-8") as file:
-        json.dump(player_data, file, ensure_ascii=False, indent=4)

@@ -1,7 +1,6 @@
 from shared.ui.common_ui import *
-from shared.utils.common_utils import draw_text
 from shared.tools import get_screen_size, apply_circular_mask
-import json
+from shared.utils.data_manager import *
 import pygame
 
 # Classe pour la gestion de l'avatar
@@ -11,9 +10,7 @@ class AvatarManager:
         self.screen = screen
         self.W, self.H = get_screen_size()
         self.avatar_size = 100
-        with open("data/player_data.json") as f:
-            self.player_data = json.load(f)
-        self.input_text = self.player_data["pseudo"]
+        self.input_text = PLAYER_DATA["pseudo"]
         
         # Charger ou créer l'avatar
         self.avatar_path = "data/avatar.bmp"
@@ -34,7 +31,7 @@ class AvatarManager:
         
         # Positions
         self.avatar_start_pos = (self.W - self.avatar_size - 25, 20)
-        self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
+        self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
         
         # Positions cibles pour l'édition
         self.avatar_target_size = int(0.71 * self.H)
@@ -56,24 +53,18 @@ class AvatarManager:
         self.size_max = 40
         
         self.colors = [ (255, 255, 255), (0, 0, 0)]
+        self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60, 
+                                self.avatar_target_pos[1] - 80, 50, 50) 
+                                for i in range(len(self.colors))]
         # Palette de couleurs pour l'édition d'avatar
 
         self.brush_color = self.colors[0]
 
         # Bordure d'avatar
+        self.avatar_bordure_id=PLAYER_DATA["selected_items"]["Bordures"]
+        self.base_avatar_bordure = pygame.image.load(SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])
+        self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
 
-        with open("data/shop_items.json") as f:
-            self.shop_item = json.load(f)
-
-        for i in range(len(self.shop_item)):
-            if self.shop_item[i]["category"] == "Bordures" and self.shop_item[i]["selected"]:
-                self.base_avatar_bordure = pygame.image.load(self.shop_item[i]["image_path"])
-                self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
-                break
-        try:
-            self.base_avatar_bordure
-        except:
-            raise Exception("No border selected")        
         # Boutons
         button_width, button_height = 160, 50
         self.cancel_button_rect = pygame.Rect(self.W // 2 - 150, self.pseudo_target_pos[1] + 45, 
@@ -124,7 +115,7 @@ class AvatarManager:
             if not self.show_buttons:  # Si pas déjà en mode édition
                 if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
                    self.avatar_start_pos[1] < mouse_pos[1] < self.avatar_start_pos[1] + self.avatar_size:
-                    self.input_text = self.player_data["pseudo"]
+                    self.input_text = PLAYER_DATA["pseudo"]
                     self.is_expanding = True
                     self.pseudo_editable = True
                     return True
@@ -139,13 +130,12 @@ class AvatarManager:
 
                 elif self.validate_button_rect.collidepoint(mouse_pos):  # Valider
                     pygame.image.save(self.avatar, self.avatar_path)
-                    self.player_data["pseudo"] = self.input_text
+                    PLAYER_DATA["pseudo"] = self.input_text
                     self.show_buttons = False
                     self.pseudo_editable = False
                     self.is_retracting = True
-                    self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
-                    with open("data/player_data.json", "w") as f:
-                        json.dump(self.player_data, f)
+                    self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
+                    save_data("PLAYER_DATA")
 
                     return True
 
@@ -180,13 +170,12 @@ class AvatarManager:
         elif event.type == pygame.KEYDOWN and self.pseudo_editable:
             if event.key == pygame.K_RETURN:  # Valider avec ENTER
                 pygame.image.save(self.avatar, self.avatar_path)
-                self.player_data["pseudo"] = self.input_text
+                PLAYER_DATA["pseudo"] = self.input_text
                 self.show_buttons = False
                 self.pseudo_editable = False
                 self.is_retracting = True
-                self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
-                with open("data/player_data.json", "w") as f:
-                    json.dump(self.player_data, f)
+                self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
+                save_data("PLAYER_DATA")
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC
                 self.avatar = self.avatar_original.copy()
@@ -242,14 +231,12 @@ class AvatarManager:
                 self.pseudo_editable = True
 
 
-                for i in range(len(self.player_data["achievements"])):
-                    if self.player_data["achievements"][i]["succeed"]:
-                        if not self.player_data["achievements"][i]["couleurs"] in self.colors:
-                            self.colors.append(self.player_data["achievements"][i]["couleurs"])
+                for i in range(len(PLAYER_DATA["achievements"])):
+                    if PLAYER_DATA["achievements"][i]["succeed"]:
+                        self.colors.append(PLAYER_DATA["achievements"][i]["couleurs"])
 
-                            self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60, 
-                                self.avatar_target_pos[1] - 70, 50, 50) 
-                                for i in range(len(self.colors))]
+                        self.color_rects.append(
+                            pygame.Rect(self.avatar_target_pos[0] + len(self.color_rects) * 60, self.avatar_target_pos[1] - 80, 50, 50))
                 
         # Animation Retrait
         if self.is_retracting:
@@ -259,6 +246,11 @@ class AvatarManager:
                 self.anim_progress = 0
                 self.is_retracting = False
                 self.pseudo_editable = False
+
+        if self.avatar_bordure_id!= PLAYER_DATA["selected_items"]["Bordures"]:
+            self.avatar_bordure_id=PLAYER_DATA["selected_items"]["Bordures"]
+            self.base_avatar_bordure = pygame.image.load(SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])
+            self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
     
     def get_current_avatar_position(self):
         return (
@@ -294,7 +286,7 @@ class AvatarManager:
         self.screen.blit(self.avatar_bordure, (avatar_pos[0]-avatar_size*0.045, avatar_pos[1]-avatar_size*0.045))
         
         # Afficher le pseudo
-        pseudo_surf = SMALL_FONT.render(self.input_text + "|" if self.pseudo_editable else self.player_data["pseudo"], True, WHITE)
+        pseudo_surf = SMALL_FONT.render(self.input_text + "|" if self.pseudo_editable else PLAYER_DATA["pseudo"], True, WHITE)
         self.screen.blit(pseudo_surf, pseudo_pos)
         
         # Afficher les boutons et contrôles d'édition si activés

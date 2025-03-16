@@ -1,6 +1,7 @@
 from shared.ui.common_ui import *
 from shared.ui.elements import Button
 from SoloGame.ui.elements import FloatingObject
+from shared.utils.data_manager import *
 
 import pygame
 import sys
@@ -8,12 +9,7 @@ import math
 import random
 from pygame import gfxdraw
 import time
-import yaml
 import os
-
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 # Définition des thèmes et des données d'exemple d'images
 themes = [
@@ -366,4 +362,4 @@ def image_selector(screen, cursor, theme_index):
         # Mettre à jour l'affichage
         cursor.show(screen, mouse_pos)
         pygame.display.flip()
-        clock.tick(config["fps"])
+        clock.tick(CONFIG["fps"])

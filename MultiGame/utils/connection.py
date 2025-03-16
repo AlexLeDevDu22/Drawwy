@@ -2,15 +2,11 @@ import asyncio
 import socketio
 import threading
 import MultiGame.utils.tools as tools
+from shared.utils.data_manager import *
 import os
 from dotenv import load_dotenv
 import time
-import yaml
-import json
 from datetime import datetime
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 connection_loop=None
 
@@ -41,16 +37,12 @@ async def handle_connection_client(MultiGame):
     MultiGame.SIO = socketio.AsyncClient(logger=True, engineio_logger=True)
     @MultiGame.SIO.event
     async def connect(): #joining the game
-        with open("data/player_data.json") as f:
-            player_data = json.load(f)
 
-        with open("data/shop_items.json") as f:
-            items = json.load(f)
-            for item in items:
-                if item["category"] == "Bordures" and item["selected"]:
-                    border = item
+        for item in SHOP_ITEMS:
+            if item["category"] == "Bordures" and item["selected"]:
+                border = item
 
-        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"), "border_path": border["image_path"]}})
+        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": PLAYER_DATA["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"), "border_path": border["image_path"]}})
 
     @MultiGame.SIO.event
     async def disconnect():
@@ -70,7 +62,7 @@ async def handle_connection_client(MultiGame):
     @MultiGame.SIO.on("new_player")
     async def new_player(data):
         MultiGame.PLAYERS.append(data)
-        MultiGame.MESSAGES.append({"type":"system","message":data["pseudo"]+" viens de nous rejoindre!", "color": config["succeed_color"]})
+        MultiGame.MESSAGES.append({"type":"system","message":data["pseudo"]+" viens de nous rejoindre!", "color": CONFIG["succeed_color"]})
 
     @MultiGame.SIO.on("player_disconnected")
     async def player_disconnected(data):
@@ -79,18 +71,18 @@ async def handle_connection_client(MultiGame):
                 player=MultiGame.PLAYERS.pop(i)
                 break
 
-        MultiGame.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": config["bad_color"]})
+        MultiGame.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": CONFIG["bad_color"]})
 
     @MultiGame.SIO.on("new_game")
     def new_game(data):
         #save draw
-        if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS and MultiGame.CANVAS!=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])]: #save your draw
+        if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS and MultiGame.CANVAS!=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]: #save your draw
             tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE)
 
-        MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
+        MultiGame.CANVAS=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])] #reset canvas
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
-        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": config["succeed_color"]})
+        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": CONFIG["succeed_color"]})
         MultiGame.ALL_FRAMES=[]
         for i in range(len(MultiGame.PLAYERS)):
             MultiGame.PLAYERS[i]["found"]=False

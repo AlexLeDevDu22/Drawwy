@@ -8,7 +8,7 @@ def draw_text(text, font, color, surface, x, y):
     textrect.center = (x, y)
     surface.blit(textobj, textrect)
 
-class achievement_popup:
+class AchievementPopup:
 
     def __init__(self, text,description,H,W,surface):
         #dessiner la boite
@@ -35,17 +35,17 @@ class achievement_popup:
             pygame.draw.rect(self.surface,PASTEL_GREEN,box_rect_achievement,border_radius=15)
             #rond valide
             pygame.draw.circle(self.surface, DARK_BLUE, 
-                                    ( 100, self.H-165+ self.height // 2), 
+                                    ( 100, self.H-230+ self.height // 2), 
                                     20)
             pygame.draw.line(self.surface, WHITE, 
-                                ( 90, self.H-165 + self.height // 2), 
-                                ( 100, self.H-165 + self.height // 2 + 10), 
+                                ( 90, self.H-230 + self.height // 2), 
+                                ( 100, self.H-230 + self.height // 2 + 10), 
                                 4)
             pygame.draw.line(self.surface, WHITE, 
-                                ( 100, self.H-165 + self.height // 2 + 10), 
-                                ( 115, self.H-165 + self.height // 2 - 10), 
+                                ( 100, self.H-230 + self.height // 2 + 10), 
+                                ( 115, self.H-230 + self.height // 2 - 10), 
                                 4)
 
             #dessiner le texte
-            draw_text(self.text,SMALL_FONT,BLACK,self.surface,50 + self.width // 2, self.H-180 + self.height // 2)
-            draw_text(self.description,SMALL_FONT,LIGHT_GRAY,self.surface,50 + self.width // 2, self.H-150 + self.height // 2)
+            draw_text(self.text,SMALL_FONT,BLACK,self.surface,50 + self.width // 2, self.H-230 + self.height // 2)
+            draw_text(self.description,SMALL_FONT,LIGHT_GRAY,self.surface,50 + self.width // 2, self.H-200 + self.height // 2)

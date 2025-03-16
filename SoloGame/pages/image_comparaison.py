@@ -1,5 +1,6 @@
 from shared.ui.common_ui import *
 from shared.ui.elements import Button
+from shared.utils.data_manager import *
 
 import pygame
 import sys
@@ -7,12 +8,7 @@ import math
 import random
 from pygame import gfxdraw
 import time
-import yaml
 import os
-
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 W, H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
@@ -307,7 +303,7 @@ def image_comparison_screen(screen, original_img_id, redrawn_img_path=None):
         
         # Mettre à jour l'affichage
         pygame.display.flip()
-        clock.tick(config["fps"])
+        clock.tick(CONFIG["fps"])
 
 
 def main():

@@ -1,6 +1,7 @@
 from shared.ui.common_ui import *
 from shared.ui.elements import *
 from SoloGame.ui.elements import FloatingObject
+from shared.utils.data_manager import *
 
 import pygame
 import sys
@@ -8,11 +9,7 @@ import math
 import random
 from pygame import gfxdraw
 try:from pygame_emojis import load_emoji
-except:import pygame.freetype 
-import yaml
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+except:import pygame.freetype
 
 # Définition des thèmes
 themes = [
@@ -295,4 +292,4 @@ def theme_choicer(screen, cursor):
         # Mettre à jour l'affichage
         cursor.show(screen, mouse_pos)
         pygame.display.flip()
-        clock.tick(config["fps"])
+        clock.tick(CONFIG["fps"])

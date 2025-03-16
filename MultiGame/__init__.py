@@ -2,17 +2,16 @@ from shared.ui.common_ui import *
 from MultiGame.ui.widgets import *
 from shared.ui.elements import ColorPicker
 import MultiGame.utils.connection as connection
+from shared.utils.data_manager import *
+from shared.utils.common_utils import AchievementPopup
+
 
 import threading
 import pygame
-import yaml
 import MultiGame.utils.tools as tools
 import asyncio
 import os
 from datetime import datetime, timedelta
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 class MultiGame:
     
@@ -38,13 +37,16 @@ class MultiGame:
         self.ROLL_BACK=0
         self.SIO=None
         self.GAMESTART=None
+        
+        self.AchievementPopup = AchievementPopup(PLAYER_DATA["achievements"][0]["title"],PLAYER_DATA["achievements"][0]["explication"],self.H,self.W,self.screen)
+
     
         try:
             self.connection_loop=asyncio.new_event_loop()
             self.connexion_thread=threading.Thread(target=connection.start_connexion, args=(self,))
             self.connexion_thread.start()
 
-            self.game_remaining_time=config["game_duration"]
+            self.game_remaining_time=CONFIG["game_duration"]
             
             self.me={   "id": -1,
                         "pseudo": "",
@@ -73,7 +75,7 @@ class MultiGame:
             self.PLAYERS=[]
             
             while 1:
-                clock.tick(config["fps"])
+                clock.tick(CONFIG["fps"])
 
                 self.mouse_pos=pygame.mouse.get_pos()
 
@@ -84,7 +86,7 @@ class MultiGame:
                         break
                     
                 if self.frame_num%2==0:
-                    self.game_remaining_time=max(0, (self.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if self.GAMESTART else config["game_duration"])
+                    self.game_remaining_time=max(0, (self.GAMESTART+timedelta(seconds=CONFIG["game_duration"])-datetime.now()).seconds%CONFIG["game_duration"] if self.GAMESTART else CONFIG["game_duration"])
 
                     if self.game_remaining_time==0: #if game time over
                         if self.me["is_drawer"]:
@@ -109,6 +111,8 @@ class MultiGame:
                     slider_radius(self)
                 timer(self)
 
+                self.AchievementPopup.draw_if_active()
+
                 if not self.connected:
                     font = pygame.font.Font("assets/PermanentMarker.ttf", 20)
                     text = font.render("Connexion au serveur...", True, (0, 0, 0))
@@ -132,7 +136,7 @@ class MultiGame:
                 cursor.show(self.screen, self.mouse_pos)
                 pygame.display.flip()
                 
-                self.frame_num=(self.frame_num+1)%config["fps"]
+                self.frame_num=(self.frame_num+1)%CONFIG["fps"]
 
         except KeyboardInterrupt:
             threading.Thread(target=connection.disconnect,args=(self,), daemon=True).start()

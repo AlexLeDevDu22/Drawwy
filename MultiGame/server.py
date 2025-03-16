@@ -1,23 +1,16 @@
+from shared.utils.data_manager import *
+
 import requests
 import os
-import yaml
-import sys
 import threading
 import time
 from datetime import datetime
 import MultiGame.utils.sentences as sentences
 import MultiGame.utils.tools as tools
-from dotenv import load_dotenv
 from flask import Flask, request
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit
 from pyngrok import ngrok
 
-# Charger config
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
-
-# Charger le token ngrok depuis .env
-load_dotenv()
 ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
 ngrok_domain = os.getenv("NGROK_DOMAIN")
 ngrok_api = os.getenv("NGROK_API")
@@ -184,12 +177,12 @@ def handle_guess(guess):
             if succeed and not player["found"]:
                 guess["succeed"]=True
                 # point au founder
-                founder_points = int((guess["remaining_time"] / config["game_duration"]) * len(players) * config["points_per_found"])
+                founder_points = int((guess["remaining_time"] / CONFIG["game_duration"]) * len(players) * CONFIG["points_per_found"])
                 players[i]["points"] += founder_points
                 players[i]["found"] = True
 
                 # Donner des points au dessinateur
-                drawer_points=config["points_per_found"]
+                drawer_points=CONFIG["points_per_found"]
                 for j in range(len(players)):
                     if players[j]["id"] == drawer_id:
                         players[j]["points"] += drawer_points

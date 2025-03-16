@@ -1,33 +1,9 @@
-
-import json
-import yaml
+from shared.utils.data_manager import *
+import time
 import pygame
 import sys
-import random
-import math
-import SoloGame.Ui_histoire as Ui_histoire
-from datetime import datetime
-
-import threading
-import time
-import socketio
-import threading
-import pygame
-import sys
-
-import json
-from dotenv import load_dotenv
-import os
-import socketio
-import json
-from datetime import datetime, timedelta
 import time
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
-
 
 pygame.init()
 
@@ -110,11 +86,11 @@ class SoloGame:
 
         # Taille des carrés de couleur
         cols = 4  # Nombre de couleurs par ligne
-        square_size = min(palette_w // cols, palette_h // (len(config["drawing_colors"]) // cols + 1))
+        square_size = min(palette_w // cols, palette_h // (len(CONFIG["drawing_colors"]) // cols + 1))
         spacing = 10  # Espacement entre les couleurs
         offset_x = (palette_w - (square_size + spacing) * cols) // 2  # Centrage horizontal
 
-        for i, color in enumerate(config["drawing_colors"]):
+        for i, color in enumerate(CONFIG["drawing_colors"]):
             row = i // cols
             col = i % cols
             x = palette_x + col * (square_size + spacing) + offset_x
@@ -132,7 +108,7 @@ class SoloGame:
         for event in self.events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                for i, color in enumerate(config["drawing_colors"]):
+                for i, color in enumerate(CONFIG["drawing_colors"]):
                     row = i // cols
                     col = i % cols
                     x = palette_x + col * (square_size + spacing) + offset_x
@@ -202,7 +178,7 @@ class SoloGame:
         self.guess=""
         
         while 1:
-            clock.tick(config["fps"])
+            clock.tick(CONFIG["fps"])
 
 
             

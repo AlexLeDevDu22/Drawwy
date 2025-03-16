@@ -6,10 +6,10 @@ from Menu.pages import home
 from Menu.pages import credit
 from Menu.pages import shop
 from shared.utils.common_utils import *
+from shared.utils.data_manager import *
 
 import Menu.pages.play as play
 import shared.tools as tools
-import yaml
 import pygame
 import sys
 import random
@@ -17,16 +17,9 @@ from datetime import datetime
 from shared.ui.common_ui import *
 from MultiGame import MultiGame
 from SoloGame import soloGame
-import json
-with open("data/player_data.json") as f:
-        player_data = json.load(f)
-player_data = player_data
 
 if sys.platform.startswith("win"):
     import pygetwindow as gw
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 pygame.init()
 W, H = tools.get_screen_size()
@@ -60,11 +53,10 @@ current_page = "home"
 avatar_manager = AvatarManager(screen)
 
 cursor=CustomCursor("assets/souris/cursor_alien.png")
-with open("data/shop_items.json") as f:
-    for item in json.load(f):
-        if item["category"] == "Curseurs" and item["selected"]:
-            cursor=CustomCursor(item["image_path"])
-            break
+for item in SHOP_ITEMS:
+    if item["category"] == "Curseurs" and item["selected"]:
+        cursor=CustomCursor(item["image_path"])
+        break
 
 clock = pygame.time.Clock()
 running = True
@@ -72,13 +64,6 @@ running = True
 while running:
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
-    
-    with open("data/player_data.json") as f:
-        player_data = json.load(f)
-    
-    if player_data != player_data:
-        avatar_manager = AvatarManager(screen)
-        player_data = player_data
 
     if datetime.now().second==(last_sec_check_connection+2)%60:
         last_sec_check_connection=datetime.now().second
@@ -90,11 +75,8 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button in (1,3):
             mouse_click = True
         
-            
-        # Donner priorité aux événements d'avatar s'il est en cours d'édition
-        if avatar_manager.handle_event(event, mouse_pos, pygame.mouse.get_pressed()):
-            continue  # Événement déjà traité par le gestionnaire d'avatar
-    
+        avatar_manager.handle_event(event, mouse_pos, pygame.mouse.get_pressed())
+
     # Mise à jour des éléments d'arrière plan
     for element in drawing_elements:
         element.update()
@@ -172,7 +154,7 @@ while running:
     
     cursor.show(screen, mouse_pos)
     pygame.display.flip()
-    clock.tick(config["fps"])
+    clock.tick(CONFIG["fps"])
 
 pygame.quit()
 sys.exit()

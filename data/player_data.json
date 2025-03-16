@@ -1,5 +1,5 @@
 {
-    "pseudo": "ba",
+    "pseudo": "toto",
     "achievements": [
         {
             "title": "Premier Trace",
@@ -54,7 +54,8 @@
     ],
     "num_game_played": 0,
     "points": 0,
-    "selected_items": [
-        3
-    ]
+    "selected_items": {
+        "Bordures": 9,
+        "Curseurs": 12
+    }
 }

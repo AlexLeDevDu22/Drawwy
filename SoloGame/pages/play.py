@@ -1,17 +1,12 @@
 import pygame
 import sys
-import json
-import yaml
-from shared.utils.common_utils import achievement_popup
+from shared.utils.common_utils import AchievementPopup
 from shared.ui.elements import ColorPicker
+from shared.utils.data_manager import *
 
-with open("data/player_data.json") as f:
-    player_data = json.load(f)
+
 from shared.ui.common_ui import *
 from shared.tools import *
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 def get_screen_size():
     info_ecran = pygame.display.Info()
@@ -42,13 +37,13 @@ class SoloPlay:
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
 
-        self.achievement_popup = achievement_popup(player_data["achievements"][0]["title"],player_data["achievements"][0]["explication"],self.H,self.W,self.screen)
+        self.AchievementPopup = AchievementPopup(PLAYER_DATA["achievements"][0]["title"],PLAYER_DATA["achievements"][0]["explication"],self.H,self.W,self.screen)
 
         # Boucle principale
         clock = pygame.time.Clock()
         running = True
         while running:
-            clock.tick(config["fps"])
+            clock.tick(CONFIG["fps"])
             self.events = pygame.event.get()
 
             # Mise à jour de la taille si on redimensionne
@@ -86,7 +81,7 @@ class SoloPlay:
 
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
-            self.achievement_popup.draw_if_active()
+            self.AchievementPopup.draw_if_active()
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
                 pygame.image.save(self.canvas_surf, "mon_dessin.png")  # Sauvegarde du dessin
@@ -151,11 +146,10 @@ class SoloPlay:
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
             #achievement
-            if player_data["achievements"][0]["succeed"]== False:
-                player_data["achievements"][0]["succeed"] = True
-                self.achievement_popup.start()
-                with open("data/player_data.json", "w") as f:
-                    json.dump(player_data, f)
+            if PLAYER_DATA["achievements"][0]["succeed"]== False:
+                PLAYER_DATA["achievements"][0]["succeed"] = True
+                self.AchievementPopup.start()
+                save_data("PLAYER_DATA")
     
 
     def draw_slider(self):

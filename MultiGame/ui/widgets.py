@@ -2,15 +2,10 @@ import pygame, yaml, json
 import MultiGame.utils.tools as tools
 from shared.tools import apply_circular_mask
 from shared.ui.common_ui import *
+from shared.utils.data_manager import *
 
 try:from pygame_emojis import load_emoji
 except:import pygame.freetype 
-
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
-
-with open("data/shop_items.json") as f:
-    items = json.load(f)
 
 def timer(MultiGame):
         
@@ -61,11 +56,11 @@ def players(MultiGame):
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[i][0])
 
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, CONFIG["players_colors"][i%len(CONFIG["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, CONFIG["players_colors"][i%len(CONFIG["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, CONFIG["players_colors"][i%len(CONFIG["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
         #avatar
 
@@ -199,9 +194,14 @@ def drawing(MultiGame):
                     MultiGame.ROLL_BACK=0
                     MultiGame.second_draw_frames.append({"type":"new_step"})
                     MultiGame.ALL_FRAMES.append({"type":"new_step"})
+
+                    if PLAYER_DATA["achievements"][0]["succeed"]== False:
+                        PLAYER_DATA["achievements"][0]["succeed"] = True
+                        MultiGame.AchievementPopup.start()
+                        save_data("PLAYER_DATA")
                     
                 elif MultiGame.mouse_down and event.type == pygame.MOUSEMOTION:
-                    if MultiGame.lastMouseDown and 0<MultiGame.game_remaining_time<config["game_duration"]:   # can draw    
+                    if MultiGame.lastMouseDown and 0<MultiGame.game_remaining_time<CONFIG["game_duration"]:   # can draw    
                         # Position actuelle dans le CANVAS
                         canvas_x = (event.pos[0] - zone_x_min) // MultiGame.pixel_width
                         canvas_y = (event.pos[1] - zone_y_min) // MultiGame.pixel_height
@@ -240,7 +240,7 @@ def drawing(MultiGame):
                         tools.emit_sio(MultiGame.SIO, "roll_back", MultiGame.ROLL_BACK)
 
     #send draw
-    if MultiGame.frame_num==config["fps"]-1 and MultiGame.second_draw_frames!=[]:
+    if MultiGame.frame_num==CONFIG["fps"]-1 and MultiGame.second_draw_frames!=[]:
         print("draw sended")
         tools.emit_sio(MultiGame.SIO, "draw", tools.simplify_frames(MultiGame.second_draw_frames))#send draw
         MultiGame.second_draw_frames=[]
