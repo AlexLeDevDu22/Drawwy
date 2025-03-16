@@ -413,8 +413,8 @@ def load_items():
             "description": "Meilleur qu'hier ",
             "image_path": "assets/bordures/bordures_profil/silver_border.png",
             "category": "Bordures",
-            "purchased": False,
-            "selected": False
+            "purchased": True,
+            "selected": True
         },
         {
             "id": 12,

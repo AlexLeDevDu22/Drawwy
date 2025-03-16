@@ -61,11 +61,7 @@ def players(MultiGame):
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[i][0])
 
-<<<<<<< HEAD
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
-=======
         pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
->>>>>>> cd6ac2f4cdb2c647567bad05d48547a796ebbe4f
 
         pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
