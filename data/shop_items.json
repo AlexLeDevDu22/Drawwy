@@ -1,112 +1,112 @@
 [
-    {
-        "id": 1,
-        "name": "Étoile caca",
-        "price": 100,
-        "description": "Une jolie étoile rose",
-        "image_path": "assets/decorations/star_pink.png",
-        "category": "Badges",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 2,
-        "name": "Bordure de bronze",
-        "price": 150,
-        "description": "Une bordure quelconque",
-        "image_path": "assets/bordures/bordures_profil/bronze_border.png",
-        "category": "Bordures",
-        "purchased": true,
-        "selected": true
-    },
-    {
-        "id": 3,
-        "name": "Cœur Rouge",
-        "price": 120,
-        "description": "Un cœur rouge brillant",
-        "image_path": "assets/bodecorations/heart_red.png",
-        "category": "Skin",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 4,
-        "name": "Étoile Verte",
-        "price": 100,
-        "description": "Une étoile verte scintillante",
-        "image_path": "assets/decorations/star_green.png",
-        "category": "Badges",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 5,
-        "name": "Bordure en diamant",
-        "price": 140,
-        "description": "Une bordure brillante",
-        "image_path": "assets/bordures/bordures_profil/diamond_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 6,
-        "name": "Bordure en or",
-        "price": 120,
-        "description": "Une bordure dore",
-        "image_path": "assets/bordures/bordures_profil/gold_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 7,
-        "name": "Bordure de grand maitre",
-        "price": 140,
-        "description": "Pour etre le GOAT de Drawwy",
-        "image_path": "assets/bordures/bordures_profil/grandmaster_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 8,
-        "name": "Bordure du maitre",
-        "price": 140,
-        "description": "Pour montrer sa puissance",
-        "image_path": "assets/bordures/bordures_profil/master_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 9,
-        "name": "Bordure mythique",
-        "price": 140,
-        "description": "Pour montrer son talent ",
-        "image_path": "assets/bordures/bordures_profil/mythic_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 10,
-        "name": "Bordure platine",
-        "price": 140,
-        "description": "L'un des meilleurs ",
-        "image_path": "assets/bordures/bordures_profil/platinum_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    },
-    {
-        "id": 11,
-        "name": "Bordure argent",
-        "price": 140,
-        "description": "Meilleur qu'hier ",
-        "image_path": "assets/bordures/bordures_profil/silver_border.png",
-        "category": "Bordures",
-        "purchased": false,
-        "selected": false
-    }
+  {
+    "id": 1,
+    "name": "Étoile caca",
+    "price": 100,
+    "description": "Une jolie étoile rose",
+    "image_path": "assets/decorations/star_pink.png",
+    "category": "Badges",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 2,
+    "name": "Bordure de bronze",
+    "price": 150,
+    "description": "Une bordure quelconque",
+    "image_path": "assets/bordures/bordures_profil/bronze_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 3,
+    "name": "Cœur Rouge",
+    "price": 120,
+    "description": "Un cœur rouge brillant",
+    "image_path": "assets/bodecorations/heart_red.png",
+    "category": "Skin",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 4,
+    "name": "Étoile Verte",
+    "price": 100,
+    "description": "Une étoile verte scintillante",
+    "image_path": "assets/decorations/star_green.png",
+    "category": "Badges",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 5,
+    "name": "Bordure en diamant",
+    "price": 140,
+    "description": "Une bordure brillante",
+    "image_path": "assets/bordures/bordures_profil/diamond_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 6,
+    "name": "Bordure en or",
+    "price": 120,
+    "description": "Une bordure dore",
+    "image_path": "assets/bordures/bordures_profil/gold_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 7,
+    "name": "Bordure de grand maitre",
+    "price": 140,
+    "description": "Pour etre le GOAT de Drawwy",
+    "image_path": "assets/bordures/bordures_profil/grandmaster_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 8,
+    "name": "Bordure du maitre",
+    "price": 140,
+    "description": "Pour montrer sa puissance",
+    "image_path": "assets/bordures/bordures_profil/master_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 9,
+    "name": "Bordure mythique",
+    "price": 140,
+    "description": "Pour montrer son talent ",
+    "image_path": "assets/bordures/bordures_profil/mythic_border.png",
+    "category": "Bordures",
+    "purchased": true,
+    "selected": true
+  },
+  {
+    "id": 10,
+    "name": "Bordure platine",
+    "price": 140,
+    "description": "L'un des meilleurs ",
+    "image_path": "assets/bordures/bordures_profil/platinum_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  },
+  {
+    "id": 11,
+    "name": "Bordure argent",
+    "price": 140,
+    "description": "Meilleur qu'hier ",
+    "image_path": "assets/bordures/bordures_profil/silver_border.png",
+    "category": "Bordures",
+    "purchased": false,
+    "selected": false
+  }
 ]

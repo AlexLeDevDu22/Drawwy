@@ -131,7 +131,7 @@ class ThemeCard:
         except: # pygame freetype
             seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 135)
             emoji, rect = seguisy80.render(self.theme_info["icone"], "black")
-            rect.center = (scaled_rect.centerx, scaled_rect.centery - 135)
+            rect.center = (scaled_rect.centerx, scaled_rect.centery)
             screen.blit(emoji, rect)
         
         # Dessiner le nom du thème

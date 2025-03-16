@@ -43,12 +43,17 @@ async def handle_connection_client(MultiGame):
         with open("data/player_data.json") as f:
             player_data = json.load(f)
 
-        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("assets/avatar.bmp")}})
+        with open("data/shop_items.json") as f:
+            items = json.load(f)
+            for item in items:
+                if item["category"] == "Bordures" and item["selected"]:
+                    border = item
+
+        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("assets/avatar.bmp"), "border_path": border["image_path"]}})
 
     @MultiGame.SIO.event
     async def disconnect():
         print("Déconnecté du serveur WebSocket.")
-
 
     @MultiGame.SIO.on('welcome')
     async def welcome(data):

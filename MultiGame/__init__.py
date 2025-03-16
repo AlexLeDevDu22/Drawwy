@@ -72,12 +72,11 @@ class MultiGame:
             while 1:
                 clock.tick(config["fps"])
 
-                for player in self.PLAYERS:
-                    if player["id"] == self.PLAYER_ID:
-                        self.me=player
+                for i in range(len(self.PLAYERS)):
+                    if self.PLAYERS[i]["id"] == self.PLAYER_ID and not self.me:
+                        self.me=self.PLAYERS[i]
                         self.me["is_drawer"]=self.PLAYER_ID==self.CURRENT_DRAWER
-                        break
-
+                    
                 if self.frame_num%2==0:
                     self.game_remaining_time=max(0, (self.GAMESTART+timedelta(seconds=config["game_duration"])-datetime.now()).seconds%config["game_duration"] if self.GAMESTART else config["game_duration"])
 
@@ -106,7 +105,7 @@ class MultiGame:
                 
                 for event in self.events:
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                        threading.Thread(target=connection.disconnect, daemon=True).start()
+                        threading.Thread(target=connection.disconnect,args=(self,), daemon=True).start()
                         return
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         self.mouseDown=True
@@ -125,5 +124,5 @@ class MultiGame:
                 self.frame_num=(self.frame_num+1)%config["fps"]
 
         except KeyboardInterrupt:
-            threading.Thread(target=connection.disconnect, daemon=True).start()
+            threading.Thread(target=connection.disconnect,args=(self,), daemon=True).start()
             os._exit(0)

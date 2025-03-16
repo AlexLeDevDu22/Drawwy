@@ -1,5 +1,6 @@
-import pygame, yaml
+import pygame, yaml, json
 import MultiGame.utils.tools as tools
+from shared.tools import apply_circular_mask
 from shared.ui.common_ui import *
 
 try:from pygame_emojis import load_emoji
@@ -8,6 +9,8 @@ except:import pygame.freetype
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
+with open("data/shop_items.json") as f:
+    items = json.load(f)
 
 def timer(MultiGame):
         
@@ -58,15 +61,22 @@ def players(MultiGame):
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
         pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
-        #avatar TODO FOR EMOJI!!!!
+        #avatar
         if player["avatar"]["type"]=="matrix":
-            avatar=tools.matrix_to_image(player["avatar"]["matrix"])
-            avatar=pygame.transform.scale(avatar, (5/100*MultiGame.H, 5/100*MultiGame.H))
-            pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
-            tools.apply_circular_mask(avatar)
-            MultiGame.screen.blit(avatar, dico_co[y][1])
-        else:# emoji
+            #pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
+            if player["avatar"]["type"]=="matrix" and ("pygame_border" not in player["avatar"].keys()):
+                border=pygame.image.load(player["avatar"]["border_path"])
+                border=pygame.transform.scale(border, (5/100*MultiGame.H+6, 5/100*MultiGame.H+6))
+                MultiGame.PLAYERS[y]["avatar"]["pygame_border"]=border
+            MultiGame.screen.blit(player["avatar"]["pygame_border"], (dico_co[y][1][0]-3,dico_co[y][1][1]-3))
 
+            if player["avatar"]["type"]=="matrix" and ("pygame_image" not in player["avatar"].keys()):
+                avatar=tools.matrix_to_image(player["avatar"]["matrix"])
+                avatar=pygame.transform.scale(avatar, (5/100*MultiGame.H, 5/100*MultiGame.H))
+                apply_circular_mask(avatar)
+                MultiGame.PLAYERS[y]["avatar"]["pygame_image"]=avatar
+            MultiGame.screen.blit(player["avatar"]["pygame_image"], dico_co[y][1])
+        else:# emoji
             pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+5/100*MultiGame.H//2,dico_co[y][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2+3)
             pygame.draw.circle(MultiGame.screen, player["avatar"]["color"], (dico_co[y][1][0]+5/100*MultiGame.H//2,dico_co[y][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2)
 

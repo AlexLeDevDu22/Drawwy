@@ -30,7 +30,7 @@ class AvatarManager:
         
         # Historique des modifications
         self.history = [self.avatar.copy()]
-        self.REDo_stack = []
+        self.redo_stack = []
         
         # Positions
         self.avatar_start_pos = (self.W - self.avatar_size - 25, 20)
@@ -59,6 +59,17 @@ class AvatarManager:
         # Palette de couleurs pour l'édition d'avatar
 
         self.brush_color = self.colors[0]
+
+        # Bordure d'avatar
+
+        with open("data/shop_items.json") as f:
+            self.shop_item = json.load(f)
+
+        for i in range(len(self.shop_item)):
+            if self.shop_item[i]["category"] == "Bordures" and self.shop_item[i]["selected"]:
+                self.base_avatar_bordure = pygame.image.load(self.shop_item[i]["image_path"])
+                self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
+
         
         # Boutons
         button_width, button_height = 160, 50
@@ -77,10 +88,6 @@ class AvatarManager:
                                               self.avatar_start_pos[1] + size_button_height // 2 - 10, 
                                               size_button_width, size_button_height)
         
-        # Ajouter l'affichage de la bordure actuelle
-        self.border_icon = None
-        self.border_icon = pygame.image.load("assets/bordures/bordures_profil/bronze_border.png").convert_alpha()
-        self.border_icon = pygame.transform.scale(self.border_icon, (70, 70))
 
             
         # Modification: Déplacer la position du texte et de l'icône de bordure au milieu à gauche
@@ -91,7 +98,7 @@ class AvatarManager:
         self.history.append(self.avatar.copy())
         if len(self.history) > 20:  # Limite historique
             self.history.pop(0)
-        self.REDo_stack.clear()  # Reset REDo
+        self.redo_stack.clear()  # Reset REDo
         
     def size_button(self, rect, text, hover):
         # Ombre
@@ -190,12 +197,12 @@ class AvatarManager:
                 return True
             elif event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Z (Undo)
                 if len(self.history) > 1:
-                    self.REDo_stack.append(self.history.pop())
+                    self.redo_stack.append(self.history.pop())
                     self.avatar = self.history[-1].copy()
                 return True
             elif event.key == pygame.K_y and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Y (REDo)
-                if self.REDo_stack:
-                    self.avatar = self.REDo_stack.pop()
+                if self.redo_stack:
+                    self.avatar = self.redo_stack.pop()
                     self.history.append(self.avatar.copy())
                 return True
             elif event.key == pygame.K_BACKSPACE:
@@ -209,9 +216,9 @@ class AvatarManager:
         
     def update(self, mouse_pos, mouse_pressed):
         # Dessin sur l'avatar si en mode édition et que la souris est appuyée
+        avatar_size = self.get_current_avatar_size()
         if self.show_buttons and True in mouse_pressed:
             avatar_pos = self.get_current_avatar_position()
-            avatar_size = self.get_current_avatar_size()
             
             rel_x = (mouse_pos[0] - avatar_pos[0]) / avatar_size
             rel_y = (mouse_pos[1] - avatar_pos[1]) / avatar_size
@@ -223,11 +230,13 @@ class AvatarManager:
         # Animation Expansion
         if self.is_expanding:
             self.anim_progress += 0.1
+            self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (avatar_size*1.09, avatar_size*1.09))
             if self.anim_progress >= 1:
                 self.anim_progress = 1
                 self.is_expanding = False
                 self.show_buttons = True
                 self.pseudo_editable = True
+
 
                 for i in range(len(self.player_data["achievements"])):
                     if self.player_data["achievements"][i]["succeed"]:
@@ -241,6 +250,7 @@ class AvatarManager:
         # Animation Retrait
         if self.is_retracting:
             self.anim_progress -= 0.1
+            self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (avatar_size*1.09, avatar_size*1.09))
             if self.anim_progress <= 0:
                 self.anim_progress = 0
                 self.is_retracting = False
@@ -267,21 +277,6 @@ class AvatarManager:
         avatar_size = self.get_current_avatar_size()
         pseudo_pos = self.get_current_pseudo_position()
         
-        # Contour ORANGE de l'avatar
-        with open("data/shop_items.json") as f:
-            self.shop_item = json.load(f)
-
-        for i in range(len(self.shop_item)):
-            if self.shop_item[i]["category"] == "bordures" and self.shop_item[i]["selected"] == True:
-                bordure = pygame.image.load(self.shop_item[i]["image_path"])
-                bordure = pygame.transform.scale(bordure,avatar_size // 2 + 4 + (8 * self.anim_progress) )
-                self.screen.blit(bordure,avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2)
-
-
-
-
-
-
         #pygame.draw.circle(self.screen, ORANGE, 
          #                 (avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2), 
           #                avatar_size // 2 + 4 + (8 * self.anim_progress))
@@ -290,6 +285,9 @@ class AvatarManager:
         temp_avatar = pygame.transform.scale(self.avatar, (avatar_size, avatar_size))
         apply_circular_mask(temp_avatar)
         self.screen.blit(temp_avatar, avatar_pos)
+
+        # Bordure d'avatar
+        self.screen.blit(self.avatar_bordure, (avatar_pos[0]-avatar_size*0.045, avatar_pos[1]-avatar_size*0.045))
         
         # Afficher le pseudo
         pseudo_surf = MEDIUM_FONT.render(self.input_text + "|" if self.pseudo_editable else self.player_data["pseudo"], True, WHITE)
@@ -297,13 +295,6 @@ class AvatarManager:
         
         # Afficher les boutons et contrôles d'édition si activés
         if self.show_buttons:
-            # Afficher le texte "Bordure actuelle de l'avatar:"
-            border_text = SMALL_FONT.render("Bordure actuelle de l'avatar:", True, WHITE)
-            self.screen.blit(border_text, self.border_text_pos)
-            
-            # Afficher l'icône de bordure (PNG)
-            self.screen.blit(self.border_icon, self.border_icon_pos)
-            
             # Palette de couleurs
             for i, rect in enumerate(self.color_rects):
                 pygame.draw.rect(self.screen, self.colors[i], rect, border_radius=8)
