@@ -34,7 +34,7 @@ class AvatarManager:
         
         # Positions
         self.avatar_start_pos = (self.W - self.avatar_size - 25, 20)
-        self.pseudo_start_pos = (self.W - self.avatar_size - 35, self.avatar_size + 30)
+        self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
         
         # Positions cibles pour l'édition
         self.avatar_target_size = int(0.71 * self.H)
@@ -69,10 +69,11 @@ class AvatarManager:
             if self.shop_item[i]["category"] == "Bordures" and self.shop_item[i]["selected"]:
                 self.base_avatar_bordure = pygame.image.load(self.shop_item[i]["image_path"])
                 self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
+                break
         try:
             self.base_avatar_bordure
         except:
-            raise Exception("No border selected in shop items")        
+            raise Exception("No border selected")        
         # Boutons
         button_width, button_height = 160, 50
         self.cancel_button_rect = pygame.Rect(self.W // 2 - 150, self.pseudo_target_pos[1] + 45, 
@@ -142,6 +143,7 @@ class AvatarManager:
                     self.show_buttons = False
                     self.pseudo_editable = False
                     self.is_retracting = True
+                    self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
                     with open("data/player_data.json", "w") as f:
                         json.dump(self.player_data, f)
 
@@ -182,6 +184,7 @@ class AvatarManager:
                 self.show_buttons = False
                 self.pseudo_editable = False
                 self.is_retracting = True
+                self.pseudo_start_pos = (self.W - SMALL_FONT.size(self.player_data["pseudo"])[0] - 10, self.avatar_size + 30)
                 with open("data/player_data.json", "w") as f:
                     json.dump(self.player_data, f)
                 return True
@@ -209,7 +212,7 @@ class AvatarManager:
             elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
                 return True
-            elif event.unicode:
+            elif event.unicode and len(self.input_text) < 10:
                 self.input_text += event.unicode
                 return True
                 
@@ -291,7 +294,7 @@ class AvatarManager:
         self.screen.blit(self.avatar_bordure, (avatar_pos[0]-avatar_size*0.045, avatar_pos[1]-avatar_size*0.045))
         
         # Afficher le pseudo
-        pseudo_surf = MEDIUM_FONT.render(self.input_text + "|" if self.pseudo_editable else self.player_data["pseudo"], True, WHITE)
+        pseudo_surf = SMALL_FONT.render(self.input_text + "|" if self.pseudo_editable else self.player_data["pseudo"], True, WHITE)
         self.screen.blit(pseudo_surf, pseudo_pos)
         
         # Afficher les boutons et contrôles d'édition si activés

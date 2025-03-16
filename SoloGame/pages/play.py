@@ -3,6 +3,7 @@ import sys
 import json
 import yaml
 from shared.utils.common_utils import achievement_popup
+from shared.ui.elements import ColorPicker
 
 with open("data/player_data.json") as f:
     player_data = json.load(f)
@@ -26,6 +27,7 @@ class SoloPlay:
         # Paramètres du pinceau
         self.pen_color = BLACK
         self.pen_radius = 6
+
         
         # État de la souris
         self.mouseDown = False
@@ -33,6 +35,8 @@ class SoloPlay:
 
         # On définit les valeurs des rectangles d’interface
         self.define_layout()
+        
+        self.color_picker = ColorPicker(self.colors_rect.x, self.colors_rect.y, self.colors_rect.width, self.colors_rect.height)
 
         # Canvas persistant (Surface)
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
@@ -58,10 +62,18 @@ class SoloPlay:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown = True
+                    color=self.color_picker.get_color_at(pygame.mouse.get_pos())
+                    if color:
+                        self.pen_color = color
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown = False
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouse_pos = event.pos
+
+            if self.mouseDown:
+                color=self.color_picker.get_color_at(pygame.mouse.get_pos())
+                if color:
+                    self.pen_color = color
 
             # Dessin de l’arrière-plan
             self.screen.fill(BEIGE)
@@ -70,7 +82,7 @@ class SoloPlay:
             self.draw_canvas()
 
             # Dessin de la palette en haut à droite
-            self.draw_colors()
+            self.color_picker.draw(self.screen)
 
             # Dessin du slider en dessous
             self.draw_slider()
@@ -146,44 +158,7 @@ class SoloPlay:
                 self.achievement_popup.start()
                 with open("data/player_data.json", "w") as f:
                     json.dump(player_data, f)
-        
-    def draw_colors(self):
-        # Fond + bordure
-        pygame.draw.rect(self.screen, (230,230,230), self.colors_rect)
-        pygame.draw.rect(self.screen, BLACK, self.colors_rect, 2)
-
-        margin = 10
-        cols = 4
-        rows = 3
-        rect_w = (self.colors_rect.width - (cols+1)*margin) // cols
-        rect_h = (self.colors_rect.height - (rows+1)*margin) // rows
-
-        palette_colors = config["drawing_colors"]
-        
-        for i, color in enumerate(palette_colors[:12]):
-            r = i // cols
-            c = i % cols
-            x = self.colors_rect.x + margin + c*(rect_w+margin)
-            y = self.colors_rect.y + margin + r*(rect_h+margin)
-            rect_color = pygame.Rect(x, y, rect_w, rect_h)
-
-            # Dessin du carré de couleur
-            pygame.draw.rect(self.screen, color, rect_color)
-            pygame.draw.rect(self.screen, BLACK, rect_color, 2)
-
-            # Gestion du clic
-            if self.mouseDown and rect_color.collidepoint(self.mouse_pos):
-                self.pen_color = color
-
-        # Affiche la couleur sélectionnée sous la palette (vous pouvez essaye de le mettre dedans mais j'ai un peu galere...)
-        color_bar = pygame.Rect(
-            self.colors_rect.x + margin,
-            self.colors_rect.bottom - margin + 20,
-            self.colors_rect.width - 2*margin,
-            50
-        )
-        pygame.draw.rect(self.screen, self.pen_color, color_bar)
-        pygame.draw.rect(self.screen, BLACK, color_bar, 2)
+    
 
     def draw_slider(self):
         """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
