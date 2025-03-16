@@ -153,7 +153,7 @@ def draw_background(screen):
         ]
         pygame.draw.line(screen, color, (0, y), (W, y))
 
-def theme_choicer(screen):
+def theme_choicer(screen, cursor):
     global W, H
     W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
     # Créer les cartes de thèmes
@@ -293,5 +293,6 @@ def theme_choicer(screen):
             quit_button.draw(screen)
         
         # Mettre à jour l'affichage
+        cursor.show(screen, mouse_pos)
         pygame.display.flip()
         clock.tick(config["fps"])

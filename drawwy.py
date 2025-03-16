@@ -152,10 +152,10 @@ while running:
         elif current_page == "play":
             screen, current_page, buttons = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Solo":
-            soloGame(screen)
+            soloGame(screen, cursor)
             current_page="home"
         elif current_page == "Multijoueurs":
-            MultiGame(screen, clock, W, H)
+            MultiGame(screen,cursor, clock, W, H)
             current_page="home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":

@@ -18,7 +18,7 @@ def get_screen_size():
     return info_ecran.current_w, info_ecran.current_h
 
 class SoloPlay:
-    def __init__(self, screen, theme_index, image):
+    def __init__(self, screen,cursor, theme_index, image):
         self.last_mouse_pos = None 
 
         self.screen = screen
@@ -92,6 +92,7 @@ class SoloPlay:
                 pygame.image.save(self.canvas_surf, "mon_dessin.png")  # Sauvegarde du dessin
                 return
 
+            cursor.show(screen, self.mouse_pos)
             pygame.display.flip()
 
     def define_layout(self):

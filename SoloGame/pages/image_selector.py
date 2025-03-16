@@ -228,7 +228,7 @@ def draw_background(surface):
         ]
         pygame.draw.line(surface, color, (0, y), (W, y))
 
-def image_selector(screen, theme_index):
+def image_selector(screen, cursor, theme_index):
     global W, H
     W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
@@ -364,5 +364,6 @@ def image_selector(screen, theme_index):
                 return screen, "play", image_roulette.selected_image
         
         # Mettre à jour l'affichage
+        cursor.show(screen, mouse_pos)
         pygame.display.flip()
         clock.tick(config["fps"])

@@ -16,7 +16,7 @@ with open("config.yaml", "r") as f:
 
 class MultiGame:
     
-    def __init__(self,screen,clock, W,H):
+    def __init__(self,screen, cursor, clock, W,H):
         if not tools.is_connected():
             print( "Désolé, une connexion internet est requise.")
             return
@@ -129,6 +129,7 @@ class MultiGame:
                     if event.type == pygame.VIDEORESIZE:
                         self.W, self.H = tools.get_screen_size()
                 
+                cursor.show(self.screen, self.mouse_pos)
                 pygame.display.flip()
                 
                 self.frame_num=(self.frame_num+1)%config["fps"]
