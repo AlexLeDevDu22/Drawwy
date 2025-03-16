@@ -33,3 +33,20 @@ BUTTON_FONT = pygame.font.Font(None, 70)
 MEDIUM_FONT = pygame.font.Font(None, 50)
 SMALL_FONT = pygame.font.Font( pygame.font.match_font("segoeuisymbol" if sys.platform.startswith("win") else "dejavusans"), 26)
 VERY_SMALL_FONT = pygame.font.Font(None, 25)
+
+
+class CustomCursor:
+    def __init__(self, cursor_path):
+        if cursor_path is None:
+            cursor_path = "assets/cursors/default_cursor.png"
+        else:
+            pygame.mouse.set_visible(False)
+        self.cursor = pygame.image.load(cursor_path).convert_alpha()
+        self.cursor = pygame.transform.scale(self.cursor, (35, 35))
+
+    def show(self, screen, mouse_pos=None):
+        if mouse_pos:
+            mouse_x, mouse_y = mouse_pos
+        else:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+        screen.blit(self.cursor, (mouse_x, mouse_y))

@@ -59,6 +59,13 @@ current_page = "home"
 # Créer le gestionnaire d'avatar
 avatar_manager = AvatarManager(screen)
 
+cursor=CustomCursor("assets/souris/cursor_alien.png")
+with open("data/shop_items.json") as f:
+    for item in json.load(f):
+        if item["category"] == "Curseur" and item["selected"]:
+            cursor=CustomCursor(item["image_path"])
+            break
+
 clock = pygame.time.Clock()
 running = True
 
@@ -163,6 +170,7 @@ while running:
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
     
+    cursor.show(screen, mouse_pos)
     pygame.display.flip()
     clock.tick(config["fps"])
 

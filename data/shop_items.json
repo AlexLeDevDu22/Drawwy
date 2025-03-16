@@ -1,13 +1,23 @@
 [
   {
+    "id": 0,
+    "name": "Starter",
+    "price": 0,
+    "description": "Pour les débutants",
+    "image_path": "assets/souris/cursor_alien.png",
+    "category": "Curseur",
+    "purchased": true,
+    "selected": true
+  },
+  {
     "id": 1,
     "name": "Curseur alien",
     "price": 100,
     "description": "Afin d'envahir la galaxy",
-    "image_path": "assets/souris/funny_cursors/cursor_alien.png",
+    "image_path": "assets/souris/cursor_alien.png",
     "category": "Curseur",
     "purchased": false,
-    "selected": true
+    "selected": false
   },
   {
     "id": 2,
@@ -24,7 +34,7 @@
     "name": "Curseur chat",
     "price": 100,
     "description": "MIAOU",
-    "image_path": "assets/souris/funny_cursors/cursor_cat.png",
+    "image_path": "assets/souris/cursor_cat.png",
     "category": "Curseur",
     "purchased": false,
     "selected": false
@@ -34,7 +44,7 @@
     "name": "Curseur fantome",
     "price": 100,
     "description": "BOUH",
-    "image_path": "assets/souris/funny_cursors/cursor_ghost.png",
+    "image_path": "assets/souris/cursor_ghost.png",
     "category": "Curseur",
     "purchased": false,
     "selected": false
@@ -114,7 +124,7 @@
     "name": "Curseur robot",
     "price": 100,
     "description": "ha!ha!Cuic!",
-    "image_path": "assets/souris/funny_cursors/cursor_robot.png",
+    "image_path": "assets/souris/cursor_robot.png",
     "category": "Curseur",
     "purchased": false,
     "selected": false

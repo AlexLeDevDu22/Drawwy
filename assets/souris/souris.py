@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 import os
 import math
 
-def create_funny_cursor(design_type, size=32, output_dir="funny_cursors"):
+def create_funny_cursor(design_type, size=32):
     """
     Crée un curseur de souris amusant en PNG
     
@@ -14,10 +14,6 @@ def create_funny_cursor(design_type, size=32, output_dir="funny_cursors"):
     Returns:
         str: Chemin du fichier sauvegardé
     """
-    # Créer le dossier de sortie s'il n'existe pas
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
     # Créer une image avec transparence
     img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -26,7 +22,7 @@ def create_funny_cursor(design_type, size=32, output_dir="funny_cursors"):
     hotspot = (0, 0)
     
     # Nom du fichier de sortie
-    file_name = os.path.join(output_dir, f"cursor_{design_type}.png")
+    file_name = f"cursor_{design_type}.png"
     
     # Dessiner différents curseurs selon le design choisi
     if design_type == "cat":

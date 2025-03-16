@@ -311,7 +311,7 @@ def load_items():
             "name": "Curseur alien",
             "price": 100,
             "description": "Afin d'envahir la galaxy",
-            "image_path": "assets/souris/funny_cursors/cursor_alien.png",
+            "image_path": "assets/souris/cursor_alien.png",
             "category": "Curseur",
             "purchased": False,
             "selected": False
@@ -331,7 +331,7 @@ def load_items():
             "name": "Curseur chat",
             "price": 100,
             "description": "MIAOU",
-            "image_path": "assets/souris/funny_cursors/cursor_cat.png",
+            "image_path": "assets/souris/cursor_cat.png",
             "category": "Curseur",
             "purchased": False,
             "selected": False
@@ -341,7 +341,7 @@ def load_items():
             "name": "Curseur fantome",
             "price": 100,
             "description": "BOUH",
-            "image_path": "assets/souris/funny_cursors/cursor_ghost.png",
+            "image_path": "assets/souris/cursor_ghost.png",
             "category": "Curseur",
             "purchased": False,
             "selected": False
@@ -421,7 +421,7 @@ def load_items():
             "name": "Curseur robot",
             "price": 100,
             "description": "ha!ha!Cuic!",
-            "image_path": "assets/souris/funny_cursors/cursor_robot.png",
+            "image_path": "assets/souris/cursor_robot.png",
             "category": "Curseur",
             "purchased": False,
             "selected": False
