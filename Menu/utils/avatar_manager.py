@@ -69,8 +69,10 @@ class AvatarManager:
             if self.shop_item[i]["category"] == "Bordures" and self.shop_item[i]["selected"]:
                 self.base_avatar_bordure = pygame.image.load(self.shop_item[i]["image_path"])
                 self.avatar_bordure = pygame.transform.scale(self.base_avatar_bordure, (109, 109))
-
-        
+        try:
+            self.base_avatar_bordure
+        except:
+            raise Exception("No border selected in shop items")        
         # Boutons
         button_width, button_height = 160, 50
         self.cancel_button_rect = pygame.Rect(self.W // 2 - 150, self.pseudo_target_pos[1] + 45, 
