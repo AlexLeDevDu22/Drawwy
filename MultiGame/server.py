@@ -279,6 +279,7 @@ def stop_server():
 
     from pyngrok import ngrok as ngrok2
     ngrok2.get_tunnels()
+    ngrok2.kill()
     
     # Marquer le serveur comme arrêté
     server_running = False

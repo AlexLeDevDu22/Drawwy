@@ -8,7 +8,7 @@ import json
 import os
 
 
-def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
+def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -48,8 +48,10 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
             W // 2, main_panel_y + 80)
     
     # Charger les données
-    items = load_items()
-    player_data = load_player_data()
+    with open("data/shop_items.json", "r", encoding="utf-8") as file:
+        items = json.load(file)
+    with open("data/player_data.json", "r", encoding="utf-8") as file:
+        player_data = json.load(file)
     coins = player_data.get("coins", 0)
     
     # Afficher le solde
@@ -188,26 +190,17 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
         
         # Gestion des clics sur les items
         if mouse_click and hover_item:
-            
+            if item["purchased"]:
+                cursor_= toggle_select(item, player_data, items)
+                if cursor_:
+                    cursor = cursor_
 
-                if item["purchased"]:
-                    # Basculer la sélection
-                    item["selected"] = not item["selected"]
-                    if item["selected"]:
-                        if item["id"] not in player_data.get("selected_items", []):
-                            player_data.setdefault("selected_items", []).append(item["id"])
-                    else:
-                        if item["id"] in player_data.get("selected_items", []):
-                            player_data["selected_items"].remove(item["id"])
-                    save_player_data(player_data)
-                    save_items(items)
-
-                elif not item["purchased"] and coins >= item["price"]:
-                    coins -= item["price"]
-                    item["purchased"] = True
-                    player_data["coins"] = coins
-                    save_items(items)
-                    save_player_data(player_data)
+            elif not item["purchased"] and coins >= item["price"]:
+                coins -= item["price"]
+                item["purchased"] = True
+                player_data["coins"] = coins
+                save_items(items)
+                save_player_data(player_data)
     
     # Boutons de pagination
     if total_pages > 1:
@@ -290,179 +283,35 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
     
     # Gestion du clic sur le bouton retour
     if mouse_click and hover_back:
-        return screen, "home", buttons
+        return screen, cursor, "home", buttons
     
     
-    return screen, "shop", buttons
+    return screen, cursor, "shop", buttons
 
-def load_items():
-    """Charge les objets de décoration depuis un fichier JSON ou crée des objets par défaut"""
-    if os.path.exists("data/shop_items.json"):
-        try:
-            with open("data/shop_items.json", "r", encoding="utf-8") as file:
-                return json.load(file)
-        except Exception as e:
-            print(f"Erreur lors du chargement des items: {e}")
-    
-    # Items par défaut si le fichier n'existe pas
-    default_items = [
-        {
-            "id": 1,
-            "name": "Curseur alien",
-            "price": 100,
-            "description": "Afin d'envahir la galaxy",
-            "image_path": "assets/souris/cursor_alien.png",
-            "category": "Curseur",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 2,
-            "name": "Bordure de bronze",
-            "price": 150,
-            "description": "Une bordure quelconque",
-            "image_path": "assets/bordures/bordures_profil/bronze_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 3,
-            "name": "Curseur chat",
-            "price": 100,
-            "description": "MIAOU",
-            "image_path": "assets/souris/cursor_cat.png",
-            "category": "Curseur",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 4,
-            "name": "Curseur fantome",
-            "price": 100,
-            "description": "BOUH",
-            "image_path": "assets/souris/cursor_ghost.png",
-            "category": "Curseur",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 5,
-            "name": "Bordure en diamant",
-            "price": 140,
-            "description": "Une bordure brillante",
-            "image_path": "assets/bordures/bordures_profil/diamond_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-        {
-            "id": 6,
-            "name": "Bordure en or",
-            "price": 120,
-            "description": "Une bordure dore",
-            "image_path": "assets/bordures/bordures_profil/gold_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-                {
-            "id": 7,
-            "name": "Bordure de grand maitre",
-            "price": 140,
-            "description": "Pour etre le GOAT de Drawwy",
-            "image_path": "assets/bordures/bordures_profil/grandmaster_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },      
-        {     
-            "id": 8,
-            "name": "Bordure du maitre",
-            "price": 140,
-            "description": "Pour montrer sa puissance",
-            "image_path": "assets/bordures/bordures_profil/master_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-        {     
-            "id": 9,
-            "name": "Bordure mythique",
-            "price": 140,
-            "description": "Pour montrer son talent ",
-            "image_path": "assets/bordures/bordures_profil/mythic_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-        {     
-            "id": 10,
-            "name": "Bordure platine",
-            "price": 140,
-            "description": "L'un des meilleurs ",
-            "image_path": "assets/bordures/bordures_profil/platinum_border.png",
-            "category": "Bordures",
-            "purchased": False,
-            "selected": False
-        },
-        {     
-            "id": 11,
-            "name": "Bordure argent",
-            "price": 140,
-            "description": "Meilleur qu'hier ",
-            "image_path": "assets/bordures/bordures_profil/silver_border.png",
-            "category": "Bordures",
-            "purchased": True,
-            "selected": True
-        },
-        {
-            "id": 12,
-            "name": "Curseur robot",
-            "price": 100,
-            "description": "ha!ha!Cuic!",
-            "image_path": "assets/souris/cursor_robot.png",
-            "category": "Curseur",
-            "purchased": False,
-            "selected": False
-        }
-    ]
-    
-    # Créer le répertoire data s'il n'existe pas
-    os.makedirs("data", exist_ok=True)
-    
-    # Sauvegarder les items par défaut
-    with open("data/shop_items.json", "w", encoding="utf-8") as file:
-        json.dump(default_items, file, ensure_ascii=False, indent=4)
-    
-    return default_items
+def toggle_select(item, player_data, items):
+    # Basculer la sélection
+    if item["selected"]:
+        item["selected"] = False
+        if item["category"] in ["Bordures", "Curseurs"]:
+            player_data["selected_items"].remove(item["id"])
+    else:
+        for player_item in player_data["selected_items"]:
+            if items[player_item]["category"] in ["Bordures", "Curseurs"]:
+                if items[player_item]["category"] == item["category"]:
+                    items[player_item]["selected"] = False
+                    player_data["selected_items"].remove(player_item)
+        item["selected"] = True
+        player_data["selected_items"].append(item["id"])
+    save_player_data(player_data)
+    save_items(items)
 
+    if item["category"] == "Curseurs":
+        return CustomCursor(item["image_path"])
 def save_items(items):
     """Sauvegarde les items dans un fichier JSON"""
     os.makedirs("data", exist_ok=True)
     with open("data/shop_items.json", "w", encoding="utf-8") as file:
         json.dump(items, file, ensure_ascii=False, indent=4)
-
-def load_player_data():
-    """Charge les données du joueur"""
-    if os.path.exists("data/player_data.json"):
-        try:
-            with open("data/player_data.json", "r", encoding="utf-8") as file:
-                return json.load(file)
-        except:
-            pass
-    
-    # Données par défaut
-    default_data = {"coins": 500, "selected_items": []}
-    
-    # Créer le répertoire data s'il n'existe pas
-    os.makedirs("data", exist_ok=True)
-    
-    # Sauvegarder les données par défaut
-    with open("data/player_data.json", "w", encoding="utf-8") as file:
-        json.dump(default_data, file, ensure_ascii=False, indent=4)
-    
-    return default_data
 
 def save_player_data(player_data):
     """Sauvegarde les données du joueur"""

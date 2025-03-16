@@ -333,7 +333,7 @@ def image_selector(screen, cursor, theme_index):
             spin_button.draw(screen)
         
         # Dessiner le bouton de dessin si une image est sélectionnée
-        if image_roulette.selected_image:
+        if image_roulette.selected_image is not None:
             start_drawing_button.draw(screen)
 
         back_button.draw(screen)

@@ -121,7 +121,8 @@ class ColorPicker:
             step_h = self.rect.height // self.dark_steps
             i = (x - self.rect.x) // step_w
             j = (y - self.rect.y) // step_h
-            self.selected_color = self.colors[j][i]
+            try: self.selected_color = self.colors[j][i]
+            except IndexError: return None
             self.selected_pos = (self.rect.x + i * step_w, self.rect.y + j * step_h)
             return (self.selected_color.r, self.selected_color.g, self.selected_color.b)
         return None
