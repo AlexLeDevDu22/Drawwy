@@ -308,11 +308,11 @@ def load_items():
     default_items = [
         {
             "id": 1,
-            "name": "Étoile caca",
+            "name": "Curseur alien",
             "price": 100,
-            "description": "Une jolie étoile rose",
-            "image_path": "assets/decorations/star_pink.png",
-            "category": "Badges",
+            "description": "Afin d'envahir la galaxy",
+            "image_path": "assets/souris/funny_cursors/cursor_alien.png",
+            "category": "Curseur",
             "purchased": False,
             "selected": False
         },
@@ -328,21 +328,21 @@ def load_items():
         },
         {
             "id": 3,
-            "name": "Cœur Rouge",
-            "price": 120,
-            "description": "Un cœur rouge brillant",
-            "image_path": "assets/bodecorations/heart_red.png",
-            "category": "Skin",
+            "name": "Curseur chat",
+            "price": 100,
+            "description": "MIAOU",
+            "image_path": "assets/souris/funny_cursors/cursor_cat.png",
+            "category": "Curseur",
             "purchased": False,
             "selected": False
         },
         {
             "id": 4,
-            "name": "Étoile Verte",
+            "name": "Curseur fantome",
             "price": 100,
-            "description": "Une étoile verte scintillante",
-            "image_path": "assets/decorations/star_green.png",
-            "category": "Badges",
+            "description": "BOUH",
+            "image_path": "assets/souris/funny_cursors/cursor_ghost.png",
+            "category": "Curseur",
             "purchased": False,
             "selected": False
         },
@@ -413,6 +413,16 @@ def load_items():
             "description": "Meilleur qu'hier ",
             "image_path": "assets/bordures/bordures_profil/silver_border.png",
             "category": "Bordures",
+            "purchased": False,
+            "selected": False
+        },
+        {
+            "id": 12,
+            "name": "Curseur robot",
+            "price": 100,
+            "description": "ha!ha!Cuic!",
+            "image_path": "assets/souris/funny_cursors/cursor_robot.png",
+            "category": "Curseur",
             "purchased": False,
             "selected": False
         }

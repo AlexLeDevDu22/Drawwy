@@ -60,9 +60,20 @@ def players(MultiGame):
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
 
+        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["player_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+
         pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
+<<<<<<< HEAD
         #avatar
+=======
+        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+
+
+        #avatar
+
+
+>>>>>>> c6c2269f865bb9adde852837d2c4bdad600ecdf0
         if player["avatar"]["type"]=="matrix":
             #pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
             if player["avatar"]["type"]=="matrix" and ("pygame_border" not in player["avatar"].keys()):
