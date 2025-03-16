@@ -40,31 +40,36 @@ def players(MultiGame):
     pygame.draw.rect(MultiGame.screen, WHITE, (0.01 * MultiGame.W, 0.04 * MultiGame.H, 0.18 * MultiGame.W, 0.7 * MultiGame.H))
     pygame.draw.rect(MultiGame.screen, BLACK, (0.01 * MultiGame.W, 0.04 * MultiGame.H, 0.18 * MultiGame.W, 0.7 * MultiGame.H), 1)
 
-    font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
-    image_texte = font.render ( "Liste de joueurs:", 1 , (0,0,0) )
-    MultiGame.screen.blit(image_texte, (5.5/100*MultiGame.W,6/100*MultiGame.H))
+    image_texte = BUTTON_FONT.render ( "Joueurs", 1 , (0,0,0) )
+    MultiGame.screen.blit(image_texte, (4.5/100*MultiGame.W,5.5/100*MultiGame.H))
 
 
     dico_co = [
         [(1/100*MultiGame.W, (11+i*7)/100*MultiGame.H, 18/100*MultiGame.W, 7/100*MultiGame.H),
         (1.5/100*MultiGame.W,(12+i*7)/100*MultiGame.H),
-            (6/100*MultiGame.W,(12.5+i*7)/100*MultiGame.H),
-            (13/100*MultiGame.W,(14+i*7)/100*MultiGame.H),
-            (12/100*MultiGame.W,(12+i*7)/100*MultiGame.H),
+            (4.6/100*MultiGame.W,(12.6+i*7)/100*MultiGame.H),
+            (12.4/100*MultiGame.W,(12+i*7)/100*MultiGame.H),
+            (12.4/100*MultiGame.W,(14+i*7)/100*MultiGame.H),
             (17.4/100*MultiGame.W,(13.2+i*7)/100*MultiGame.H)]
-        for i in range(9)  # Génère 9 entrées automatiquement
+        for i in range(9)
     ]
     
-    for y,player in enumerate(MultiGame.PLAYERS):
+    for i,player in enumerate(MultiGame.PLAYERS):
+        if i*0.07*MultiGame.H>0.7*MultiGame.H: break
+        i=min(i, 8)
 
         #fond
-        pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
+        pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[i][0])
 
+<<<<<<< HEAD
         pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+=======
+        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
+>>>>>>> cd6ac2f4cdb2c647567bad05d48547a796ebbe4f
 
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
-        pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
+        pygame.draw.rect(MultiGame.screen, config["players_colors"][i%len(config["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
         #avatar
 
@@ -74,82 +79,84 @@ def players(MultiGame):
             if player["avatar"]["type"]=="matrix" and ("pygame_border" not in player["avatar"].keys()):
                 border=pygame.image.load(player["avatar"]["border_path"])
                 border=pygame.transform.scale(border, (5/100*MultiGame.H+6, 5/100*MultiGame.H+6))
-                MultiGame.PLAYERS[y]["avatar"]["pygame_border"]=border
-            MultiGame.screen.blit(player["avatar"]["pygame_border"], (dico_co[y][1][0]-3,dico_co[y][1][1]-3))
+                MultiGame.PLAYERS[i]["avatar"]["pygame_border"]=border
+            MultiGame.screen.blit(player["avatar"]["pygame_border"], (dico_co[i][1][0]-3,dico_co[i][1][1]-3))
 
             if player["avatar"]["type"]=="matrix" and ("pygame_image" not in player["avatar"].keys()):
                 avatar=tools.matrix_to_image(player["avatar"]["matrix"])
                 avatar=pygame.transform.scale(avatar, (5/100*MultiGame.H, 5/100*MultiGame.H))
                 apply_circular_mask(avatar)
-                MultiGame.PLAYERS[y]["avatar"]["pygame_image"]=avatar
-            MultiGame.screen.blit(player["avatar"]["pygame_image"], dico_co[y][1])
+                MultiGame.PLAYERS[i]["avatar"]["pygame_image"]=avatar
+            MultiGame.screen.blit(player["avatar"]["pygame_image"], dico_co[i][1])
         else:# emoji
-            pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+5/100*MultiGame.H//2,dico_co[y][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2+3)
-            pygame.draw.circle(MultiGame.screen, player["avatar"]["color"], (dico_co[y][1][0]+5/100*MultiGame.H//2,dico_co[y][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2)
+            pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[i][1][0]+5/100*MultiGame.H//2,dico_co[i][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2+3)
+            pygame.draw.circle(MultiGame.screen, player["avatar"]["color"], (dico_co[i][1][0]+5/100*MultiGame.H//2,dico_co[i][1][1]+5/100*MultiGame.H//2), 5/100*MultiGame.H//2)
 
             try:
-                MultiGame.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*MultiGame.H, 4.6/100*MultiGame.H)), (dico_co[y][1][0],dico_co[y][1][1]+4))
+                MultiGame.screen.blit(load_emoji(player["avatar"]["emoji"], (4.6/100*MultiGame.H, 4.6/100*MultiGame.H)), (dico_co[i][1][0],dico_co[i][1][1]+4))
             except:
                 seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 30)
                 emoji, rect = seguisy80.render(player["avatar"]["emoji"], "black")
-                rect.center = (dico_co[y][1][0]+20,dico_co[y][1][1]+24)
+                rect.center = (dico_co[i][1][0]+20,dico_co[i][1][1]+24)
                 MultiGame.screen.blit(emoji, rect)
 
 
         #pseudo
         text_color=(10,10,10) if player["id"] == MultiGame.PLAYER_ID else (100,100,100)
-        font = pygame.font.Font("assets/PermanentMarker.ttf" ,30)
-        image_texte = font.render ( player["pseudo"], 1 , text_color )
-        MultiGame.screen.blit(image_texte, dico_co[y][2])
+        #font = pygame.font.Font("assets/PermanentMarker.ttf" ,30)
+        image_texte = MEDIUM_FONT.render ( player["pseudo"], 1 , text_color )
+        MultiGame.screen.blit(image_texte, dico_co[i][2])
         #points
-        font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
-        image_texte = font.render ( "points:  "+str(player["points"]), 1 , text_color )
-        MultiGame.screen.blit(image_texte, dico_co[y][3])
+        #font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
 
-        if player["id"] != MultiGame.CURRENT_DRAWER:
-            image_texte = font.render ( "Trouvé ", 1 , text_color )
-            MultiGame.screen.blit(image_texte, dico_co[y][4])
-                
+        if player["id"] != MultiGame.CURRENT_DRAWER and len(MultiGame.PLAYERS)>1:
+            image_texte = SMALL_FONT.render ( "Trouvé ", 1 , text_color )
+            MultiGame.screen.blit(image_texte, dico_co[i][3])
+            
             # pygame.draw.circle(MultiGame.screen, text_color, dico_co[y][4], 7)
             if player["found"]:
-                pygame.draw.circle(MultiGame.screen, GREEN,dico_co[y][5], 5)
+                pygame.draw.circle(MultiGame.screen, GREEN,dico_co[i][5], 5)
             else:
-                pygame.draw.circle(MultiGame.screen, RED,dico_co[y][5], 5)
+                pygame.draw.circle(MultiGame.screen, RED,dico_co[i][5], 5)
+        
+        image_texte = SMALL_FONT.render (str(player["points"]) + " points", 1 , text_color )
+        MultiGame.screen.blit(image_texte, dico_co[i][4])
 
 def sentence(MultiGame):
-    pygame.draw.rect(MultiGame.screen, WHITE, (0.01 * MultiGame.W, 0.75 * MultiGame.H, 0.18 * MultiGame.W, 0.2 * MultiGame.H))
-    pygame.draw.rect(MultiGame.screen, BLACK, (0.01 * MultiGame.W, 0.75 * MultiGame.H, 0.18 * MultiGame.W, 0.2 * MultiGame.H), 1)
+    if len(MultiGame.PLAYERS) >1:
+        pygame.draw.rect(MultiGame.screen, WHITE, (0.01 * MultiGame.W, 0.75 * MultiGame.H, 0.18 * MultiGame.W, 0.2 * MultiGame.H))
+        pygame.draw.rect(MultiGame.screen, BLACK, (0.01 * MultiGame.W, 0.75 * MultiGame.H, 0.18 * MultiGame.W, 0.2 * MultiGame.H), 1)
 
-    text= "Phrase à faire deviner:"if MultiGame.me["is_drawer"] else "Phrase à trouver:"
-    pygame.draw.rect(MultiGame.screen, GREEN,(1/100*MultiGame.W,75/100*MultiGame.H, 18/100*MultiGame.W, 20/100*MultiGame.H) )
+        text= "Phrase à faire deviner:"if MultiGame.me["is_drawer"] else "Phrase à trouver:"
+        pygame.draw.rect(MultiGame.screen, GREEN,(1/100*MultiGame.W,75/100*MultiGame.H, 18/100*MultiGame.W, 20/100*MultiGame.H) )
 
-    font = pygame.font.Font("assets/PermanentMarker.ttf" ,22)
-    image_texte = font.render( text, True , (0,0,0) )
-    MultiGame.screen.blit(image_texte, (2/100*MultiGame.W,77/100*MultiGame.H))
-    
-    if len(MultiGame.CURRENT_SENTENCE) >0:
-        FONT_SIZE_BASE = 20  # Taille de base de la font
-        Y_START = 77 / 100 * MultiGame.H +36 # Position de départ
+        #font = pygame.font.Font("assets/PermanentMarker.ttf" ,22)
+        image_texte = SMALL_FONT.render( text, True , (0,0,0) )
+        MultiGame.screen.blit(image_texte, (2/100*MultiGame.W,77/100*MultiGame.H))
+        
+        if len(MultiGame.CURRENT_SENTENCE) >0:
+            FONT_SIZE_BASE = 20  # Taille de base de la font
+            Y_START = 77 / 100 * MultiGame.H +36 # Position de départ
 
-        # Choisir la taille de font en fonction de la longueur du texte
-        if len(MultiGame.CURRENT_SENTENCE) <= 30:
-            font_size = FONT_SIZE_BASE
-        elif len(MultiGame.CURRENT_SENTENCE) <= 60:
-            font_size = FONT_SIZE_BASE - 2
-        else:
-            font_size = FONT_SIZE_BASE - 4
+            # Choisir la taille de font en fonction de la longueur du texte
+            if len(MultiGame.CURRENT_SENTENCE) <= 30:
+                font_size = FONT_SIZE_BASE
+            elif len(MultiGame.CURRENT_SENTENCE) <= 60:
+                font_size = FONT_SIZE_BASE - 2
+            else:
+                font_size = FONT_SIZE_BASE - 4
 
-        font = pygame.font.Font("assets/PermanentMarker.ttf", font_size)
+            font = pygame.font.Font("assets/PermanentMarker.ttf", font_size)
 
-        lines=tools.lines_return(MultiGame.CURRENT_SENTENCE, font, 0.16 * MultiGame.W)
+            lines=tools.lines_return(MultiGame.CURRENT_SENTENCE, font, 0.16 * MultiGame.W)
 
-        # Affichage ligne par ligne
-        for i, ligne in enumerate(lines):
-            image_texte = font.render(ligne, True, (20, 10, 10))
-            if (not MultiGame.me["found"]) and not MultiGame.me["is_drawer"]:
-                image_texte=tools.flou(image_texte)
-            MultiGame.screen.blit(image_texte, (0.03 * MultiGame.W, Y_START + (i * (font_size + 2))))
-            
+            # Affichage ligne par ligne
+            for i, ligne in enumerate(lines):
+                image_texte = font.render(ligne, True, (20, 10, 10))
+                if (not MultiGame.me["found"]) and not MultiGame.me["is_drawer"]:
+                    image_texte=tools.flou(image_texte)
+                MultiGame.screen.blit(image_texte, (0.03 * MultiGame.W, Y_START + (i * (font_size + 2))))
+                
 def drawing(MultiGame):
 
     """Permet de dessiner uniquement dans la zone de dessin."""
@@ -197,7 +204,7 @@ def drawing(MultiGame):
                     MultiGame.second_draw_frames.append({"type":"new_step"})
                     MultiGame.ALL_FRAMES.append({"type":"new_step"})
                     
-                elif MultiGame.mouseDown and event.type == pygame.MOUSEMOTION:
+                elif MultiGame.mouse_down and event.type == pygame.MOUSEMOTION:
                     if MultiGame.lastMouseDown and 0<MultiGame.game_remaining_time<config["game_duration"]:   # can draw    
                         # Position actuelle dans le CANVAS
                         canvas_x = (event.pos[0] - zone_x_min) // MultiGame.pixel_width
@@ -242,49 +249,6 @@ def drawing(MultiGame):
         tools.emit_sio(MultiGame.SIO, "draw", tools.simplify_frames(MultiGame.second_draw_frames))#send draw
         MultiGame.second_draw_frames=[]
 
-    
-def couleurs(MultiGame):
-    pygame.draw.rect(MultiGame.screen, WHITE, (0.81 * MultiGame.W, 0.04 * MultiGame.H, 0.18 * MultiGame.W, 0.25 * MultiGame.H))
-    pygame.draw.rect(MultiGame.screen, BLACK, (0.81 * MultiGame.W, 0.04 * MultiGame.H, 0.18 * MultiGame.W, 0.25 * MultiGame.H), 1)
-
-    """Affiche une palette de couleurs fixes et permet de sélectionner une couleur."""
-    palette_x, palette_y = int(0.81 * MultiGame.W), int(0.04 * MultiGame.H)
-    palette_w, palette_h = int(0.18 * MultiGame.W), int(0.25 * MultiGame.H)
-
-    # Taille des carrés de couleur
-    cols = 4  # Nombre de couleurs par ligne
-    square_size = min(palette_w // cols, palette_h // (len(config["drawing_colors"]) // cols + 1))
-    spacing = 10  # Espacement entre les couleurs
-    offset_x = (palette_w - (square_size + spacing) * cols) // 2  # Centrage horizontal
-
-    for i, color in enumerate(config["drawing_colors"]):
-        row = i // cols
-        col = i % cols
-        x = palette_x + col * (square_size + spacing) + offset_x +5
-        y = palette_y + row * (square_size + spacing)
-        pygame.draw.rect(MultiGame.screen, color, (x, y, square_size, square_size))
-        pygame.draw.rect(MultiGame.screen, (0, 0, 0), (x, y, square_size, square_size), 2)  # Bordure noire
-
-    # Afficher la couleur sélectionnée
-    selected_x = palette_x + palette_w // 2 - 50
-    selected_y = palette_y + palette_h - 25
-    pygame.draw.rect(MultiGame.screen, MultiGame.pen_color, (selected_x, selected_y, 100, 30))
-    pygame.draw.rect(MultiGame.screen, (0, 0, 0), (selected_x, selected_y, 100, 30), 2)  # Bordure noire
-
-    # Gestion du clic sur une couleur
-    for event in MultiGame.events:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            for i, color in enumerate(config["drawing_colors"]):
-                row = i // cols
-                col = i % cols
-                x = palette_x + col * (square_size + spacing) + offset_x
-                y = palette_y + row * (square_size + spacing)
-
-                if x <= mouse_x < x + square_size and y <= mouse_y < y + square_size:
-                    MultiGame.pen_color = color
-                    break  # Empêche de changer plusieurs fois la couleur dans une seule itération
-
 def slider_radius(MultiGame):
     pygame.draw.rect(MultiGame.screen, WHITE, (0.81 * MultiGame.W, 0.3083 * MultiGame.H, 0.18 * MultiGame.W, 0.0833 * MultiGame.H))
     pygame.draw.rect(MultiGame.screen, BLACK, (0.81 * MultiGame.W, 0.3083 * MultiGame.H, 0.18 * MultiGame.W, 0.0833 * MultiGame.H), 1)
@@ -314,7 +278,7 @@ def slider_radius(MultiGame):
     
     #update
     for event in MultiGame.events:
-        if event.type == pygame.MOUSEMOTION and MultiGame.mouseDown:
+        if event.type == pygame.MOUSEMOTION and MultiGame.mouse_down:
             if slider_min-MultiGame.pen_radius<=event.pos[0]<=slider_max+MultiGame.pen_radius and slider_y <= event.pos[1] <= slider_y + slider_h:
                 radius_slider_pos = max(slider_min, min(event.pos[0], slider_max))
                 MultiGame.pen_radius = int((int(1 + (radius_slider_pos - slider_min) * 10 / (slider_max - slider_min)))* MultiGame.pixel_height)

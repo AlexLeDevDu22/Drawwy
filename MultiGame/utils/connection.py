@@ -49,7 +49,7 @@ async def handle_connection_client(MultiGame):
                 if item["category"] == "Bordures" and item["selected"]:
                     border = item
 
-        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("assets/avatar.bmp"), "border_path": border["image_path"]}})
+        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": player_data["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"), "border_path": border["image_path"]}})
 
     @MultiGame.SIO.event
     async def disconnect():
@@ -89,6 +89,7 @@ async def handle_connection_client(MultiGame):
         MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
+        print(data["drawer_id"], "nn")
         MultiGame.MESSAGES=[{"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": config["succeed_color"]}]
         MultiGame.ALL_FRAMES=[]
         MultiGame.FOUND=False
