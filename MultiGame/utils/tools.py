@@ -83,24 +83,6 @@ def matrix_to_image(pixel_matrix):
 
     return surface
 
-def apply_circular_mask(image):
-    """Applique un masque circulaire avec transparence à une image Pygame."""
-    # Créer un masque avec canal alpha
-    mask = pygame.Surface(image.get_size(), pygame.SRCALPHA)
-    mask.fill((0, 0, 0, 0))  # Transparence totale
-
-    # Dessiner un cercle blanc opaque dans le masque
-    pygame.draw.circle(
-        mask,
-        (255, 255, 255, 255),  # Blanc opaque
-        (image.get_width() // 2, image.get_height() // 2),
-        image.get_width() // 2,
-    )
-
-    # Appliquer le masque sur l'image
-    image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-
 def get_random_sentence():
     with open("Max/phrases_droles_v2.json") as f:
         return random.choice(json.load(f))
