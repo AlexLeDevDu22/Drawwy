@@ -62,9 +62,6 @@ class SoloPlay:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown = True
-                    color=self.color_picker.get_color_at(pygame.mouse.get_pos())
-                    if color:
-                        self.pen_color = color
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown = False
                 elif event.type == pygame.MOUSEMOTION:

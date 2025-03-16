@@ -16,7 +16,7 @@ class AvatarManager:
         self.input_text = self.player_data["pseudo"]
         
         # Charger ou créer l'avatar
-        self.avatar_path = "assets/avatar.bmp"
+        self.avatar_path = "data/avatar.bmp"
         try:
             self.avatar_original = pygame.image.load(self.avatar_path).convert_alpha()
             self.avatar_original = pygame.transform.scale(self.avatar_original, (100, 100))
