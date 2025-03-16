@@ -20,6 +20,7 @@ def start_connexion(MultiGameClass):
         if not asyncio.run(tools.test_server()):# start the serv
             
             import MultiGame.server as server
+            MultiGameClass.server=server
             threading.Thread(target=server.start_server, daemon=True).start()
 
             while not server.server_running:
@@ -153,7 +154,9 @@ def disconnect(MultiGame):
     for task in asyncio.all_tasks(connection_loop):
         task.cancel()
     MultiGame.connection_loop.stop()
+    print(MultiGame.server)
     if MultiGame.server:
+        print(555)
         MultiGame.server.stop_server()
     MultiGame.connexion_thread.join()
     print("deco")

@@ -62,7 +62,7 @@ avatar_manager = AvatarManager(screen)
 cursor=CustomCursor("assets/souris/cursor_alien.png")
 with open("data/shop_items.json") as f:
     for item in json.load(f):
-        if item["category"] == "Curseur" and item["selected"]:
+        if item["category"] == "Curseurs" and item["selected"]:
             cursor=CustomCursor(item["image_path"])
             break
 
@@ -165,7 +165,7 @@ while running:
             screen, current_page, buttons = credit.show_credit(screen, W,H, mouse_pos, mouse_click, buttons)
         #=== ÉCRAN DU SHOP ===
         elif current_page == "shop":
-             screen, current_page, buttons = shop.show_shop(screen, W,H, mouse_pos, mouse_click, buttons)
+            screen, cursor, current_page, buttons = shop.show_shop(screen, cursor, W,H, mouse_pos, mouse_click, buttons)
         
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
