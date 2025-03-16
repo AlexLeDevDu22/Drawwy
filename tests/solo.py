@@ -339,6 +339,7 @@ class DrawingPage:
                 if self.validate_button.is_clicked(self.mouse_pos, (True, False, False)):
                     print("Dessin validé!")
                     # Insérer le code pour passer à la page de résultats
+                    pygame.image.save(self.canvas_surf, "mon_dessin.png")  # Sauvegarde du dessin
                     self.mouseDown = False
                     
                 # Vérifier le bouton gomme
