@@ -59,9 +59,15 @@ def players(MultiGame):
 
         #fond
         pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[y][0])
+
         pygame.draw.rect(MultiGame.screen, config["players_colors"][y%len(config["players_colors"])],(dico_co[y][0][0]+3,dico_co[y][0][1]+3,dico_co[y][0][2]-6,dico_co[y][0][3]-6))
 
+<<<<<<< HEAD
         #avatar
+=======
+
+        #avatar TODO FOR EMOJI!!!!
+>>>>>>> 6d94e543b6df9e22599cf6b3cac1ce49ea5809d8
         if player["avatar"]["type"]=="matrix":
             #pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
             if player["avatar"]["type"]=="matrix" and ("pygame_border" not in player["avatar"].keys()):
