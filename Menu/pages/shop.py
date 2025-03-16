@@ -76,7 +76,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     categories = ["tous"] + list(set(item["category"] for item in items))
     
     # Dessiner les onglets de catégories
-    tab_width = 150
+    tab_width = 160
     tab_height = 50
     tab_margin = 10
     start_x = main_panel_x + (main_panel_width - (len(categories) * (tab_width + tab_margin) - tab_margin)) // 2
