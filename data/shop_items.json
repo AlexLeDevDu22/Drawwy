@@ -7,7 +7,7 @@
     "image_path": "assets/souris/cursor_alien.png",
     "category": "Curseurs",
     "purchased": true,
-    "selected": false
+    "selected": true
   },
   {
     "id": 1,
@@ -27,7 +27,7 @@
     "image_path": "assets/bordures/bordures_profil/bronze_border.png",
     "category": "Bordures",
     "purchased": true,
-    "selected": false
+    "selected": true
   },
   {
     "id": 3,
