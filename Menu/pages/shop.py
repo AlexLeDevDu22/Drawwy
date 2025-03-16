@@ -50,7 +50,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     # Afficher le solde
     coin_icon = pygame.image.load("assets/icon_coin.png")
     coin_icon = pygame.transform.scale(coin_icon, (40, 40))
-    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 160, main_panel_y + 72))
+    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 160, main_panel_y + 75))
     screen.blit(coin_icon, coin_icon_rect)
     
     draw_text(str(coins), MEDIUM_FONT, BLACK, screen, 
@@ -164,11 +164,11 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
-                item_x + 220, item_y + 40)
+                item_x + 230, item_y + 40)
         
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
-                item_x + 260, item_y + 80)
+                item_x + 248, item_y + 80)
         
         # Prix ou statut
         if item["purchased"]:
