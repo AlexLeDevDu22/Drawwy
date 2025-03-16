@@ -16,7 +16,7 @@
         "description": "Une bordure quelconque",
         "image_path": "assets/bordures/bordures_profil/bronze_border.png",
         "category": "Bordures",
-        "purchased": false,
+        "purchased": true,
         "selected": false
     },
     {
@@ -67,7 +67,7 @@
         "image_path": "assets/bordures/bordures_profil/grandmaster_border.png",
         "category": "Bordures",
         "purchased": true,
-        "selected": false
+        "selected": true
     },
     {
         "id": 8,

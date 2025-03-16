@@ -14,7 +14,7 @@
         {
             "title": "Artiste en herbe",
             "explication": "Dessinez 10 dessins",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 255,
@@ -24,7 +24,7 @@
         {
             "title": "Maitre du crayon",
             "explication": "Dessinez 50 dessins",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 0,
@@ -34,7 +34,7 @@
         {
             "title": "Collaborateur",
             "explication": "Jouez en multijoueur 5 fois",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 165,
@@ -44,7 +44,7 @@
         {
             "title": "Perfectionniste",
             "explication": "Obtenez un score parfait",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 255,
@@ -55,6 +55,6 @@
     "num_game_played": 0,
     "points": 0,
     "selected_items": [
-        2
+        7
     ]
 }
