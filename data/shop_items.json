@@ -7,7 +7,7 @@
         "image_path": "assets/souris/cursor_alien.png",
         "category": "Curseur",
         "purchased": true,
-        "selected": true
+        "selected": false
     },
     {
         "id": 1,
@@ -16,8 +16,8 @@
         "description": "Afin d'envahir la galaxy",
         "image_path": "assets/souris/cursor_alien.png",
         "category": "Curseur",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 2,
@@ -26,7 +26,7 @@
         "description": "Une bordure quelconque",
         "image_path": "assets/bordures/bordures_profil/bronze_border.png",
         "category": "Bordures",
-        "purchased": false,
+        "purchased": true,
         "selected": false
     },
     {
@@ -36,7 +36,7 @@
         "description": "MIAOU",
         "image_path": "assets/souris/cursor_cat.png",
         "category": "Curseur",
-        "purchased": false,
+        "purchased": true,
         "selected": false
     },
     {
@@ -46,8 +46,8 @@
         "description": "BOUH",
         "image_path": "assets/souris/cursor_ghost.png",
         "category": "Curseur",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 5,
@@ -56,8 +56,8 @@
         "description": "Une bordure brillante",
         "image_path": "assets/bordures/bordures_profil/diamond_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 6,
@@ -66,8 +66,8 @@
         "description": "Une bordure dore",
         "image_path": "assets/bordures/bordures_profil/gold_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 7,
@@ -86,8 +86,8 @@
         "description": "Pour montrer sa puissance",
         "image_path": "assets/bordures/bordures_profil/master_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 9,
@@ -96,8 +96,8 @@
         "description": "Pour montrer son talent ",
         "image_path": "assets/bordures/bordures_profil/mythic_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 10,
@@ -106,8 +106,8 @@
         "description": "L'un des meilleurs ",
         "image_path": "assets/bordures/bordures_profil/platinum_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 11,
@@ -116,8 +116,8 @@
         "description": "Meilleur qu'hier ",
         "image_path": "assets/bordures/bordures_profil/silver_border.png",
         "category": "Bordures",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     },
     {
         "id": 12,
@@ -126,7 +126,7 @@
         "description": "ha!ha!Cuic!",
         "image_path": "assets/souris/cursor_robot.png",
         "category": "Curseur",
-        "purchased": false,
-        "selected": false
+        "purchased": true,
+        "selected": true
     }
 ]
