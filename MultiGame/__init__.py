@@ -79,7 +79,6 @@ class MultiGame:
 
                 for i in range(len(self.PLAYERS)):
                     if self.PLAYERS[i]["id"] == self.PLAYER_ID:
-                        print(self.PLAYER_ID,self.CURRENT_DRAWER)
                         self.me=self.PLAYERS[i]
                         self.me["is_drawer"]=self.PLAYER_ID==self.CURRENT_DRAWER
                         break

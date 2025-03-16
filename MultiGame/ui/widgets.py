@@ -50,7 +50,7 @@ def players(MultiGame):
             (4.6/100*MultiGame.W,(12.6+i*7)/100*MultiGame.H),
             (12.4/100*MultiGame.W,(12+i*7)/100*MultiGame.H),
             (12.4/100*MultiGame.W,(14+i*7)/100*MultiGame.H),
-            (17.4/100*MultiGame.W,(13.2+i*7)/100*MultiGame.H)]
+            (17.8/100*MultiGame.W,(13.3+i*7)/100*MultiGame.H)]
         for i in range(9)
     ]
     
@@ -106,14 +106,14 @@ def players(MultiGame):
         #font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
 
         if player["id"] != MultiGame.CURRENT_DRAWER and len(MultiGame.PLAYERS)>1:
-            image_texte = SMALL_FONT.render ( "Trouvé ", 1 , text_color )
-            MultiGame.screen.blit(image_texte, dico_co[i][3])
+            # image_texte = SMALL_FONT.render ( "Trouvé ", 1 , text_color )
+            # MultiGame.screen.blit(image_texte, dico_co[i][3])
             
             # pygame.draw.circle(MultiGame.screen, text_color, dico_co[y][4], 7)
             if player["found"]:
-                pygame.draw.circle(MultiGame.screen, GREEN,dico_co[i][5], 5)
+                pygame.draw.circle(MultiGame.screen, GREEN,dico_co[i][5], 8)
             else:
-                pygame.draw.circle(MultiGame.screen, RED,dico_co[i][5], 5)
+                pygame.draw.circle(MultiGame.screen, RED,dico_co[i][5], 8)
         
         image_texte = SMALL_FONT.render (str(player["points"]) + " points", 1 , text_color )
         MultiGame.screen.blit(image_texte, dico_co[i][4])
@@ -148,10 +148,10 @@ def sentence(MultiGame):
 
             # Affichage ligne par ligne
             for i, ligne in enumerate(lines):
-                image_texte = font.render(ligne, True, (20, 10, 10))
+                image_texte = font.render(" "+ligne+" ", True, (20, 10, 10))
                 if (not MultiGame.me["found"]) and not MultiGame.me["is_drawer"]:
                     image_texte=tools.flou(image_texte)
-                MultiGame.screen.blit(image_texte, (0.03 * MultiGame.W, Y_START + (i * (font_size + 2))))
+                MultiGame.screen.blit(image_texte, (0.026 * MultiGame.W, Y_START + (i * (font_size + 2))))
                 
 def drawing(MultiGame):
 
@@ -300,9 +300,9 @@ def chat(MultiGame):
                 MultiGame.guess += event.unicode
 
     # Mise à jour visuelle
-    min_y=0.4083 * MultiGame.H if MultiGame.me["is_drawer"] else 0.04 * MultiGame.H -45 -len(guess_line)*20
-    pygame.draw.rect(MultiGame.screen, WHITE, (0.81 * MultiGame.W, min_y, 0.18 * MultiGame.W, 0.9533 * MultiGame.H - min_y))
-    pygame.draw.rect(MultiGame.screen, BLACK, (0.81 * MultiGame.W, min_y, 0.18 * MultiGame.W, 0.9533 * MultiGame.H - min_y), 1)
+    min_y=0.4083 * MultiGame.H if MultiGame.me["is_drawer"] else 0.1*MultiGame.H
+    pygame.draw.rect(MultiGame.screen, WHITE, (0.81 * MultiGame.W, min_y, 0.18 * MultiGame.W, 0.95 * MultiGame.H - min_y))
+    pygame.draw.rect(MultiGame.screen, BLACK, (0.81 * MultiGame.W, min_y, 0.18 * MultiGame.W, 0.95 * MultiGame.H - min_y), 1)
 
     color = BLUE if MultiGame.guess_input_active else LIGHT_BLUE
     for i,line in enumerate(guess_line):
@@ -312,7 +312,7 @@ def chat(MultiGame):
 
 
     #chat
-    y=0.9533 * MultiGame.H-60 -len(guess_line)*20
+    y=0.95 * MultiGame.H-60 -len(guess_line)*20
 
     for mess in MultiGame.MESSAGES[::-1]:
         font = pygame.font.Font("assets/PermanentMarker.ttf" ,16)

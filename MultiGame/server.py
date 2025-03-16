@@ -174,10 +174,9 @@ def handle_guess(guess):
     
     list_found = []
     succeed = False
-    mess = None
 
-    guess["succeed"]=False
     guess["type"]="guess"
+    guess["succeed"]=False
     
     for i, player in enumerate(players):
         if guess["pid"]==player["id"] and player["id"] != drawer_id:
@@ -197,12 +196,12 @@ def handle_guess(guess):
                         break
 
                 guess["new_points"]=[{"pid": player["id"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
-            break
         
         if player["id"] != drawer_id:
+            print(player["id"],player["found"])
             list_found.append(player["found"])
     
-    guess_list.append(mess)
+    guess_list.append(guess)
 
     emit('new_message', guess, broadcast=True) 
 

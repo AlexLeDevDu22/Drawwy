@@ -55,10 +55,10 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
     # Afficher le solde
     coin_icon = pygame.image.load("assets/icon_coin.png")
     coin_icon = pygame.transform.scale(coin_icon, (40, 40))
-    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 180, main_panel_y + 80))
+    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 160, main_panel_y + 72))
     screen.blit(coin_icon, coin_icon_rect)
     
-    draw_text(f"{coins}", MEDIUM_FONT, BLACK, screen, 
+    draw_text(str(coins), MEDIUM_FONT, BLACK, screen, 
             main_panel_x + main_panel_width - 120, main_panel_y + 80)
     
     # Variables statiques pour la pagination et filtrage
@@ -74,7 +74,7 @@ def show_shop(screen, W, H, mouse_pos, mouse_click, buttons):
     categories = ["tous"] + list(set(item["category"] for item in items))
     
     # Dessiner les onglets de catégories
-    tab_width = 140
+    tab_width = 150
     tab_height = 50
     tab_margin = 10
     start_x = main_panel_x + (main_panel_width - (len(categories) * (tab_width + tab_margin) - tab_margin)) // 2

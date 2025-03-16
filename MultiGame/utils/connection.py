@@ -89,10 +89,10 @@ async def handle_connection_client(MultiGame):
         MultiGame.CANVAS=[[None for _ in range(config["canvas_width"])] for _ in range(config["canvas_height"])] #reset canvas
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
-        print(data["drawer_id"], "nn")
-        MultiGame.MESSAGES=[{"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": config["succeed_color"]}]
+        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": config["succeed_color"]})
         MultiGame.ALL_FRAMES=[]
-        MultiGame.FOUND=False
+        for i in range(len(MultiGame.PLAYERS)):
+            MultiGame.PLAYERS[i]["found"]=False
         MultiGame.GAMESTART=datetime.fromisoformat(data["start_time"])
         MultiGame.ROLL_BACK=0
 
@@ -147,7 +147,9 @@ async def handle_connection_client(MultiGame):
 
 def disconnect(MultiGame):
     global connection_loop
-    MultiGame.SIO.disconnect()
+    if MultiGame.connection_loop.is_running():
+        future = asyncio.run_coroutine_threadsafe(MultiGame.SIO.disconnect(), MultiGame.connection_loop)
+        future.result()
     for task in asyncio.all_tasks(connection_loop):
         task.cancel()
     MultiGame.connection_loop.stop()

@@ -93,7 +93,7 @@ def check_sentences(phrase1, phrase2):
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
-    print(score)
+    print(phrase1, phrase2,score)
     return score>config["sentence_checker_seuil"]
     
 def emit_sio(sio, event, data):
