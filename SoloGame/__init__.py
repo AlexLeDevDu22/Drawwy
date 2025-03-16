@@ -6,6 +6,7 @@ import pygame
 
 def soloGame(screen):
     soloPage="themes"
+    pygame.display.set_caption(f"Drawwy - Mode Solo")
     while True:
         if soloPage=="themes":
             screen, soloPage, theme=theme_choicer(screen)

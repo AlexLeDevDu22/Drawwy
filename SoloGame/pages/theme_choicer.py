@@ -1,5 +1,6 @@
 from shared.ui.common_ui import *
 from shared.ui.elements import *
+from SoloGame.ui.elements import FloatingObject
 
 import pygame
 import sys
@@ -20,7 +21,6 @@ themes = [
     {"nom": "Animaux", "couleur": BLUE, "icone": "🦁"},
     {"nom": "Mode", "couleur": PINK, "icone": "👗"},
 ]
-W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 class ThemeCard:
     def __init__(self, x, y, width, height, theme_info):
@@ -143,33 +143,6 @@ class ThemeCard:
         nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 60))
         screen.blit(nom_texte, nom_rect)
     
-class FloatingObject:
-    def __init__(self, x, y, size, color, speed):
-        self.x = x
-        self.y = y
-        self.size = size
-        self.color = color
-        self.speed = speed
-        self.angle = random.uniform(0, 2 * math.pi)
-        self.orig_y = y
-        self.amplitude = random.uniform(20, 50)
-        self.phase = random.uniform(0, 2 * math.pi)
-    
-    def update(self):
-        self.x += self.speed
-        self.phase += 0.02
-        self.y = self.orig_y + math.sin(self.phase) * self.amplitude
-        
-        if self.x > W + 100:
-            self.x = -100
-    
-    def draw(self, screen):
-        # Dessiner un cercle flou
-        for i in range(5):
-            radius = self.size - i
-            alpha = 100 - i * 20
-            gfxdraw.filled_circle(screen, int(self.x), int(self.y), radius, (*self.color, alpha))
-
 def draw_background(screen):
     # Dégradé de fond
     for y in range(H):
@@ -181,6 +154,8 @@ def draw_background(screen):
         pygame.draw.line(screen, color, (0, y), (W, y))
 
 def theme_choicer(screen):
+    global W, H
+    W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
     # Créer les cartes de thèmes
     theme_width, theme_height = 200, 200
     theme_cards = []
@@ -201,7 +176,7 @@ def theme_choicer(screen):
         size = random.randint(5, 15)
         color_choice = random.choice([PINK, YELLOW, BLUE, GREEN])
         speed = random.uniform(0.2, 0.8)
-        floating_objects.append(FloatingObject(x, y, size, color_choice, speed))
+        floating_objects.append(FloatingObject(x, y, size, color_choice, speed, W))
     
     # Variables de jeu
     selected_theme = None

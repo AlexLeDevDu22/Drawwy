@@ -130,6 +130,7 @@ while running:
 
     if last_current_page != current_page:
         buttons={}
+        pygame.display.set_caption(f"Drawwy - {current_page}")
         last_current_page = current_page
 
     avatar_manager.draw()

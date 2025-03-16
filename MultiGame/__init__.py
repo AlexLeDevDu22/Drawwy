@@ -20,6 +20,8 @@ class MultiGame:
             print( "Désolé, une connexion internet est requise.")
             return
         
+        pygame.display.set_caption(f"Drawwy - Mode Multijoueur")
+        
         self.screen, self.W, self.H=screen, W,H
         self.connected=False
         self.server=None

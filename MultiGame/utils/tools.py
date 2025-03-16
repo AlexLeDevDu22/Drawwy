@@ -6,7 +6,6 @@ import pygame
 from PIL import Image, ImageFilter
 from dotenv import load_dotenv
 import time
-from datetime import datetime
 import socketio
 import os
 import socket

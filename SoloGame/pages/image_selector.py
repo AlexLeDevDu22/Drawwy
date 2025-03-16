@@ -1,5 +1,6 @@
 from shared.ui.common_ui import *
 from shared.ui.elements import Button
+from SoloGame.ui.elements import FloatingObject
 
 import pygame
 import sys
@@ -13,8 +14,6 @@ import os
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
-
-W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
 # Définition des thèmes et des données d'exemple d'images
 themes = [
@@ -219,33 +218,6 @@ class ImageCarousel:
                 particle_color
             )
 
-class FloatingObject:
-    def __init__(self, x, y, size, color, speed):
-        self.x = x
-        self.y = y
-        self.size = size
-        self.color = color
-        self.speed = speed
-        self.angle = random.uniform(0, 2 * math.pi)
-        self.orig_y = y
-        self.amplitude = random.uniform(20, 50)
-        self.phase = random.uniform(0, 2 * math.pi)
-    
-    def update(self):
-        self.x += self.speed
-        self.phase += 0.02
-        self.y = self.orig_y + math.sin(self.phase) * self.amplitude
-        
-        if self.x > W + 100:
-            self.x = -100
-    
-    def draw(self, surface):
-        # Dessiner un cercle flou
-        for i in range(5):
-            radius = self.size - i
-            alpha = 100 - i * 20
-            gfxdraw.filled_circle(surface, int(self.x), int(self.y), radius, (*self.color, alpha))
-
 def draw_background(surface):
     # Dégradé de fond bleu clair
     for y in range(H):
@@ -257,6 +229,9 @@ def draw_background(surface):
         pygame.draw.line(surface, color, (0, y), (W, y))
 
 def image_selector(screen, theme_index):
+    global W, H
+    W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
+
     # Générer des images d'exemple pour le thème sélectionné
     images = generate_placeholder_images(theme_index, 15)
     
@@ -279,7 +254,7 @@ def image_selector(screen, theme_index):
         size = random.randint(5, 15)
         color_choice = random.choice([PINK, YELLOW, BLUE, GREEN])
         speed = random.uniform(0.2, 0.8)
-        floating_objects.append(FloatingObject(x, y, size, color_choice, speed))
+        floating_objects.append(FloatingObject(x, y, size, color_choice, speed, W))
     
     # Variables d'état
     countdown_start_time = 0

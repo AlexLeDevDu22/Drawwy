@@ -29,7 +29,7 @@ LIGHT_PURPLE = (157, 127, 211)
 # Police personnalisée
 pygame.init()
 TITLE_FONT = pygame.font.Font(None, 300)
-BUTTON_FONT = pygame.font.Font(None, 80)
+BUTTON_FONT = pygame.font.Font(None, 70)
 MEDIUM_FONT = pygame.font.Font(None, 50)
 SMALL_FONT = pygame.font.Font( pygame.font.match_font("segoeuisymbol" if sys.platform.startswith("win") else "dejavusans"), 26)
 VERY_SMALL_FONT = pygame.font.Font(None, 25)
