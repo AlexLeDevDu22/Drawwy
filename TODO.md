@@ -1,16 +1,20 @@
-- [x] Couleurs
-- [x] skin souris
-- [x] Bordure pdp
-- [ ] Badge apres pseudo
-- [ ] Emojis speciaux
-- [x] Réglé les bugs visuel du shop
-- [ ] Rendre moins "fade" l'ui drawer
-- [ ] easter egg
-- [ ] Achievement
-- [ ] Stocker points
-- [ ] Si ts les achievements, courone sur la pdp
-- [x] 1 achievement égal une couleur pour la pp
-- [ ] Possibilité de régénére une phrase (1 fois par game)
-- [x] Réglé les bugs lié au particule dans le shop
-- [ ] Déf un nombre de joueurs limités
-- [ ] Finir mode solo!
+🟥 Robin | 🟩 Maxence | 🟦 Alex
+
+[ ] 🟦 Update du shop
+[ ] 🟦 Réparer Multi
+[ ] 🟦 Bonne déconnection du server
+[ ] 🟦 FINIR LE MODE SOLO
+[ ] 🟦 Stockage des données à la fin d'une partie (joué, gagné, points)
+[ ] 🟥 Bon achievements
+[ ] 🟥 Achievements intégré au jeux
+[ ] 🟥 Couronne quand tous les achievements
+[ ] 🟩 Emotes dans le shop
+[ ] 🟩 Emotes dans le chat
+[ ] 🟩 Rareté d'items dans le shop
+[ ] 🟥 Pouvoir quitter le Multi
+[ ] 🟥 Possibilité de régénére une phrase (1 fois par game, payer)
+[ ] 🟦🟩 Limite de jouers
+[ ] 🟦🟩 Plusieurs servers
+[ ] 🟥 Rendre moins "fade" l'ui drawer
+[ ] 🟩 Skin souris animé on click
+[ ] 🟥🟩 easter egg

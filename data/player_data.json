@@ -54,9 +54,14 @@
     ],
     "num_game_played": 0,
     "points": 0,
-    "purchased_items":[8, 12],
+    "purchased_items": [
+        8,
+        12,
+        0
+    ],
     "selected_items": {
         "Bordures": 8,
-        "Curseurs": 12
-    }
+        "Curseurs": 0
+    },
+    "coins": 0
 }

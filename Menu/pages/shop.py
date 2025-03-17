@@ -134,8 +134,9 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         # Animation de survol
         hover_item = item_x <= mouse_pos[0] <= item_x + item_width and item_y <= mouse_pos[1] <= item_y + item_height
         
+        is_selected = item["id"] == PLAYER_DATA["selected_items"][item["category"]]
         # Couleur de fond basée sur sélection/achat/survol
-        if item["id"] in PLAYER_DATA["purchased_items"] and item["selected"]:
+        if item["id"] in PLAYER_DATA["purchased_items"] and is_selected:
             item_color = (220, 250, 220)
         else:
             item_color = LIGHT_BEIGE if hover_item else BEIGE
@@ -172,8 +173,8 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         
         # Prix ou statut
         if item["id"] in PLAYER_DATA["purchased_items"]:
-            status_text = "SÉLECTIONNÉ" if item["selected"] else "ACHETÉ"
-            status_color = (50, 150, 50) if item["selected"] else (100, 100, 100)
+            status_text = "SÉLECTIONNÉ" if is_selected else "ACHETÉ"
+            status_color = (50, 150, 50) if is_selected else (100, 100, 100)
             draw_text(status_text, SMALL_FONT, status_color, screen,
                     item_x + 220, item_y + 130)
         else:
@@ -184,7 +185,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         # Gestion des clics sur les SHOP_ITEMS
         if mouse_click and hover_item:
             if item["id"] in PLAYER_DATA["purchased_items"]:
-                cursor_= toggle_select(item, PLAYER_DATA)
+                cursor_= toggle_select(item, cursor)
                 if cursor_:
                     cursor = cursor_
 
@@ -280,9 +281,9 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     
     return screen, cursor, "shop", buttons
 
-def toggle_select(item, PLAYER_DATA):
+def toggle_select(item, cursor):
     # Basculer la sélection
-    if item["selected"]: # unselect
+    if item["id"] == PLAYER_DATA["selected_items"][item["category"]]: # unselect
         if item["category"] != "Bordures":
             if item["category"]=="Curseurs":
                 PLAYER_DATA["selected_items"]["Curseurs"]=None
