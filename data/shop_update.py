@@ -9,7 +9,7 @@ from datetime import datetime
 OWNER = "AlexLeDevDu22"  # Exemple : "octocat"
 REPO = "Drawwy-Shop"  # Exemple : "Hello-World"
 LAST_UPDATE_FILE = "data/last_update.txt"
-UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront téléchargés
+UPDATE_DIR = "data/shop2"  # Dossier où les nouveaux fichiers seront téléchargés
 
 # Créez une instance de l'API GitHub
 g = Github()

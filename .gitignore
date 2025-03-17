@@ -3,3 +3,4 @@ paraphrase-multilingual-MiniLM-L12-v2
 .venv
 /MultiGame/web/players-avatars/*
 /assets/your_best_draws/*
+/data/shop/.git

@@ -15,6 +15,7 @@
 [ ] 🟥 Possibilité de régénére une phrase (1 fois par game, payer)
 [ ] 🟦🟩 Limite de jouers
 [ ] 🟦🟩 Plusieurs servers
+[ ] 🟦 Plus de FPS
 [ ] 🟥 Rendre moins "fade" l'ui drawer
 [ ] 🟩 Skin souris animé on click
 [ ] 🟥🟩 easter egg
