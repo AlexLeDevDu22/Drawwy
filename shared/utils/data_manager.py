@@ -10,7 +10,7 @@ def reload():
 
     with open('data/player_data.json') as f:
         PLAYER_DATA = json.load(f)
-    with open('data/shop_items.json') as f:
+    with open('data/shop/shop_items.json') as f:
         SHOP_ITEMS = json.load(f)
     with open('data/solo_game.json') as f:
         SOLO_GAME = json.load(f)
@@ -25,10 +25,11 @@ def save_data(file):
     with open(f'data/{file.lower()}.json', 'w') as f:
         if file =="PLAYER_DATA":
             json.dump(PLAYER_DATA, f, ensure_ascii=False, indent=4)
-        elif file =="SHOP_ITEMS":
-            json.dump(SHOP_ITEMS, f, ensure_ascii=False, indent=4)
         elif file =="SOLO_GAME":
             json.dump(SOLO_GAME, f, ensure_ascii=False, indent=4)
+        else:
+            print(file, " ce fichier n'est pas reconnu")
+            raise ValueError
 
 PLAYER_DATA = {}
 SHOP_ITEMS = {}

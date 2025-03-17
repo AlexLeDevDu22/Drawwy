@@ -38,11 +38,7 @@ async def handle_connection_client(MultiGame):
     @MultiGame.SIO.event
     async def connect(): #joining the game
 
-        for item in SHOP_ITEMS:
-            if item["category"] == "Bordures" and item["selected"]:
-                border = item
-
-        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": PLAYER_DATA["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"), "border_path": border["image_path"]}})
+        await MultiGame.SIO.emit("join", {"type": "join", "pseudo": PLAYER_DATA["pseudo"], "avatar": {"type": "matrix", "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"), "border_path": SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"]}})
 
     @MultiGame.SIO.event
     async def disconnect():
