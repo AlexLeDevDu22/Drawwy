@@ -58,11 +58,11 @@ def handle_disconnect(data=None):
                 break
 
         if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/players-avatars/{player['id']}.bmp"):
-            os.remove(f"MultiGame/web/players-avatars/{player["id"]}.bmp")
+            os.remove(f"MultiGame/web/players-avatars/{player["pid"]}.bmp")
         
         # Envoyer la mise à jour des joueurs
         emit('player_disconnected', { 
-            "pid": player["id"],
+            "pid": player["pid"],
             "pseudo": player["pseudo"]
         }, broadcast=True)
     
@@ -72,13 +72,13 @@ def handle_join(data):
     global players, last_game_start
 
     if len(players)>0:
-        pid=players[-1]["id"]+1
+        pid=players[-1]["pid"]+1
     else:
         pid=0
     
     # Ajouter le joueur à la liste
     players.append({
-        "id": pid,
+        "pid": pid,
         "pseudo": data["pseudo"],
         "avatar": data["avatar"],
         "points": 0,
@@ -88,8 +88,8 @@ def handle_join(data):
     
     # Envoyer l'ID du joueur et l'état initial du jeu
     emit('welcome', {
-        "id": pid,
-        "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
+        "pid": pid,
+        "players": [{"pid": p["pid"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
         "sentence": sentences_list[-1],
         "drawer_id": drawer_id,
         "all_frames": all_frames,
@@ -104,7 +104,7 @@ def handle_join(data):
     
     # Annoncer le nouveau joueur
     emit('new_player', {
-            "id": pid,
+            "pid": pid,
             "pseudo": data["pseudo"],
             "avatar": data["avatar"],
             "points": 0, 
@@ -130,11 +130,11 @@ def handle_new_game(data=None):
     # Changer de dessinateur
     if drawer_id!=-1:
         for i in range(len(players)):
-            if int(players[i]["id"]) == int(drawer_id):
-                drawer_id = players[(i + 1) % len(players)]["id"]
+            if int(players[i]["pid"]) == int(drawer_id):
+                drawer_id = players[(i + 1) % len(players)]["pid"]
                 break
     else:
-        drawer_id = players[0]["id"]
+        drawer_id = players[0]["pid"]
 
     emit('new_game', {
         "drawer_id": drawer_id,
@@ -172,7 +172,7 @@ def handle_guess(guess):
     guess["succeed"]=False
     
     for i, player in enumerate(players):
-        if guess["pid"]==player["id"] and player["id"] != drawer_id:
+        if guess["pid"]==player["pid"] and player["pid"] != drawer_id:
             succeed = tools.check_sentences(sentences_list[-1], guess["message"])
             if succeed and not player["found"]:
                 guess["succeed"]=True
@@ -184,14 +184,14 @@ def handle_guess(guess):
                 # Donner des points au dessinateur
                 drawer_points=CONFIG["points_per_found"]
                 for j in range(len(players)):
-                    if players[j]["id"] == drawer_id:
+                    if players[j]["pid"] == drawer_id:
                         players[j]["points"] += drawer_points
                         break
 
-                guess["new_points"]=[{"pid": player["id"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
+                guess["new_points"]=[{"pid": player["pid"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
         
-        if player["id"] != drawer_id:
-            print(player["id"],player["found"])
+        if player["pid"] != drawer_id:
+            print(player["pid"],player["found"])
             list_found.append(player["found"])
     
     guess_list.append(guess)
@@ -259,13 +259,13 @@ def stop_server():
     # Au cas ou...
     endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
     if endpoints:
-        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
+        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["pid"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
 
     try:
         ts=requests.get("https://api.ngrok.com/tunnel_sessions", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()["tunnel_sessions"]
 
         if ts:
-            requests.post("https://api.ngrok.com/tunnel_sessions/"+ts[0]["id"]+"/stop", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()
+            requests.post("https://api.ngrok.com/tunnel_sessions/"+ts[0]["pid"]+"/stop", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()
     except: pass
     
     ngrok.kill()

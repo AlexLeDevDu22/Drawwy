@@ -50,7 +50,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     # Afficher le solde
     coin_icon = pygame.image.load("assets/icon_coin.png")
     coin_icon = pygame.transform.scale(coin_icon, (40, 40))
-    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 160, main_panel_y + 72))
+    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 165, main_panel_y + 72))
     screen.blit(coin_icon, coin_icon_rect)
     
     draw_text(str(coins), MEDIUM_FONT, BLACK, screen, 
@@ -69,7 +69,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     categories = ["Tous"] + list(set(item["category"] for item in SHOP_ITEMS))
     
     # Dessiner les onglets de catégories
-    tab_width = 160
+    tab_width = 165
     tab_height = 50
     tab_margin = 10
     start_x = main_panel_x + (main_panel_width - (len(categories) * (tab_width + tab_margin) - tab_margin)) // 2
@@ -107,9 +107,6 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
             show_shop.state["current_page"] = 0
     
 
-    
-
-
 
     # Filtrer les SHOP_ITEMS selon la catégorie sélectionnée
     filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if show_shop.state["selected_category"] == "Tous" or item["category"] == show_shop.state["selected_category"]]
@@ -134,9 +131,9 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         # Animation de survol
         hover_item = item_x <= mouse_pos[0] <= item_x + item_width and item_y <= mouse_pos[1] <= item_y + item_height
         
-        is_selected = item["id"] == PLAYER_DATA["selected_items"][item["category"]]
+        is_selected = item["index"] == PLAYER_DATA["selected_items"][item["category"]]
         # Couleur de fond basée sur sélection/achat/survol
-        if item["id"] in PLAYER_DATA["purchased_items"] and is_selected:
+        if item["index"] in PLAYER_DATA["purchased_items"] and is_selected:
             item_color = (220, 250, 220)
         else:
             item_color = LIGHT_BEIGE if hover_item else BEIGE
@@ -169,29 +166,31 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
         
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
-                item_x + 260, item_y + 80)
+                item_x + 225, item_y + 80)
         
         # Prix ou statut
-        if item["id"] in PLAYER_DATA["purchased_items"]:
+        if item["index"] in PLAYER_DATA["purchased_items"]:
             status_text = "SÉLECTIONNÉ" if is_selected else "ACHETÉ"
             status_color = (50, 150, 50) if is_selected else (100, 100, 100)
             draw_text(status_text, SMALL_FONT, status_color, screen,
                     item_x + 220, item_y + 130)
         else:
             price_color = (0, 100, 0) if coins >= item["price"] else (150, 0, 0)
-            draw_text(f"{item['price']} pièces", SMALL_FONT, price_color, screen,
+            draw_text(str(item['price']), SMALL_FONT, price_color, screen,
                     item_x + 220, item_y + 130)
+            coin_icon_rect = coin_icon.get_rect(center=(item_x + 224 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
+            screen.blit(coin_icon, coin_icon_rect)
         
         # Gestion des clics sur les SHOP_ITEMS
         if mouse_click and hover_item:
-            if item["id"] in PLAYER_DATA["purchased_items"]:
+            if item["index"] in PLAYER_DATA["purchased_items"]:
                 cursor_= toggle_select(item, cursor)
                 if cursor_:
                     cursor = cursor_
 
-            elif item["id"] not in PLAYER_DATA["purchased_items"] and coins >= item["price"]:
+            elif item["index"] not in PLAYER_DATA["purchased_items"] and coins >= item["price"]:
                 coins -= item["price"]
-                PLAYER_DATA["purchased_items"].append(item["id"])
+                PLAYER_DATA["purchased_items"].append(item["index"])
                 PLAYER_DATA["coins"] = coins
                 save_data("PLAYER_DATA")
     
@@ -283,15 +282,15 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
 
 def toggle_select(item, cursor):
     # Basculer la sélection
-    if item["id"] == PLAYER_DATA["selected_items"][item["category"]]: # unselect
+    if item["index"] == PLAYER_DATA["selected_items"][item["category"]]: # unselect
         if item["category"] != "Bordures":
             if item["category"]=="Curseurs":
                 PLAYER_DATA["selected_items"]["Curseurs"]=None
                 cursor= CustomCursor(None)
             else:
-                PLAYER_DATA["selected_items"][item["category"]].remove(item["id"])
+                PLAYER_DATA["selected_items"][item["category"]].remove(item["index"])
     elif item["category"] in ["Bordures", "Curseurs"]: # select
-        PLAYER_DATA["selected_items"][item["category"]] = item["id"]
+        PLAYER_DATA["selected_items"][item["category"]] = item["index"]
 
         if item["category"] == "Curseurs":
             cursor = CustomCursor(item["image_path"])

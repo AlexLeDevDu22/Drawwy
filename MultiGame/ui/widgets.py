@@ -54,7 +54,7 @@ def players(MultiGame):
         i=min(i, 8)
 
         #fond
-        pygame.draw.rect(MultiGame.screen, (222,0,0) if player["id"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[i][0])
+        pygame.draw.rect(MultiGame.screen, (222,0,0) if player["pid"]==MultiGame.CURRENT_DRAWER else (0,0,0),dico_co[i][0])
 
         pygame.draw.rect(MultiGame.screen, CONFIG["players_colors"][i%len(CONFIG["players_colors"])],(dico_co[i][0][0]+3,dico_co[i][0][1]+3,dico_co[i][0][2]-6,dico_co[i][0][3]-6))
 
@@ -93,14 +93,14 @@ def players(MultiGame):
 
 
         #pseudo
-        text_color=(10,10,10) if player["id"] == MultiGame.PLAYER_ID else (100,100,100)
+        text_color=(10,10,10) if player["pid"] == MultiGame.PLAYER_ID else (100,100,100)
         #font = pygame.font.Font("assets/PermanentMarker.ttf" ,30)
         image_texte = MEDIUM_FONT.render ( player["pseudo"], 1 , text_color )
         MultiGame.screen.blit(image_texte, dico_co[i][2])
         #points
         #font = pygame.font.Font("assets/PermanentMarker.ttf" ,20)
 
-        if player["id"] != MultiGame.CURRENT_DRAWER and len(MultiGame.PLAYERS)>1:
+        if player["pid"] != MultiGame.CURRENT_DRAWER and len(MultiGame.PLAYERS)>1:
             # image_texte = SMALL_FONT.render ( "Trouvé ", 1 , text_color )
             # MultiGame.screen.blit(image_texte, dico_co[i][3])
             

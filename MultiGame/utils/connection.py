@@ -48,7 +48,7 @@ async def handle_connection_client(MultiGame):
     async def welcome(data):
         MultiGame.connected=True
         MultiGame.ALL_FRAMES+=data["all_frames"]
-        MultiGame.PLAYER_ID=data["id"]
+        MultiGame.PLAYER_ID=data["pid"]
         MultiGame.MESSAGES=data["messages"]
         MultiGame.PLAYERS=data["players"]
         MultiGame.CURRENT_SENTENCE=data["sentence"]
@@ -63,7 +63,7 @@ async def handle_connection_client(MultiGame):
     @MultiGame.SIO.on("player_disconnected")
     async def player_disconnected(data):
         for i in range(len(MultiGame.PLAYERS)):
-            if MultiGame.PLAYERS[i]["id"]==data["pid"]:
+            if MultiGame.PLAYERS[i]["pid"]==data["pid"]:
                 player=MultiGame.PLAYERS.pop(i)
                 break
 
@@ -78,7 +78,7 @@ async def handle_connection_client(MultiGame):
         MultiGame.CANVAS=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])] #reset canvas
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
-        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["id"]==MultiGame.CURRENT_DRAWER][0], "color": CONFIG["succeed_color"]})
+        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["pid"]==MultiGame.CURRENT_DRAWER][0], "color": CONFIG["succeed_color"]})
         MultiGame.ALL_FRAMES=[]
         for i in range(len(MultiGame.PLAYERS)):
             MultiGame.PLAYERS[i]["found"]=False
@@ -110,12 +110,12 @@ async def handle_connection_client(MultiGame):
         #update found and points
         if guess["succeed"]:
             for i in range(len(MultiGame.PLAYERS)):
-                if MultiGame.PLAYERS[i]["id"]==guess["pid"]:
+                if MultiGame.PLAYERS[i]["pid"]==guess["pid"]:
                     MultiGame.PLAYERS[i]["found"]=True
         
             for e in guess["new_points"]:
                 for i in range(len(MultiGame.PLAYERS)):
-                    if MultiGame.PLAYERS[i]["id"]==e["pid"]:
+                    if MultiGame.PLAYERS[i]["pid"]==e["pid"]:
                         MultiGame.PLAYERS[i]["points"]+=e["points"]
 
 

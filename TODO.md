@@ -1,8 +1,8 @@
 🟥 Robin | 🟩 Maxence | 🟦 Alex
 
-[ ] 🟦 Update du shop
-[ ] 🟦 Réparer Multi
-[ ] 🟦 Bonne déconnection du server
+[X] 🟦 Update du shop
+[X] 🟦 Réparer Multi
+[X] 🟦 Bonne déconnection du server
 [ ] 🟦 FINIR LE MODE SOLO
 [ ] 🟦 Stockage des données à la fin d'une partie (joué, gagné, points)
 [ ] 🟥 Bon achievements

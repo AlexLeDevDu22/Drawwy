@@ -9,7 +9,7 @@ from datetime import datetime
 OWNER = "AlexLeDevDu22"  # Exemple : "octocat"
 REPO = "Drawwy-Shop"  # Exemple : "Hello-World"
 LAST_UPDATE_FILE = "data/last_update.txt"
-UPDATE_DIR = "data/shop2"  # Dossier où les nouveaux fichiers seront téléchargés
+UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront téléchargés
 
 # Créez une instance de l'API GitHub
 g = Github()
@@ -62,8 +62,6 @@ def check_for_shop_updates():
         set_last_update(latest_commit_time)
         print(f"Mise à jour terminée, fichiers téléchargés dans {UPDATE_DIR}")
         data.reload()
-    else:
-        print("Aucune mise à jour disponible.")
 
 # Créer le dossier de mise à jour si nécessaire
 if not os.path.exists(UPDATE_DIR):
