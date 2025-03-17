@@ -222,7 +222,7 @@ def image_selector(screen, cursor, theme):
         # Mettre à jour les survols
         spin_button.check_hover(mouse_pos)
 
-        start_drawing_button.active=image_roulette.selected_image and not image_roulette.is_spinning
+        start_drawing_button.active=image_roulette.selected_image is not None and not image_roulette.is_spinning
         start_drawing_button.check_hover(mouse_pos)
 
         back_button.check_hover(mouse_pos)
