@@ -109,7 +109,7 @@ while running:
         # Interpolation entre deux couleurs pour créer un dégradé
         color = [
             int(LIGHT_BLUE[i] + (VERY_LIGHT_BLUE[i] - LIGHT_BLUE[i]) * (y / H))
-            for i in range(3)
+            for i in range(3)               
         ]
         pygame.draw.line(screen, color, (0, y), (W, y))
 
@@ -146,7 +146,7 @@ while running:
             current_page="home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
-            screen, current_page, buttons = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click, buttons)
+            screen, current_page, buttons, scroll_y = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click, buttons)
         # === ÉCRAN DES Crédits ===
         elif current_page == "credits":
             screen, current_page, buttons = credit.show_credit(screen, W,H, mouse_pos, mouse_click, buttons)
