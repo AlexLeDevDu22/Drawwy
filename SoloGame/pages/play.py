@@ -133,7 +133,7 @@ class SoloPlay:
             validate_button_h
         )
 
-        self.model=pygame.image.load(f"data/themes/{theme["path"]}{theme['images'][image]["path"]}")
+        self.model=pygame.image.load(f"assets/SoloImages/{theme['name']}/{theme["path"]}{theme['images'][image]["path"]}")
         model_width= self.W-self.canvas_rect.right-20
         model_height = self.model.get_height()*model_width//self.model.get_width()
         self.model = pygame.transform.scale(self.model, (model_width, model_height))
