@@ -160,29 +160,22 @@ def drawing(MultiGame):
     zone_y_min = int(0.04 * MultiGame.H)+2   # Commence en haut de la fenêtre
     zone_y_max = int(0.96 * MultiGame.H)-4   # Remplie toute la hauteur de la fenêtre
     
-    canvas_width = len(MultiGame.CANVAS[0])
-    canvas_height = len(MultiGame.CANVAS)
-
     # Affichage du CANVAS à l'écran
-    MultiGame.pixel_width = (zone_x_max - zone_x_min) // canvas_width
-    MultiGame.pixel_height = (zone_y_max - zone_y_min) // canvas_height
+    MultiGame.pixel_width = (zone_x_max - zone_x_min) // CONFIG["canvas_width"]
+    MultiGame.pixel_height = (zone_y_max - zone_y_min) // CONFIG["canvas_height"]
     
-    zone_x_min = MultiGame.W//2-MultiGame.pixel_width*canvas_width//2
-    zone_x_max = MultiGame.W//2+MultiGame.pixel_width*canvas_width//2
-    zone_y_min = MultiGame.H//2-MultiGame.pixel_height*canvas_height//2
-    zone_y_max = MultiGame.H//2+MultiGame.pixel_height*canvas_height//2
+    canvas_x = MultiGame.W//2-MultiGame.pixel_width*CONFIG["canvas_width"]//2
+    canvas_w = MultiGame.W//2+MultiGame.pixel_width*CONFIG["canvas_width"]//2
+    canvas_y = MultiGame.H//2-MultiGame.pixel_height*CONFIG["canvas_height"]//2
+    canvas_h = MultiGame.pixel_height*CONFIG["canvas_height"]
     
-    pygame.draw.rect(MultiGame.screen, BLACK, (zone_x_min-1, zone_y_min-1,zone_x_max-zone_x_min+2, zone_y_max-zone_y_min+2), 1)
-
     #! show
-    for y in range(canvas_height):
-        for x in range(canvas_width):
-            color = MultiGame.CANVAS[y][x] if MultiGame.CANVAS[y][x] else WHITE
-            pygame.draw.rect(MultiGame.screen, color, (zone_x_min + x * MultiGame.pixel_width, zone_y_min + y * MultiGame.pixel_height, MultiGame.pixel_width, MultiGame.pixel_height))
+    pygame.draw.rect(MultiGame.screen, BLACK, (canvas_x-1, canvas_y-1,canvas_w+2, canvas_h+2), 1)
+    MultiGame.screen.blit(MultiGame.CANVAS, (canvas_x, canvas_y))
 
     #! drawing
     if MultiGame.me["is_drawer"]:
-        if zone_x_min <= MultiGame.mouse_pos[0] <= zone_x_max and zone_y_min <= MultiGame.mouse_pos[1] <= zone_y_max:# Vérifier si le clic est dans la zone de dessin
+        if MultiGame.CANVAS.get_rect().collidepoint(pygame.mouse.get_pos()):# Vérifier si le clic est dans la zone de dessin
             for event in MultiGame.events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     MultiGame.ALL_FRAMES=tools.split_steps_by_roll_back(MultiGame.ALL_FRAMES, MultiGame.ROLL_BACK)[0]

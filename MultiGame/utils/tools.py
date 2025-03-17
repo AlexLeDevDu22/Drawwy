@@ -92,14 +92,12 @@ def simplify_frames(frames):
                 del frames[i]["radius"]
     return frames
 
-def update_canva_by_frames(MultiGame, frames, specified_canva=None, delay=True, reset=False):
+def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
     if reset:
         MultiGame.ALL_FRAMES=[]
-        if specified_canva:
-            specified_canva=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]
-        else:
-            MultiGame.CANVAS=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]
-            
+        MultiGame.CANVAS=pygame.Surface((CONFIG["canvas_width"], CONFIG["canvas_height"]))
+        MultiGame.CANVAS.fill((255,255,255))
+
     current_drawing_color=(0,0,0)
     current_drawing_radius=1
     
@@ -118,59 +116,26 @@ def update_canva_by_frames(MultiGame, frames, specified_canva=None, delay=True, 
             if "radius" in frame.keys():
                 current_drawing_radius=frame["radius"]
             
-            if specified_canva:
-                specified_canva=draw_brush_line(specified_canva, frame["x1"], frame["y1"],frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
-            else:
-                MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
+            MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
 
         MultiGame.ALL_FRAMES.append(frame)
 
     for frame in new_frames[1]:
         MultiGame.ALL_FRAMES.append(frame)
-            
-    if specified_canva:
-        return specified_canva
 
 def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
     """Dessine une ligne épaisse et arrondie entre (x1, y1) et (x2, y2) directement dans canvas"""
     height = len(canvas)
     width = len(canvas[0]) if height > 0 else 0
-
-    def in_bounds(x, y):
-        """Vérifie si (x, y) est dans les limites de canvas"""
-        return 0 <= x < width and 0 <= y < height
-
+    
     # Fonction pour dessiner un cercle dans canvas
     radius=max(radius//4,1)
-    def draw_circle(cx, cy):
-        for i in range(-radius, radius):
-            for j in range(-radius, radius):
-                if i ** 2 + j ** 2 <= radius ** 2:  # Vérifie si (i, j) est dans le cercle
-                    if in_bounds(cx + i, cy + j):
-                        canvas[cy + j][cx + i] = (color[0], color[1], color[2])  # Mettre la couleur (R, G, B)
-
-    # Fonction pour dessiner une ligne épaisse
-    def draw_thick_line(x1, y1, x2, y2):
-        dx, dy = x2 - x1, y2 - y1
-        dist = max(abs(dx), abs(dy))
-        
-        # Interpolation linéaire pour créer la ligne
-        if dist>0:
-            step_duration=duration/dist
-            for step in range(dist + 1):
-                t = step / dist
-                x = round(x1 + t * dx)
-                y = round(y1 + t * dy)
-                draw_circle(x, y)  # On dessine un cercle autour de chaque point
-                
-                time.sleep(max(0,step_duration-0.004))
-
     # Dessiner la ligne épaisse
-    draw_thick_line(x1, y1, x2, y2)
+    canvas.draw.line(canvas, color, (x1, y1), (x2, y2), radius*2)
 
     # Dessiner les extrémités arrondies
-    draw_circle(x1, y1)
-    draw_circle(x2, y2)
+    canvas.draw.circle(canvas, color, (x1, y1), radius)
+    canvas.draw.circle(canvas, color, (x2, y2), radius)
 
     #achievement
     if PLAYER_DATA["achievements"][0]["succeed"]== False:
@@ -224,19 +189,32 @@ def lines_return(text, font, max_largeur_pixels):
 
     return lignes
 
-def save_canvas(color_matrix, filename, sentence):
-    height = len(color_matrix)
-    width = max(len(row) for row in color_matrix)  # Trouve la ligne la plus longue
+def save_canvas(surface, filename, sentence, is_pygame_surface=False):
+    """Sauvegarde une surface Pygame ou une matrice de couleurs en image BMP et ajoute une phrase en métadonnées."""
+    
+    if is_pygame_surface:
+        # Surface Pygame -> Extraire les dimensions et les pixels
+        width, height = surface.get_size()
+        img = Image.new("RGB", (width, height), "white")
 
-    img = Image.new("RGB", (width, height), "white")  # Fond blanc
+        for y in range(height):
+            for x in range(width):
+                img.putpixel((x, y), surface.get_at((x, y))[:3])  # Ignorer l'alpha
 
-    for y, row in enumerate(color_matrix):
-        for x, color in enumerate(row):
-            if color is not None:
-                img.putpixel((x, y), (color[0], color[1], color[2]))  # Mettre la couleur (R, G, B)
-            else:
-                img.putpixel((x, y), (255, 255, 255))
+    else:
+        # Matrice de couleurs -> Convertir en image
+        height = len(surface)
+        width = max(len(row) for row in surface)
+        img = Image.new("RGB", (width, height), "white")
 
+        for y, row in enumerate(surface):
+            for x, color in enumerate(row):
+                if color is not None:
+                    img.putpixel((x, y), (color[0], color[1], color[2]))  # Mettre la couleur (R, G, B)
+                else:
+                    img.putpixel((x, y), (255, 255, 255))
+
+    # Sauvegarder l'image
     img.save(filename, "BMP")
 
     # Ajouter la phrase en fin de fichier BMP
@@ -244,4 +222,3 @@ def save_canvas(color_matrix, filename, sentence):
         f.write(b"\nMETADATA_START\n")  # Marqueur pour retrouver la phrase
         f.write(sentence.encode("utf-8"))  # Écriture de la phrase
         f.write(b"\nMETADATA_END\n")  # Marqueur de fin
-

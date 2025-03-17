@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import time
 from datetime import datetime
+import pygame
 
 connection_loop=None
 
@@ -72,10 +73,11 @@ async def handle_connection_client(MultiGame):
     @MultiGame.SIO.on("new_game")
     def new_game(data):
         #save draw
-        if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS and MultiGame.CANVAS!=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])]: #save your draw
-            tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE)
+        if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS: #save your draw
+            tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE, True)
 
-        MultiGame.CANVAS=[[None for _ in range(CONFIG["canvas_width"])] for _ in range(CONFIG["canvas_height"])] #reset canvas
+        MultiGame.CANVAS=pygame.Surface((CONFIG["canvas_width"], CONFIG["canvas_height"])) #reset canvas
+        MultiGame.CANVAS.fill((255,255,255))
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
         MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["pid"]==MultiGame.CURRENT_DRAWER][0], "color": CONFIG["succeed_color"]})

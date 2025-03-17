@@ -133,7 +133,7 @@ class SoloPlay:
             validate_button_h
         )
 
-        self.model=pygame.image.load(f"assets/SoloImages/{theme['name']}/{theme["path"]}{theme['images'][image]["path"]}")
+        self.model=pygame.image.load(f"assets/soloImages/{theme["path"]}{theme['images'][image]["path"]}")
         model_width= self.W-self.canvas_rect.right-20
         model_height = self.model.get_height()*model_width//self.model.get_width()
         self.model = pygame.transform.scale(self.model, (model_width, model_height))
@@ -152,6 +152,7 @@ class SoloPlay:
             local_x = self.mouse_pos[0] - self.canvas_rect.x
             local_y = self.mouse_pos[1] - self.canvas_rect.y
             # Dessin d'un cercle
+            
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
             #achievement

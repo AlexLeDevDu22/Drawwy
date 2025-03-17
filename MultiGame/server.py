@@ -57,7 +57,7 @@ def handle_disconnect(data=None):
                 players.pop(i)
                 break
 
-        if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/players-avatars/{player['id']}.bmp"):
+        if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/players-avatars/{player['pid']}.bmp"):
             os.remove(f"MultiGame/web/players-avatars/{player["pid"]}.bmp")
         
         # Envoyer la mise à jour des joueurs
@@ -100,7 +100,7 @@ def handle_join(data):
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "MultiGame/web/players-avatars/"+str(pid)+".bmp", sentences_list[-1])
+        tools.save_canvas(data["avatar"]["matrix"], "MultiGame/web/players-avatars/"+str(pid)+".bmp", sentences_list[-1], False)
     
     # Annoncer le nouveau joueur
     emit('new_player', {
