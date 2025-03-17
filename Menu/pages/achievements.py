@@ -41,7 +41,7 @@ def show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y=0)
                      border_radius=10)
 
     # Dessiner le curseur de défilement
-    cursor_height = 100
+    cursor_height = 210
     cursor_y = scrollbar_y + (scroll_y / total_height) * scrollbar_height
     pygame.draw.rect(screen, GRAY,
                      (scrollbar_x, cursor_y, scrollbar_width, cursor_height),
@@ -49,8 +49,8 @@ def show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y=0)
 
     # Dessiner les achievements visibles
     for i, achievement in enumerate(PLAYER_DATA["achievements"]):
-        achievement_y = main_panel_y + 60 + i * (achievement_height + 10) - scroll_y
-        if main_panel_y <= achievement_y < main_panel_y + main_panel_height:
+        achievement_y = main_panel_y + 10 + i * (achievement_height + 10) - scroll_y
+        if main_panel_y <= achievement_y <= main_panel_y + main_panel_height-70:
             # Fond
             color = PASTEL_GREEN if achievement["succeed"] else LIGHT_GRAY
             pygame.draw.rect(screen, color,
@@ -105,8 +105,8 @@ def show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y=0)
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")
     if buttons["back"].check_hover(mouse_pos) and mouse_click:
-        return screen, "home", buttons
+        return screen, "achievements", buttons
     buttons["back"].draw(screen)
 
-    return screen, "achievements", buttons, scroll_y
+    return screen, "achievements", buttons
 
