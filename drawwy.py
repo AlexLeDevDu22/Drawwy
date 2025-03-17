@@ -61,42 +61,49 @@ for item in SHOP_ITEMS:
 clock = pygame.time.Clock()
 running = True
 
+# Initialiser scroll_y
+scroll_y = 0
+
 while running:
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
 
-    if datetime.now().second==(last_sec_check_connection+2)%60:
-        last_sec_check_connection=datetime.now().second
-        connected=tools.is_connected()
-    
+    if datetime.now().second == (last_sec_check_connection + 2) % 60:
+        last_sec_check_connection = datetime.now().second
+        connected = tools.is_connected()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button in (1,3):
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button in (1, 3):
             mouse_click = True
-        
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:  # Molette vers le haut
+            scroll_y = max(0, scroll_y - 30)
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:  # Molette vers le bas
+            scroll_y = min(100, scroll_y + 30)
+
         avatar_manager.handle_event(event, mouse_pos, pygame.mouse.get_pressed())
 
     # Mise à jour des éléments d'arrière plan
     for element in drawing_elements:
         element.update()
-    
+
     if mouse_click:
-        particles+=tools.generate_particles(20, mouse_pos[0]-30, mouse_pos[1]-30, mouse_pos[0]+30, mouse_pos[1]+30)
+        particles += tools.generate_particles(20, mouse_pos[0] - 30, mouse_pos[1] - 30, mouse_pos[0] + 30, mouse_pos[1] + 30)
 
     # Mise à jour des particules
     for particle in particles[:]:
         particle.update()
         if particle.lifetime <= 0:
             particles.remove(particle)
-    
+
     # Ajouter de nouvelles particules occasionnellement
     if animation_counter % 5 == 0 and len(particles) < 200:
-        particles+=tools.generate_particles(10,0, H+10, W, H+10 )
-    
+        particles += tools.generate_particles(10, 0, H + 10, W, H + 10)
+
     # Mise à jour du gestionnaire d'avatar
     avatar_manager.update(mouse_pos, pygame.mouse.get_pressed())
-    
+
     # Fond
     screen.fill(LIGHT_BLUE)
 
@@ -108,17 +115,17 @@ while running:
             for i in range(3)
         ]
         pygame.draw.line(screen, color, (0, y), (W, y))
-    
+
     # Dessiner les éléments de dessin en arrière-plan
     for element in drawing_elements:
         element.draw(screen)
-    
+
     # Dessiner les particules
     for particle in particles:
         particle.draw(screen)
 
     if last_current_page != current_page:
-        buttons={}
+        buttons = {}
         pygame.display.set_caption(f"Drawwy - {current_page}")
         last_current_page = current_page
 
@@ -129,29 +136,29 @@ while running:
             # Mise à jour de l'animation
             animation_counter += 1
             title_angle += 0.02
-            screen, current_page, buttons = home.show_home(screen, W, H, mouse_pos, mouse_click, title_angle,buttons)
+            screen, current_page, buttons = home.show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons)
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
-            screen, current_page, buttons = play.play_choicer(screen, W,H, mouse_pos, mouse_click, connected, buttons)
+            screen, current_page, buttons = play.play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Solo":
             soloGame(screen, cursor)
-            current_page="home"
+            current_page = "home"
         elif current_page == "Multijoueurs":
-            MultiGame(screen,cursor, clock, W, H)
-            current_page="home"
+            MultiGame(screen, cursor, clock, W, H)
+            current_page = "home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
-            screen, current_page, buttons = achievements.show_achievements(screen, W,H, mouse_pos, mouse_click, buttons)
+            screen, current_page, buttons, scroll_y = achievements.show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y)
         # === ÉCRAN DES Crédits ===
         elif current_page == "credits":
-            screen, current_page, buttons = credit.show_credit(screen, W,H, mouse_pos, mouse_click, buttons)
-        #=== ÉCRAN DU SHOP ===
+            screen, current_page, buttons = credit.show_credit(screen, W, H, mouse_pos, mouse_click, buttons)
+        # === ÉCRAN DU SHOP ===
         elif current_page == "shop":
-            screen, cursor, current_page, buttons = shop.show_shop(screen, cursor, W,H, mouse_pos, mouse_click, buttons)
-        
+            screen, cursor, current_page, buttons = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons)
+
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
-    
+
     cursor.show(screen, mouse_pos)
     pygame.display.flip()
     clock.tick(CONFIG["fps"])

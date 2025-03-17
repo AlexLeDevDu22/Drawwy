@@ -47,7 +47,7 @@
         "image_path": "assets/souris/cursor_ghost.png",
         "category": "Curseurs",
         "purchased": true,
-        "selected": false
+        "selected": true
     },
     {
         "id": 5,
@@ -87,7 +87,7 @@
         "image_path": "assets/bordures/bordures_profil/master_border.png",
         "category": "Bordures",
         "purchased": true,
-        "selected": true
+        "selected": false
     },
     {
         "id": 9,
@@ -97,7 +97,7 @@
         "image_path": "assets/bordures/bordures_profil/mythic_border.png",
         "category": "Bordures",
         "purchased": true,
-        "selected": false
+        "selected": true
     },
     {
         "id": 10,
@@ -127,6 +127,6 @@
         "image_path": "assets/souris/cursor_robot.png",
         "category": "Curseurs",
         "purchased": true,
-        "selected": true
+        "selected": false
     }
 ]
