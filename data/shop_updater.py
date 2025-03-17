@@ -1,4 +1,5 @@
 import shared.utils.data_manager as data
+from shared.tools import is_connected
 
 import os
 import requests
@@ -34,16 +35,33 @@ def download_file(url, file_path):
     with open(file_path, 'wb') as f:
         f.write(response.content)
 
+def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
+    """Télécharge récursivement tous les fichiers du repo"""
+    contents = repo.get_contents(path)  # Liste des fichiers/dossiers à `path`
+    
+    for content in contents:
+        file_path = os.path.join(local_dir, content.path)  # Crée le chemin local
+        
+        if content.type == "dir":  
+            # Si c'est un dossier, le créer et continuer récursivement
+            os.makedirs(file_path, exist_ok=True)
+            download_repo_contents(repo, content.path, local_dir)  
+        
+        elif content.type == "file":  
+            # Si c'est un fichier, le télécharger
+            print(f"Téléchargement : {content.path}")
+            download_file(content.download_url, file_path)
+
 def check_for_shop_updates():
     """Vérifier si une mise à jour est disponible pour le dépôt GitHub"""
+    if not is_connected():
+        return
+
     repo = g.get_repo(f"{OWNER}/{REPO}")
     
     # Récupérer la dernière mise à jour du dépôt
-    latest_commit = repo.get_commits()[0]  # Récupère le dernier commit
-    latest_commit_time = latest_commit.commit.author.date  # Date du dernier commit
-    
-    # Rendre la date du dernier commit naif (supprimer le fuseau horaire)
-    latest_commit_time = latest_commit_time.replace(tzinfo=None)
+    latest_commit = repo.get_commits()[0]
+    latest_commit_time = latest_commit.commit.author.date.replace(tzinfo=None)
     
     # Comparer avec la dernière mise à jour connue
     last_update = get_last_update()
@@ -51,17 +69,14 @@ def check_for_shop_updates():
     if not last_update or latest_commit_time > last_update:
         print("Mise à jour détectée, téléchargement des nouveaux fichiers...")
         
-        # Télécharger les fichiers du dépôt
-        for content in repo.get_contents(""):
-            if content.type == "file":  # Si c'est un fichier
-                file_url = content.download_url
-                file_path = os.path.join(UPDATE_DIR, content.name)
-                download_file(file_url, file_path)
+        # Télécharger récursivement tous les fichiers/dossiers
+        download_repo_contents(repo)
         
         # Mettre à jour la dernière date de mise à jour
         set_last_update(latest_commit_time)
         print(f"Mise à jour terminée, fichiers téléchargés dans {UPDATE_DIR}")
         data.reload()
+
 
 # Créer le dossier de mise à jour si nécessaire
 if not os.path.exists(UPDATE_DIR):

@@ -202,7 +202,7 @@ def theme_choicer(screen, cursor):
                             c.is_selected = False
                         # Sélectionner la carte cliquée
                         card.is_selected = True
-                        selected_theme = i
+                        selected_theme = SOLO_THEMES[i]
 
                         start_button.active=True
                 

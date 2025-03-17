@@ -9,7 +9,7 @@ from shared.utils.common_utils import *
 from shared.utils.data_manager import *
 import Menu.pages.play as play
 import shared.tools as tools
-import data.shop_update as updater
+import data.shop_updater as updater
 
 import pygame
 import threading
