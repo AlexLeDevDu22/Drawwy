@@ -11,20 +11,12 @@ from pygame import gfxdraw
 try:from pygame_emojis import load_emoji
 except:import pygame.freetype
 
-# Définition des thèmes
-themes = [
-    {"nom": "Paysage", "couleur": GREEN, "icone": "🏞️"},
-    {"nom": "Nourriture", "couleur": YELLOW, "icone": "🍔"},
-    {"nom": "Animaux", "couleur": BLUE, "icone": "🦁"},
-    {"nom": "Mode", "couleur": PINK, "icone": "👗"},
-]
-
 class ThemeCard:
     def __init__(self, x, y, width, height, theme_info):
         self.rect = pygame.Rect(x, y, width, height)
         self.y = y
         self.theme_info = theme_info
-        self.color = theme_info["couleur"]
+        self.color = theme_info["color"]
         self.light_color = self.lighten_color(self.color, 30)
         self.is_hovered = False
         self.is_selected = False
@@ -119,26 +111,26 @@ class ThemeCard:
         pygame.draw.rect(screen, color, scaled_rect, border_radius=15)
         
         # Dessiner l'icône
-        icone_texte = MEDIUM_FONT.render(self.theme_info["icone"], True, WHITE)
+        icone_texte = MEDIUM_FONT.render(self.theme_info["icon"], True, WHITE)
         icone_rect = icone_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery - 30))
         screen.blit(icone_texte, icone_rect)
 
         try: # pygame emojis
-            screen.blit(load_emoji(self.theme_info["icone"], (16/100*H, 16/100*H)), (scaled_rect.centerx-85, scaled_rect.centery - 108))
+            screen.blit(load_emoji(self.theme_info["icon"], (16/100*H, 16/100*H)), (scaled_rect.centerx-85, scaled_rect.centery - 108))
         except: # pygame freetype
             seguisy80 = pygame.freetype.SysFont("segoeuisymbol", 135)
-            emoji, rect = seguisy80.render(self.theme_info["icone"], "black")
+            emoji, rect = seguisy80.render(self.theme_info["icon"], "black")
             rect.center = (scaled_rect.centerx, scaled_rect.centery)
             screen.blit(emoji, rect)
         
-        # Dessiner le nom du thème
-        nom_texte = MEDIUM_FONT.render(self.theme_info["nom"], True, SOFT_ORANGE)
-        nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx+2, scaled_rect.centery + 62))
-        screen.blit(nom_texte, nom_rect)
+        # Dessiner le name du thème
+        name_texte = MEDIUM_FONT.render(self.theme_info["name"], True, SOFT_ORANGE)
+        name_rect = name_texte.get_rect(center=(scaled_rect.centerx+2, scaled_rect.centery + 62))
+        screen.blit(name_texte, name_rect)
 
-        nom_texte = MEDIUM_FONT.render(self.theme_info["nom"], True, WHITE)
-        nom_rect = nom_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 60))
-        screen.blit(nom_texte, nom_rect)
+        name_texte = MEDIUM_FONT.render(self.theme_info["name"], True, WHITE)
+        name_rect = name_texte.get_rect(center=(scaled_rect.centerx, scaled_rect.centery + 60))
+        screen.blit(name_texte, name_rect)
     
 def draw_background(screen):
     # Dégradé de fond
@@ -157,8 +149,8 @@ def theme_choicer(screen, cursor):
     theme_width, theme_height = 200, 200
     theme_cards = []
     
-    for i, theme in enumerate(themes):
-        x = W // 2 - (len(themes) * (theme_width + 30)) // 2 + i * (theme_width + 30)
+    for i, theme in enumerate(SOLO_THEMES):
+        x = W // 2 - (len(SOLO_THEMES) * (theme_width + 30)) // 2 + i * (theme_width + 30)
         y = H // 3
         theme_cards.append(ThemeCard(x, y, theme_width, theme_height, theme))
     # Créer le bouton de démarrage
@@ -210,14 +202,13 @@ def theme_choicer(screen, cursor):
                             c.is_selected = False
                         # Sélectionner la carte cliquée
                         card.is_selected = True
-                        selected_theme = i
+                        selected_theme = SOLO_THEMES[i]
 
                         start_button.active=True
                 
                 
                 # Vérifier le clic sur le bouton de démarrage
                 if start_button.rect.collidepoint(mouse_pos) and selected_theme is not None:
-                    print(f"Thème sélectionné: {themes[selected_theme]['nom']}")
                     return screen, "images", selected_theme
                 if quit_button.rect.collidepoint(mouse_pos):
                     return screen, "exit", selected_theme

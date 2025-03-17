@@ -48,7 +48,7 @@ class MultiGame:
 
             self.game_remaining_time=CONFIG["game_duration"]
             
-            self.me={   "id": -1,
+            self.me={   "pid": -1,
                         "pseudo": "",
                         "points": 0,
                         "found":False,
@@ -80,7 +80,7 @@ class MultiGame:
                 self.mouse_pos=pygame.mouse.get_pos()
 
                 for i in range(len(self.PLAYERS)):
-                    if self.PLAYERS[i]["id"] == self.PLAYER_ID:
+                    if self.PLAYERS[i]["pid"] == self.PLAYER_ID:
                         self.me=self.PLAYERS[i]
                         self.me["is_drawer"]=self.PLAYER_ID==self.CURRENT_DRAWER
                         break

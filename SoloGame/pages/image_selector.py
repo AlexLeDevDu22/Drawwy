@@ -11,71 +11,6 @@ from pygame import gfxdraw
 import time
 import os
 
-# Définition des thèmes et des données d'exemple d'images
-themes = [
-    {"name": "Paysage", "color": GREEN, "icon": "🏞️"},
-    {"name": "Nourriture", "color": YELLOW, "icon": "🍔"},
-    {"name": "Animaux", "color": BLUE, "icon": "🦁"},
-    {"name": "Mode", "color": PINK, "icon": "👗"},
-]
-
-# Images fictives pour chaque thème (normalement chargées depuis Internet)
-def generate_placeholder_images(theme, theme_index, count=10):
-    # theme_color = themes[theme_index]["color"]
-    # images = []
-    
-    # for i in range(count):
-    #     # Créer une surface pour représenter une image
-    #     img_surface = pygame.Surface((300, 300))
-        
-    #     # Remplir avec la color du thème
-    #     img_surface.fill(theme_color)
-        
-    #     # Ajouter des formes aléatoires pour différencier chaque image
-    #     for _ in range(10):
-    #         shape_color = (
-    #             random.randint(max(0, theme_color[0]-50), min(255, theme_color[0]+50)),
-    #             random.randint(max(0, theme_color[1]-50), min(255, theme_color[1]+50)),
-    #             random.randint(max(0, theme_color[2]-50), min(255, theme_color[2]+50))
-    #         )
-            
-    #         shape_type = random.choice(["rect", "circle", "line"])
-            
-    #         if shape_type == "rect":
-    #             x = random.randint(0, 250)
-    #             y = random.randint(0, 250)
-    #             w = random.randint(20, 100)
-    #             h = random.randint(20, 100)
-    #             pygame.draw.rect(img_surface, shape_color, (x, y, w, h))
-            
-    #         elif shape_type == "circle":
-    #             x = random.randint(20, 280)
-    #             y = random.randint(20, 280)
-    #             r = random.randint(10, 50)
-    #             pygame.draw.circle(img_surface, shape_color, (x, y), r)
-            
-    #         else:  # line
-    #             x1 = random.randint(0, 300)
-    #             y1 = random.randint(0, 300)
-    #             x2 = random.randint(0, 300)
-    #             y2 = random.randint(0, 300)
-    #             pygame.draw.line(img_surface, shape_color, (x1, y1), (x2, y2), random.randint(2, 8))
-        
-    #     # Ajouter du texte pour identifier l'image
-    #     text = info_font.render(f"Image {i+1}", True, WHITE)
-    #     text_rect = text.get_rect(center=(150, 150))
-    #     img_surface.blit(text, text_rect)
-        
-    #     images.append(img_surface)
-
-    images=[]
-    for i in range(len(os.listdir(f"assets/soloImages/{themes[theme]['name']}"))):
-        image=pygame.image.load(f"assets/soloImages/{themes[theme]["name"]}/{i}.jpeg")
-        images.append(image)
-    
-    return images
-
-
 class ImageCarousel:
     def __init__(self, X, Y, images):
         self.W = W
@@ -224,12 +159,12 @@ def draw_background(surface):
         ]
         pygame.draw.line(surface, color, (0, y), (W, y))
 
-def image_selector(screen, cursor, theme_index):
+def image_selector(screen, cursor, theme):
     global W, H
     W,H = pygame.display.Info().current_w, pygame.display.Info().current_h
 
     # Générer des images d'exemple pour le thème sélectionné
-    images = generate_placeholder_images(theme_index, 15)
+    images=[pygame.image.load(f"assets/soloImages/{theme["path"]}{image["path"]}") for image in theme["images"]]
     
     # Créer la roulette d'images
     image_roulette = ImageCarousel(W,H, images)
@@ -273,7 +208,7 @@ def image_selector(screen, cursor, theme_index):
                     image_roulette.start_spin()
                 
                 # Vérifier le clic sur le bouton de dessin
-                if start_drawing_button.check_hover(mouse_pos) and image_roulette.selected_image and not image_roulette.is_spinning:
+                if start_drawing_button.check_hover(mouse_pos) and image_roulette.selected_image is not None and not image_roulette.is_spinning:
                     # Lancer le compte à rebours
                     if not show_countdown:
                         show_countdown = True
@@ -287,7 +222,7 @@ def image_selector(screen, cursor, theme_index):
         # Mettre à jour les survols
         spin_button.check_hover(mouse_pos)
 
-        start_drawing_button.active=image_roulette.selected_image and not image_roulette.is_spinning
+        start_drawing_button.active=image_roulette.selected_image is not None and not image_roulette.is_spinning
         start_drawing_button.check_hover(mouse_pos)
 
         back_button.check_hover(mouse_pos)
@@ -317,7 +252,7 @@ def image_selector(screen, cursor, theme_index):
         screen.blit(title, title_rect)
         
         # Dessiner le sous-titre avec le thème sélectionné
-        subtitle = BUTTON_FONT.render(f"Thème: {themes[theme_index]['name']}", True, WHITE)
+        subtitle = BUTTON_FONT.render(f"Thème: {theme["name"]}", True, WHITE)
         subtitle_rect = subtitle.get_rect(center=(W//2, 220))
         screen.blit(subtitle, subtitle_rect)
         

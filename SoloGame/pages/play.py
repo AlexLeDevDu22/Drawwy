@@ -13,7 +13,7 @@ def get_screen_size():
     return info_ecran.current_w, info_ecran.current_h
 
 class SoloPlay:
-    def __init__(self, screen,cursor, theme_index, image):
+    def __init__(self, screen,cursor, theme, image):
         self.last_mouse_pos = None 
 
         self.screen = screen
@@ -23,13 +23,12 @@ class SoloPlay:
         self.pen_color = BLACK
         self.pen_radius = 6
 
-        
         # État de la souris
         self.mouseDown = False
         self.mouse_pos = (0, 0)
 
         # On définit les valeurs des rectangles d’interface
-        self.define_layout()
+        self.define_layout(theme, image)
         
         self.color_picker = ColorPicker(self.colors_rect.x, self.colors_rect.y, self.colors_rect.width, self.colors_rect.height)
 
@@ -48,7 +47,6 @@ class SoloPlay:
 
             # Mise à jour de la taille si on redimensionne
             self.W, self.H = get_screen_size()
-            self.define_layout()
 
             # Gestion des événements
             for event in self.events:
@@ -81,6 +79,11 @@ class SoloPlay:
 
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
+
+            # Dessin du modèle
+            pygame.draw.rect(self.screen, BLACK, self.model_rect, 2)
+            self.screen.blit(self.model, self.model_rect)
+
             self.AchievementPopup.draw_if_active()
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
@@ -90,7 +93,7 @@ class SoloPlay:
             cursor.show(screen, self.mouse_pos)
             pygame.display.flip()
 
-    def define_layout(self):
+    def define_layout(self, theme, image):
 
         # Canvas 
         self.canvas_rect = pygame.Rect(
@@ -115,7 +118,7 @@ class SoloPlay:
         slider_height = int(0.10 * self.H)
         self.slider_rect = pygame.Rect(
             self.canvas_rect.right + 10,
-            self.colors_rect.bottom + 70,
+            self.colors_rect.bottom + 10,
             slider_width,
             slider_height
         )
@@ -124,11 +127,17 @@ class SoloPlay:
         validate_button_w = 365
         validate_button_h = 50
         self.validate_button_rect = pygame.Rect(
-            self.W - validate_button_w - 10,  # 20 px de marge à droite
-            self.H - validate_button_h -400,  # 20 px de marge en bas
+            self.slider_rect.left+(self.slider_rect.width-validate_button_w)//2,
+            self.slider_rect.bottom + 10, 
             validate_button_w,
             validate_button_h
         )
+
+        self.model=pygame.image.load(f"data/themes/{theme["path"]}{theme['images'][image]["path"]}")
+        model_width= self.W-self.canvas_rect.right-20
+        model_height = self.model.get_height()*model_width//self.model.get_width()
+        self.model = pygame.transform.scale(self.model, (model_width, model_height))
+        self.model_rect=pygame.Rect(self.canvas_rect.right+10, self.validate_button_rect.top +10 + (self.H-self.validate_button_rect.top- model_height)//2, model_width, model_height)
 
     def draw_canvas(self):
         # Cadre du canvas

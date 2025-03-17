@@ -1,4 +1,7 @@
-pip freeze > requirements.txt
+pip freeze > doc/requirements.txt
+
+& doc/install-requirements.ps1
+
 
 Si on lance le script pour la première fois sur l'ordi, ya un long chargement
 

@@ -1,0 +1,105 @@
+[
+  {
+    "index": 0,
+    "name": "Paysage",
+    "icon": "🏞️",
+    "color": [50, 200, 50],
+    "path": "landscape/",
+    "images": [
+      {
+        "index": 0,
+        "path": "0.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 1,
+        "path": "1.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 2,
+        "path": "2.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 3,
+        "path": "3.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 4,
+        "path": "4.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 5,
+        "path": "5.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 6,
+        "path": "6.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 7,
+        "path": "7.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 8,
+        "path": "8.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      },
+      {
+        "index": 9,
+        "path": "9.jpeg",
+        "stars": 0,
+        "num_try": 0,
+        "time_taken": null
+      }
+    ]
+  },
+  {
+    "index": 1,
+    "name": "Nourriture",
+    "icon": "🍔",
+    "color": [200, 50, 50],
+    "path": "food/",
+    "images": []
+  },
+  {
+    "index": 2,
+    "name": "Animaux",
+    "icon": "🐶",
+    "color": [50, 50, 200],
+    "path": "animals/",
+    "images": []
+  },
+  {
+    "index": 3,
+    "name": "Mode",
+    "icon": "👗",
+    "color": [200, 50, 200],
+    "path": "mode/",
+    "images": []
+  }
+]

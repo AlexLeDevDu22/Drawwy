@@ -100,7 +100,7 @@ function handleConnection() {
     allFrames += data.all_frames;
     console.log("start frames", data.all_frames);
     if (data.all_frames.length > 0) draw(data.all_frames, false);
-    myId = data["id"];
+    myId = data["pid"];
     data["messages"].forEach((message) => {
       addMessageToChat(
         message.message,
