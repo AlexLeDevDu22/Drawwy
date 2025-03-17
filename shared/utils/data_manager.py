@@ -8,11 +8,11 @@ def reload():
     global SOLO_THEMES
     global CONFIG
 
-    with open('data/player_data.json') as f:
+    with open('data/player_data.json', encoding="utf-8") as f:
         PLAYER_DATA = json.load(f)
-    with open('data/shop/shop_items.json') as f:
+    with open('data/shop/shop_items.json', encoding="utf-8") as f:
         SHOP_ITEMS = json.load(f)
-    with open('data/solo_themes.json') as f:
+    with open('data/solo_themes.json', encoding="utf-8") as f:
         SOLO_THEMES = json.load(f)
     with open('config.yaml') as f:
         CONFIG = yaml.safe_load(f)
@@ -22,7 +22,7 @@ def save_data(file):
     global SHOP_ITEMS
     global SOLO_THEMES
 
-    with open(f'data/{file.lower()}.json', 'w') as f:
+    with open(f'data/{file.lower()}.json', 'w', encoding="utf-8") as f:
         if file =="PLAYER_DATA":
             json.dump(PLAYER_DATA, f, ensure_ascii=False, indent=4)
         elif file =="SOLO_THEMES":
