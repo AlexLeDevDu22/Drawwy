@@ -10,7 +10,7 @@
 [ ] 🟥 Couronne quand tous les achievements
 [ ] 🟩 Emotes dans le shop
 [ ] 🟩 Emotes dans le chat
-[ ] 🟩 Rareté d'items dans le shop
+[X] 🟩 Rareté d'items dans le shop
 [ ] 🟥 Pouvoir quitter le Multi
 [ ] 🟥 Possibilité de régénére une phrase (1 fois par game, payer)
 [ ] 🟦🟩 Limite de jouers
