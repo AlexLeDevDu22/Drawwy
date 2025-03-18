@@ -8,7 +8,7 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
     draw_text("Crédits", BUTTON_FONT, BLACK, screen, W // 2, 100)
 
     draw_text("Développé par: Robin Loisil", SMALL_FONT, BLACK, screen, W // 2, 300)
-    draw_text("Musique et sons: Mozart ", SMALL_FONT, BLACK, screen, W // 2, 350)
+    draw_text("Musique et sons: JUL ", SMALL_FONT, BLACK, screen, W // 2, 350)
     draw_text("Merci d'avoir joué à DRAWWY !", SMALL_FONT, BLACK, screen, W // 2, 400)
 
     # Bouton retour

@@ -12,6 +12,9 @@ class AvatarManager:
         self.avatar_size = 100
         self.input_text = PLAYER_DATA["pseudo"]
         
+
+
+
         # Charger ou créer l'avatar
         self.avatar_path = "data/avatar.bmp"
         try:
@@ -175,6 +178,7 @@ class AvatarManager:
                 self.pseudo_editable = False
                 self.is_retracting = True
                 self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
+                nom = PLAYER_DATA["pseudo"].lower()
                 save_data("PLAYER_DATA")
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC

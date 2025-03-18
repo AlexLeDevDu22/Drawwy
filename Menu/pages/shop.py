@@ -5,7 +5,7 @@ from shared.utils.common_utils import AchievementPopup
 import pygame
 import random
 
-def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement_popup):
+def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement_popup):
 
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
@@ -107,8 +107,6 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
             show_shop.state["selected_category"] = category
             show_shop.state["current_page"] = 0
     
-
-
     # Filtrer les SHOP_ITEMS selon la catégorie sélectionnée
     filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if show_shop.state["selected_category"] == "Tous" or item["category"] == show_shop.state["selected_category"]]
     
@@ -169,6 +167,22 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
                 item_x + 225, item_y + 80)
         
+        # Ajout de la rareté
+        if "rarity" in item:
+            # Définir la couleur selon la rareté
+            rarity_colors = {
+                "Common": (150, 150, 150),
+                "Uncommon": (50, 200, 50),
+                "Rare": (50, 50, 200),
+                "Epic": (200, 50, 200),
+                "Legendary": (255, 165, 0)
+            }
+            rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
+            
+            # Afficher la rareté sous la description
+            draw_text(item["rarity"], VERY_SMALL_FONT, rarity_color, screen,
+                    item_x + 225, item_y + 100)
+        
         # Prix ou statut
         if item["index"] in PLAYER_DATA["purchased_items"]:
             status_text = "SÉLECTIONNÉ" if is_selected else "ACHETÉ"
@@ -203,7 +217,6 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
                 elif item["category"] == "Bordures":
                     PLAYER_DATA["purchased_borders"]+=1
 
-
                 if PLAYER_DATA["achievements"][5]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 1:
                     
                     PLAYER_DATA["achievements"][5]["succeed"] = True
@@ -211,8 +224,34 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
                     
                     achievement_popup.start()
                 
-                save_data("PLAYER_DATA")
+                if PLAYER_DATA["achievements"][6]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4:
+                    
+                    PLAYER_DATA["achievements"][6]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][6]["title"],PLAYER_DATA["achievements"][6]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+
+                if PLAYER_DATA["achievements"][7]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 1:
+                    
+                    PLAYER_DATA["achievements"][7]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][7]["title"],PLAYER_DATA["achievements"][7]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
                 
+                if PLAYER_DATA["achievements"][8]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 8:
+                    
+                    PLAYER_DATA["achievements"][8]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][8]["title"],PLAYER_DATA["achievements"][8]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+                
+                if PLAYER_DATA["achievements"][11]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4 and PLAYER_DATA["purchased_borders"] == 8:
+                    
+                    PLAYER_DATA["achievements"][11]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][11]["title"],PLAYER_DATA["achievements"][11]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+                save_data("PLAYER_DATA")
     
     # Boutons de pagination
     if total_pages > 1:
@@ -238,42 +277,35 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
             fleche_gauche_rect = fleche_gauche.get_rect(center=(prev_x + nav_width // 2, nav_y + nav_height // 2))
             screen.blit(fleche_gauche, fleche_gauche_rect)
             
-
-            
             if mouse_click and prev_hover:
                 show_shop.state["current_page"] -= 1
         
         # Bouton suivant
-        # Bouton précédent
         next_hover = next_x <= mouse_pos[0] <= next_x + nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
         next_color = SOFT_ORANGE if next_hover else ORANGE
         
-        
         if show_shop.state["current_page"] < total_pages - 1:
             # Ombre
-            pygame.draw.circle(screen, DARK_BEIGE, (next_x + nav_width // 2+4,   nav_y + nav_height // 2+ 4), nav_width // 2)
+            pygame.draw.circle(screen, DARK_BEIGE, (next_x + nav_width // 2+4, nav_y + nav_height // 2+ 4), nav_width // 2)
             # Cercle
             pygame.draw.circle(screen, next_color, (next_x + nav_width // 2, nav_y + nav_height // 2), nav_width // 2)
             # Flèche
             fleche_droite = pygame.image.load("assets/fleche_droite.png")
             fleche_droite= pygame.transform.scale(fleche_droite, (40, 40))
-            fleche_droite_rect = fleche_droite.get_rect(center=(next_x + nav_width // 2,  nav_y + nav_height // 2))
+            fleche_droite_rect = fleche_droite.get_rect(center=(next_x + nav_width // 2, nav_y + nav_height // 2))
             screen.blit(fleche_droite, fleche_droite_rect)
-
-
             
-
             if mouse_click and next_hover:
                 show_shop.state["current_page"] += 1
         
         # Afficher numéro de page
         draw_text(f"Page {show_shop.state['current_page'] + 1}/{total_pages}", SMALL_FONT, BLACK, screen,
-                main_panel_x + main_panel_width // 2, nav_y + nav_height + 10 )
+                main_panel_x + main_panel_width // 2, nav_y + nav_height + 10)
     
     # Bouton retour
     back_width = 180
     back_height = 60
-    back_x = main_panel_x + 50
+    back_x = main_panel_x + main_panel_width- 200
     back_y = main_panel_y + main_panel_height - 100
     
     # Animation de survol
@@ -297,22 +329,21 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
     if mouse_click and hover_back:
         return screen, cursor, "home", buttons, achievement_popup
     
-    
     return screen, cursor, "shop", buttons, achievement_popup
 
 def toggle_select(item, cursor):
     # Basculer la sélection
-    if item["index"] == PLAYER_DATA["selected_items"][item["category"]]: # unselect
-        if item["category"] != "Bordures":
-            if item["category"]=="Curseurs":
-                PLAYER_DATA["selected_items"]["Curseurs"]=None
-                cursor= CustomCursor(None)
-            else:
-                PLAYER_DATA["selected_items"][item["category"]].remove(item["index"])
-    elif item["category"] in ["Bordures", "Curseurs"]: # select
+    if item["index"] == PLAYER_DATA["selected_items"][item["category"]]:  # désélectionner
+        if item["category"] == "Curseurs":
+            PLAYER_DATA["selected_items"]["Curseurs"] = None
+            cursor = CustomCursor(None)
+        elif item["category"] != "Bordures":
+            # Si c'est une autre catégorie qui utilise un index unique (et non une liste)
+            PLAYER_DATA["selected_items"][item["category"]] = None
+    else:  # sélectionner
         PLAYER_DATA["selected_items"][item["category"]] = item["index"]
-
         if item["category"] == "Curseurs":
             cursor = CustomCursor(item["image_path"])
+    
     save_data("PLAYER_DATA")
     return cursor
