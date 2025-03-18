@@ -1,6 +1,7 @@
 from Menu.utils.avatar_manager import AvatarManager
 from Menu.ui.elements import *
 from Menu.pages import achievements
+from shared.utils.common_utils import AchievementPopup
 from Menu.pages import play
 from Menu.pages import home
 from Menu.pages import credit
@@ -74,6 +75,16 @@ total_height = 0
 achievements_popup=None
 
 while running:
+
+    
+    
+
+
+    #achievement leuleu
+    nom = PLAYER_DATA["pseudo"].lower()
+    if (nom == "leuleu" or nom == "fred leuleu" or nom == "frederic leuleu" or nom == "mr leuleu")  and PLAYER_DATA["achievements"][14]["succeed"]== False:
+                    PLAYER_DATA["achievements"][14]["succeed"] = True
+                    save_data("PLAYER_DATA")
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
 
