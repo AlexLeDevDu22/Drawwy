@@ -1,105 +1,179 @@
 {
-  "pseudo": "leuleu",
-  "achievements": [
-    {
-      "title": "Premier pas",
-      "explication": "Dessiner votre premier dessin",
-      "succeed": false,
-      "couleurs": [0, 0, 255]
+    "pseudo": "leuleu",
+    "achievements": [
+        {
+            "title": "Premier pas",
+            "explication": "Dessiner votre premier dessin",
+            "succeed": true,
+            "couleurs": [
+                0,
+                0,
+                255
+            ]
+        },
+        {
+            "title": "Artiste en herbe",
+            "explication": "Dessinez 10 dessins",
+            "succeed": false,
+            "couleurs": [
+                0,
+                255,
+                0
+            ]
+        },
+        {
+            "title": "Maitre du crayon",
+            "explication": "Dessinez 50 dessins",
+            "succeed": false,
+            "couleurs": [
+                255,
+                0,
+                255
+            ]
+        },
+        {
+            "title": "Maestro",
+            "explication": "Trouvez une phrase du premier coup",
+            "succeed": false,
+            "couleurs": [
+                255,
+                165,
+                0
+            ]
+        },
+        {
+            "title": "Perfectionniste",
+            "explication": "Obtenez un score de 90% ",
+            "succeed": false,
+            "couleurs": [
+                255,
+                255,
+                0
+            ]
+        },
+        {
+            "title": "Aaaaaaah ca change",
+            "explication": "Achetez votre premier clicker",
+            "succeed": true,
+            "couleurs": [
+                255,
+                0,
+                0
+            ]
+        },
+        {
+            "title": "Clickers-mania",
+            "explication": "Obtenir tous les clickers",
+            "succeed": true,
+            "couleurs": [
+                0,
+                255,
+                255
+            ]
+        },
+        {
+            "title": "Quel beau rond !",
+            "explication": "Obtenir votre premiere bordure",
+            "succeed": true,
+            "couleurs": [
+                170,
+                170,
+                170
+            ]
+        },
+        {
+            "title": "Seigneur des anneaux",
+            "explication": "Obtenir toutes les bordures",
+            "succeed": true,
+            "couleurs": [
+                148,
+                0,
+                211
+            ]
+        },
+        {
+            "title": "Coucou !",
+            "explication": "Obtenir votre premiere emote",
+            "succeed": false,
+            "couleurs": [
+                88,
+                41,
+                0
+            ]
+        },
+        {
+            "title": "LV2 emoji",
+            "explication": "Obtenir toutes les emotes",
+            "succeed": false,
+            "couleurs": [
+                0,
+                100,
+                0
+            ]
+        },
+        {
+            "title": "Acheteur compulsif",
+            "explication": "obtenir tous les items",
+            "succeed": true,
+            "couleurs": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "title": "Une petite fortune",
+            "explication": "Collecter 1000 pieces",
+            "succeed": false,
+            "couleurs": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "title": "Picsou ?",
+            "explication": "Collecter 10_000 pieces",
+            "succeed": false,
+            "couleurs": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "title": "C'est qui le patron ?",
+            "explication": "Je sais pas, c'est toi ?",
+            "succeed": true,
+            "couleurs": [
+                0,
+                0,
+                0
+            ]
+        }
+    ],
+    "num_game_played": 0,
+    "points": 0,
+    "selected_items": {
+        "Curseurs": null,
+        "Bordures": 13
     },
-    {
-      "title": "Artiste en herbe",
-      "explication": "Dessinez 10 dessins",
-      "succeed": false,
-      "couleurs": [0, 255, 0]
-    },
-    {
-      "title": "Maitre du crayon",
-      "explication": "Dessinez 50 dessins",
-      "succeed": false,
-      "couleurs": [255, 0, 255]
-    },
-    {
-      "title": "Maestro",
-      "explication": "Trouvez une phrase du premier coup",
-      "succeed": false,
-      "couleurs": [255, 165, 0]
-    },
-    {
-      "title": "Perfectionniste",
-      "explication": "Obtenez un score de 90% ",
-      "succeed": false,
-      "couleurs": [255, 255, 0]
-    },
-    {
-      "title": "Aaaaaaah ca change",
-      "explication": "Achetez votre premier clicker",
-      "succeed": true,
-      "couleurs": [255, 0, 0]
-    },
-    {
-      "title": "Clickers-mania",
-      "explication": "Obtenir tous les clickers",
-      "succeed": true,
-      "couleurs": [0, 255, 255]
-    },
-    {
-      "title": "Quel beau rond !",
-      "explication": "Obtenir votre premiere bordure",
-      "succeed": true,
-      "couleurs": [170, 170, 170]
-    },
-    {
-      "title": "Seigneur des anneaux",
-      "explication": "Obtenir toutes les bordures",
-      "succeed": true,
-      "couleurs": [148, 0, 211]
-    },
-    {
-      "title": "Coucou !",
-      "explication": "Obtenir votre premiere emote",
-      "succeed": false,
-      "couleurs": [88, 41, 0]
-    },
-    {
-      "title": "LV2 emoji",
-      "explication": "Obtenir toutes les emotes",
-      "succeed": false,
-      "couleurs": [0, 100, 0]
-    },
-    {
-      "title": "Acheteur compulsif",
-      "explication": "obtenir tous les items",
-      "succeed": true,
-      "couleurs": [0, 0, 0]
-    },
-    {
-      "title": "Une petite fortune",
-      "explication": "Collecter 1000 pieces",
-      "succeed": false,
-      "couleurs": [0, 0, 0]
-    },
-    {
-      "title": "Picsou ?",
-      "explication": "Collecter 10_000 pieces",
-      "succeed": false,
-      "couleurs": [0, 0, 0]
-    },
-    {
-      "title": "C'est qui le patron ?",
-      "explication": "Je sais pas, c'est toi ?",
-      "succeed": true,
-      "couleurs": [0, 0, 0]
-    }
-  ],
-  "num_game_played": 0,
-  "points": 0,
-  "selected_items": {
-    "Curseurs": null,
-    "Bordures": 13
-  },
-  "purchased_items": [0, 2, 6, 5, 7, 9, 8, 10, 11, 3, 1, 4, 12],
-  "coins": 97040,
-  "purchased_cursers": 5,
-  "purchased_borders": 9
+    "purchased_items": [
+        0,
+        2,
+        6,
+        5,
+        7,
+        9,
+        8,
+        10,
+        11,
+        3,
+        1,
+        4,
+        12
+    ],
+    "coins": 97040,
+    "purchased_cursers": 5,
+    "purchased_borders": 9
 }

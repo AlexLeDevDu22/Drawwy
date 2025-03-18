@@ -114,25 +114,7 @@ def players(MultiGame):
         image_texte = SMALL_FONT.render (str(player["points"]) + " points", 1 , text_color )
         MultiGame.screen.blit(image_texte, dico_co[i][4])
 
-            # Dessiner le bouton quitter tout en bas de la liste des joueurs
-        quit_button_width = 0.18 * MultiGame.W
-        quit_button_height = 0.07 * MultiGame.H
-        quit_button_x = 0.01 * MultiGame.W
-        quit_button_y = 0.75 * MultiGame.H + 0.7 * MultiGame.H  # Placer en bas de la liste des joueurs
-
-        # Dessiner le fond du bouton
-        pygame.draw.rect(MultiGame.screen, (255, 0, 0), (quit_button_x, quit_button_y, quit_button_width, quit_button_height))
-        pygame.draw.rect(MultiGame.screen, BLACK, (quit_button_x, quit_button_y, quit_button_width, quit_button_height), 1)
-
-        quit_text = BUTTON_FONT.render("Quitter", 1, (255, 255, 255))
-        quit_text_rect = quit_text.get_rect(center=(quit_button_x + quit_button_width / 2, quit_button_y + quit_button_height / 2))
-        MultiGame.screen.blit(quit_text, quit_text_rect)
-
-        # Vérifier les clics sur le bouton Quitter
-        for event in MultiGame.events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if quit_button_x <= event.pos[0] <= quit_button_x + quit_button_width and quit_button_y <= event.pos[1] <= quit_button_y + quit_button_height:
-                    MultiGame.running = False  # Arrête la boucle du jeu
+        
 
 def sentence(MultiGame):
     if len(MultiGame.PLAYERS) >1:
