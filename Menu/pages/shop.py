@@ -213,7 +213,57 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
                     achievement_popup.start()
                 
                 save_data("PLAYER_DATA")
+              # Remplacer les lignes 214-219 par ceci:
+
+                # Description de l'item
+                draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
+                        item_x + 225, item_y + 80)
                 
+
+                # Ajout de la rareté
+                if "rarity" in item:
+                    # Définir la couleur selon la rareté
+                    rarity_colors = {
+                        "Commun": (150, 150, 150),
+                        "Peu commun": (50, 200, 50),
+                        "Rare": (50, 50, 200),
+                        "Épique": (200, 50, 200),
+                        "Légendaire": (255, 165, 0)
+                    }
+                    rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
+                    
+                    # Afficher la rareté sous la description
+                    draw_text(item["rarity"], VERY_SMALL_FONT, rarity_color, screen,
+                            item_x + 225, item_y + 100)
+
+                # Ajout de la rareté
+                if "rarity" in item:
+                    # Définir la couleur selon la rareté
+                    rarity_colors = {
+                        "Commun": (150, 150, 150),
+                        "Peu commun": (50, 200, 50),
+                        "Rare": (50, 50, 200),
+                        "Épique": (200, 50, 200),
+                        "Légendaire": (255, 165, 0)
+                    }
+                    rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
+                    
+                    # Afficher la rareté sous la description
+                    draw_text(item["rarity"], VERY_SMALL_FONT, rarity_color, screen,
+                            item_x + 225, item_y + 300)
+
+                # Prix ou statut (ajuster la position Y si nécessaire)
+                if item["index"] in PLAYER_DATA["purchased_items"]:
+                    status_text = "SÉLECTIONNÉ" if is_selected else "ACHETÉ"
+                    status_color = (50, 150, 50) if is_selected else (100, 100, 100)
+                    draw_text(status_text, SMALL_FONT, status_color, screen,
+                            item_x + 220, item_y + 130)
+                else:
+                    price_color = (0, 100, 0) if coins >= item["price"] else (150, 0, 0)
+                    draw_text(str(item['price']), SMALL_FONT, price_color, screen,
+                            item_x + 220, item_y + 130)
+                    coin_icon_rect = coin_icon.get_rect(center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
+                    screen.blit(coin_icon, coin_icon_rect)  
 
 
 
