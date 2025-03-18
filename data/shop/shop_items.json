@@ -114,7 +114,25 @@
       "description": "ha! ha! Cuic!",
       "image_path": "data/shop/cursors_assets/cursor_robot.png",
       "category": "Curseurs",
-      "rarity": "Legendary"
+      "rarity": "Common"
+    },
+    {
+      "index": 13,
+      "name": "SINGE",
+      "price": 100,
+      "description": "ook ook",
+      "image_path": "data/shop/emotes_assets/SINGE.png",
+      "category": "Emotes",
+      "rarity": "Epic"
+    },
+    {
+      "index": 14,
+      "name": "Bravo!",
+      "price": 100,
+      "description": "Clap clap",
+      "image_path": "data/shop/emotes_assets/cursor_alien.png",
+      "category": "Emotes",
+      "rarity": "Common"
     }
   ]
       

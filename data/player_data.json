@@ -156,7 +156,7 @@
     "points": 0,
     "selected_items": {
         "Curseurs": null,
-        "Bordures": 2
+        "Bordures": 13
     },
     "purchased_items": [
         0,
@@ -170,9 +170,10 @@
         8,
         10,
         9,
-        11
+        11,
+        13
     ],
-    "coins": 95630,
+    "coins": 95530,
     "purchased_cursers": 4,
-    "purchased_borders": 8
+    "purchased_borders": 9
 }
