@@ -25,7 +25,8 @@ PINK = (255, 130, 186)
 YELLOW = (255, 223, 97)
 PURPLE = (130, 94, 196)
 LIGHT_PURPLE = (157, 127, 211)
-
+GRAY = (200, 200, 200)
+GOLD = (255, 215, 0)
 # Police personnalisée
 pygame.init()
 TITLE_FONT = pygame.font.Font(None, 300)

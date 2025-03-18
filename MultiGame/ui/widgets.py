@@ -91,6 +91,7 @@ def players(MultiGame):
                 rect.center = (dico_co[i][1][0]+20,dico_co[i][1][1]+24)
                 MultiGame.screen.blit(emoji, rect)
 
+        
 
         #pseudo
         text_color=(10,10,10) if player["pid"] == MultiGame.PLAYER_ID else (100,100,100)
@@ -112,6 +113,8 @@ def players(MultiGame):
         
         image_texte = SMALL_FONT.render (str(player["points"]) + " points", 1 , text_color )
         MultiGame.screen.blit(image_texte, dico_co[i][4])
+
+        
 
 def sentence(MultiGame):
     if len(MultiGame.PLAYERS) >1:

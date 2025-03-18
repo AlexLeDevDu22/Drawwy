@@ -76,11 +76,6 @@ achievements_manager=AchievementManager(W,H)
 
 while running:
 
-    #achievement leuleu
-    nom = PLAYER_DATA["pseudo"].lower()
-    if (nom == "leuleu" or nom == "fred leuleu" or nom == "frederic leuleu" or nom == "mr leuleu")  and PLAYER_DATA["achievements"][14]["succeed"]== False:
-                    PLAYER_DATA["achievements"][14]["succeed"] = True
-                    save_data("PLAYER_DATA")
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
 
@@ -99,7 +94,7 @@ while running:
             elif event.y < 0:  # Molette vers le bas
                 scroll_y = min(700, scroll_y + 30)
 
-        avatar_manager.handle_event(event, mouse_pos, pygame.mouse.get_pressed())
+        avatar_manager.handle_event(event, mouse_pos, achievements_manager)
 
     # Mise à jour des particules
     if mouse_click:
@@ -143,6 +138,7 @@ while running:
         last_current_page = current_page
 
     avatar_manager.draw()
+
     if not (avatar_manager.show_buttons or avatar_manager.is_expanding or avatar_manager.is_retracting):
         # === ÉCRAN DU MENU PRINCIPAL ===
         if current_page == "home":
@@ -171,7 +167,10 @@ while running:
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
 
+    achievements_manager.draw_popup_if_active(screen)
+
     cursor.show(screen, mouse_pos)
+    
     pygame.display.flip()
     clock.tick(CONFIG["fps"])
 
