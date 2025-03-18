@@ -149,9 +149,21 @@
         "Bordures": 2
     },
     "purchased_items": [
-        0
+        0,
+        2,
+        6,
+        5,
+        7,
+        9,
+        8,
+        10,
+        11,
+        3,
+        1,
+        4,
+        12
     ],
-    "coins": 98550,
-    "purchased_cursers": 1,
-    "purchased_borders": 1
+    "coins": 97040,
+    "purchased_cursers": 5,
+    "purchased_borders": 9
 }

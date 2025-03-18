@@ -53,7 +53,6 @@ def handle_disconnect(data=None):
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
             if player.get("sid") == request.sid:
-                print(requests.sid, player)
                 print(f"Joueur {player['pseudo']} déconnecté")
                 players.pop(i)
                 break

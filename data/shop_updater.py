@@ -20,7 +20,8 @@ def get_last_update():
     if os.path.exists(LAST_UPDATE_FILE):
         with open(LAST_UPDATE_FILE, 'r') as f:
             last_update = f.read().strip()
-            return datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%S")
+            if last_update != "":
+                return datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%S")
     return None
 
 def set_last_update(update_time):
