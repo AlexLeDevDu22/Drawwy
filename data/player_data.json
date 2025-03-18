@@ -4,7 +4,7 @@
         {
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,

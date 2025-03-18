@@ -1,6 +1,7 @@
 from SoloGame.pages.theme_choicer import theme_choicer
 from SoloGame.pages.image_selector import image_selector
 from SoloGame.pages.play import SoloPlay
+from SoloGame.pages.theme_choicer import image_comparaison
 
 import pygame
 
