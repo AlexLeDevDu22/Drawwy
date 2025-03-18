@@ -1,4 +1,5 @@
 from shared.ui.common_ui import *
+from shared.utils.data_manager import *
 
 import pygame
 
@@ -8,44 +9,51 @@ def draw_text(text, font, color, surface, x, y):
     textrect.center = (x, y)
     surface.blit(textobj, textrect)
 
-class AchievementPopup:
+class AchievementManager:
 
-    def __init__(self, text,description,H,W,surface):
+    def __init__(self, W, H):
         #dessiner la boite
         self.width = 500
         self.height = 100
         self.W=W
         self.H=H
-        self.surface=surface
-        self.text = text
-        self.description = description
-        self.active=False
-        self.start_time=None
-    
-    def start(self):
-        self.active=True
-        self.start_time = pygame.time.get_ticks()
+        self.popup_active=False
+        self.start_time=pygame.time.get_ticks()
 
-    def draw_if_active(self):
+    def new_achievement(self, index):
+        self.current_achievement=PLAYER_DATA["achievements"][index]
+        if not self.current_achievement["succeed"]:
+            PLAYER_DATA["achievements"][index]["succeed"]=True
+            save_data()
+            self.popup_active=True
+            self.start_time = pygame.time.get_ticks()
+    
+    def draw_popup_if_active(self, screen):
         if self.start_time and self.start_time+3000 < pygame.time.get_ticks():
-            self.active=False
-            self.start_time=None
-        if self.active:
-            box_rect_achievement = pygame.Rect(50,self.H-230,self.width,self.height)
-            pygame.draw.rect(self.surface,PASTEL_GREEN,box_rect_achievement,border_radius=15)
+            self.popup_active=False
+        if self.popup_active:
+            anim_offset=0
+
+            if self.start_time+4000 > pygame.time.get_ticks():
+                anim_offset=(self.width+100)*min((self.start_time+1000-pygame.time.get_ticks(), 1000)/1000, 1)
+            else:
+                anim_offset=(self.width+100)*max((self.start_time+4000-pygame.time.get_ticks())/1000, 0)
+
+            box_rect_achievement = pygame.Rect(anim_offset-50,self.H-230,self.width,self.height)
+            pygame.draw.rect(screen,PASTEL_GREEN,box_rect_achievement,border_radius=15)
             #rond valide
-            pygame.draw.circle(self.surface, DARK_BLUE, 
-                                    ( 100, self.H-230+ self.height // 2), 
+            pygame.draw.circle(screen, DARK_BLUE, 
+                                    ( anim_offset, self.H-230+ self.height // 2), 
                                     20)
-            pygame.draw.line(self.surface, WHITE, 
-                                ( 90, self.H-230 + self.height // 2), 
-                                ( 100, self.H-230 + self.height // 2 + 10), 
+            pygame.draw.line(screen, WHITE, 
+                                ( anim_offset-10, self.H-230 + self.height // 2), 
+                                ( anim_offset, self.H-230 + self.height // 2 + 10), 
                                 4)
-            pygame.draw.line(self.surface, WHITE, 
-                                ( 100, self.H-230 + self.height // 2 + 10), 
-                                ( 115, self.H-230 + self.height // 2 - 10), 
+            pygame.draw.line(screen, WHITE, 
+                                ( anim_offset, self.H-230 + self.height // 2 + 10), 
+                                ( anim_offset+15, self.H-230 + self.height // 2 - 10), 
                                 4)
 
             #dessiner le texte
-            draw_text(self.text,SMALL_FONT,BLACK,self.surface,50 + self.width // 2, self.H-230 + self.height // 2)
-            draw_text(self.description,SMALL_FONT,LIGHT_GRAY,self.surface,50 + self.width // 2, self.H-200 + self.height // 2)
+            draw_text(self.current_achievement["title"],SMALL_FONT,BLACK,screen,anim_offset-50 + self.width // 2, self.H-230 + self.height // 2)
+            draw_text(self.current_achievement["explication"],SMALL_FONT,LIGHT_GRAY,screen,anim_offset-50 + self.width // 2, self.H-200 + self.height // 2)

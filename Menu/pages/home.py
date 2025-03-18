@@ -51,7 +51,7 @@ def show_home(screen, W,H,mouse_pos, mouse_click, title_angle,buttons):
     
     # Position de l'image (centrée)
     title_x = W // 2 - scaled_width // 2
-    title_y = main_panel_y + 20
+    title_y = main_panel_y + 15
     
     # Ombre du titre (optionnel)
     shadow_img = title_img_scaled.copy()

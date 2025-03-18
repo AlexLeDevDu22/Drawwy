@@ -183,10 +183,7 @@ def drawing(MultiGame):
                     MultiGame.second_draw_frames.append({"type":"new_step"})
                     MultiGame.ALL_FRAMES.append({"type":"new_step"})
 
-                    if PLAYER_DATA["achievements"][0]["succeed"]== False:
-                        PLAYER_DATA["achievements"][0]["succeed"] = True
-                        MultiGame.AchievementPopup.start()
-                        save_data("PLAYER_DATA")
+                    MultiGame.achievements_manager.new_achievement(0)
                     
                 elif MultiGame.mouse_down and event.type == pygame.MOUSEMOTION:
                     if MultiGame.lastMouseDown and 0<MultiGame.game_remaining_time<CONFIG["game_duration"]:   # can draw    

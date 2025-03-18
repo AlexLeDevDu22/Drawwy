@@ -1,6 +1,5 @@
 import pygame
 import sys
-from shared.utils.common_utils import AchievementPopup
 from shared.ui.elements import ColorPicker
 from shared.utils.data_manager import *
 
@@ -13,7 +12,7 @@ def get_screen_size():
     return info_ecran.current_w, info_ecran.current_h
 
 class SoloPlay:
-    def __init__(self, screen,cursor, theme, image):
+    def __init__(self, screen,cursor, theme, image, achievements_manager):
         self.last_mouse_pos = None 
 
         self.screen = screen
@@ -36,7 +35,7 @@ class SoloPlay:
         self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
 
-        self.AchievementPopup = AchievementPopup(PLAYER_DATA["achievements"][0]["title"],PLAYER_DATA["achievements"][0]["explication"],self.H,self.W,self.screen)
+        self.achievements_manager=achievements_manager
 
         # Boucle principale
         clock = pygame.time.Clock()
@@ -84,7 +83,7 @@ class SoloPlay:
             pygame.draw.rect(self.screen, BLACK, self.model_rect, 2)
             self.screen.blit(self.model, self.model_rect)
 
-            self.AchievementPopup.draw_if_active()
+            self.achievements_manager.draw_popup_if_active(self.screen)
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
                 pygame.image.save(self.canvas_surf, "mon_dessin.png")  # Sauvegarde du dessin
@@ -156,12 +155,8 @@ class SoloPlay:
             pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
             #achievement
-            if PLAYER_DATA["achievements"][0]["succeed"]== False:
-                PLAYER_DATA["achievements"][0]["succeed"] = True
-                self.AchievementPopup.start()
-                save_data("PLAYER_DATA")
+            self.achievements_manager.new_achievement(0)
     
-
     def draw_slider(self):
         """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
         pygame.draw.rect(self.screen, (220,220,220), self.slider_rect)

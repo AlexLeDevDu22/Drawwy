@@ -1,7 +1,7 @@
 from Menu.utils.avatar_manager import AvatarManager
 from Menu.ui.elements import *
 from Menu.pages import achievements
-from shared.utils.common_utils import AchievementPopup
+from shared.utils.common_utils import AchievementManager
 from Menu.pages import play
 from Menu.pages import home
 from Menu.pages import credit
@@ -72,13 +72,9 @@ running = True
 # Initialiser scroll_y et total_height
 scroll_y = 0
 total_height = 0
-achievements_popup=None
+achievements_manager=AchievementManager(W,H)
 
 while running:
-
-    
-    
-
 
     #achievement leuleu
     nom = PLAYER_DATA["pseudo"].lower()
@@ -157,10 +153,10 @@ while running:
         elif current_page == "play":
             screen, current_page, buttons = play.play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Solo":
-            soloGame(screen, cursor)
+            soloGame(screen, cursor, achievements_manager)
             current_page = "home"
         elif current_page == "Multijoueurs":
-            MultiGame(screen, cursor, clock, W, H)
+            MultiGame(screen, cursor, clock, W, H, achievements_manager)
             current_page = "home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
@@ -170,7 +166,7 @@ while running:
             screen, current_page, buttons = credit.show_credit(screen, W, H, mouse_pos, mouse_click, buttons)
         # === ÉCRAN DU SHOP ===
         elif current_page == "shop":
-            screen, cursor, current_page, buttons, achievements_popup = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievements_popup)
+            screen, cursor, current_page, buttons, achievements_manager = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievements_manager)
 
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)

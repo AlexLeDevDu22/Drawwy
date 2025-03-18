@@ -3,7 +3,6 @@ from MultiGame.ui.widgets import *
 from shared.ui.elements import ColorPicker
 import MultiGame.utils.connection as connection
 from shared.utils.data_manager import *
-from shared.utils.common_utils import AchievementPopup
 
 
 import threading
@@ -15,7 +14,7 @@ from datetime import datetime, timedelta
 
 class MultiGame:
     
-    def __init__(self,screen, cursor, clock, W,H):
+    def __init__(self,screen, cursor, clock, W,H, achievements_manager):
         if not tools.is_connected():
             print( "Désolé, une connexion internet est requise.")
             return
@@ -37,9 +36,8 @@ class MultiGame:
         self.ROLL_BACK=0
         self.SIO=None
         self.GAMESTART=None
-        
-        self.AchievementPopup = AchievementPopup(PLAYER_DATA["achievements"][0]["title"],PLAYER_DATA["achievements"][0]["explication"],self.H,self.W,self.screen)
 
+        self.achievements_manager=achievements_manager
     
         try:
             self.connection_loop=asyncio.new_event_loop()
@@ -129,7 +127,7 @@ class MultiGame:
                     slider_radius(self)
                 timer(self)
 
-                self.AchievementPopup.draw_if_active()
+                self.achievements_manager.draw_popup_if_active(self.screen)
 
                 if not self.connected:
                     font = pygame.font.Font("assets/PermanentMarker.ttf", 20)

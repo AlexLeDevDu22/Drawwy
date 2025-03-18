@@ -4,7 +4,7 @@ from SoloGame.pages.play import SoloPlay
 
 import pygame
 
-def soloGame(screen, cursor):
+def soloGame(screen, cursor, achievements_manager):
     soloPage="themes"
     pygame.display.set_caption(f"Drawwy - Mode Solo")
     while True:
@@ -13,7 +13,7 @@ def soloGame(screen, cursor):
         elif soloPage=="images":
             screen, soloPage, image=image_selector(screen, cursor, theme)
         elif soloPage=="play":
-            SoloPlay(screen, cursor, theme, image)
+            SoloPlay(screen, cursor, theme, image, achievements_manager)
             return screen, "home"
         elif soloPage=="exit":
             return screen, "home"

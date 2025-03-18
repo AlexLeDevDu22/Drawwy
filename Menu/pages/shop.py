@@ -1,11 +1,10 @@
 from shared.ui.common_ui import *
 from shared.utils.common_utils import draw_text
 from shared.utils.data_manager import *
-from shared.utils.common_utils import AchievementPopup
 import pygame
 import random
 
-def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement_popup):
+def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement_manager):
 
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
@@ -49,13 +48,12 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
     
     # Afficher le solde
     draw_text(str(coins), MEDIUM_FONT, BLACK, screen, 
-            main_panel_x + main_panel_width - 120, main_panel_y + 80)
+            main_panel_x + main_panel_width - 100, main_panel_y + 80)
     
     coin_icon = pygame.image.load("assets/icon_star.png")
     coin_icon = pygame.transform.scale(coin_icon, (40, 40))
-    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 126+MEDIUM_FONT.size(str(coins))[0], main_panel_y + 68))
+    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - MEDIUM_FONT.size(str(coins))[0]//2 -126, main_panel_y + 76))
     screen.blit(coin_icon, coin_icon_rect)
-    
     
     # Variables statiques pour la pagination et filtrage
     # Utiliser un dictionnaire pour stocker l'état entre les appels
@@ -130,7 +128,7 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
         # Animation de survol
         hover_item = item_x <= mouse_pos[0] <= item_x + item_width and item_y <= mouse_pos[1] <= item_y + item_height
         
-        is_selected = item["index"] == PLAYER_DATA["selected_items"][item["category"]]
+        is_selected = item["category"]=="Emotes" or item["index"] == PLAYER_DATA["selected_items"][item["category"]]
         # Couleur de fond basée sur sélection/achat/survol
         if item["index"] in PLAYER_DATA["purchased_items"] and is_selected:
             item_color = (220, 250, 220)
@@ -185,7 +183,7 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
         
         # Prix ou statut
         if item["index"] in PLAYER_DATA["purchased_items"]:
-            status_text = "SÉLECTIONNÉ" if is_selected else "ACHETÉ"
+            status_text = "SÉLECTIONNÉ" if is_selected and item["category"] != "Emotes" else "ACHETÉ"
             status_color = (50, 150, 50) if is_selected else (100, 100, 100)
             draw_text(status_text, SMALL_FONT, status_color, screen,
                     item_x + 220, item_y + 130)
@@ -196,8 +194,7 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
             coin_icon_rect = coin_icon.get_rect(center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
             screen.blit(coin_icon, coin_icon_rect)
 
-        if achievement_popup:
-            achievement_popup.draw_if_active()
+        achievement_manager.draw_popup_if_active(screen)
         
         # Gestion des clics sur les SHOP_ITEMS
         if mouse_click and hover_item:
@@ -210,48 +207,32 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
                 coins -= item["price"]
                 PLAYER_DATA["purchased_items"].append(item["index"])
                 PLAYER_DATA["coins"] = coins
-                
+
                 #ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
+                list_cursers = [e in PLAYER_DATA["purchased_items"] for e in SHOP_ITEMS if e["category"] == "Curseurs"]
+                list_borders = [e in PLAYER_DATA["purchased_items"] for e in SHOP_ITEMS if e["category"] == "Bordures"]
+                list_emotes = [e in PLAYER_DATA["purchased_items"] for e in SHOP_ITEMS if e["category"] == "Emotes"]
+                list_all = [e in PLAYER_DATA["purchased_items"] for e in SHOP_ITEMS]
                 if item["category"] == "Curseurs":
-                    PLAYER_DATA["purchased_cursers"] +=1
-                elif item["category"] == "Bordures":
-                    PLAYER_DATA["purchased_borders"]+=1
+                    achievement_manager.new_achievement(5)
 
-                if PLAYER_DATA["achievements"][5]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 1:
-                    
-                    PLAYER_DATA["achievements"][5]["succeed"] = True
-                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][5]["title"],PLAYER_DATA["achievements"][5]["explication"],H,W,screen)
-                    
-                    achievement_popup.start()
+                if all(list_cursers):
+                    achievement_manager.new_achievement(6)
                 
-                if PLAYER_DATA["achievements"][6]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4:
-                    
-                    PLAYER_DATA["achievements"][6]["succeed"] = True
-                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][6]["title"],PLAYER_DATA["achievements"][6]["explication"],H,W,screen)
-                    
-                    achievement_popup.start()
+                if item["category"] == "Bordures":
+                    achievement_manager.new_achievement(7)
 
-                if PLAYER_DATA["achievements"][7]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 1:
-                    
-                    PLAYER_DATA["achievements"][7]["succeed"] = True
-                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][7]["title"],PLAYER_DATA["achievements"][7]["explication"],H,W,screen)
-                    
-                    achievement_popup.start()
+                if all(list_borders):
+                    achievement_manager.new_achievement(8)
                 
-                if PLAYER_DATA["achievements"][8]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 8:
-                    
-                    PLAYER_DATA["achievements"][8]["succeed"] = True
-                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][8]["title"],PLAYER_DATA["achievements"][8]["explication"],H,W,screen)
-                    
-                    achievement_popup.start()
-                
-                if PLAYER_DATA["achievements"][11]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4 and PLAYER_DATA["purchased_borders"] == 8:
-                    
-                    PLAYER_DATA["achievements"][11]["succeed"] = True
-                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][11]["title"],PLAYER_DATA["achievements"][11]["explication"],H,W,screen)
-                    
-                    achievement_popup.start()
-                save_data("PLAYER_DATA")
+                if item["category"] == "Emotes":
+                    achievement_manager.new_achievement(9)
+
+                if all(list_emotes):
+                    achievement_manager.new_achievement(10)
+
+                if all(list_all):
+                    achievement_manager.new_achievement(11)
     
     # Boutons de pagination
     if total_pages > 1:
@@ -327,13 +308,13 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
     
     # Gestion du clic sur le bouton retour
     if mouse_click and hover_back:
-        return screen, cursor, "home", buttons, achievement_popup
+        return screen, cursor, "home", buttons, achievement_manager
     
-    return screen, cursor, "shop", buttons, achievement_popup
+    return screen, cursor, "shop", buttons, achievement_manager
 
 def toggle_select(item, cursor):
     # Basculer la sélection
-    if item["index"] == PLAYER_DATA["selected_items"][item["category"]]:  # désélectionner
+    if item["category"] != "Emotes" and item["index"] == PLAYER_DATA["selected_items"][item["category"]]:  # désélectionner
         if item["category"] == "Curseurs":
             PLAYER_DATA["selected_items"]["Curseurs"] = None
             cursor = CustomCursor(None)

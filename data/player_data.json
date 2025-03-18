@@ -1,5 +1,5 @@
 {
-  "pseudo": "leuleu",
+  "pseudo": "LeLeu",
   "achievements": [
     {
       "title": "Premier pas",
@@ -33,26 +33,26 @@
     },
     {
       "title": "Aaaaaaah ca change",
-      "explication": "Achetez votre premier clicker",
-      "succeed": true,
+      "explication": "Achetez votre premier curseur",
+      "succeed": false,
       "couleurs": [255, 0, 0]
     },
     {
       "title": "Clickers-mania",
       "explication": "Obtenir tous les clickers",
-      "succeed": true,
+      "succeed": false,
       "couleurs": [0, 255, 255]
     },
     {
       "title": "Quel beau rond !",
       "explication": "Obtenir votre premiere bordure",
-      "succeed": true,
+      "succeed": false,
       "couleurs": [170, 170, 170]
     },
     {
       "title": "Seigneur des anneaux",
       "explication": "Obtenir toutes les bordures",
-      "succeed": true,
+      "succeed": false,
       "couleurs": [148, 0, 211]
     },
     {
@@ -70,7 +70,7 @@
     {
       "title": "Acheteur compulsif",
       "explication": "obtenir tous les items",
-      "succeed": true,
+      "succeed": false,
       "couleurs": [0, 0, 0]
     },
     {
@@ -88,7 +88,7 @@
     {
       "title": "C'est qui le patron ?",
       "explication": "Je sais pas, c'est toi ?",
-      "succeed": true,
+      "succeed": false,
       "couleurs": [0, 0, 0]
     }
   ],
@@ -96,10 +96,9 @@
   "points": 0,
   "selected_items": {
     "Curseurs": null,
-    "Bordures": 13
+    "Bordures": 9,
+    "Emotes": 14
   },
-  "purchased_items": [0, 2, 6, 5, 7, 9, 8, 10, 11, 3, 1, 4, 12],
-  "coins": 97040,
-  "purchased_cursers": 5,
-  "purchased_borders": 9
+  "purchased_items": [0, 2, 6, 5, 7, 9, 8, 10, 11, 3, 1, 4, 12, 14, 13],
+  "coins": 96840
 }
