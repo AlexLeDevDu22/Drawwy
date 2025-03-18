@@ -5,10 +5,8 @@ from shared.utils.common_utils import AchievementPopup
 import pygame
 import random
 
-achievement_popup = None
-def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
+def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement_popup):
 
-    global achievement_popup
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -183,6 +181,9 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
                     item_x + 220, item_y + 130)
             coin_icon_rect = coin_icon.get_rect(center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
             screen.blit(coin_icon, coin_icon_rect)
+
+        if achievement_popup:
+            achievement_popup.draw_if_active()
         
         # Gestion des clics sur les SHOP_ITEMS
         if mouse_click and hover_item:
@@ -202,9 +203,6 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
                 elif item["category"] == "Bordures":
                     PLAYER_DATA["purchased_borders"]+=1
 
-                if achievement_popup:
-                    achievement_popup.draw_if_active()
-
 
                 if PLAYER_DATA["achievements"][5]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 1:
                     
@@ -215,10 +213,6 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
                 
                 save_data("PLAYER_DATA")
                 
-
-
-
-
     
     # Boutons de pagination
     if total_pages > 1:
@@ -301,10 +295,10 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     
     # Gestion du clic sur le bouton retour
     if mouse_click and hover_back:
-        return screen, cursor, "home", buttons
+        return screen, cursor, "home", buttons, achievement_popup
     
     
-    return screen, cursor, "shop", buttons
+    return screen, cursor, "shop", buttons, achievement_popup
 
 def toggle_select(item, cursor):
     # Basculer la sélection

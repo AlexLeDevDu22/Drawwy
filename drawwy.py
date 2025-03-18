@@ -71,6 +71,7 @@ running = True
 # Initialiser scroll_y et total_height
 scroll_y = 0
 total_height = 0
+achievements_popup=None
 
 while running:
     mouse_pos = pygame.mouse.get_pos()
@@ -158,7 +159,7 @@ while running:
             screen, current_page, buttons = credit.show_credit(screen, W, H, mouse_pos, mouse_click, buttons)
         # === ÉCRAN DU SHOP ===
         elif current_page == "shop":
-            screen, cursor, current_page, buttons = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons)
+            screen, cursor, current_page, buttons, achievements_popup = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievements_popup)
 
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)

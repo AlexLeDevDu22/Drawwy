@@ -54,7 +54,7 @@
         {
             "title": "Aaaaaaah ca change",
             "explication": "Achetez votre premier clicker",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 0,
@@ -145,13 +145,13 @@
     "num_game_played": 0,
     "points": 0,
     "selected_items": {
-        "Curseurs": 1,
+        "Curseurs": null,
         "Bordures": 2
     },
     "purchased_items": [
-        
+        0
     ],
     "coins": 98550,
-    "purchased_cursers": 0,
+    "purchased_cursers": 1,
     "purchased_borders": 1
 }
