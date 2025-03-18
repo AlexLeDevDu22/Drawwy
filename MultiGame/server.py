@@ -53,6 +53,7 @@ def handle_disconnect(data=None):
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
             if player.get("sid") == request.sid:
+                print(requests.sid, player)
                 print(f"Joueur {player['pseudo']} déconnecté")
                 players.pop(i)
                 break
@@ -259,13 +260,13 @@ def stop_server():
     # Au cas ou...
     endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
     if endpoints:
-        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["pid"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
+        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
 
     try:
         ts=requests.get("https://api.ngrok.com/tunnel_sessions", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()["tunnel_sessions"]
 
         if ts:
-            requests.post("https://api.ngrok.com/tunnel_sessions/"+ts[0]["pid"]+"/stop", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()
+            requests.post("https://api.ngrok.com/tunnel_sessions/"+ts[0]["id"]+"/stop", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()
     except: pass
     
     ngrok.kill()

@@ -50,13 +50,14 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
     coins = PLAYER_DATA.get("coins", 0)
     
     # Afficher le solde
-    coin_icon = pygame.image.load("assets/icon_coin.png")
-    coin_icon = pygame.transform.scale(coin_icon, (40, 40))
-    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 165, main_panel_y + 72))
-    screen.blit(coin_icon, coin_icon_rect)
-    
     draw_text(str(coins), MEDIUM_FONT, BLACK, screen, 
             main_panel_x + main_panel_width - 120, main_panel_y + 80)
+    
+    coin_icon = pygame.image.load("assets/icon_coin.png")
+    coin_icon = pygame.transform.scale(coin_icon, (40, 40))
+    coin_icon_rect = coin_icon.get_rect(center=(main_panel_x + main_panel_width - 126+MEDIUM_FONT.size(str(coins))[0], main_panel_y + 68))
+    screen.blit(coin_icon, coin_icon_rect)
+    
     
     # Variables statiques pour la pagination et filtrage
     # Utiliser un dictionnaire pour stocker l'état entre les appels
