@@ -211,6 +211,33 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
                     
                     achievement_popup.start()
                 
+                if PLAYER_DATA["achievements"][6]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4:
+                    
+                    PLAYER_DATA["achievements"][6]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][6]["title"],PLAYER_DATA["achievements"][6]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+
+                if PLAYER_DATA["achievements"][7]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 1:
+                    
+                    PLAYER_DATA["achievements"][7]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][7]["title"],PLAYER_DATA["achievements"][7]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+                
+                if PLAYER_DATA["achievements"][8]["succeed"]== False and PLAYER_DATA["purchased_borders"] == 8:
+                    
+                    PLAYER_DATA["achievements"][8]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][8]["title"],PLAYER_DATA["achievements"][8]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+                
+                if PLAYER_DATA["achievements"][11]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 4 and PLAYER_DATA["purchased_borders"] == 8:
+                    
+                    PLAYER_DATA["achievements"][11]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][11]["title"],PLAYER_DATA["achievements"][11]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
                 save_data("PLAYER_DATA")
                 
     
@@ -273,7 +300,7 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons, achievement
     # Bouton retour
     back_width = 180
     back_height = 60
-    back_x = main_panel_x + 50
+    back_x = main_panel_x + main_panel_width- 200
     back_y = main_panel_y + main_panel_height - 100
     
     # Animation de survol

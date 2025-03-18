@@ -43,7 +43,7 @@
         },
         {
             "title": "Perfectionniste",
-            "explication": "Obtenez un score de 90% en parfait",
+            "explication": "Obtenez un score de 90% ",
             "succeed": false,
             "couleurs": [
                 255,
@@ -64,7 +64,7 @@
         {
             "title": "Clickers-mania",
             "explication": "Obtenir tous les clickers",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 255,
@@ -74,7 +74,7 @@
         {
             "title": "Quel beau rond !",
             "explication": "Obtenir votre premiere bordure",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 170,
                 170,
@@ -84,7 +84,7 @@
         {
             "title": "Seigneur des anneaux",
             "explication": "Obtenir toutes les bordures",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 148,
                 0,
@@ -108,6 +108,16 @@
             "couleurs": [
                 0,
                 100,
+                0
+            ]
+        },
+        {
+            "title": "Acheteur compulsif",
+            "explication": "obtenir tous les items",
+            "succeed": true,
+            "couleurs": [
+                0,
+                0,
                 0
             ]
         },
@@ -149,9 +159,20 @@
         "Bordures": 2
     },
     "purchased_items": [
-        0
+        0,
+        1,
+        3,
+        4,
+        2,
+        5,
+        6,
+        7,
+        8,
+        10,
+        9,
+        11
     ],
-    "coins": 98550,
-    "purchased_cursers": 1,
-    "purchased_borders": 1
+    "coins": 95630,
+    "purchased_cursers": 4,
+    "purchased_borders": 8
 }
