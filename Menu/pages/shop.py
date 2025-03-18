@@ -171,11 +171,11 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
         if "rarity" in item:
             # Définir la couleur selon la rareté
             rarity_colors = {
-                "Commun": (150, 150, 150),
-                "Peu commun": (50, 200, 50),
+                "Common": (150, 150, 150),
+                "Uncommon": (50, 200, 50),
                 "Rare": (50, 50, 200),
-                "Épique": (200, 50, 200),
-                "Légendaire": (255, 165, 0)
+                "Epic": (200, 50, 200),
+                "Legendary": (255, 165, 0)
             }
             rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
             
