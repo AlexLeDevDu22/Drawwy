@@ -5,12 +5,6 @@ import random
 from pygame.locals import *
 from pygame import gfxdraw
 from shared.ui.common_ui import *
-# Initialisation
-pygame.init()
-WIDTH, HEIGHT = 1200, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Animation de Score")
-
 
 # Police
 font_large = pygame.font.SysFont('Arial', 36, bold=True)
@@ -396,4 +390,10 @@ def main():
     sys.exit()
 
 if __name__ == "__main__":
+    # Initialisation
+    pygame.init()
+    WIDTH, HEIGHT = 1300, 600
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Animation de Score")
+
     main()

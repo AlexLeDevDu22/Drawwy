@@ -113,7 +113,7 @@ class AvatarManager:
         text_y = rect.y + (rect.height - text_surface.get_height()) // 2 - (2 if hover else 0)
         self.screen.blit(text_surface, (text_x, text_y))
         
-    def handle_event(self, event, mouse_pos, mouse_pressed):
+    def handle_event(self, event, mouse_pos, achievements_manager):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if not self.show_buttons:  # Si pas déjà en mode édition
                 if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
@@ -139,6 +139,10 @@ class AvatarManager:
                     self.is_retracting = True
                     self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
                     save_data("PLAYER_DATA")
+                    #achievement leleu
+                    nom = PLAYER_DATA["pseudo"].lower()
+                    if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
+                        achievements_manager.new_achievement(14)
 
                     return True
 
@@ -180,6 +184,12 @@ class AvatarManager:
                 self.pseudo_start_pos = (self.avatar_start_pos[0] + self.avatar_size//2 - SMALL_FONT.size(PLAYER_DATA["pseudo"])[0]//2, self.avatar_size + 30)
                 nom = PLAYER_DATA["pseudo"].lower()
                 save_data("PLAYER_DATA")
+
+                #achievement leleu
+                nom = PLAYER_DATA["pseudo"].lower()
+                if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
+                    achievements_manager.new_achievement(14)
+
                 return True
             elif event.key == pygame.K_ESCAPE and self.input_text!="":  # Annuler avec ESC
                 self.avatar = self.avatar_original.copy()
