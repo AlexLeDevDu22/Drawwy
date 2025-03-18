@@ -105,7 +105,7 @@ def show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y=0)
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")
     if buttons["back"].check_hover(mouse_pos) and mouse_click:
-        return screen, "achievements", buttons
+        return screen, "home", buttons
     buttons["back"].draw(screen)
 
     return screen, "achievements", buttons

@@ -1,12 +1,14 @@
 from shared.ui.common_ui import *
 from shared.utils.common_utils import draw_text
 from shared.utils.data_manager import *
-
+from shared.utils.common_utils import AchievementPopup
 import pygame
 import random
 
-
+achievement_popup = None
 def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
+
+    global achievement_popup
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
     main_panel_width = 900
@@ -192,7 +194,30 @@ def show_shop(screen,cursor,  W, H, mouse_pos, mouse_click, buttons):
                 coins -= item["price"]
                 PLAYER_DATA["purchased_items"].append(item["index"])
                 PLAYER_DATA["coins"] = coins
+                
+                #ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
+                if item["category"] == "Curseurs":
+                    PLAYER_DATA["purchased_cursers"] +=1
+                elif item["category"] == "Bordures":
+                    PLAYER_DATA["purchased_borders"]+=1
+
+                if achievement_popup:
+                    achievement_popup.draw_if_active()
+
+
+                if PLAYER_DATA["achievements"][5]["succeed"]== False and PLAYER_DATA["purchased_cursers"] == 1:
+                    
+                    PLAYER_DATA["achievements"][5]["succeed"] = True
+                    achievement_popup = AchievementPopup(PLAYER_DATA["achievements"][5]["title"],PLAYER_DATA["achievements"][5]["explication"],H,W,screen)
+                    
+                    achievement_popup.start()
+                
                 save_data("PLAYER_DATA")
+                
+
+
+
+
     
     # Boutons de pagination
     if total_pages > 1:
