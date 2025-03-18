@@ -1,4 +1,4 @@
-import pygame, yaml, json
+import pygame
 import MultiGame.utils.tools as tools
 from shared.tools import apply_circular_mask
 from shared.ui.common_ui import *
@@ -6,6 +6,8 @@ from shared.utils.data_manager import *
 
 try:from pygame_emojis import load_emoji
 except:import pygame.freetype 
+
+import math
 
 def timer(MultiGame):
         
@@ -168,8 +170,8 @@ def drawing(MultiGame):
     MultiGame.pixel_height = (zone_y_max - zone_y_min) // CONFIG["canvas_height"]
     
     #! show
-    pygame.draw.rect(MultiGame.screen, BLACK, MultiGame.canvas_rect, 1)
     MultiGame.screen.blit(MultiGame.CANVAS, (MultiGame.canvas_rect.x, MultiGame.canvas_rect.y))
+    pygame.draw.rect(MultiGame.screen, BLACK, MultiGame.canvas_rect, 1)
 
     #! drawing
     if MultiGame.me["is_drawer"]:
@@ -278,6 +280,9 @@ def chat(MultiGame):
     for event in MultiGame.events:
         if event.type == pygame.MOUSEBUTTONDOWN:
             MultiGame.guess_input_active = input_box.collidepoint(event.pos)
+            if input_box.x+10<=event.pos[0]<=input_box.x+30 and input_box.y+10<=event.pos[1]<=input_box.y+30:
+                MultiGame.show_emotes= not MultiGame.show_emotes
+
         if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
             if event.key == pygame.K_RETURN and MultiGame.guess.strip():
                 tools.emit_sio(MultiGame.SIO, "guess", {"pid": MultiGame.PLAYER_ID,"pseudo":MultiGame.me["pseudo"], "message":MultiGame.guess, "remaining_time":MultiGame.game_remaining_time}) # send message
@@ -299,6 +304,37 @@ def chat(MultiGame):
         MultiGame.screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5+i*20))
     pygame.draw.rect(MultiGame.screen, color, input_box, 2)
 
+    # emotes
+    emote_icon=pygame.image.load("assets/emote_icon.png").convert_alpha()
+    emote_icon=pygame.transform.scale(emote_icon, (20, 20))
+    MultiGame.screen.blit(emote_icon, (input_box.x+10, input_box.y + 10))
+
+    emotes=[e for e in PLAYER_DATA["purchased_items"] if SHOP_ITEMS[e]["category"]=="Emotes"]
+
+    num_emotes_rows=int(math.sqrt(len(emotes)))
+    num_emotes_column=math.ceil(len(emotes)/num_emotes_rows)
+
+    emote_size=50
+    emote_margin=12
+
+    emote_rect_size=(num_emotes_column*(emote_size+emote_margin),
+                     num_emotes_rows*(emote_size+emote_margin))
+    
+    emote_rect= pygame.Rect(input_box.x-emote_rect_size[0]//2,
+                input_box.y-30-(emote_size + emote_margin)*num_emotes_rows,
+                emote_rect_size[0],
+                emote_rect_size[1])
+    
+    if MultiGame.show_emotes:
+        pygame.draw.rect(MultiGame.screen, LIGHT_GRAY, emote_rect, border_radius=15)
+        pygame.draw.rect(MultiGame.screen, BLACK, emote_rect,1, border_radius=15)
+
+        for i,emote in enumerate(emotes):
+            x=emote_rect.x+emote_margin+i%num_emotes_column*(emote_size+emote_margin)-emote_margin
+            y=emote_rect.y+emote_margin+i//num_emotes_column*(emote_size+emote_margin)-emote_margin
+            emote_image=pygame.image.load(SHOP_ITEMS[emote]["image_path"]).convert_alpha()
+            emote_image=pygame.transform.scale(emote_image, (emote_size, emote_size))
+            MultiGame.screen.blit(emote_image, (x,y))
 
     #chat
     y=0.95 * MultiGame.H-60 -len(guess_line)*20

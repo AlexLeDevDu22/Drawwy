@@ -70,7 +70,7 @@ class MultiGame:
             self.guess_input_active=False
             self.guess=""
 
-            self.PLAYERS=[]
+            MultiGame.show_emotes=False
 
             zone_x_min = int(0.2 * self.W)+2    # 20% de la largeur de la fenêtre
             zone_x_max = int(0.8 * self.W)-4    # 60% de la largeur de la fenêtre
@@ -116,7 +116,6 @@ class MultiGame:
                 players(self)
                 sentence(self)
                 drawing(self)
-                chat(self)
                 if self.me["is_drawer"]:
                     #couleurs(self)
                     if self.mouse_down:
@@ -125,6 +124,7 @@ class MultiGame:
                             self.pen_color=color
                     self.color_picker.draw(self.screen)
                     slider_radius(self)
+                chat(self)
                 timer(self)
 
                 self.achievements_manager.draw_popup_if_active(self.screen)
