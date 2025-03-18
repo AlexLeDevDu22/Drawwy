@@ -282,6 +282,8 @@ def chat(MultiGame):
             MultiGame.guess_input_active = input_box.collidepoint(event.pos)
             if input_box.x+10<=event.pos[0]<=input_box.x+30 and input_box.y+10<=event.pos[1]<=input_box.y+30:
                 MultiGame.show_emotes= not MultiGame.show_emotes
+            else:
+                MultiGame.show_emotes=False
 
         if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
             if event.key == pygame.K_RETURN and MultiGame.guess.strip():
