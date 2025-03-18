@@ -95,7 +95,7 @@ def simplify_frames(frames):
 def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
     if reset:
         MultiGame.ALL_FRAMES=[]
-        MultiGame.CANVAS=pygame.Surface((CONFIG["canvas_width"], CONFIG["canvas_height"]))
+        MultiGame.CANVAS=pygame.Surface((MultiGame.canvas_rect.width, MultiGame.canvas_rect.height))
         MultiGame.CANVAS.fill((255,255,255))
 
     current_drawing_color=(0,0,0)
@@ -116,26 +116,23 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
             if "radius" in frame.keys():
                 current_drawing_radius=frame["radius"]
             
-            MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"], frame["y1"], frame["x2"], frame["y2"], current_drawing_color, current_drawing_radius, duration)
+            MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"]*MultiGame.pixel_width, frame["y1"]*MultiGame.pixel_height, frame["x2"]*MultiGame.pixel_width, frame["y2"]**MultiGame.pixel_height, current_drawing_color, current_drawing_radius)
+            time.sleep(duration)
 
         MultiGame.ALL_FRAMES.append(frame)
 
     for frame in new_frames[1]:
         MultiGame.ALL_FRAMES.append(frame)
 
-def draw_brush_line(canvas, x1, y1, x2, y2, color, radius, duration):
+def draw_brush_line(canvas, x1, y1, x2, y2, color, radius):
     """Dessine une ligne épaisse et arrondie entre (x1, y1) et (x2, y2) directement dans canvas"""
-    height = len(canvas)
-    width = len(canvas[0]) if height > 0 else 0
-    
     # Fonction pour dessiner un cercle dans canvas
-    radius=max(radius//4,1)
     # Dessiner la ligne épaisse
-    canvas.draw.line(canvas, color, (x1, y1), (x2, y2), radius*2)
+    pygame.draw.line(canvas, color, (x1, y1), (x2, y2), radius*2)
 
     # Dessiner les extrémités arrondies
-    canvas.draw.circle(canvas, color, (x1, y1), radius)
-    canvas.draw.circle(canvas, color, (x2, y2), radius)
+    pygame.draw.circle(canvas, color, (x1, y1), radius)
+    pygame.draw.circle(canvas, color, (x2, y2), radius) 
 
     #achievement
     if PLAYER_DATA["achievements"][0]["succeed"]== False:

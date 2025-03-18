@@ -156,10 +156,10 @@ function handleConnection() {
 
     if (guess.succeed) {
       for (let i = 0; i < players.length; i++) {
-        if (players[i].id == guess.pid) players[i].found = true;
+        if (players[i].pid == guess.pid) players[i].found = true;
 
         guess.new_points.forEach((point) => {
-          if (players[i].id == point.pid) players[i].points += point.points;
+          if (players[i].pid == point.pid) players[i].points += point.points;
         });
       }
 
@@ -179,7 +179,7 @@ function handleConnection() {
     console.log(players, drawerId);
     addMessageToChat(
       "Nouvelle partie, " +
-        players.find((p) => p.id == drawerId)["pseudo"] +
+        players.find((p) => p.pid == drawerId)["pseudo"] +
         " deviens le dessinateur !",
       "#63ff6c"
     );
@@ -191,10 +191,12 @@ function handleConnection() {
   });
 
   socket.on("player_disconnected", (data) => {
-    console.log("Joueur déconnecté :", data);
-    players = players.filter((player) => player.id !== data.pid);
-    updatePlayerList();
-    addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
+    if (data.pid != myId) {
+      console.log("Joueur déconnecté :", data);
+      players = players.filter((player) => player.pid !== data.pid);
+      updatePlayerList();
+      addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
+    }
   });
 
   // Écouter les mises à jour du jeu
@@ -203,8 +205,11 @@ function handleConnection() {
   });
 }
 
+var isDrawing = false;
 function draw(frames, delay) {
   if (!frames || frames.length === 0) return;
+  while (isDrawing) {}
+  isDrawing = true;
 
   let totalDuration = 1000; // On suppose que ça a pris 1s pour faire tous les traits
   let frameDuration = totalDuration / frames.length; // Temps moyen entre chaque trait
@@ -226,6 +231,8 @@ function draw(frames, delay) {
   } else {
     frames.forEach(drawLine);
   }
+
+  isDrawing = false;
 }
 
 function drawLine(x1, y1, x2, y2, color, radius) {
@@ -261,10 +268,10 @@ function updatePlayerList() {
     playerItem.className = "player-item";
 
     // Add classes based on player status
-    if (player.id == drawerId) {
+    if (player.pid == drawerId) {
       playerItem.classList.add("current-drawer");
     }
-    console.log(player.id, drawerId);
+    console.log(player.pid, drawerId);
 
     if (player.found) {
       playerItem.classList.add("found");
@@ -274,14 +281,14 @@ function updatePlayerList() {
       (player.avatar.type == "emoji"
         ? `
             <div class="avatar" style="background-color: rgb(${player.avatar.color[0]}, ${player.avatar.color[1]}, ${player.avatar.color[2]})">${player.avatar.emoji} </div>`
-        : `<img class="avatar" src="players-avatars/${player.id}.bmp">`) +
+        : `<img class="avatar" src="players-avatars/${player.pid}.bmp">`) +
       `<div class="player-info">
                 <div class="player-name-found">
                     <div class="player-name${
-                      player.id === myId ? " me" : ""
+                      player.pid === myId ? " me" : ""
                     }">${player.pseudo}</div>
                     ${
-                      player.id != drawerId
+                      player.pid != drawerId
                         ? player.found
                           ? '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#63ff6c"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>'
                           : '<svg xmlns="http://www.w3.org/2000/svg" class="player-found-icon" viewBox="0 0 512 512" fill="#333"><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>'
@@ -292,7 +299,7 @@ function updatePlayerList() {
             </div>
             <div>
                 ${
-                  player.id === drawerId
+                  player.pid === drawerId
                     ? '<span class="player-status status-drawing">Dessine</span>'
                     : ""
                 }

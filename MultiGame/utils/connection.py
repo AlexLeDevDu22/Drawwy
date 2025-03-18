@@ -64,11 +64,12 @@ async def handle_connection_client(MultiGame):
     @MultiGame.SIO.on("player_disconnected")
     async def player_disconnected(data):
         for i in range(len(MultiGame.PLAYERS)):
+            print(MultiGame.PLAYERS[i]["pid"], data["pid"])
             if MultiGame.PLAYERS[i]["pid"]==data["pid"]:
                 player=MultiGame.PLAYERS.pop(i)
+                if MultiGame.PLAYER_ID != player["pid"]:
+                    MultiGame.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": CONFIG["bad_color"]})
                 break
-
-        MultiGame.MESSAGES.append({"type":"system","message":player["pseudo"]+" à quitté la partie.", "color": CONFIG["bad_color"]})
 
     @MultiGame.SIO.on("new_game")
     def new_game(data):
@@ -76,14 +77,15 @@ async def handle_connection_client(MultiGame):
         if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER and MultiGame.CANVAS: #save your draw
             tools.save_canvas(MultiGame.CANVAS, f"assets/your_best_draws/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bmp", MultiGame.CURRENT_SENTENCE, True)
 
-        MultiGame.CANVAS=pygame.Surface((CONFIG["canvas_width"], CONFIG["canvas_height"])) #reset canvas
+        MultiGame.CANVAS=pygame.Surface((MultiGame.canvas_rect.width, MultiGame.canvas_rect.height)) #reset canvas
         MultiGame.CANVAS.fill((255,255,255))
         MultiGame.CURRENT_SENTENCE=data["new_sentence"]
         MultiGame.CURRENT_DRAWER=data["drawer_id"]
-        MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+[p["pseudo"] for p in MultiGame.PLAYERS if p["pid"]==MultiGame.CURRENT_DRAWER][0], "color": CONFIG["succeed_color"]})
         MultiGame.ALL_FRAMES=[]
         for i in range(len(MultiGame.PLAYERS)):
             MultiGame.PLAYERS[i]["found"]=False
+            if MultiGame.PLAYERS[i]["pid"]==MultiGame.CURRENT_DRAWER:
+                MultiGame.MESSAGES.append({"type":"system","message":"Nouvelle partie ! C'est le tour de "+MultiGame.PLAYERS[i]["pseudo"], "color": CONFIG["succeed_color"]})
         MultiGame.GAMESTART=datetime.fromisoformat(data["start_time"])
         MultiGame.ROLL_BACK=0
 
@@ -139,14 +141,26 @@ async def handle_connection_client(MultiGame):
 def disconnect(MultiGame):
     global connection_loop
     if MultiGame.connection_loop.is_running():
-        future = asyncio.run_coroutine_threadsafe(MultiGame.SIO.disconnect(), MultiGame.connection_loop)
+        # Arrêter proprement la connexion Socket.IO
+        future = asyncio.run_coroutine_threadsafe(
+            MultiGame.SIO.disconnect(), MultiGame.connection_loop
+        )
         future.result()
-    for task in asyncio.all_tasks(connection_loop):
-        task.cancel()
-    MultiGame.connection_loop.stop()
+
+        # Annuler toutes les tâches en les récupérant dans le bon thread
+        def cancel_tasks(loop):
+            asyncio.set_event_loop(loop)
+            for task in asyncio.all_tasks(loop):
+                task.cancel()
+            loop.stop()
+
+        MultiGame.connection_loop.call_soon_threadsafe(cancel_tasks, MultiGame.connection_loop)
+
+    # Vérifier et arrêter le serveur si nécessaire
     print(MultiGame.server)
     if MultiGame.server:
-        print(555)
         MultiGame.server.stop_server()
+
+    # Attendre la fin du thread de connexion
     MultiGame.connexion_thread.join()
-    print("deco")
+    print("Déconnexion terminée.")

@@ -73,7 +73,25 @@ class MultiGame:
             self.guess=""
 
             self.PLAYERS=[]
+
+            zone_x_min = int(0.2 * self.W)+2    # 20% de la largeur de la fenêtre
+            zone_x_max = int(0.8 * self.W)-4    # 60% de la largeur de la fenêtre
+            zone_y_min = int(0.04 * self.H)+2   # Commence en haut de la fenêtre
+            zone_y_max = int(0.96 * self.H)-4   # Remplie toute la hauteur de la fenêtre
             
+            canvas_width = CONFIG["canvas_width"]
+            canvas_height = CONFIG["canvas_height"]
+
+            # Affichage du CANVAS à l'écran
+            pixel_width = (zone_x_max - zone_x_min) // canvas_width
+            pixel_height = (zone_y_max - zone_y_min) // canvas_height
+            
+            canvas_x = self.W//2-pixel_width*canvas_width//2
+            canvas_w = pixel_width*canvas_width
+            canvas_y = self.H//2-pixel_height*canvas_height//2
+            canvas_h = pixel_height*canvas_height
+            self.canvas_rect=pygame.Rect(canvas_x, canvas_y, canvas_w, canvas_h)
+        
             while 1:
                 clock.tick(CONFIG["fps"])
 
