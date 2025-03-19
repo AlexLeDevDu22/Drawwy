@@ -20,7 +20,7 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage=="exit": 
             return screen, "home"
         elif soloPage =="resultat":
-            return screen, compare_images("mon_dessin.png",)
+            return screen, compare_images("SoloGame/temp/mon_dessin.png"f"assets/soloImages/{theme["path"]}{theme['images'][image]["path"]}",)
                 
 if __name__ == '__main__':
     W, H = pygame.display.Info().current_w, pygame.display.Info().current_h()
