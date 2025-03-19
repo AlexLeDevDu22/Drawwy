@@ -10,6 +10,7 @@ import MultiGame.utils.tools as tools
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 from pyngrok import ngrok
+import shutil
 
 ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
 ngrok_domain = os.getenv("NGROK_DOMAIN")
@@ -57,8 +58,8 @@ def handle_disconnect(data=None):
                 players.pop(i)
                 break
 
-        if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/players-avatars/{player['pid']}.bmp"):
-            os.remove(f"MultiGame/web/players-avatars/{player["pid"]}.bmp")
+        if player["avatar"]["type"] == "matrix" and os.path.exists(f"MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
+            os.remove(f"MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
         
         # Envoyer la mise à jour des joueurs
         emit('player_disconnected', { 
@@ -100,7 +101,7 @@ def handle_join(data):
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "MultiGame/web/players-avatars/"+str(pid)+".bmp", sentences_list[-1], False)
+        tools.save_canvas(data["avatar"]["matrix"], "MultiGame/web/temp-assets/avatars/"+str(pid)+".bmp", sentences_list[-1], False)
     
     # Annoncer le nouveau joueur
     emit('new_player', {
@@ -161,46 +162,53 @@ def handle_roll_back(data_roll_back):
     
     emit('roll_back', roll_back, broadcast=True, skip_sid=request.sid)
 
-@socketio.on('guess')
-def handle_guess(guess):
+@socketio.on('message')
+def handle_message(message):
     global players, drawer_id, guess_list, sentences_list, last_game_start
     
-    list_found = []
-    succeed = False
+    if message["type"]=="guess":
+        list_found = []
+        succeed = False
 
-    guess["type"]="guess"
-    guess["succeed"]=False
-    
-    for i, player in enumerate(players):
-        if guess["pid"]==player["pid"] and player["pid"] != drawer_id:
-            succeed = tools.check_sentences(sentences_list[-1], guess["message"])
-            if succeed and not player["found"]:
-                guess["succeed"]=True
-                # point au founder
-                founder_points = int((guess["remaining_time"] / CONFIG["game_duration"]) * len(players) * CONFIG["points_per_found"])
-                players[i]["points"] += founder_points
-                players[i]["found"] = True
-
-                # Donner des points au dessinateur
-                drawer_points=CONFIG["points_per_found"]
-                for j in range(len(players)):
-                    if players[j]["pid"] == drawer_id:
-                        players[j]["points"] += drawer_points
-                        break
-
-                guess["new_points"]=[{"pid": player["pid"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
+        message["succeed"]=False
         
-        if player["pid"] != drawer_id:
-            print(player["pid"],player["found"])
-            list_found.append(player["found"])
-    
-    guess_list.append(guess)
+        for i, player in enumerate(players):
+            if message["pid"]==player["pid"] and player["pid"] != drawer_id:
+                succeed = tools.check_sentences(sentences_list[-1], message["message"])
+                if succeed and not player["found"]:
+                    message["succeed"]=True
+                    # point au founder
+                    founder_points = int((message["remaining_time"] / CONFIG["game_duration"]) * len(players) * CONFIG["points_per_found"])
+                    players[i]["points"] += founder_points
+                    players[i]["found"] = True
 
-    emit('new_message', guess, broadcast=True) 
+                    # Donner des points au dessinateur
+                    drawer_points=CONFIG["points_per_found"]
+                    for j in range(len(players)):
+                        if players[j]["pid"] == drawer_id:
+                            players[j]["points"] += drawer_points
+                            break
 
-    # Vérifier si tous les joueurs ont trouvé
-    if len(players) > 1 and all(list_found):
-        handle_new_game()
+                    message["new_points"]=[{"pid": player["pid"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
+            
+            if player["pid"] != drawer_id:
+                print(player["pid"],player["found"])
+                list_found.append(player["found"])
+        
+        guess_list.append(message)
+
+        emit('new_message', message, broadcast=True) 
+
+        # Vérifier si tous les joueurs ont trouvé
+        if len(players) > 1 and all(list_found):
+            handle_new_game()
+
+    elif message['type']=="emote":
+        if not os.path.exists("MultiGame/web/temp-assets/emotes/"+message["emote_path"]):
+            if os.path.exists("data/shop/emotes_assets/"+message["emote_path"]):
+                shutil.copyfile("data/shop/emotes_assets/"+message["emote_path"], "MultiGame/web/temp-assets/emotes/"+message["emote_path"])
+
+        emit('new_message', message, broadcast=True)
 
 def flask_worker():
     """Fonction pour exécuter le serveur Flask dans un thread"""
@@ -253,8 +261,8 @@ def stop_server():
     # except Exception as e:
     #     print(f"Erreur lors de l'envoi du message de fermeture: {e}")
 
-    for filename in os.listdir("MultiGame/web/players-avatars"):
-        os.remove(os.path.join("MultiGame/web/players-avatars", filename))
+    for filename in os.listdir("MultiGame/web/temp-assets/avatars"):
+        os.remove(os.path.join("MultiGame/web/temp-assets/avatars", filename))
 
     # Au cas ou...
     endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
