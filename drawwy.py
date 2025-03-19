@@ -76,6 +76,12 @@ achievements_manager=AchievementManager(W,H)
 
 while running:
 
+    #achievement id 14 (leleu)
+    nom = PLAYER_DATA["pseudo"].lower
+    if nom == ("leleu" or nom == "mr leuleu" or nom== "fred leleu" or nom == "frederic leleu"):
+        achievements_manager.new_achievement(14)
+
+
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
 

@@ -3,7 +3,7 @@ import sys
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GRAY = (170, 170, 170)
+GRAY = (140, 140, 140)
 LIGHT_GRAY = (200, 200, 200)
 DARK_BLUE = (65, 105, 225)
 LIGHT_BLUE = (119, 181, 254)
@@ -25,7 +25,6 @@ PINK = (255, 130, 186)
 YELLOW = (255, 223, 97)
 PURPLE = (130, 94, 196)
 LIGHT_PURPLE = (157, 127, 211)
-GRAY = (200, 200, 200)
 GOLD = (255, 215, 0)
 # Police personnalisée
 pygame.init()
