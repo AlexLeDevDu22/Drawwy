@@ -1,4 +1,5 @@
 from shared.ui.common_ui import *
+from shared.utils.common_utils import CustomCursor
 from shared.utils.common_utils import draw_text
 from shared.utils.data_manager import *
 import pygame
