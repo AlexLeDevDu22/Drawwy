@@ -5,10 +5,12 @@ import random
 from pygame.locals import *
 from pygame import gfxdraw
 from shared.ui.common_ui import *
+from shared.tools import get_screen_size
 
 # Police
 font_large = pygame.font.SysFont('Arial', 36, bold=True)
 font_medium = pygame.font.SysFont('Arial', 24)
+WIDHT, HEIGHT = get_screen_size()
 
 def draw_background(surface):
     # Dégradé de fond bleu clair
