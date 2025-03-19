@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
+    "pseudo": "leleu",
+=======
     "pseudo": "Shreck",
+>>>>>>> 01d8ef7e2196ca12d22deed3c2dd608e4f5baa98
     "achievements": [
         {
             "title": "Premier pas",
@@ -144,7 +148,11 @@
         {
             "title": "C'est qui le patron ?",
             "explication": "Je sais pas, c'est toi ?",
+<<<<<<< HEAD
+            "succeed": false,
+=======
             "succeed": true,
+>>>>>>> 01d8ef7e2196ca12d22deed3c2dd608e4f5baa98
             "couleurs": [
                 0,
                 0,
@@ -163,10 +171,26 @@
         0,
         1,
         2,
+<<<<<<< HEAD
+        6,
+        5,
+        7,
+        8,
+        10,
+        9,
+        11,
+        3,
+        4,
+        12,
+        13
+    ],
+    "coins": 94880
+=======
         13,
         3,
         14,
         5
     ],
     "coins": 96150
+>>>>>>> 01d8ef7e2196ca12d22deed3c2dd608e4f5baa98
 }
