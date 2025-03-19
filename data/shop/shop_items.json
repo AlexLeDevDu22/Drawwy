@@ -130,9 +130,18 @@
       "name": "Bravo!",
       "price": 100,
       "description": "Clap clap",
-      "image_path": "data/shop/emotes_assets/aplaudissement.png",
+      "image_path": "data/shop/emotes_assets/applaudissement.png",
       "category": "Emotes",
       "rarity": "Common"
+    },
+    {
+      "index": 15,
+      "name": "Souris!",
+      "price": 100,
+      "description": "couic squick (anime)",
+      "image_path": "data/shop/cursors_assets/cursor_anime_0.png",
+      "category": "Curseurs",
+      "rarity": "Legendary"
     }
   ]
       
