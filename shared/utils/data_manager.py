@@ -23,12 +23,13 @@ def reload():
             PYGAME_EMOTES[i]["type"]="image"
             PYGAME_EMOTES[i]["image_pygame"] = pygame.image.load(PYGAME_EMOTES[i]["image_path"])
         else: # GIF
+            print("ok")
             gif = Image.open(PYGAME_EMOTES[i]["image_path"])
             
             frames = []
             for j in range(gif.n_frames):
                 gif.seek(j)  # Aller à la frame i
-                frame = gif.convert("RGBA").resize((100, 100))  # Redimensionne à 100x100
+                frame = gif.convert("RGBA").resize((150, 150))  # Redimensionne à 100x100
 
                 # Convertir en Surface Pygame
                 mode = frame.mode

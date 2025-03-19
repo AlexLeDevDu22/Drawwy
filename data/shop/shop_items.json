@@ -138,7 +138,7 @@
     "index": 15,
     "name": "Souris!",
     "price": 100,
-    "description": "couic squick (anime)",
+    "description": "couic squick",
     "image_path": "data/shop/cursors_assets/mouse.png",
     "category": "Curseurs",
     "rarity": "Rare"
@@ -146,8 +146,8 @@
   {
     "index": 16,
     "name": "Stonks!",
-    "price": "200",
-    "description": "couic squick (anime)",
+    "price": 200,
+    "description": "Pour le long terme",
     "image_path": "data/shop/emotes_assets/stonks.gif",
     "category": "Emotes",
     "rarity": "Epic"

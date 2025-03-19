@@ -2,6 +2,7 @@ from shared.ui.common_ui import *
 from shared.utils.common_utils import CustomCursor
 from shared.utils.common_utils import draw_text
 from shared.utils.data_manager import *
+import shared.tools as tools
 import pygame
 import random
 
@@ -147,16 +148,14 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
                         border_radius=20)
         
         # Image de l'item
-        try:
+        if item["category"] == "Emotes":
+            tools.show_emote(screen, PYGAME_EMOTES[item["index"]], item_x + 20, item_y + item_height // 2 -50, 100)
+        else:
             item_img = pygame.image.load(item["image_path"])
             item_img = pygame.transform.scale(item_img, (100, 100))
-        except:
-            # Image de remplacement si non trouvée
-            item_img = pygame.Surface((100, 100))
-            item_img.fill((200, 200, 200))
-        
-        img_rect = item_img.get_rect(center=(item_x + 70, item_y + item_height // 2))
-        screen.blit(item_img, img_rect)
+            
+            img_rect = item_img.get_rect(center=(item_x + 70, item_y + item_height // 2))
+            screen.blit(item_img, img_rect)
         
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
@@ -234,6 +233,8 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
 
                 if all(list_all):
                     achievement_manager.new_achievement(11)
+
+                save_data("PLAYER_DATA")
     
     # Boutons de pagination
     if total_pages > 1:

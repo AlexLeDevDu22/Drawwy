@@ -1,6 +1,7 @@
 import socket
 import pygame
 import random
+import time
 
 from shared.ui.elements import Particle
 from shared.ui.common_ui import *
@@ -16,6 +17,14 @@ def is_connected():
 def get_screen_size():
     info_ecran = pygame.display.Info()
     return info_ecran.current_w, info_ecran.current_h
+
+def show_emote(screen,emote, x, y, size):
+        if emote["type"]=="image":
+            emote_img=pygame.transform.scale(emote["image_pygame"], (size, size))
+        else: #GIF
+            current_frame_index=int((time.time() - emote["gif_start_time"])*emote["gif_frame_duration"])%len(emote["gif_frames"])
+            emote_img=pygame.transform.scale(emote["gif_frames"][current_frame_index], (size, size))
+        screen.blit(emote_img, (x,y))
 
 def apply_circular_mask(image):
     """Applique un masque circulaire avec transparence à une image Pygame."""
