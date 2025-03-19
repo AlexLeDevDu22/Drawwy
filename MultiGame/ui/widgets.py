@@ -329,7 +329,7 @@ def chat(MultiGame):
                 break
             emote_size=100
             if os.path.exists("data/shop/emotes_assets/"+mess["emote_path"]):
-                y-=emote_size+24
+                y-=emote_size+25
 
                 emote_container=pygame.Rect(0.83 * MultiGame.W, y, emote_size+20, emote_size+20)
 
@@ -366,7 +366,7 @@ def chat(MultiGame):
                      num_emotes_rows*(emote_size+emote_margin))
     
     emotes_rect= pygame.Rect(input_box.x-emotes_rect_size[0]//2,
-                input_box.y-30-(emote_size + emote_margin)*num_emotes_rows,
+                input_box.y-45-(emote_size + emote_margin)*num_emotes_rows,
                 emotes_rect_size[0],
                 emotes_rect_size[1])
     
