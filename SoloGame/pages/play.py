@@ -86,7 +86,7 @@ class SoloPlay:
             self.achievements_manager.draw_popup_if_active(self.screen)
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
-                pygame.image.save(self.canvas_surf, "mon_dessin.png")  # Sauvegarde du dessin
+                pygame.image.save(self.canvas_surf, "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
                 return
 
             cursor.show(screen, self.mouse_pos)
