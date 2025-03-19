@@ -72,14 +72,15 @@ def check_sentences(phrase1, phrase2):
     return score>CONFIG["sentence_checker_seuil"]
     
 def emit_sio(sio, event, data):
-    try:
-        loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-        loop.create_task(sio.emit(event, data))  # Crée une tâche si la boucle existe
-    except RuntimeError:
-        # Créer une nouvelle boucle si aucune n'existe
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(sio.emit(event, data))  # Exécuter directement l'événement
+    if sio.connected:
+        try:
+            loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
+            loop.create_task(sio.emit(event, data))  # Crée une tâche si la boucle existe
+        except RuntimeError:
+            # Créer une nouvelle boucle si aucune n'existe
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(sio.emit(event, data))  # Exécuter directement l'événement
 
 def simplify_frames(frames):
     

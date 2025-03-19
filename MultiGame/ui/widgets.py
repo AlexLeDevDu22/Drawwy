@@ -336,7 +336,7 @@ def chat(MultiGame):
             if y<min_y+100:
                 break
             emote_size=100
-            y-=emote_size+25
+            y-=emote_size+20
 
             emote_container=pygame.Rect(0.83 * MultiGame.W, y, emote_size+20, emote_size+20)
 
@@ -344,6 +344,8 @@ def chat(MultiGame):
             pygame.draw.rect(MultiGame.screen, BLACK, emote_container, 1, border_radius=12)
 
             show_emote(PYGAME_EMOTES[mess["emote_index"]], emote_container.x+10, emote_container.y+10, emote_size)
+
+            y-=5
 
         # write pseudo
         if mess["type"]=="emote" or (mess["type"]=="guess" and not mess["succeed"]):
@@ -388,7 +390,7 @@ def chat(MultiGame):
             for event in MultiGame.events:
                 if pygame.MOUSEBUTTONDOWN == event.type:
                     if pygame.Rect(x,y,emote_size,emote_size).collidepoint(pygame.mouse.get_pos()):
-                        e_mess = {"type":"emote","pseudo":MultiGame.me["pseudo"],"emote_path": emote["image_path"].split("/")[-1], "emote_index":emote["index"]}
+                        e_mess = {"type":"emote","pid": MultiGame.PLAYER_ID, "pseudo":MultiGame.me["pseudo"],"emote_path": emote["image_path"].split("/")[-1], "emote_index":emote["index"]}
                         tools.emit_sio(MultiGame.SIO, "message", e_mess)
                         MultiGame.MESSAGES.append(e_mess)
                 

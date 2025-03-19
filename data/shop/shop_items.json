@@ -141,6 +141,15 @@
     "description": "couic squick (anime)",
     "image_path": "data/shop/cursors_assets/mouse.png",
     "category": "Curseurs",
-    "rarity": "Legendary"
+    "rarity": "Rare"
+  },
+  {
+    "index": 16,
+    "name": "Stonks!",
+    "price": "200",
+    "description": "couic squick (anime)",
+    "image_path": "data/shop/emotes_assets/stonks.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
   }
 ]

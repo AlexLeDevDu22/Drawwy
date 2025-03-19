@@ -155,8 +155,8 @@
     "num_game_played": 0,
     "points": 0,
     "selected_items": {
-        "Curseurs": 15,
-        "Bordures": 9,
+        "Curseurs": null,
+        "Bordures": 2,
         "Emotes": 14
     },
     "purchased_items": [
