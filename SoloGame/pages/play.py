@@ -87,7 +87,7 @@ class SoloPlay:
 
             if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
                 pygame.image.save(self.canvas_surf, "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
-                return
+                return "resultat"
 
             cursor.show(screen, self.mouse_pos)
             pygame.display.flip()
