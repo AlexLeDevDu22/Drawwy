@@ -1,12 +1,12 @@
 import json
 import yaml
 from dotenv import load_dotenv
+import pygame
+from PIL import Image
+import time
 
 def reload():
-    global PLAYER_DATA
-    global SHOP_ITEMS
-    global SOLO_THEMES
-    global CONFIG
+    global PLAYER_DATA, SHOP_ITEMS, SOLO_THEMES, CONFIG, PYGAME_EMOTES
 
     with open('data/player_data.json', encoding="utf-8") as f:
         PLAYER_DATA = json.load(f)
@@ -16,10 +16,37 @@ def reload():
         SOLO_THEMES = json.load(f)
     with open('config.yaml') as f:
         CONFIG = yaml.safe_load(f)
+    
+    PYGAME_EMOTES = {e["index"] : e for e in SHOP_ITEMS if e["category"] == "Emotes"}
+    for i in PYGAME_EMOTES.keys():
+        if ".gif" not in PYGAME_EMOTES[i]["image_path"]: #image
+            PYGAME_EMOTES[i]["type"]="image"
+            PYGAME_EMOTES[i]["image_pygame"] = pygame.image.load(PYGAME_EMOTES[i]["image_path"])
+        else: # GIF
+            gif = Image.open(PYGAME_EMOTES[i]["image_path"])
+            
+            frames = []
+            for j in range(gif.n_frames):
+                gif.seek(j)  # Aller à la frame i
+                frame = gif.convert("RGBA").resize((100, 100))  # Redimensionne à 100x100
 
+                # Convertir en Surface Pygame
+                mode = frame.mode
+                size = frame.size
+                data = frame.tobytes()
+                pygame_frame = pygame.image.fromstring(data, size, mode)
+                
+                frames.append(pygame_frame)
+
+            PYGAME_EMOTES[i]["type"]="gif"
+            PYGAME_EMOTES[i]["gif_frame_duration"] = gif.info["duration"]/len(frames)
+            PYGAME_EMOTES[i]["gif_frames"] = frames
+            PYGAME_EMOTES[i]["gif_start_time"] = time.time()
+
+            
+                
 def save_data(file):
     global PLAYER_DATA
-    global SHOP_ITEMS
     global SOLO_THEMES
 
     with open(f'data/{file.lower()}.json', 'w', encoding="utf-8") as f:
@@ -32,9 +59,10 @@ def save_data(file):
             raise ValueError
 
 PLAYER_DATA = {}
-SHOP_ITEMS = {}
-SOLO_THEMES = {}
+SHOP_ITEMS = []
+SOLO_THEMES = []
 CONFIG = {}
+PYGAME_EMOTES = {}
 reload()
 
 load_dotenv()

@@ -175,7 +175,7 @@ while running:
 
     achievements_manager.draw_popup_if_active(screen)
 
-    cursor.show(screen, mouse_pos)
+    cursor.show(screen, mouse_pos, True in pygame.mouse.get_pressed())
     
     pygame.display.flip()
     clock.tick(CONFIG["fps"])

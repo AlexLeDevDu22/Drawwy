@@ -2,6 +2,7 @@ from shared.ui.common_ui import *
 from shared.utils.data_manager import *
 
 import pygame
+import os
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, True, color)
@@ -57,3 +58,30 @@ class AchievementManager:
             #dessiner le texte
             draw_text(self.current_achievement["title"],SMALL_FONT,BLACK,screen, 50+anim_offset + self.width // 2, self.H-245 + self.height // 2)
             draw_text(self.current_achievement["explication"],SMALL_FONT,ORANGE,screen, 50+anim_offset + self.width // 2, self.H-205 + self.height // 2)
+
+
+class CustomCursor:
+    def __init__(self, cursor_path):
+        self.custom_cursor = bool(cursor_path)
+        pygame.mouse.set_visible(not self.custom_cursor)
+
+        if self.custom_cursor:
+            self.cursor_default = pygame.transform.scale(
+                pygame.image.load(cursor_path).convert_alpha(), (32, 32)
+            )
+            self.as_pressed_cursor =False
+            clicked_path=cursor_path[:-4] + "_clicked"+cursor_path[-4:]
+            if os.path.exists(clicked_path):
+                self.cursor_pressed = pygame.transform.scale(
+                    pygame.image.load(clicked_path).convert_alpha(), (32, 32)
+                )
+                self.as_pressed_cursor = True
+
+    def show(self, screen, mouse_pos=None, mouse_pressed=False):
+        if self.custom_cursor:
+            if mouse_pos:
+                mouse_x, mouse_y = mouse_pos
+            else:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+            
+            screen.blit(self.cursor_pressed if mouse_pressed and self.as_pressed_cursor else self.cursor_default, (mouse_x, mouse_y))

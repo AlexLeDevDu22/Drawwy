@@ -89,7 +89,7 @@ class SoloPlay:
                 pygame.image.save(self.canvas_surf, "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
                 return "resultat"
 
-            cursor.show(screen, self.mouse_pos)
+            cursor.show(screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()
 
     def define_layout(self, theme, image):

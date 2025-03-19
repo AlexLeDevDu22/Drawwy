@@ -149,7 +149,7 @@ class MultiGame:
                     if event.type == pygame.VIDEORESIZE:
                         self.W, self.H = tools.get_screen_size()
                 
-                cursor.show(self.screen, self.mouse_pos)
+                cursor.show(self.screen, self.mouse_pos, self.mouse_down)
                 pygame.display.flip()
                 
                 self.frame_num=(self.frame_num+1)%CONFIG["fps"]

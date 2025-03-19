@@ -39,6 +39,8 @@ def download_file(url, file_path):
 def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
     """Télécharge récursivement tous les fichiers du repo"""
     contents = repo.get_contents(path)  # Liste des fichiers/dossiers à `path`
+
+    all_paths = []
     
     for content in contents:
         file_path = os.path.join(local_dir, content.path)  # Crée le chemin local
@@ -46,12 +48,16 @@ def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
         if content.type == "dir":  
             # Si c'est un dossier, le créer et continuer récursivement
             os.makedirs(file_path, exist_ok=True)
-            download_repo_contents(repo, content.path, local_dir)  
+            all_paths += download_repo_contents(repo, content.path, local_dir)
+            all_paths.append(file_path)
         
-        elif content.type == "file":  
+        elif content.type == "file":
             # Si c'est un fichier, le télécharger
             print(f"Téléchargement : {content.path}")
             download_file(content.download_url, file_path)
+            all_paths.append(file_path)
+
+    return all_paths
 
 def check_for_shop_updates():
     """Vérifier si une mise à jour est disponible pour le dépôt GitHub"""
@@ -71,8 +77,14 @@ def check_for_shop_updates():
         print("Mise à jour détectée, téléchargement des nouveaux fichiers...")
         
         # Télécharger récursivement tous les fichiers/dossiers
-        download_repo_contents(repo)
-        
+        all_path=download_repo_contents(repo)
+
+        print(all_path)
+        for p in os.listdir(UPDATE_DIR):
+            p=os.path.join(UPDATE_DIR, p)
+            if p not in all_path:
+                os.remove(p)
+
         # Mettre à jour la dernière date de mise à jour
         set_last_update(latest_commit_time)
         print(f"Mise à jour terminée, fichiers téléchargés dans {UPDATE_DIR}")

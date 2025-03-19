@@ -281,6 +281,6 @@ def theme_choicer(screen, cursor):
             quit_button.draw(screen)
         
         # Mettre à jour l'affichage
-        cursor.show(screen, mouse_pos)
+        cursor.show(screen, mouse_pos, True in pygame.mouse.get_pressed())
         pygame.display.flip()
         clock.tick(CONFIG["fps"])

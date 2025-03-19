@@ -33,39 +33,3 @@ BUTTON_FONT = pygame.font.Font(None, 70)
 MEDIUM_FONT = pygame.font.Font(None, 50)
 SMALL_FONT = pygame.font.Font( pygame.font.match_font("segoeuisymbol" if sys.platform.startswith("win") else "dejavusans"), 26)
 VERY_SMALL_FONT = pygame.font.Font(None, 25)
-
-
-class CustomCursor:
-    def __init__(self, cursor_path):
-        self.custom_cursor = bool(cursor_path)
-        pygame.mouse.set_visible(not self.custom_cursor)
-
-        if self.custom_cursor:
-            self.cursor_default = pygame.transform.scale(
-                pygame.image.load(cursor_path).convert_alpha(), (35, 35)
-            )
-            self.cursor = self.cursor_default
-
-            # Si "anime" est dans le nom du fichier, charger un curseur alternatif
-            if "anime" in cursor_path:
-                self.cursor_click = pygame.transform.scale(
-                    pygame.image.load(cursor_path.replace("anime", "click")).convert_alpha(), (35, 35)
-                )
-            else:
-                self.cursor_click = self.cursor_default  # Pas d'animation, reste le même
-
-    def handle_event(self, event):
-        """Change le curseur si 'anime' est dans le nom du fichier"""
-        if self.custom_cursor and "anime" in pygame.image.get_extended():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                self.cursor = self.cursor_click
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.cursor = self.cursor_default
-
-    def show(self, screen, mouse_pos=None):
-        if self.custom_cursor:
-            if mouse_pos:
-                mouse_x, mouse_y = mouse_pos
-            else:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-            screen.blit(self.cursor, (mouse_x, mouse_y))
