@@ -130,7 +130,7 @@
       "name": "Bravo!",
       "price": 100,
       "description": "Clap clap",
-      "image_path": "data/shop/emotes_assets/aplaudissemnt.png",
+      "image_path": "data/shop/emotes_assets/aplaudissement.png",
       "category": "Emotes",
       "rarity": "Common"
     }
