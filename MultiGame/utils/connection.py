@@ -103,7 +103,6 @@ async def handle_connection_client(MultiGame):
                     num_steps+=1
             MultiGame.STEP_NUM=num_steps
 
-
     @MultiGame.SIO.on("new_message")
     def new_message(guess):
         #ajouter à la liste de message
@@ -112,15 +111,16 @@ async def handle_connection_client(MultiGame):
         MultiGame.MESSAGES.append(guess)
         
         #update found and points
-        if guess["succeed"]:
-            for i in range(len(MultiGame.PLAYERS)):
-                if MultiGame.PLAYERS[i]["pid"]==guess["pid"]:
-                    MultiGame.PLAYERS[i]["found"]=True
-        
-            for e in guess["new_points"]:
+        if guess["type"] == "guess":
+            if guess["succeed"]:
                 for i in range(len(MultiGame.PLAYERS)):
-                    if MultiGame.PLAYERS[i]["pid"]==e["pid"]:
-                        MultiGame.PLAYERS[i]["points"]+=e["points"]
+                    if MultiGame.PLAYERS[i]["pid"]==guess["pid"]:
+                        MultiGame.PLAYERS[i]["found"]=True
+            
+                for e in guess["new_points"]:
+                    for i in range(len(MultiGame.PLAYERS)):
+                        if MultiGame.PLAYERS[i]["pid"]==e["pid"]:
+                            MultiGame.PLAYERS[i]["points"]+=e["points"]
 
 
     @MultiGame.SIO.on("roll_back")

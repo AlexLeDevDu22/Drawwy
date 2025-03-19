@@ -115,8 +115,10 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
                 current_drawing_color=frame["color"]
             if "radius" in frame.keys():
                 current_drawing_radius=frame["radius"]
+
+            print(frame)
             
-            MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"]*MultiGame.pixel_width, frame["y1"]*MultiGame.pixel_height, frame["x2"]*MultiGame.pixel_width, frame["y2"]**MultiGame.pixel_height, current_drawing_color, current_drawing_radius)
+            MultiGame.CANVAS=draw_brush_line(MultiGame.CANVAS, frame["x1"]*MultiGame.pixel_width, frame["y1"]*MultiGame.pixel_height, frame["x2"]*MultiGame.pixel_width, frame["y2"]*MultiGame.pixel_height, current_drawing_color, current_drawing_radius)
             time.sleep(duration)
 
         MultiGame.ALL_FRAMES.append(frame)

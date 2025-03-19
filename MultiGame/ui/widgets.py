@@ -8,6 +8,7 @@ try:from pygame_emojis import load_emoji
 except:import pygame.freetype 
 
 import math
+import os
 
 def timer(MultiGame):
         
@@ -276,24 +277,6 @@ def chat(MultiGame):
     font = pygame.font.Font("assets/PermanentMarker.ttf" ,18)
     guess_line=tools.lines_return(MultiGame.guess, font, 0.15 * MultiGame.W)
     input_box = pygame.Rect(0.82 * MultiGame.W, 0.9533 * MultiGame.H-45 -len(guess_line)*20, 0.16 * MultiGame.W, max(40,15+20*len(guess_line)))
-    
-    for event in MultiGame.events:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            MultiGame.guess_input_active = input_box.collidepoint(event.pos)
-            if input_box.x+10<=event.pos[0]<=input_box.x+30 and input_box.y+10<=event.pos[1]<=input_box.y+30:
-                MultiGame.show_emotes= not MultiGame.show_emotes
-            else:
-                MultiGame.show_emotes=False
-
-        if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
-            if event.key == pygame.K_RETURN and MultiGame.guess.strip():
-                tools.emit_sio(MultiGame.SIO, "guess", {"pid": MultiGame.PLAYER_ID,"pseudo":MultiGame.me["pseudo"], "message":MultiGame.guess, "remaining_time":MultiGame.game_remaining_time}) # send message
-                MultiGame.MESSAGES.append({"type":"guess","pseudo":MultiGame.me["pseudo"], "message":MultiGame.guess, "succeed":False})
-                MultiGame.guess=""
-            elif event.key == pygame.K_BACKSPACE:
-                MultiGame.guess = MultiGame.guess[:-1]
-            else:
-                MultiGame.guess += event.unicode
 
     # Mise à jour visuelle
     min_y=0.4083 * MultiGame.H if MultiGame.me["is_drawer"] else 0.1*MultiGame.H
@@ -306,12 +289,72 @@ def chat(MultiGame):
         MultiGame.screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5+i*20))
     pygame.draw.rect(MultiGame.screen, color, input_box, 2)
 
-    # emotes
-    emote_icon=pygame.image.load("assets/emote_icon.png").convert_alpha()
-    emote_icon=pygame.transform.scale(emote_icon, (20, 20))
-    MultiGame.screen.blit(emote_icon, (input_box.x+10, input_box.y + 10))
+   
+    #chat
+    y=0.95 * MultiGame.H-60 -len(guess_line)*20 - 30
 
-    emotes=[e for e in PLAYER_DATA["purchased_items"] if SHOP_ITEMS[e]["category"]=="Emotes"]
+    for mess in MultiGame.MESSAGES[::-1]:
+        if mess["type"]!="emote":
+            font = pygame.font.Font("assets/PermanentMarker.ttf" ,16)
+            if mess["type"]=="guess": 
+                if mess["succeed"]:
+
+                    text=f"{mess['pseudo']} à trouvé (+{mess['new_points'][0]["points"]} points)!"
+                    color=(0,255,0)
+                
+                else:
+
+                    text=mess["message"]
+                    color=(0,0,0)
+
+            else: #systeme message
+                text=mess["message"]
+                color=mess["color"]
+
+            # write the message
+            lines=tools.lines_return(text, font, 0.16 * MultiGame.W)
+
+            for line in lines[::-1]:
+                if y>min_y+16:
+                    y-=19
+
+                    image_texte = font.render ( line, 1 , color)
+                    MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W,y))
+
+            if y<min_y+18:
+                break
+
+        else:
+            if y<min_y+100:
+                break
+            emote_size=100
+            if os.path.exists("data/shop/emotes_assets/"+mess["emote_path"]):
+                y-=emote_size+24
+
+                emote_container=pygame.Rect(0.83 * MultiGame.W, y, emote_size+20, emote_size+20)
+
+                pygame.draw.rect(MultiGame.screen, VERY_LIGHT_BLUE, emote_container, border_radius=12)
+                pygame.draw.rect(MultiGame.screen, BLACK, emote_container, 1, border_radius=12)
+
+                emote_icon=pygame.image.load("data/shop/emotes_assets/"+mess["emote_path"]).convert_alpha()
+                emote_icon=pygame.transform.scale(emote_icon, (emote_size, emote_size))
+                MultiGame.screen.blit(emote_icon, (emote_container.x+10, emote_container.y+10))
+
+        # write pseudo
+        if mess["type"]=="emote" or (mess["type"]=="guess" and not mess["succeed"]):
+            y-=20
+            image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
+            MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W + 30,y))
+
+        y-=10
+
+
+     # emotes
+    emote_icon=pygame.image.load("assets/emote_icon.png").convert_alpha()
+    emote_icon=pygame.transform.scale(emote_icon, (30, 30))
+    MultiGame.screen.blit(emote_icon, (input_box.x+5, input_box.y -35))
+
+    emotes=[SHOP_ITEMS[e] for e in PLAYER_DATA["purchased_items"] if SHOP_ITEMS[e]["category"]=="Emotes"]
 
     num_emotes_rows=int(math.sqrt(len(emotes)))
     num_emotes_column=math.ceil(len(emotes)/num_emotes_rows)
@@ -319,61 +362,48 @@ def chat(MultiGame):
     emote_size=50
     emote_margin=12
 
-    emote_rect_size=(num_emotes_column*(emote_size+emote_margin),
+    emotes_rect_size=(num_emotes_column*(emote_size+emote_margin),
                      num_emotes_rows*(emote_size+emote_margin))
     
-    emote_rect= pygame.Rect(input_box.x-emote_rect_size[0]//2,
+    emotes_rect= pygame.Rect(input_box.x-emotes_rect_size[0]//2,
                 input_box.y-30-(emote_size + emote_margin)*num_emotes_rows,
-                emote_rect_size[0],
-                emote_rect_size[1])
+                emotes_rect_size[0],
+                emotes_rect_size[1])
     
     if MultiGame.show_emotes:
-        pygame.draw.rect(MultiGame.screen, LIGHT_GRAY, emote_rect, border_radius=15)
-        pygame.draw.rect(MultiGame.screen, BLACK, emote_rect,1, border_radius=15)
+        pygame.draw.rect(MultiGame.screen, BEIGE, emotes_rect, border_radius=15)
+        pygame.draw.rect(MultiGame.screen, BLACK, emotes_rect,1, border_radius=15)
 
         for i,emote in enumerate(emotes):
-            x=emote_rect.x+emote_margin+i%num_emotes_column*(emote_size+emote_margin)-emote_margin
-            y=emote_rect.y+emote_margin+i//num_emotes_column*(emote_size+emote_margin)-emote_margin
-            emote_image=pygame.image.load(SHOP_ITEMS[emote]["image_path"]).convert_alpha()
+            x=emotes_rect.x+emote_margin+i%num_emotes_column*(emote_size+emote_margin)-emote_margin//2
+            y=emotes_rect.y+emote_margin+i//num_emotes_column*(emote_size+emote_margin)-emote_margin//2
+            emote_image=pygame.image.load(emote["image_path"]).convert_alpha()
             emote_image=pygame.transform.scale(emote_image, (emote_size, emote_size))
             MultiGame.screen.blit(emote_image, (x,y))
 
-    #chat
-    y=0.95 * MultiGame.H-60 -len(guess_line)*20
+            for event in MultiGame.events:
+                if pygame.MOUSEBUTTONDOWN == event.type:
+                    print(x,y,emote_size,emote_size, pygame.mouse.get_pos())
+                    if pygame.Rect(x,y,emote_size,emote_size).collidepoint(pygame.mouse.get_pos()):
+                        print("gfoo")
+                        tools.emit_sio(MultiGame.SIO, "message", {"type":"emote","pid": MultiGame.PLAYER_ID,"pseudo":MultiGame.me["pseudo"],"emote_path": emote["image_path"].split("/")[-1]})
+                        MultiGame.MESSAGES.append({"type":"emote","pseudo":MultiGame.me["pseudo"], "emote_path":emote["image_path"].split("/")[-1]})
+                
 
-    for mess in MultiGame.MESSAGES[::-1]:
-        font = pygame.font.Font("assets/PermanentMarker.ttf" ,16)
-        if mess["type"]=="guess": 
-            if mess["succeed"]:
-
-                text=f"{mess['pseudo']} à trouvé (+{mess['new_points'][0]["points"]} points)!"
-                color=(0,255,0)
-            
+    for event in MultiGame.events:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            MultiGame.guess_input_active = input_box.collidepoint(event.pos)
+            if input_box.x+5<=event.pos[0]<=input_box.x+40 and input_box.y-40<=event.pos[1]<=input_box.y-5:
+                MultiGame.show_emotes= not MultiGame.show_emotes
             else:
+                MultiGame.show_emotes=False
 
-                text=mess["message"]
-                color=(0,0,0)
-        else: #systeme message
-            text=mess["message"]
-            color=mess["color"]
-
-        # write the message
-        lines=tools.lines_return(text, font, 0.16 * MultiGame.W)
-
-        for line in lines[::-1]:
-            if y>min_y+16:
-                y-=19
-
-                image_texte = font.render ( line, 1 , color)
-                MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W,y))
-        
-        if y<min_y+18:
-            break
-
-        # write pseudo
-        if mess["type"]=="guess" and not mess["succeed"]:
-            y-=20
-            image_texte = font.render ( mess["pseudo"], 1 , (80,80,80) )
-            MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W + 30,y))
-
-        y-=10
+        if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
+            if event.key == pygame.K_RETURN and MultiGame.guess.strip():
+                tools.emit_sio(MultiGame.SIO, "message", {"type":"guess","pid": MultiGame.PLAYER_ID,"pseudo":MultiGame.me["pseudo"], "message":MultiGame.guess, "remaining_time":MultiGame.game_remaining_time}) # send message
+                MultiGame.MESSAGES.append({"type":"guess","pseudo":MultiGame.me["pseudo"], "message":MultiGame.guess, "succeed":False})
+                MultiGame.guess=""
+            elif event.key == pygame.K_BACKSPACE:
+                MultiGame.guess = MultiGame.guess[:-1]
+            else:
+                MultiGame.guess += event.unicode

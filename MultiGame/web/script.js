@@ -144,21 +144,24 @@ function handleConnection() {
     draw(allFrames, false);
   });
 
-  socket.on("new_message", (guess) => {
-    console.log("Nouveau guess :", guess);
-    addMessageToChat(
-      guess.message,
-      guess.succeed ? "#63ff6c" : null,
-      guess.pseudo,
-      guess.pid,
-      guess.succeed
-    );
+  socket.on("new_message", (mess) => {
+    console.log("Nouveau mess :", mess);
+    if (mess.type == "guess")
+      addMessageToChat(
+        mess.message,
+        mess.succeed ? "#63ff6c" : null,
+        mess.pseudo,
+        mess.pid,
+        mess.succeed
+      );
+    else if (mess.type == "emote")
+      addEmoteToChat(mess.emote_path, mess.pseudo, mess.pid);
 
-    if (guess.succeed) {
+    if (mess.succeed) {
       for (let i = 0; i < players.length; i++) {
-        if (players[i].pid == guess.pid) players[i].found = true;
+        if (players[i].pid == mess.pid) players[i].found = true;
 
-        guess.new_points.forEach((point) => {
+        mess.new_points.forEach((point) => {
           if (players[i].pid == point.pid) players[i].points += point.points;
         });
       }
@@ -281,7 +284,7 @@ function updatePlayerList() {
       (player.avatar.type == "emoji"
         ? `
             <div class="avatar" style="background-color: rgb(${player.avatar.color[0]}, ${player.avatar.color[1]}, ${player.avatar.color[2]})">${player.avatar.emoji} </div>`
-        : `<img class="avatar" src="players-avatars/${player.pid}.bmp">`) +
+        : `<img class="avatar" src="temp-assets/avatars/${player.pid}.bmp">`) +
       `<div class="player-info">
                 <div class="player-name-found">
                     <div class="player-name${
@@ -337,6 +340,22 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
 
   chatMessages.appendChild(divMessage);
 
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addEmoteToChat(emotePath, messPseudo, pid) {
+  let pseudo = document.createElement("p");
+  pseudo.textContent = messPseudo;
+  pseudo.className = "chat-pseudo";
+  if (pid == myId) pseudo.classList.add(`my-pseudo`);
+  pseudo.style.marginBottom = "0";
+  chatMessages.appendChild(pseudo);
+
+  const emoteElement = document.createElement("img");
+  emoteElement.src = `temp-assets/emotes/${emotePath}`;
+  emoteElement.alt = emotePath;
+  emoteElement.classList.add("emote");
+  chatMessages.appendChild(emoteElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -434,7 +453,8 @@ loginForm.addEventListener("submit", (e) => {
 // send message
 function sendMessage(message) {
   if (message) {
-    socket.emit("guess", {
+    socket.emit("message", {
+      type: "guess",
       pid: myId,
       pseudo: pseudo,
       message: message,
