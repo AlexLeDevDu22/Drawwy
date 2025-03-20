@@ -23,7 +23,6 @@ def reload():
             PYGAME_EMOTES[i]["type"]="image"
             PYGAME_EMOTES[i]["image_pygame"] = pygame.image.load(PYGAME_EMOTES[i]["image_path"])
         else: # GIF
-            print("ok")
             gif = Image.open(PYGAME_EMOTES[i]["image_path"])
             
             frames = []
