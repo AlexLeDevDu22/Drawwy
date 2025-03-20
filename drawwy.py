@@ -1,11 +1,7 @@
 from Menu.utils.avatar_manager import AvatarManager
 from Menu.ui.elements import *
-from Menu.pages import achievements
 from shared.utils.common_utils import AchievementManager
-from Menu.pages import play
-from Menu.pages import home
-from Menu.pages import credit
-from Menu.pages import shop
+from Menu.pages import play, home, credit, shop, achievements, choice_server
 from shared.utils.common_utils import *
 from shared.utils.data_manager import *
 import Menu.pages.play as play
@@ -157,8 +153,10 @@ while running:
         elif current_page == "Solo":
             soloGame(screen, cursor, achievements_manager)
             current_page = "home"
-        elif current_page == "Multijoueurs":
-            MultiGame(screen, cursor, clock, W, H, achievements_manager)
+        elif current_page=="Select server":
+            screen, current_page, buttons, server_name = choice_server.choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons)
+        elif current_page == "Multi":
+            MultiGame(screen, cursor, clock, W, H, achievements_manager, server_name)
             current_page = "home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":

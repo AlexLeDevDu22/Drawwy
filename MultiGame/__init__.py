@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 class MultiGame:
     
-    def __init__(self,screen, cursor, clock, W,H, achievements_manager):
+    def __init__(self,screen, cursor, clock, W,H, achievements_manager, server_name):
         if not tools.is_connected():
             print( "Désolé, une connexion internet est requise.")
             return
@@ -41,7 +41,7 @@ class MultiGame:
     
         try:
             self.connection_loop=asyncio.new_event_loop()
-            self.connexion_thread=threading.Thread(target=connection.start_connexion, args=(self,))
+            self.connexion_thread=threading.Thread(target=connection.start_connexion, args=(self, server_name,))
             self.connexion_thread.start()
 
             self.game_remaining_time=CONFIG["game_duration"]

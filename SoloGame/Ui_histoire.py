@@ -158,7 +158,6 @@ class SoloGame:
 
         self.screen, self.W, self.H=screen, W,H
         self.connected=False
-        self.server=None
         
         #pen values
         self.pen_color=(0,0,0)
@@ -192,10 +191,6 @@ class SoloGame:
             
             for event in self.events:
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_q and not self.guess_input_active) or event.type == pygame.QUIT:
-                    if self.server:
-                        self.server.stop_server()
-                        time.sleep(0.1)
-                        self.server_thread.join()
                     return
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown=True

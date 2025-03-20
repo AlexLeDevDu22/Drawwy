@@ -18,15 +18,13 @@ def is_connected():
         return False
 
 
-async def test_server():
+async def test_server(server_name):
     try:
         sio=socketio.AsyncClient()
-        await sio.connect(f"https://{CONFIG["servers"]["Mastiff"]["domain"]}")
+        await sio.connect(f"https://{CONFIG["servers"][server_name]["domain"]}")
         return True
     except:
         return False
-    
-asyncio.run(test_server())
 
 def load_bmp_to_matrix(file_path):
     """Charge une image BMP et retourne une matrice de pixels."""

@@ -12,12 +12,11 @@ from flask_socketio import SocketIO, emit
 from pyngrok import ngrok
 import shutil
 
-# Configuration de ngrok
-ngrok.set_auth_token(CONFIG["servers"]["Mastiff"]["auth_token"])
-
 # Initialisation de Flask et SocketIO
 app = Flask(__name__, static_folder='web', static_url_path='/')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading", logger=False, engineio_logger=False, allow_unsafe_werkzeug=True)
+
+server_name=None
 
 # Variables du jeu
 players = []
@@ -214,15 +213,20 @@ def flask_worker():
     """Fonction pour exécuter le serveur Flask dans un thread"""
     socketio.run(app, host='0.0.0.0', port=8765, debug=False, use_reloader=False)
 
-def start_server():
+def start_server(serv_name):
     """Démarre le serveur Flask-SocketIO et Ngrok."""
-    global server_running, http_tunnel, flask_thread, stop_event
+    global server_running, http_tunnel, flask_thread, stop_event, server_name
+
+    server_name = serv_name
     
     # Réinitialiser l'événement d'arrêt
     stop_event.clear()
-    
+
+    # Configuration de ngrok
+    ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
+
     # Exposer le port avec ngrok
-    http_tunnel = ngrok.connect(8765, "http", domain=CONFIG["servers"]["Mastiff"]["domain"], bind_tls=True)
+    http_tunnel = ngrok.connect(8765, "http", domain=CONFIG["servers"][server_name]["domain"], bind_tls=True)
     
     print(f"Serveur accessible via: {http_tunnel.public_url}")
     
@@ -243,7 +247,9 @@ def start_server():
         stop_server()
 def stop_server():
     """Arrête proprement le serveur Flask-SocketIO et Ngrok."""
-    global server_running, http_tunnel, stop_event
+    global server_running, http_tunnel, stop_event, server_name
+
+    if not server_name: return
     
     print("Arrêt du serveur en cours...")
     
@@ -265,11 +271,11 @@ def stop_server():
         os.remove(os.path.join("MultiGame/web/temp-assets/avatars", filename))
 
     # Au cas ou...
-    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+CONFIG["servers"]["Mastiff"]["api"], "Ngrok-Version": "2"}).json()["endpoints"]
-    if endpoints:
-        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+CONFIG["servers"]["Mastiff"]["api"], "Ngrok-Version": "2"})
-
     try:
+        endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+CONFIG["servers"][server_name]["api"], "Ngrok-Version": "2"}).json()["endpoints"]
+        if endpoints:
+            requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+CONFIG["servers"][server_name]["api"], "Ngrok-Version": "2"})
+
         ts=requests.get("https://api.ngrok.com/tunnel_sessions", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()["tunnel_sessions"]
 
         if ts:
@@ -292,4 +298,4 @@ if __name__ == '__main__':
     try:
         start_server()
     except KeyboardInterrupt:
-        stop_server()
+        stop_server(server_name)

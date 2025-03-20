@@ -38,7 +38,7 @@ def play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons):
         # Gérer le clic
         if mouse_click and hover:
             if mode=="Solo" or connected:
-                return screen, mode, buttons
+                return screen, "Solo" if mode=="Solo" else "Select server", buttons
     
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")

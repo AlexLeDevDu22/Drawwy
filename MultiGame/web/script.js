@@ -70,7 +70,7 @@ clearCanvas();
 //* Handle WebSocket connection
 var socket = null;
 function handleConnection() {
-  socket = io(gameConfig.serverUrl);
+  socket = io(document.URL);
 
   socket.on("connect", () => {
     console.log("Connecté au serveur WebSocket !");

@@ -11,14 +11,14 @@ import pygame
 
 connection_loop=None
 
-def start_connexion(MultiGameClass):
+def start_connexion(MultiGameClass, server_name):
     try:
 
-        if not asyncio.run(tools.test_server()):# start the serv
+        if not asyncio.run(tools.test_server(server_name)):# start the serv
             
             import MultiGame.server as server
             MultiGameClass.server=server
-            threading.Thread(target=server.start_server, daemon=True).start()
+            threading.Thread(target=server.start_server, args=(server_name,), daemon=True).start()
 
             while not server.server_running:
                 time.sleep(0.1)
@@ -26,11 +26,11 @@ def start_connexion(MultiGameClass):
         global connection_loop
         connection_loop=asyncio.new_event_loop()
         asyncio.set_event_loop(connection_loop)
-        MultiGameClass.connection_loop.run_until_complete(handle_connection_client(MultiGameClass))
+        MultiGameClass.connection_loop.run_until_complete(handle_connection_client(MultiGameClass, server_name))
     except RuntimeError:
         print("connexion fermé")
 
-async def handle_connection_client(MultiGame):
+async def handle_connection_client(MultiGame, server_name):
 
     MultiGame.SIO = socketio.AsyncClient(logger=True, engineio_logger=True)
     @MultiGame.SIO.event
@@ -104,7 +104,9 @@ async def handle_connection_client(MultiGame):
     def new_message(guess):
         #ajouter à la liste de message
         if guess["pid"] == MultiGame.PLAYER_ID:
-            MultiGame.MESSAGES=MultiGame.MESSAGES[:-1]
+            for i in range(len(MultiGame.MESSAGES)):
+                if MultiGame.MESSAGES[i]["pid"] == guess["pid"]:
+                    MultiGame.MESSAGES.pop(i)
         MultiGame.MESSAGES.append(guess)
         
         #update found and points
@@ -128,7 +130,7 @@ async def handle_connection_client(MultiGame):
             
 
     try:
-        await MultiGame.SIO.connect(f"https://{CONFIG["servers"]["Mastiff"]["domain"]}")
+        await MultiGame.SIO.connect(f"https://{CONFIG["servers"][server_name]["domain"]}")
 
         # Boucle pour écouter et réagir aux messages
         await MultiGame.SIO.wait()
