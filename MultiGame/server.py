@@ -12,12 +12,8 @@ from flask_socketio import SocketIO, emit
 from pyngrok import ngrok
 import shutil
 
-ngrok_token = os.getenv("NGROK_AUTH_TOKEN")
-ngrok_domain = os.getenv("NGROK_DOMAIN")
-ngrok_api = os.getenv("NGROK_API")
-
 # Configuration de ngrok
-ngrok.set_auth_token(ngrok_token)
+ngrok.set_auth_token(CONFIG["servers"]["Mastiff"]["auth_token"])
 
 # Initialisation de Flask et SocketIO
 app = Flask(__name__, static_folder='web', static_url_path='/')
@@ -42,6 +38,10 @@ stop_event = threading.Event()
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
+
+@app.route('/num_players', methods=['GET'])
+def get_player_count():
+    return {"num_players": len(players)}, 200
 
 @socketio.on('connect')
 def handle_connect():
@@ -222,7 +222,7 @@ def start_server():
     stop_event.clear()
     
     # Exposer le port avec ngrok
-    http_tunnel = ngrok.connect(8765, "http", domain=ngrok_domain, bind_tls=True)
+    http_tunnel = ngrok.connect(8765, "http", domain=CONFIG["servers"]["Mastiff"]["domain"], bind_tls=True)
     
     print(f"Serveur accessible via: {http_tunnel.public_url}")
     
@@ -265,9 +265,9 @@ def stop_server():
         os.remove(os.path.join("MultiGame/web/temp-assets/avatars", filename))
 
     # Au cas ou...
-    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
+    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+CONFIG["servers"]["Mastiff"]["api"], "Ngrok-Version": "2"}).json()["endpoints"]
     if endpoints:
-        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
+        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+CONFIG["servers"]["Mastiff"]["api"], "Ngrok-Version": "2"})
 
     try:
         ts=requests.get("https://api.ngrok.com/tunnel_sessions", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()["tunnel_sessions"]

@@ -157,7 +157,7 @@
     "selected_items": {
         "Curseurs": null,
         "Bordures": 2,
-        "Emotes": 14
+        "Emotes": 20
     },
     "purchased_items": [
         0,
@@ -169,7 +169,13 @@
         5,
         15,
         12,
-        16
+        16,
+        19,
+        20,
+        17,
+        18,
+        21,
+        22
     ],
-    "coins": 95750
+    "coins": 94550
 }

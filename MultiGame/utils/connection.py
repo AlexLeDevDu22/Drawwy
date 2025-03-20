@@ -32,9 +32,6 @@ def start_connexion(MultiGameClass):
 
 async def handle_connection_client(MultiGame):
 
-    load_dotenv()
-    NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
-
     MultiGame.SIO = socketio.AsyncClient(logger=True, engineio_logger=True)
     @MultiGame.SIO.event
     async def connect(): #joining the game
@@ -131,7 +128,7 @@ async def handle_connection_client(MultiGame):
             
 
     try:
-        await MultiGame.SIO.connect(f"https://{NGROK_DOMAIN}")
+        await MultiGame.SIO.connect(f"https://{CONFIG["servers"]["Mastiff"]["domain"]}")
 
         # Boucle pour écouter et réagir aux messages
         await MultiGame.SIO.wait()

@@ -19,10 +19,9 @@ def is_connected():
 
 
 async def test_server():
-    NGROK_DOMAIN = os.getenv("NGROK_DOMAIN")
     try:
         sio=socketio.AsyncClient()
-        await sio.connect(f"https://{NGROK_DOMAIN}")
+        await sio.connect(f"https://{CONFIG["servers"]["Mastiff"]["domain"]}")
         return True
     except:
         return False

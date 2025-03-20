@@ -1,10 +1,20 @@
+servers:
+  Mastiff:
+    auth_token: "2j0ZXs82uJ78fmGVfSKxkQ26Nhl_2MiAUCneGVvY4BmQDLMya"
+    domain: "vital-mastiff-publicly.ngrok-free.app"
+    api: "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW"
+
+  Smoothly:
+    auth_token: "2uaepshfgfXbFazHgLVrtGH1IsO_7ABTr6aEWtt6bZksmJf8h"
+    domain: "smoothly-on-hyena.ngrok-free.app"
+    api: "ak_2uafcx7VDVvaUvckKoEWawgK74O"
+
 sentence_checker_seuil: 0.8
 game_duration: 150
 canvas_height: 200
 canvas_width: 200
 points_per_found: 25
 
-emote_size: 100
 gif_ips: 16
 
 fps: 50
