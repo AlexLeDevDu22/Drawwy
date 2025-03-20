@@ -6,6 +6,7 @@ import time
 from shared.ui.elements import Particle
 from shared.ui.common_ui import *
 
+
 def is_connected():
     try:
         # Tente de se connecter à un serveur DNS public (Google)
@@ -13,18 +14,24 @@ def is_connected():
         return True
     except OSError:
         return False
-                
+
+
 def get_screen_size():
     info_ecran = pygame.display.Info()
     return info_ecran.current_w, info_ecran.current_h
 
-def show_emote(screen,emote, x, y, size):
-        if emote["type"]=="image":
-            emote_img=pygame.transform.scale(emote["image_pygame"], (size, size))
-        else: #GIF
-            current_frame_index=int((time.time() - emote["gif_start_time"])*emote["gif_frame_duration"])%len(emote["gif_frames"])
-            emote_img=pygame.transform.scale(emote["gif_frames"][current_frame_index], (size, size))
-        screen.blit(emote_img, (x,y))
+
+def show_emote(screen, emote, x, y, size):
+    if emote["type"] == "image":
+        emote_img = pygame.transform.scale(emote["image_pygame"], (size, size))
+    else:  # GIF
+        current_frame_index = int(
+            (time.time() - emote["gif_start_time"]) * emote["gif_frame_duration"]) % len(
+            emote["gif_frames"])
+        emote_img = pygame.transform.scale(
+            emote["gif_frames"][current_frame_index], (size, size))
+    screen.blit(emote_img, (x, y))
+
 
 def apply_circular_mask(image):
     """Applique un masque circulaire avec transparence à une image Pygame."""
@@ -43,12 +50,23 @@ def apply_circular_mask(image):
     # Appliquer le masque sur l'image
     image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-def generate_particles(n, x1,y1,x2,y2, colors=[SOFT_ORANGE, PASTEL_PINK, PASTEL_GREEN, PASTEL_YELLOW]):
-    particles=[]
+
+def generate_particles(
+    n,
+    x1,
+    y1,
+    x2,
+    y2,
+    colors=[
+        SOFT_ORANGE,
+        PASTEL_PINK,
+        PASTEL_GREEN,
+        PASTEL_YELLOW]):
+    particles = []
     for _ in range(n):
         particles.append(Particle(
-            random.randint(x1,x2),
-            random.randint(y1,y2),
+            random.randint(x1, x2),
+            random.randint(y1, y2),
             random.choice(colors)
         ))
 

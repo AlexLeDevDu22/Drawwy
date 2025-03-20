@@ -10,7 +10,9 @@ with open("tests/gallery/gallery_data.json", "r") as f:
     rooms = json.load(f)
 
 pygame.init()
-screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h))
+screen = pygame.display.set_mode(
+    (pygame.display.Info().current_w,
+     pygame.display.Info().current_h))
 W, H = screen.get_size()
 clock = pygame.time.Clock()
 
@@ -21,18 +23,21 @@ parquet = pygame.image.load("tests/gallery/assets/parquet.jpg").convert()
 
 WALL_SIZE = int(0.8 * H)
 LINE_SIZE = W
-PERSPECTIVE=0.6
+PERSPECTIVE = 0.6
 
 wall = pygame.transform.scale(wall, (WALL_SIZE, WALL_SIZE))
 line = pygame.transform.scale(line, (LINE_SIZE, LINE_SIZE * 0.01))
-parquet = pygame.transform.scale(parquet, (WALL_SIZE, (H-WALL_SIZE)*(1/PERSPECTIVE)))
+parquet = pygame.transform.scale(
+    parquet, (WALL_SIZE, (H - WALL_SIZE) * (1 / PERSPECTIVE)))
 
 # Largeur totale du sol pour permettre le déplacement
-CORRIDOR_WIDTH = int(W+PERSPECTIVE*2*W)
+CORRIDOR_WIDTH = int(W + PERSPECTIVE * 2 * W)
 FLOOR_HEIGHT = int(0.9 * WALL_SIZE)
 
 # --- TRANSFORMATION EN PERSPECTIVE --- #
-cached_parquet=None
+cached_parquet = None
+
+
 def perspective_parquet(parquet, view_pos):
     """Transforme et affiche le sol avec une meilleure gestion de la perspective."""
     global cached_parquet
@@ -47,7 +52,8 @@ def perspective_parquet(parquet, view_pos):
     # Ajustement de l'offset pour correspondre au déplacement horizontal
     offset = -view_pos % parquet.get_width()
     new_surface = pygame.Surface((surface.get_width(), FLOOR_HEIGHT))
-    new_surface.blit(surface, (offset, 0),(0,0,surface.get_width()-offset, FLOOR_HEIGHT))
+    new_surface.blit(surface, (offset, 0),
+                     (0, 0, surface.get_width() - offset, FLOOR_HEIGHT))
 
     # Transformation en perspective (une seule fois si possible)
     if cached_parquet is None:
@@ -73,7 +79,6 @@ def perspective_parquet(parquet, view_pos):
     return cached_parquet
 
 
-
 # Position de la caméra
 view_pos = 0
 
@@ -91,12 +96,14 @@ while True:
 
     # Gestion du déplacement horizontal
     mouse_x, mouse_y = pygame.mouse.get_pos()
-    speed_factor = 1 + (1 - PERSPECTIVE) * 2  # Rend le déplacement plus naturel
+    # Rend le déplacement plus naturel
+    speed_factor = 1 + (1 - PERSPECTIVE) * 2
     if mouse_x < 300:
         view_pos = max(0, view_pos - (300 - mouse_x) / (10 * speed_factor))
         cached_parquet = None
     if mouse_x > W - 300:
-        view_pos = min(CORRIDOR_WIDTH - W, view_pos + (mouse_x - (W - 300)) / (10 * speed_factor))
+        view_pos = min(CORRIDOR_WIDTH - W, view_pos +
+                       (mouse_x - (W - 300)) / (10 * speed_factor))
         cached_parquet = None
 
     # Dessin des murs et du sol
@@ -104,13 +111,19 @@ while True:
         screen.blit(wall, (-(view_pos % WALL_SIZE) + i * WALL_SIZE, 0))
 
     # Affichage du parquet transformé
-    corridor_surface_persp = perspective_parquet(parquet,view_pos)
-    screen.blit(corridor_surface_persp, (0-WALL_SIZE*PERSPECTIVE/2, WALL_SIZE), ((corridor_surface_persp.get_width()-W)//2, 0, W+WALL_SIZE*PERSPECTIVE, FLOOR_HEIGHT))
+    corridor_surface_persp = perspective_parquet(parquet, view_pos)
+    screen.blit(
+        corridor_surface_persp,
+        (0 - WALL_SIZE * PERSPECTIVE / 2,
+         WALL_SIZE),
+        ((corridor_surface_persp.get_width() - W) // 2,
+         0,
+         W + WALL_SIZE * PERSPECTIVE,
+         FLOOR_HEIGHT))
 
     # Affichage de la ligne entre mur et sol
     for i in range(W // WALL_SIZE + 2):
         screen.blit(wall, (-(view_pos % WALL_SIZE) + i * WALL_SIZE, 0))
-
 
     # Affichage du nom de la salle
     text = font.render("Salle des Maîtres", True, (255, 255, 255))

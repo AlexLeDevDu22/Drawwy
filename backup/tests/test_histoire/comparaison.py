@@ -2,15 +2,18 @@ import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
 
+
 def reduce_colors(image, k=16):
     """ Réduit le nombre de couleurs de l'image à k couleurs. """
-    Z = image.reshape((-1, 3))  
-    Z = np.float32(Z)  
+    Z = image.reshape((-1, 3))
+    Z = np.float32(Z)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    _, labels, centers = cv2.kmeans(Z, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-    centers = np.uint8(centers)  
-    result = centers[labels.flatten()].reshape(image.shape)  
+    _, labels, centers = cv2.kmeans(
+        Z, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    centers = np.uint8(centers)
+    result = centers[labels.flatten()].reshape(image.shape)
     return result
+
 
 def compare_images(img1_path, img2_path):
     # Charger les images
@@ -39,6 +42,7 @@ def compare_images(img1_path, img2_path):
     # Calculer la similarité SSIM
     score, _ = ssim(img1_gray, img2_gray, full=True)
     return score * 100
+
 
 # 🔥 Exemple d'utilisation (METTRE LES CHEMINS ABSOLUS)
 img1 = "tests/test_histoire/image1.png"

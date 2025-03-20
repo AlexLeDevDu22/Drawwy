@@ -17,6 +17,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Color Picker")
 clock = pygame.time.Clock()
 
+
 class ColorPicker:
     def __init__(self, x, y, width, height, color_steps=30, dark_steps=15):
         self.rect = pygame.Rect(x, y, width, height)
@@ -33,7 +34,8 @@ class ColorPicker:
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
-                brightness = 1 - (j / (self.dark_steps - 1))  # Assombrissement progressif
+                # Assombrissement progressif
+                brightness = 1 - (j / (self.dark_steps - 1))
                 color = pygame.Color(0)
                 color.hsva = (hue, 100, brightness * 100)
                 row.append(color)
@@ -48,9 +50,9 @@ class ColorPicker:
         for j, row in enumerate(self.colors):
             for i, color in enumerate(row):
                 color_rect = pygame.Rect(
-                    self.rect.x + i * step_w, 
-                    self.rect.y + j * step_h, 
-                    step_w, 
+                    self.rect.x + i * step_w,
+                    self.rect.y + j * step_h,
+                    step_w,
                     step_h
                 )
                 pygame.draw.rect(surface, color, color_rect)
@@ -68,9 +70,12 @@ class ColorPicker:
             i = (x - self.rect.x) // step_w
             j = (y - self.rect.y) // step_h
             self.selected_color = self.colors[j][i]
-            self.selected_pos = (self.rect.x + i * step_w, self.rect.y + j * step_h)
+            self.selected_pos = (
+                self.rect.x + i * step_w,
+                self.rect.y + j * step_h)
             return self.selected_color
         return None
+
 
 # Création du Color Picker
 picker = ColorPicker(100, 100, 600, 300, color_steps=30, dark_steps=15)

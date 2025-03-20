@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
 
+
 def compare_images(img1_path, img2_path):
     # Charger les images
     img1 = cv2.imread(img1_path)
@@ -24,5 +25,5 @@ def compare_images(img1_path, img2_path):
 
     # Calculer la similarité SSIM
     score, _ = ssim(img1_gray, img2_gray, full=True)
-    
+
     return score * 100  # Retourne la similarité en pourcentage

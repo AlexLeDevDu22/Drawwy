@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer, util
 
 model = SentenceTransformer('camembert-base')  # Utilisation de camembert-base
 
+
 def phrases_similaires(phrase1, phrase2):
     if not phrase1 or not phrase2:
         return 0.0
@@ -12,6 +13,7 @@ def phrases_similaires(phrase1, phrase2):
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
     return round(score * 100, 2)
+
 
 # Chargement du fichier JSON
 with open("Max/phrases_droles_v2.json") as f:
@@ -46,13 +48,18 @@ while running:
 
     # Zone de texte pour l'entrée utilisateur
     input_rect = pygame.Rect(400, 500, 480, 40)
-    pygame.draw.rect(screen, "black" if input_active else "gray", input_rect, 2)
-    
+    pygame.draw.rect(
+        screen,
+        "black" if input_active else "gray",
+        input_rect,
+        2)
+
     user_text = font.render(phrase2, True, "black")
     screen.blit(user_text, (input_rect.x + 10, input_rect.y + 10))
 
     # Affichage du score de similarité
-    similarity_text = font.render(f"Correspondance: {similarity_score}%", True, "blue")
+    similarity_text = font.render(
+        f"Correspondance: {similarity_score}%", True, "blue")
     screen.blit(similarity_text, (640 - similarity_text.get_width() // 2, 550))
 
     # Gestion des événements

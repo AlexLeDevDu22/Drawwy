@@ -10,7 +10,9 @@ with open("tests/gallery/gallery_data.json", "r") as f:
     rooms = json.load(f)
 
 pygame.init()
-screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h))
+screen = pygame.display.set_mode(
+    (pygame.display.Info().current_w,
+     pygame.display.Info().current_h))
 W, H = screen.get_size()
 clock = pygame.time.Clock()
 
@@ -28,7 +30,8 @@ PERSPECTIVE = 0.6
 
 wall = pygame.transform.scale(wall, (WALL_SIZE, WALL_SIZE))
 line = pygame.transform.scale(line, (LINE_SIZE, int(LINE_SIZE * 0.01)))
-parquet = pygame.transform.scale(parquet, (WALL_SIZE, int((H - WALL_SIZE) * (1 / PERSPECTIVE))))
+parquet = pygame.transform.scale(
+    parquet, (WALL_SIZE, int((H - WALL_SIZE) * (1 / PERSPECTIVE))))
 
 # Largeur totale du sol pour permettre le déplacement
 CORRIDOR_WIDTH = int(W + PERSPECTIVE * 2 * W)
@@ -45,14 +48,15 @@ def precalculate_parquet_perspectives():
     global cached_perspectives, loading_done, progress
     for offset in range(WALL_SIZE):
         surface = pygame.Surface((CORRIDOR_WIDTH, FLOOR_HEIGHT)).convert()
-        
+
         # Remplissage du sol avec le parquet
         for x in range(0, CORRIDOR_WIDTH, parquet.get_width()):
             surface.blit(parquet, (x, 0))
 
         # Décalage horizontal
         new_surface = pygame.Surface((surface.get_width(), FLOOR_HEIGHT))
-        new_surface.blit(surface, (-offset, 0), (0, 0, surface.get_width() - offset, FLOOR_HEIGHT))
+        new_surface.blit(surface, (-offset, 0),
+                         (0, 0, surface.get_width() - offset, FLOOR_HEIGHT))
 
         # Transformation en perspective
         arr = pygame.surfarray.array3d(new_surface)
@@ -69,7 +73,7 @@ def precalculate_parquet_perspectives():
         transformed = np.transpose(transformed, (1, 0, 2))
 
         cached_perspectives.append(pygame.surfarray.make_surface(transformed))
-        
+
         # Mettre à jour la progression (mais PAS pygame.display.flip() ici)
         progress = offset + 1
 
@@ -86,13 +90,14 @@ while not loading_done:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-            
-    screen.fill((0, 0, 0))  # Fond noir
-    loading_text = font.render(f"Chargement... {progress}/{WALL_SIZE}", True, (255, 255, 255))
-    bar_width = int((progress / WALL_SIZE) * W)  # Barre de progression
-    pygame.draw.rect(screen, (255, 255, 255), (50, H//2 + 50, bar_width, 20))
 
-    screen.blit(loading_text, (W//2 - loading_text.get_width()//2, H//2))
+    screen.fill((0, 0, 0))  # Fond noir
+    loading_text = font.render(
+        f"Chargement... {progress}/{WALL_SIZE}", True, (255, 255, 255))
+    bar_width = int((progress / WALL_SIZE) * W)  # Barre de progression
+    pygame.draw.rect(screen, (255, 255, 255), (50, H // 2 + 50, bar_width, 20))
+
+    screen.blit(loading_text, (W // 2 - loading_text.get_width() // 2, H // 2))
     pygame.display.flip()  # Met à jour l'affichage
     clock.tick(30)  # Éviter une boucle trop rapide
 
@@ -116,7 +121,8 @@ while True:
     if mouse_x < 300:
         view_pos = max(0, view_pos - (300 - mouse_x) / (10 * speed_factor))
     if mouse_x > W - 300:
-        view_pos = min(CORRIDOR_WIDTH - W, view_pos + (mouse_x - (W - 300)) / (10 * speed_factor))
+        view_pos = min(CORRIDOR_WIDTH - W, view_pos +
+                       (mouse_x - (W - 300)) / (10 * speed_factor))
 
     # Dessin des murs
     for i in range(W // WALL_SIZE + 2):
@@ -124,11 +130,18 @@ while True:
 
     # Sélection de la bonne version pré-calculée du parquet
     corridor_surface_persp = cached_perspectives[int(view_pos) % WALL_SIZE]
-    screen.blit(corridor_surface_persp, (-WALL_SIZE * PERSPECTIVE / 2, WALL_SIZE), ((corridor_surface_persp.get_width() - W) // 2, 0, W + int(WALL_SIZE * PERSPECTIVE), FLOOR_HEIGHT))
+    screen.blit(corridor_surface_persp,
+                (-WALL_SIZE * PERSPECTIVE / 2,
+                 WALL_SIZE),
+                ((corridor_surface_persp.get_width() - W) // 2,
+                 0,
+                 W + int(WALL_SIZE * PERSPECTIVE),
+                 FLOOR_HEIGHT))
 
     # Affichage de la ligne entre mur et sol
     for i in range(W // WALL_SIZE + 2):
-        screen.blit(line, (-(view_pos % LINE_SIZE) + i * LINE_SIZE, WALL_SIZE - line.get_height() // 2))
+        screen.blit(line, (-(view_pos % LINE_SIZE) + i *
+                    LINE_SIZE, WALL_SIZE - line.get_height() // 2))
 
     # Affichage du nom de la salle
     text = font.render("Salle des Maîtres", True, (255, 255, 255))

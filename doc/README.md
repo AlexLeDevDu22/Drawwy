@@ -2,6 +2,7 @@ pip freeze > doc/requirements.txt
 
 & doc/install-requirements.ps1
 
+autopep8 --in-place --aggressive --aggressive --recursive . --exclude .venv,.git,.vscode
 
 Si on lance le script pour la première fois sur l'ordi, ya un long chargement
 

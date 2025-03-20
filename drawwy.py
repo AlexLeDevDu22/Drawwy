@@ -32,13 +32,19 @@ screen = pygame.display.set_mode((W, H))
 pygame.display.set_icon(pygame.image.load("assets/icon.png"))
 pygame.display.set_caption("Drawwy")
 
-try:gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
-except:pass
+try:
+    gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
+except BaseException:
+    pass
 
-buttons={}
+buttons = {}
 
 # Créer quelques éléments de dessin flottants
-drawing_elements = [BackgroundElement(random.randint(0, W), random.randint(0, H)) for _ in range(50)]
+drawing_elements = [
+    BackgroundElement(
+        random.randint(
+            0, W), random.randint(
+                0, H)) for _ in range(50)]
 
 # Liste pour stocker les particules
 particles = []
@@ -47,8 +53,8 @@ particles = []
 animation_counter = 0
 title_angle = 0
 
-connected=tools.is_connected()
-last_sec_check_connection=datetime.now().second
+connected = tools.is_connected()
+last_sec_check_connection = datetime.now().second
 
 # État du jeu
 last_current_page = "home"
@@ -58,9 +64,10 @@ current_page = "home"
 avatar_manager = AvatarManager(screen)
 
 if PLAYER_DATA["selected_items"]["Curseurs"]:
-    cursor=CustomCursor(SHOP_ITEMS[PLAYER_DATA["selected_items"]["Curseurs"]]["image_path"])
+    cursor = CustomCursor(
+        SHOP_ITEMS[PLAYER_DATA["selected_items"]["Curseurs"]]["image_path"])
 else:
-    cursor=CustomCursor(None)
+    cursor = CustomCursor(None)
 
 clock = pygame.time.Clock()
 running = True
@@ -68,15 +75,15 @@ running = True
 # Initialiser scroll_y et total_height
 scroll_y = 0
 total_height = 0
-achievements_manager=AchievementManager(W,H)
+achievements_manager = AchievementManager(W, H)
 
 while running:
 
-    #achievement id 14 (leleu)
+    # achievement id 14 (leleu)
     nom = PLAYER_DATA["pseudo"].lower
-    if nom == ("leleu" or nom == "mr leuleu" or nom== "fred leleu" or nom == "frederic leleu"):
+    if nom == ("leleu" or nom == "mr leuleu" or nom ==
+               "fred leleu" or nom == "frederic leleu"):
         achievements_manager.new_achievement(14)
-
 
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False
@@ -100,7 +107,11 @@ while running:
 
     # Mise à jour des particules
     if mouse_click:
-        particles += tools.generate_particles(20, mouse_pos[0] - 30, mouse_pos[1] - 30, mouse_pos[0] + 30, mouse_pos[1] + 30)
+        particles += tools.generate_particles(20,
+                                              mouse_pos[0] - 30,
+                                              mouse_pos[1] - 30,
+                                              mouse_pos[0] + 30,
+                                              mouse_pos[1] + 30)
 
     for particle in particles[:]:
         particle.update()
@@ -146,27 +157,40 @@ while running:
         if current_page == "home":
             animation_counter += 1
             title_angle += 0.02
-            screen, current_page, buttons = home.show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons)
+            screen, current_page, buttons = home.show_home(
+                screen, W, H, mouse_pos, mouse_click, title_angle, buttons)
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
-            screen, current_page, buttons = play.play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons)
+            screen, current_page, buttons = play.play_choicer(
+                screen, W, H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Solo":
             soloGame(screen, cursor, achievements_manager)
             current_page = "home"
-        elif current_page=="Select server":
-            screen, current_page, buttons, server_name = choice_server.choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons)
+        elif current_page == "Select server":
+            screen, current_page, buttons, server_name = choice_server.choice_server(
+                screen, W, H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Multi":
-            MultiGame(screen, cursor, clock, W, H, achievements_manager, server_name)
+            MultiGame(
+                screen,
+                cursor,
+                clock,
+                W,
+                H,
+                achievements_manager,
+                server_name)
             current_page = "home"
         # === ÉCRAN DES SUCCÈS ===
         elif current_page == "achievements":
-            screen, current_page, buttons= achievements.show_achievements(screen, W, H, mouse_pos, mouse_click, buttons, scroll_y)
+            screen, current_page, buttons = achievements.show_achievements(
+                screen, W, H, mouse_pos, mouse_click, buttons, scroll_y)
         # === ÉCRAN DES Crédits ===
         elif current_page == "credits":
-            screen, current_page, buttons = credit.show_credit(screen, W, H, mouse_pos, mouse_click, buttons)
+            screen, current_page, buttons = credit.show_credit(
+                screen, W, H, mouse_pos, mouse_click, buttons)
         # === ÉCRAN DU SHOP ===
         elif current_page == "shop":
-            screen, cursor, current_page, buttons, achievements_manager = shop.show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievements_manager)
+            screen, cursor, current_page, buttons, achievements_manager = shop.show_shop(
+                screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievements_manager)
 
     # Afficher la version
     draw_text("DRAWWY v1.0", VERY_SMALL_FONT, BLACK, screen, 20, H - 30)
@@ -174,7 +198,7 @@ while running:
     achievements_manager.draw_popup_if_active(screen)
 
     cursor.show(screen, mouse_pos, True in pygame.mouse.get_pressed())
-    
+
     pygame.display.flip()
     clock.tick(CONFIG["fps"])
 

@@ -19,7 +19,7 @@ for x in range(palette_width):
         hue = (x / palette_width) * 360  # Teinte (0 à 360°)
         saturation = 100  # Saturation maximale
         value = 100 - (y / palette_height) * 100  # Valeur (luminosité)
-        
+
         color = pygame.Color(0)  # Couleur vide
         color.hsva = (hue, saturation, value, 100)  # Appliquer HSV
 
@@ -35,7 +35,8 @@ while running:
 
     # Affichage de la couleur sélectionnée
     pygame.draw.rect(ecran, selected_color, (width // 2 - 50, 370, 100, 30))
-    pygame.draw.rect(ecran, (0, 0, 0), (width // 2 - 50, 370, 100, 30), 2)  # Bordure
+    pygame.draw.rect(ecran, (0, 0, 0), (width // 2 -
+                     50, 370, 100, 30), 2)  # Bordure
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -44,8 +45,10 @@ while running:
         # Clic pour choisir une couleur
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if palette_x <= mouse_x < palette_x + palette_width and palette_y <= mouse_y < palette_y + palette_height:
-                selected_color = palette_surface.get_at((mouse_x - palette_x, mouse_y - palette_y))
+            if palette_x <= mouse_x < palette_x + \
+                    palette_width and palette_y <= mouse_y < palette_y + palette_height:
+                selected_color = palette_surface.get_at(
+                    (mouse_x - palette_x, mouse_y - palette_y))
 
     pygame.display.flip()
 

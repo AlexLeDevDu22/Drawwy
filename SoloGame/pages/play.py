@@ -7,13 +7,15 @@ from shared.utils.data_manager import *
 from shared.ui.common_ui import *
 from shared.tools import *
 
+
 def get_screen_size():
     info_ecran = pygame.display.Info()
     return info_ecran.current_w, info_ecran.current_h
 
+
 class SoloPlay:
-    def __init__(self, screen,cursor, theme, image, achievements_manager):
-        self.last_mouse_pos = None 
+    def __init__(self, screen, cursor, theme, image, achievements_manager):
+        self.last_mouse_pos = None
 
         self.screen = screen
         self.W, self.H = screen.get_size()
@@ -28,14 +30,19 @@ class SoloPlay:
 
         # On définit les valeurs des rectangles d’interface
         self.define_layout(theme, image)
-        
-        self.color_picker = ColorPicker(self.colors_rect.x, self.colors_rect.y, self.colors_rect.width, self.colors_rect.height)
+
+        self.color_picker = ColorPicker(
+            self.colors_rect.x,
+            self.colors_rect.y,
+            self.colors_rect.width,
+            self.colors_rect.height)
 
         # Canvas persistant (Surface)
-        self.canvas_surf = pygame.Surface((self.canvas_rect.width, self.canvas_rect.height))
+        self.canvas_surf = pygame.Surface(
+            (self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
 
-        self.achievements_manager=achievements_manager
+        self.achievements_manager = achievements_manager
 
         # Boucle principale
         clock = pygame.time.Clock()
@@ -60,7 +67,7 @@ class SoloPlay:
                     self.mouse_pos = event.pos
 
             if self.mouseDown:
-                color=self.color_picker.get_color_at(pygame.mouse.get_pos())
+                color = self.color_picker.get_color_at(pygame.mouse.get_pos())
                 if color:
                     self.pen_color = color
 
@@ -85,16 +92,22 @@ class SoloPlay:
 
             self.achievements_manager.draw_popup_if_active(self.screen)
 
-            if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos):
-                pygame.image.save(self.canvas_surf, "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
-                return "resultat"
+            if self.mouseDown and self.validate_button_rect.collidepoint(
+                    self.mouse_pos):
+                pygame.image.save(
+                    self.canvas_surf,
+                    "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
+                PLAYER_DATA["solo_game_played"] += 1
+                save_data("PLAYER_DATA")
+
+                return "results"
 
             cursor.show(screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()
 
     def define_layout(self, theme, image):
 
-        # Canvas 
+        # Canvas
         self.canvas_rect = pygame.Rect(
             int(0.05 * self.W),    # marge à gauche
             int(0.05 * self.H),    # marge en haut
@@ -102,8 +115,8 @@ class SoloPlay:
             int(0.90 * self.H)     # 90% de la hauteur
         )
 
-        # Palette 
-        palette_width  = int(0.25 * self.W)
+        # Palette
+        palette_width = int(0.25 * self.W)
         palette_height = int(0.30 * self.H)
         self.colors_rect = pygame.Rect(
             self.canvas_rect.right + 10,
@@ -113,7 +126,7 @@ class SoloPlay:
         )
 
         # Le truc qui permet de changer la taille
-        slider_width  = palette_width - 20
+        slider_width = palette_width - 20
         slider_height = int(0.10 * self.H)
         self.slider_rect = pygame.Rect(
             self.canvas_rect.right + 10,
@@ -126,24 +139,35 @@ class SoloPlay:
         validate_button_w = 365
         validate_button_h = 50
         self.validate_button_rect = pygame.Rect(
-            self.slider_rect.left+(self.slider_rect.width-validate_button_w)//2,
-            self.slider_rect.bottom + 10, 
+            self.slider_rect.left + (self.slider_rect.width - validate_button_w) // 2,
+            self.slider_rect.bottom + 10,
             validate_button_w,
             validate_button_h
         )
 
-        self.model=pygame.image.load(f"assets/soloImages/{theme["path"]}{theme['images'][image]["path"]}")
-        model_width= self.W-self.canvas_rect.right-20
-        model_height = self.model.get_height()*model_width//self.model.get_width()
-        self.model = pygame.transform.scale(self.model, (model_width, model_height))
-        self.model_rect=pygame.Rect(self.canvas_rect.right+10, self.validate_button_rect.top +10 + (self.H-self.validate_button_rect.top- model_height)//2, model_width, model_height)
+        self.model = pygame.image.load(
+            f"assets/soloImages/{theme["path"]}{theme['images'][image]["path"]}")
+        model_width = self.W - self.canvas_rect.right - 20
+        model_height = self.model.get_height() * model_width // self.model.get_width()
+        self.model = pygame.transform.scale(
+            self.model, (model_width, model_height))
+        self.model_rect = pygame.Rect(self.canvas_rect.right +
+                                      10, self.validate_button_rect.top +
+                                      10 +
+                                      (self.H -
+                                       self.validate_button_rect.top -
+                                       model_height) //
+                                      2, model_width, model_height)
 
     def draw_canvas(self):
         # Cadre du canvas
         pygame.draw.rect(self.screen, BLACK, self.canvas_rect, 2)
 
         # On blit la Surface du canvas
-        self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
+        self.screen.blit(
+            self.canvas_surf,
+            (self.canvas_rect.x,
+             self.canvas_rect.y))
 
         # Si la souris est enfoncée dans la zone du canvas, on dessine
         if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
@@ -151,22 +175,27 @@ class SoloPlay:
             local_x = self.mouse_pos[0] - self.canvas_rect.x
             local_y = self.mouse_pos[1] - self.canvas_rect.y
             # Dessin d'un cercle
-            
-            pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
-            #achievement
+            pygame.draw.circle(
+                self.canvas_surf,
+                self.pen_color,
+                (local_x,
+                 local_y),
+                self.pen_radius)
+
+            # achievement
             self.achievements_manager.new_achievement(0)
-    
+
     def draw_slider(self):
         """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
-        pygame.draw.rect(self.screen, (220,220,220), self.slider_rect)
+        pygame.draw.rect(self.screen, (220, 220, 220), self.slider_rect)
         pygame.draw.rect(self.screen, BLACK, self.slider_rect, 2)
 
         # Barre du slider
         margin = 15
         line_y = self.slider_rect.centery
         line_start = (self.slider_rect.x + margin, line_y)
-        line_end   = (self.slider_rect.right - margin, line_y)
+        line_end = (self.slider_rect.right - margin, line_y)
         pygame.draw.line(self.screen, BLACK, line_start, line_end, 3)
 
         # Calcul de la position du bouton sur la barre
@@ -186,9 +215,11 @@ class SoloPlay:
             if self.slider_rect.collidepoint(mx, my):
                 # On borne la position entre line_start et line_end
                 knob_x = max(line_start[0], min(mx, line_end[0]))
-                self.pen_radius = int(((knob_x - line_start[0]) / total_width) * max_radius)
+                self.pen_radius = int(
+                    ((knob_x - line_start[0]) / total_width) * max_radius)
                 if self.pen_radius < 1:
                     self.pen_radius = 1
+
     def draw_validate_button(self):
         # Fond du bouton
         pygame.draw.rect(self.screen, (0, 255, 0), self.validate_button_rect)
@@ -198,8 +229,10 @@ class SoloPlay:
         # Texte du bouton
         font = pygame.font.SysFont(None, 30)
         text_surface = font.render("Valider", True, BLACK)
-        text_rect = text_surface.get_rect(center=self.validate_button_rect.center)
+        text_rect = text_surface.get_rect(
+            center=self.validate_button_rect.center)
         self.screen.blit(text_surface, text_rect)
+
 
 if __name__ == '__main__':
     W, H = get_screen_size()

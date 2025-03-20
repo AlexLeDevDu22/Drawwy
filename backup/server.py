@@ -28,7 +28,13 @@ ngrok.set_auth_token(ngrok_token)
 # Initialisation de Flask et SocketIO
 app = Flask(__name__, static_folder='./web', static_url_path='/')
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading", logger=False, engineio_logger=False, allow_unsafe_werkzeug=True)
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="threading",
+    logger=False,
+    engineio_logger=False,
+    allow_unsafe_werkzeug=True)
 
 # Variables du jeu
 players = []
@@ -46,13 +52,17 @@ flask_thread = None
 stop_event = threading.Event()
 
 # Route principale pour servir l'index.html
+
+
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
 
+
 @socketio.on('connect')
 def handle_connect():
     print("Nouveau client connecté")
+
 
 @socketio.on('disconnect')
 def handle_disconnect(data=None):
@@ -65,25 +75,26 @@ def handle_disconnect(data=None):
                 players.pop(i)
                 break
 
-        if player["avatar"]["type"] == "matrix" and os.path.exists(f"web/players-avatars/{player['id']}.bmp"):
+        if player["avatar"]["type"] == "matrix" and os.path.exists(
+                f"web/players-avatars/{player['id']}.bmp"):
             os.remove(f"web/players-avatars/{player["id"]}.bmp")
-        
+
         # Envoyer la mise à jour des joueurs
-        emit('player_disconnected', { 
+        emit('player_disconnected', {
             "pid": player["id"],
             "pseudo": player["pseudo"]
         }, broadcast=True)
-    
+
 
 @socketio.on('join')
 def handle_join(data):
     global players, last_game_start
 
-    if len(players)>0:
-        pid=players[-1]["id"]+1
+    if len(players) > 0:
+        pid = players[-1]["id"] + 1
     else:
-        pid=0
-    
+        pid = 0
+
     # Ajouter le joueur à la liste
     players.append({
         "id": pid,
@@ -93,50 +104,56 @@ def handle_join(data):
         "found": False,
         "sid": request.sid
     })
-    
+
     # Envoyer l'ID du joueur et l'état initial du jeu
-    emit('welcome', {
-        "id": pid,
-        "players": [{"id": p["id"], "pseudo": p["pseudo"], "avatar": p["avatar"], "points": p["points"], "found": p["found"]} for p in players],
-        "sentence": sentences_list[-1],
-        "drawer_id": drawer_id,
-        "all_frames": all_frames,
-        "messages": guess_list,
-        "new_game": last_game_start.isoformat() if len(players)>1 and last_game_start else False,
-        "roll_back": roll_back
-    })
+    emit('welcome',
+         {"id": pid,
+          "players": [{"id": p["id"],
+                       "pseudo": p["pseudo"],
+                       "avatar": p["avatar"],
+                       "points": p["points"],
+                       "found": p["found"]} for p in players],
+          "sentence": sentences_list[-1],
+          "drawer_id": drawer_id,
+          "all_frames": all_frames,
+          "messages": guess_list,
+          "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
+          "roll_back": roll_back})
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
-        tools.save_canvas(data["avatar"]["matrix"], "web/players-avatars/"+str(pid)+".bmp", sentences_list[-1])
-    
+        tools.save_canvas(data["avatar"]["matrix"],
+                          "web/players-avatars/" + str(pid) + ".bmp",
+                          sentences_list[-1])
+
     # Annoncer le nouveau joueur
     emit('new_player', {
-            "id": pid,
-            "pseudo": data["pseudo"],
-            "avatar": data["avatar"],
-            "points": 0, 
-            "found": False
+        "id": pid,
+        "pseudo": data["pseudo"],
+        "avatar": data["avatar"],
+        "points": 0,
+        "found": False
     }, broadcast=True, skip_sid=request.sid)
 
     if len(players) == 2:
         handle_new_game()
 
+
 @socketio.on('game_finished')
 def handle_new_game(data=None):
     global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
-    
+
     guess_list = []
     all_frames = []
     roll_back = 0
     last_game_start = datetime.now()
     sentences_list.append(sentences.new_sentence())
-    
+
     for i in range(len(players)):
         players[i]["found"] = False
-    
+
     # Changer de dessinateur
-    if drawer_id!=-1:
+    if drawer_id != -1:
         for i in range(len(players)):
             if int(players[i]["id"]) == int(drawer_id):
                 drawer_id = players[(i + 1) % len(players)]["id"]
@@ -149,113 +166,134 @@ def handle_new_game(data=None):
         "start_time": last_game_start.isoformat(),
         "new_sentence": sentences_list[-1]
     }, broadcast=True)
-    
+
 
 @socketio.on('draw')
 def handle_draw(frames):
     global all_frames
-    
+
     # Mise à jour du dessin
     all_frames += frames
-    
+
     # Envoyer la mise à jour
     emit('draw', frames, broadcast=True, skip_sid=request.sid)
+
 
 @socketio.on('roll_back')
 def handle_roll_back(data_roll_back):
     global roll_back
-    
+
     roll_back = data_roll_back
-    
+
     emit('roll_back', roll_back, broadcast=True, skip_sid=request.sid)
+
 
 @socketio.on('guess')
 def handle_guess(guess):
     global players, drawer_id, guess_list, sentences_list, last_game_start
-    
+
     list_found = []
     succeed = False
     mess = None
 
-    guess["succeed"]=False
-    guess["type"]="guess"
-    
+    guess["succeed"] = False
+    guess["type"] = "guess"
+
     for i, player in enumerate(players):
-        if guess["pid"]==player["id"] and player["id"] != drawer_id:
-            succeed = tools.check_sentences(sentences_list[-1], guess["message"])
+        if guess["pid"] == player["id"] and player["id"] != drawer_id:
+            succeed = tools.check_sentences(
+                sentences_list[-1], guess["message"])
             if succeed and not player["found"]:
-                guess["succeed"]=True
+                guess["succeed"] = True
                 # point au founder
-                founder_points = int((guess["remaining_time"] / config["game_duration"]) * len(players) * config["points_per_found"])
+                founder_points = int(
+                    (guess["remaining_time"] /
+                     config["game_duration"]) *
+                    len(players) *
+                    config["points_per_found"])
                 players[i]["points"] += founder_points
                 players[i]["found"] = True
 
                 # Donner des points au dessinateur
-                drawer_points=config["points_per_found"]
+                drawer_points = config["points_per_found"]
                 for j in range(len(players)):
                     if players[j]["id"] == drawer_id:
                         players[j]["points"] += drawer_points
                         break
 
-                guess["new_points"]=[{"pid": player["id"], "points": founder_points}, {"pid": drawer_id, "points": drawer_points}]
+                guess["new_points"] = [{"pid": player["id"], "points": founder_points}, {
+                    "pid": drawer_id, "points": drawer_points}]
             break
-        
+
         if player["id"] != drawer_id:
             list_found.append(player["found"])
-    
+
     guess_list.append(mess)
 
-    emit('new_message', guess, broadcast=True) 
+    emit('new_message', guess, broadcast=True)
 
     # Vérifier si tous les joueurs ont trouvé
     if len(players) > 1 and all(list_found):
         handle_new_game()
 
+
 def flask_worker():
     """Fonction pour exécuter le serveur Flask dans un thread"""
-    socketio.run(app, host='0.0.0.0', port=8765, debug=False, use_reloader=False)
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=8765,
+        debug=False,
+        use_reloader=False)
+
 
 def start_server():
     """Démarre le serveur Flask-SocketIO et Ngrok."""
     global server_running, http_tunnel, flask_thread, stop_event
-    
+
     # Réinitialiser l'événement d'arrêt
     stop_event.clear()
-    
+
     # Exposer le port avec ngrok
-    http_tunnel = ngrok.connect(8765, "http", domain=ngrok_domain, bind_tls=True)
-    
+    http_tunnel = ngrok.connect(
+        8765,
+        "http",
+        domain=ngrok_domain,
+        bind_tls=True)
+
     print(f"Serveur accessible via: {http_tunnel.public_url}")
-    
+
     try:
         # Démarrer Flask dans un thread séparé
         flask_thread = threading.Thread(target=flask_worker)
         flask_thread.daemon = True
         flask_thread.start()
-        
+
         # Marquer le serveur comme en cours d'exécution
         server_running = True
-        
+
         # Attendre que le serveur soit arrêté
         while not stop_event.is_set() and flask_thread.is_alive():
             time.sleep(0.5)
 
     except KeyboardInterrupt:
         stop_server()
+
+
 def stop_server():
     """Arrête proprement le serveur Flask-SocketIO et Ngrok."""
     global server_running, http_tunnel, stop_event
-    
+
     print("Arrêt du serveur en cours...")
-    
+
     # Signaler l'arrêt
     stop_event.set()
-    
+
     # Déconnecter ngrok
     if http_tunnel:
         print("Fermeture du tunnel ngrok...")
         ngrok.disconnect(http_tunnel.public_url)
-    
+
     # Signaler aux clients la fermeture du serveur
     # try:
     #     emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
@@ -266,26 +304,55 @@ def stop_server():
         os.remove(os.path.join("web/players-avatars", filename))
 
     # Au cas ou...
-    endpoints=requests.get("https://api.ngrok.com/endpoints", headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"}).json()["endpoints"]
+    endpoints = requests.get(
+        "https://api.ngrok.com/endpoints",
+        headers={
+            "Authorization": "Bearer " +
+            ngrok_api,
+            "Ngrok-Version": "2"}).json()["endpoints"]
     if endpoints:
-        requests.delete("https://api.ngrok.com/endpoints/"+endpoints[0]["id"], headers={"Authorization": "Bearer "+ngrok_api, "Ngrok-Version": "2"})
+        requests.delete(
+            "https://api.ngrok.com/endpoints/" +
+            endpoints[0]["id"],
+            headers={
+                "Authorization": "Bearer " +
+                ngrok_api,
+                "Ngrok-Version": "2"})
 
     try:
-        ts=requests.get("https://api.ngrok.com/tunnel_sessions", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()["tunnel_sessions"]
+        ts = requests.get(
+            "https://api.ngrok.com/tunnel_sessions",
+            headers={
+                "Authorization": "Bearer " +
+                "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW",
+                "Content-Type": "application/json",
+                "Ngrok-Version": "2"},
+            json={}).json()["tunnel_sessions"]
 
         if ts:
-            requests.post("https://api.ngrok.com/tunnel_sessions/"+ts[0]["id"]+"/stop", headers={"Authorization": "Bearer "+"2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW", "Content-Type": "application/json", "Ngrok-Version": "2"}, json={}).json()
-    except: pass
-    
+            requests.post(
+                "https://api.ngrok.com/tunnel_sessions/" +
+                ts[0]["id"] +
+                "/stop",
+                headers={
+                    "Authorization": "Bearer " +
+                    "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW",
+                    "Content-Type": "application/json",
+                    "Ngrok-Version": "2"},
+                json={}).json()
+    except BaseException:
+        pass
+
     ngrok.kill()
 
     from pyngrok import ngrok as ngrok2
     ngrok2.get_tunnels()
-    
+
     # Marquer le serveur comme arrêté
     server_running = False
-    
+
     print("Serveur arrêté avec succès.")
+
 
 # Fonction pour être compatible avec un import et un lancement direct
 if __name__ == '__main__':
