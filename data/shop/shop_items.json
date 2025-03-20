@@ -138,7 +138,7 @@
     "index": 15,
     "name": "Souris!",
     "price": 100,
-    "description": "couic squick (anime)",
+    "description": "couic squick",
     "image_path": "data/shop/cursors_assets/mouse.png",
     "category": "Curseurs",
     "rarity": "Rare"
@@ -146,9 +146,63 @@
   {
     "index": 16,
     "name": "Stonks!",
-    "price": "200",
-    "description": "couic squick (anime)",
+    "price": 200,
+    "description": "Pour une rentabilité excepionnel!",
     "image_path": "data/shop/emotes_assets/stonks.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 17,
+    "name": "This is fine !",
+    "price": 200,
+    "description": "Tout va tres bien",
+    "image_path": "data/shop/emotes_assets/This_is_fine.png",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 18,
+    "name": " Nyan cat ",
+    "price": 200,
+    "description": "Un ptit chat trognon ",
+    "image_path": "data/shop/emotes_assets/Nyan_cat.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 19,
+    "name": " Homer ",
+    "price": 200,
+    "description": "...",
+    "image_path": "data/shop/emotes_assets/homer.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 19,
+    "name": " La marche du canard ",
+    "price": 200,
+    "description": "...",
+    "image_path": "data/shop/emotes_assets/duck.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 20,
+    "name": " Pepe the frog ",
+    "price": 200,
+    "description": "...",
+    "image_path": "data/shop/emotes_assets/pepe_the_frog.gif",
+    "category": "Emotes",
+    "rarity": "Epic"
+  },
+  {
+    "index": 21,
+    "name": "Siuuu",
+    "price": 200,
+    "description": "...",
+    "image_path": "data/shop/emotes_assets/siuuu.gif",
     "category": "Emotes",
     "rarity": "Epic"
   }

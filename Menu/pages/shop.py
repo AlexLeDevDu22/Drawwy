@@ -188,7 +188,7 @@ def show_shop(screen, cursor, W, H, mouse_pos, mouse_click, buttons, achievement
             draw_text(status_text, SMALL_FONT, status_color, screen,
                     item_x + 220, item_y + 130)
         else:
-            price_color = (0, 100, 0) if coins >= item["price"] else (150, 0, 0)
+            price_color = (0, 100, 0) if coins >= int(item["price"]) else (150, 0, 0)
             draw_text(str(item['price']), SMALL_FONT, price_color, screen,
                     item_x + 220, item_y + 130)
             coin_icon_rect = coin_icon.get_rect(center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
