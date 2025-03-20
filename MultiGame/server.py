@@ -9,8 +9,8 @@ import MultiGame.utils.sentences as sentences
 import MultiGame.utils.tools as tools
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
-from pyngrok import ngrok
 import shutil
+from pyngrok import ngrok
 
 # Initialisation de Flask et SocketIO
 app = Flask(__name__, static_folder='web', static_url_path='/')
@@ -223,7 +223,9 @@ def start_server(serv_name):
     stop_event.clear()
 
     # Configuration de ngrok
+    from pyngrok import ngrok
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
+    ngrok.set_api_key(CONFIG["servers"][server_name]["api"])
 
     # Exposer le port avec ngrok
     http_tunnel = ngrok.connect(8765, "http", domain=CONFIG["servers"][server_name]["domain"], bind_tls=True)

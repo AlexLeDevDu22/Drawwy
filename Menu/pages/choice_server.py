@@ -10,12 +10,12 @@ def set_player_count(name, server_url):
     """Récupère le nombre de joueurs connectés sur un serveur."""
     global players_per_server
     try:
-        response = requests.get(server_url, timeout=2)
+        response = requests.get(server_url+ "/num_players", timeout=4)
         if response.status_code == 200:
-            players_per_server[name] = response.json().get("player_count", "")
+            players_per_server[name] = int(response.json().get("num_players", 0))
+            return
     except: pass
-    players_per_server[name] = ""
-
+    players_per_server[name] = 0
 
 def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
     global players_per_server
@@ -39,8 +39,8 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
         hover = server_rect.collidepoint(mouse_pos) and connected
         
         # Récupérer le nombre de joueurs
-        if not players_per_server:
-            players_per_server="?"
+        if players_per_server[server_name] is None:
+            players_per_server[server_name]=-1
             threading.Thread(target=set_player_count, args=(server_name, "https://"+server["domain"],)).start()
             
         # Dessiner l'ombre
@@ -57,7 +57,12 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
                     server_x + server_width // 2, servers_y + 50)
 
         # Afficher le nombre de joueurs
-        draw_text(f"{players_per_server[server_name]} joueurs" if players_per_server[server_name] else "", SMALL_FONT, DARK_GRAY, screen, 
+        if type(players_per_server[server_name]) == int and players_per_server[server_name] < 8:
+            color = GREEN
+        else:
+            color = RED
+            
+        draw_text(f"{players_per_server[server_name]} joueurs" if players_per_server[server_name] > 0 else "", SMALL_FONT, color, screen, 
                     server_x + server_width // 2, servers_y + 130)
         
         # Gérer le clic
