@@ -241,7 +241,7 @@ function draw(frames, delay) {
 function drawLine(x1, y1, x2, y2, color, radius) {
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
-  ctx.lineWidth = 1; // Adapter l'épaisseur du trait
+  ctx.lineWidth = radius * 2; // Adapter l'épaisseur du trait
 
   // Tracer une ligne entre x1 et x2
   ctx.beginPath();
@@ -251,10 +251,10 @@ function drawLine(x1, y1, x2, y2, color, radius) {
 
   // Ajouter des cercles aux extrémités pour lisser et bien remplir
   ctx.beginPath();
-  ctx.arc(x1, y1, Math.max(1, radius / 4), 0, 2 * Math.PI);
+  ctx.arc(x1, y1, Math.max(1, radius), 0, 2 * Math.PI);
   ctx.fill(); // Remplir le cercle
   ctx.beginPath();
-  ctx.arc(x2, y2, Math.max(1, radius / 4), 0, 2 * Math.PI);
+  ctx.arc(x2, y2, Math.max(1, radius), 0, 2 * Math.PI);
   ctx.fill(); // Remplir le cercle
 }
 
