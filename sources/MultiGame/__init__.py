@@ -152,10 +152,9 @@ class MultiGame:
 
                 self.achievements_manager.draw_popup_if_active(self.screen)
 
-                if not self.connected:
-                    font = pygame.font.Font("assets/PermanentMarker.ttf", 20)
-                    text = font.render(
-                        "Connexion au serveur...", True, (0, 0, 0))
+                if not self.connected or len(self.PLAYERS) == 1:
+                    text = SMALL_FONT.render(
+                        "Connexion au serveur..." if not self.connected else "En attente de joueurs...", True, (0, 0, 0))
                     self.screen.blit(
                         text,
                         text.get_rect(

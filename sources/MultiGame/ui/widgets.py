@@ -335,7 +335,7 @@ def drawing(MultiGame):
 
                             # Générer les points entre les deux
                             MultiGame.CANVAS = tools.draw_brush_line(
-                                MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius * MultiGame.pixel_width)
+                                MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius)
                             frame = {
                                 "type": "line",
                                 "x1": x1 // MultiGame.pixel_width,

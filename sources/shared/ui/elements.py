@@ -123,23 +123,35 @@ class Particle:
                 self.size))
 
 
+import pygame
+
+WHITE = (255, 255, 255)  # Définition du blanc
+
 class ColorPicker:
-    def __init__(self, x, y, width, height, color_steps=30, dark_steps=15):
+    def __init__(self, x, y, width, height, color_steps=30, dark_steps=10):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_steps = color_steps  # Beaucoup plus de teintes
-        self.dark_steps = dark_steps  # Plus de niveaux d'assombrissement
+        self.color_steps = color_steps  # Nombre de teintes
+        self.dark_steps = dark_steps  # Niveaux d'assombrissement
         self.colors = self.generate_colors()
         self.selected_color = None
         self.selected_pos = None
 
     def generate_colors(self):
         colors = []
+
+        # Ajout d'une ligne de blanc et gris au-dessus
+        grayscale_row = []
+        for i in range(self.color_steps):
+            gray_value = int(255 * (i / (self.color_steps - 1)))
+            grayscale_row.append(pygame.Color(gray_value, gray_value, gray_value))
+        colors.append(grayscale_row)
+
+        # Génération des couleurs normales
         for j in range(self.dark_steps):
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
-                # Assombrissement progressif
-                brightness = 1 - (j / (self.dark_steps - 1))
+                brightness = 0.3 + (1 - (j / (self.dark_steps - 1))) * 0.7  # Évite d'aller à 0% de luminosité
                 color = pygame.Color(0)
                 color.hsva = (hue, 100, brightness * 100)
                 row.append(color)
@@ -148,7 +160,7 @@ class ColorPicker:
 
     def draw(self, surface):
         step_w = self.rect.width // self.color_steps
-        step_h = self.rect.height // self.dark_steps
+        step_h = self.rect.height // (self.dark_steps + 1)  # +1 pour la ligne de blanc/gris
 
         # Dessiner la grille de couleurs
         for j, row in enumerate(self.colors):
@@ -170,7 +182,7 @@ class ColorPicker:
         x, y = pos
         if self.rect.collidepoint(x, y):
             step_w = self.rect.width // self.color_steps
-            step_h = self.rect.height // self.dark_steps
+            step_h = self.rect.height // (self.dark_steps + 1)  # +1 pour la ligne de blanc/gris
             i = (x - self.rect.x) // step_w
             j = (y - self.rect.y) // step_h
             try:

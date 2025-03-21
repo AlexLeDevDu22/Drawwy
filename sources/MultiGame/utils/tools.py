@@ -136,7 +136,7 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
                 frame["x2"] * MultiGame.pixel_width,
                 frame["y2"] * MultiGame.pixel_height,
                 current_drawing_color,
-                current_drawing_radius)
+                current_drawing_radius * MultiGame.pixel_height)
             time.sleep(duration)
 
         MultiGame.ALL_FRAMES.append(frame)
