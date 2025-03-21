@@ -138,6 +138,7 @@ async def handle_connection_client(MultiGame, server_name):
             for i in range(len(MultiGame.MESSAGES)):
                 if MultiGame.MESSAGES[i]["type"] != "system" and MultiGame.MESSAGES[i]["pid"] == guess["pid"]:
                     MultiGame.MESSAGES.pop(i)
+                    break
         MultiGame.MESSAGES.append(guess)
 
         # update found and points

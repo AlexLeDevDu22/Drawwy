@@ -332,11 +332,10 @@ def drawing(MultiGame):
                         if MultiGame.last_canvas_click and MultiGame.last_canvas_click != (
                                 x2, y2):
                             x1, y1 = MultiGame.last_canvas_click
-                            print(x1, y1, x2, y2)
 
                             # Générer les points entre les deux
                             MultiGame.CANVAS = tools.draw_brush_line(
-                                MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius)
+                                MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius * MultiGame.pixel_width)
                             frame = {
                                 "type": "line",
                                 "x1": x1 // MultiGame.pixel_width,
