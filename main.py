@@ -84,6 +84,11 @@ while running:
     if nom == ("leleu" or nom == "mr leuleu" or nom ==
                "fred leleu" or nom == "frederic leleu"):
         achievements_manager.new_achievement(14)
+    #achievement id 12 et 13 (money)
+    if PLAYER_DATA["coins"] >= 1_000:
+        achievements_manager.new_achievement(12)
+    if PLAYER_DATA["coins"] >= 10_000:
+        achievements_manager.new_achievement(13)
 
     mouse_pos = pygame.mouse.get_pos()
     mouse_click = False

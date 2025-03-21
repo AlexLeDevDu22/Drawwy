@@ -4,7 +4,11 @@
         {
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
+<<<<<<< HEAD
+            "succeed": false,
+=======
             "succeed": true,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 0,
                 0,
@@ -84,7 +88,11 @@
         {
             "title": "Seigneur des anneaux",
             "explication": "Obtenir toutes les bordures",
+<<<<<<< HEAD
+            "succeed": true,
+=======
             "succeed": false,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 148,
                 0,
@@ -94,7 +102,11 @@
         {
             "title": "Coucou !",
             "explication": "Obtenir votre premiere emote",
+<<<<<<< HEAD
+            "succeed": false,
+=======
             "succeed": true,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 88,
                 41,
@@ -124,7 +136,11 @@
         {
             "title": "Une petite fortune",
             "explication": "Collecter 1000 pieces",
+<<<<<<< HEAD
+            "succeed": true,
+=======
             "succeed": false,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 0,
                 0,
@@ -134,7 +150,11 @@
         {
             "title": "Picsou ?",
             "explication": "Collecter 10_000 pieces",
+<<<<<<< HEAD
+            "succeed": true,
+=======
             "succeed": false,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 0,
                 0,
@@ -144,7 +164,11 @@
         {
             "title": "C'est qui le patron ?",
             "explication": "Je sais pas, c'est toi ?",
+<<<<<<< HEAD
+            "succeed": false,
+=======
             "succeed": true,
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
             "couleurs": [
                 0,
                 0,
@@ -177,5 +201,6 @@
         18,
         21,
         22
+>>>>>>> 7413fcf108d2545d6e1c8b869ffba13a22c9943b
     ]
 }
