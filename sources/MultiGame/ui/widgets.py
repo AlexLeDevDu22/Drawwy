@@ -666,6 +666,7 @@ def chat(MultiGame):
                                    "message": MultiGame.guess,
                                    "remaining_time": MultiGame.game_remaining_time})  # send message
                 MultiGame.MESSAGES.append({"type": "guess",
+                                           "pid": MultiGame.PLAYER_ID,
                                            "pseudo": MultiGame.me["pseudo"],
                                            "message": MultiGame.guess,
                                            "succeed": False})

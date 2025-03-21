@@ -69,8 +69,8 @@ def handle_disconnect(data=None):
                 break
 
         if player["avatar"]["type"] == "matrix" and os.path.exists(
-                f"MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
-            os.remove(f"MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
+                f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
+            os.remove(f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
 
         # Envoyer la mise à jour des joueurs
         emit('player_disconnected', {
@@ -116,7 +116,7 @@ def handle_join(data):
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
         tools.save_canvas(data["avatar"]["matrix"],
-                          "MultiGame/web/temp-assets/avatars/" + str(pid) + ".bmp",
+                          "sources/MultiGame/web/temp-assets/avatars/" + str(pid) + ".bmp",
                           sentences_list[-1],
                           False)
 
@@ -231,7 +231,7 @@ def handle_message(message):
 
     elif message['type'] == "emote":
         if not os.path.exists(
-            "MultiGame/web/temp-assets/emotes/" +
+            "sources/MultiGame/web/temp-assets/emotes/" +
                 message["emote_path"]):
             if os.path.exists(
                 "data/shop/emotes_assets/" +
@@ -239,7 +239,7 @@ def handle_message(message):
                 shutil.copyfile(
                     "data/shop/emotes_assets/" +
                     message["emote_path"],
-                    "MultiGame/web/temp-assets/emotes/" +
+                    "sources/MultiGame/web/temp-assets/emotes/" +
                     message["emote_path"])
 
         emit('new_message', message, broadcast=True)
@@ -318,8 +318,8 @@ def stop_server():
     # except Exception as e:
     #     print(f"Erreur lors de l'envoi du message de fermeture: {e}")
 
-    for filename in os.listdir("MultiGame/web/temp-assets/avatars"):
-        os.remove(os.path.join("MultiGame/web/temp-assets/avatars", filename))
+    for filename in os.listdir("sources/MultiGame/web/temp-assets/avatars"):
+        os.remove(os.path.join("sources/MultiGame/web/temp-assets/avatars", filename))
 
     # Au cas ou...
     try:

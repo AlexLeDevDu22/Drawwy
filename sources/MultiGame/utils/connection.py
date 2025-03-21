@@ -136,7 +136,7 @@ async def handle_connection_client(MultiGame, server_name):
         # ajouter à la liste de message
         if guess["pid"] == MultiGame.PLAYER_ID:
             for i in range(len(MultiGame.MESSAGES)):
-                if MultiGame.MESSAGES[i]["pid"] == guess["pid"]:
+                if MultiGame.MESSAGES[i]["type"] != "system" and MultiGame.MESSAGES[i]["pid"] == guess["pid"]:
                     MultiGame.MESSAGES.pop(i)
         MultiGame.MESSAGES.append(guess)
 
