@@ -247,13 +247,13 @@ def show_shop(
                 PLAYER_DATA["coins"] = coins
 
                 # ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
-                list_cursers = [e in PLAYER_DATA["purchased_items"]
+                list_cursers = [e["index"] in PLAYER_DATA["purchased_items"]
                                 for e in SHOP_ITEMS if e["category"] == "Curseurs"]
-                list_borders = [e in PLAYER_DATA["purchased_items"]
+                list_borders = [e["index"] in PLAYER_DATA["purchased_items"]
                                 for e in SHOP_ITEMS if e["category"] == "Bordures"]
-                list_emotes = [e in PLAYER_DATA["purchased_items"]
+                list_emotes = [e["index"] in PLAYER_DATA["purchased_items"]
                                for e in SHOP_ITEMS if e["category"] == "Emotes"]
-                list_all = [e in PLAYER_DATA["purchased_items"]
+                list_all = [e["index"] in PLAYER_DATA["purchased_items"]
                             for e in SHOP_ITEMS]
                 if item["category"] == "Curseurs":
                     achievement_manager.new_achievement(5)
