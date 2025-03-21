@@ -117,7 +117,6 @@ function handleConnection() {
     updatePlayerList();
     updateWordDisplay();
     toggleDrawingTools();
-    startGameTimer();
   });
 
   socket.on("new_player", (data) => {
@@ -191,6 +190,7 @@ function handleConnection() {
     updateWordDisplay();
     updatePlayerList();
     toggleDrawingTools();
+    startGameTimer();
   });
 
   socket.on("player_disconnected", (data) => {
@@ -385,12 +385,12 @@ function startGameTimer() {
 
   const timerInterval = setInterval(() => {
     const now = new Date();
-    const elapsedSeconds = Math.floor((now - gameStartTime) / 1000);
+    const elapsedSeconds = ((now - gameStartTime) / 1000).toFixed(0);
     remainingTime = Math.max(0, gameConfig.gameDuration - elapsedSeconds);
 
     updateTimerDisplay();
 
-    if (remainingTime <= 0) {
+    if (remainingTime == 0) {
       clearInterval(timerInterval);
       handleGameEnd();
     }

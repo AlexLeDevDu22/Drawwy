@@ -1,6 +1,6 @@
 __pycache__
 paraphrase-multilingual-MiniLM-L12-v2
 .venv
-/MultiGame/web/temp-assets/avatars/*
-/MultiGame/web/temp-assets/emotes/*
+/sources/MultiGame/web/temp-assets/avatars/*
+/sources/MultiGame/web/temp-assets/emotes/*
 /assets/your_best_draws/*

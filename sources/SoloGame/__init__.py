@@ -20,7 +20,7 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage == "exit":
             return screen, "home"
         elif soloPage == "results":
-            img1_path = "SoloGame/temp/mon_dessin.png"
+            img1_path = "sources/SoloGame/temp/mon_dessin.png"
             img2_path = f"assets/soloImages/{
                 theme['path']}{
                 theme['images'][image]['path']}"

@@ -96,7 +96,7 @@ class SoloPlay:
                     self.mouse_pos):
                 pygame.image.save(
                     self.canvas_surf,
-                    "Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
+                    "sources/Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
                 PLAYER_DATA["solo_game_played"] += 1
                 save_data("PLAYER_DATA")
 
