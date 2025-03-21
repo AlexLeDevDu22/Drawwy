@@ -122,16 +122,11 @@ class Particle:
                 self.y)), int(
                 self.size))
 
-
-import pygame
-
-WHITE = (255, 255, 255)  # Définition du blanc
-
 class ColorPicker:
-    def __init__(self, x, y, width, height, color_steps=30, dark_steps=10):
+    def __init__(self, x, y, width, height, color_steps=30, dark_steps=12):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_steps = color_steps  # Nombre de teintes
-        self.dark_steps = dark_steps  # Niveaux d'assombrissement
+        self.color_steps = color_steps  
+        self.dark_steps = dark_steps  
         self.colors = self.generate_colors()
         self.selected_color = None
         self.selected_pos = None
@@ -139,30 +134,31 @@ class ColorPicker:
     def generate_colors(self):
         colors = []
 
-        # Ajout d'une ligne de blanc et gris au-dessus
-        grayscale_row = []
-        for i in range(self.color_steps):
-            gray_value = int(255 * (i / (self.color_steps - 1)))
-            grayscale_row.append(pygame.Color(gray_value, gray_value, gray_value))
-        colors.append(grayscale_row)
-
-        # Génération des couleurs normales
         for j in range(self.dark_steps):
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
-                brightness = 0.3 + (1 - (j / (self.dark_steps - 1))) * 0.7  # Évite d'aller à 0% de luminosité
+                
+                # Intégration du blanc dans la première ligne
+                if j == 0:
+                    brightness = 100  # 100% de luminosité = blanc
+                    saturation = i / self.color_steps * 100  # Blanc -> Couleurs
+                else:
+                    saturation = 100  
+                    brightness = (1 - j / (self.dark_steps - 1)) ** 0.8 * 100  
+
                 color = pygame.Color(0)
-                color.hsva = (hue, 100, brightness * 100)
+                color.hsva = (hue, saturation, brightness)
                 row.append(color)
+
             colors.append(row)
+
         return colors
 
     def draw(self, surface):
         step_w = self.rect.width // self.color_steps
-        step_h = self.rect.height // (self.dark_steps + 1)  # +1 pour la ligne de blanc/gris
+        step_h = self.rect.height // self.dark_steps
 
-        # Dessiner la grille de couleurs
         for j, row in enumerate(self.colors):
             for i, color in enumerate(row):
                 color_rect = pygame.Rect(
@@ -176,13 +172,13 @@ class ColorPicker:
         # Indiquer la couleur sélectionnée
         if self.selected_color and self.selected_pos:
             px, py = self.selected_pos
-            pygame.draw.rect(surface, WHITE, (px, py, step_w, step_h), 3)
+            pygame.draw.rect(surface, WHITE, (px, py, step_w, step_h), 2)
 
     def get_color_at(self, pos):
         x, y = pos
         if self.rect.collidepoint(x, y):
             step_w = self.rect.width // self.color_steps
-            step_h = self.rect.height // (self.dark_steps + 1)  # +1 pour la ligne de blanc/gris
+            step_h = self.rect.height // self.dark_steps
             i = (x - self.rect.x) // step_w
             j = (y - self.rect.y) // step_h
             try:

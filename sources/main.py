@@ -1,4 +1,4 @@
-from Menu.utils.avatar_manager import AvatarManager
+from Menu.ui.avatar_manager import AvatarManager
 from Menu.ui.elements import *
 from shared.utils.common_utils import AchievementManager
 from Menu.pages import play, home, credit, shop, achievements, choice_server

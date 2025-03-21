@@ -4,11 +4,13 @@ from shared.utils.data_manager import *
 import pygame
 import os
 
-
-def draw_text(text, font, color, surface, x, y):
+def draw_text(text, font, color, surface, x, y, shadow=False):
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
     textrect.center = (x, y)
+    if shadow:
+        text_obj_shadow = font.render(text, True, DARK_GRAY)
+        surface.blit(text_obj_shadow, (textrect.x + 2, textrect.y + 2))  # Ombre
     surface.blit(textobj, textrect)
 
 
