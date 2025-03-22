@@ -259,7 +259,7 @@ def sentence(MultiGame):
             else:
                 font_size = FONT_SIZE_BASE - 4
 
-            font = pygame.font.Font("assets/PermanentMarker.ttf", font_size)
+            font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", font_size)
 
             lines = tools.lines_return(
                 MultiGame.CURRENT_SENTENCE, font, 0.16 * MultiGame.W)
@@ -504,7 +504,7 @@ def chat(MultiGame):
 
     for mess in MultiGame.MESSAGES[::-1]:
         if mess["type"] != "emote":
-            font = pygame.font.Font("assets/PermanentMarker.ttf", 16)
+            font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", 16)
             if mess["type"] == "guess":
                 if mess["succeed"]:
 
