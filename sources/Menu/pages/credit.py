@@ -17,7 +17,6 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
     draw_text("- Alexandre Garin: Staff Engineer", SMALL_FONT, (255, 102, 102), screen, W // 2, 350, True)
     draw_text("- Robin Loisil: UX/UI Designer/Developer", SMALL_FONT, (255, 204, 102), screen, W // 2, 400, True)
     draw_text("- Maxence Tardivel: Staff Engineer", SMALL_FONT, (255, 153, 255), screen, W // 2, 450, True)
-    draw_text("- ChatGPT: Debugger Assistant", SMALL_FONT, (153, 255, 153), screen, W // 2, 520, True)
     draw_text(
         "Merci d'avoir joué à DRAWWY !",
         MEDIUM_FONT,
@@ -26,7 +25,6 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
         W // 2,
         630)
 
-    # Bouton retour
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")
     if buttons["back"].check_hover(mouse_pos) and mouse_clicked:
