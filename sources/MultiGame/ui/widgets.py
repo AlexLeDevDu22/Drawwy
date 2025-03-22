@@ -279,7 +279,7 @@ def drawing(MultiGame):
         return
 
     #! show
-    if MultiGame.connected and len(MultiGame.PLAYERS) > 2:
+    if MultiGame.connected and len(MultiGame.PLAYERS) > 1:
         MultiGame.screen.blit(
             MultiGame.CANVAS,
             (MultiGame.canvas_rect.x,

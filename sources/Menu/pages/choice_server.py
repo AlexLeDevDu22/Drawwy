@@ -66,6 +66,8 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
                     "https://" +
                     server["domain"],
                 )).start()
+            if i == len(CONFIG["servers"]) - 1:
+                last_check_players=time.time()
 
         # Dessiner l'ombre
         pygame.draw.rect(
