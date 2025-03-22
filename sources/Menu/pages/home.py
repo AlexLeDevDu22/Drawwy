@@ -43,7 +43,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
 
     # Animation de l'image du titre (échelle)
     title_img = pygame.image.load("assets/logo.png").convert_alpha()
-    title_scale = 1 + 0.1 * math.sin(title_angle * 1.8)
+    title_scale = 1.3 + 0.1 * math.sin(title_angle * 1.8)
     orig_width, orig_height = title_img.get_size()
     scaled_width = int(280 * orig_width / orig_height * title_scale)
     scaled_height = int(280 * title_scale)
@@ -52,7 +52,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
 
     # Position de l'image (centrée)
     title_x = W // 2 - scaled_width // 2
-    title_y = main_panel_y + 2
+    title_y = main_panel_y 
 
     # Ombre du titre (optionnel)
     shadow_img = title_img_scaled.copy()
@@ -63,11 +63,11 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
     screen.blit(title_img_scaled, (title_x, title_y))
 
     # Boutons
-    for i, button_text in enumerate(["JOUER", "SUCCÈS", "QUITTER"]):
+    for i, button_text in enumerate(["JOUER", "SUCCES", "QUITTER"]):
         if button_text not in buttons.keys():
             buttons[button_text] = Button("center",
-                                          int(main_panel_y + 315 + i * 1.3 * 80),
-                                          w=500,
+                                          int(main_panel_y + 350 + i * 1.3 * 80),
+                                          w=350,
                                           h=80,
                                           text=button_text)
 
@@ -78,7 +78,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
                 sys.exit()
             elif button_text == "JOUER":
                 return screen, "play", buttons
-            elif button_text == "SUCCÈS":
+            elif button_text == "SUCCES":
                 return screen, "achievements", buttons
 
         buttons[button_text].draw(screen)
@@ -114,7 +114,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
         button_radius *
         2 -
         10,
-        text="CRÉDIT",
+        text="CREDIT",
         radius=button_radius,
         circle=True,
         text_font=VERY_SMALL_FONT)
