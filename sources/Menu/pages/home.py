@@ -63,9 +63,9 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
     screen.blit(title_img_scaled, (title_x, title_y))
 
     # Boutons
-    for i, button_text in enumerate(["JOUER", "SUCCES", "quitter"]):
+    for i, button_text in enumerate(["JOUER", "SUCCES", "QUITTER"]):
         if button_text not in buttons.keys():
-            if button_text == "quitter":
+            if button_text == "QUITTER":
                 buttons[button_text] = Button("center",
                                           int(main_panel_y + 350 + i * 1.3 * 80),
                                           w=300,
