@@ -15,8 +15,9 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage == "images":
             screen, soloPage, image = image_selector(screen, cursor, theme)
         elif soloPage == "play":
-            SoloPlay(screen, cursor, theme, image, achievements_manager)
-            return screen, "home"
+            game = SoloPlay(screen, cursor, theme, image, achievements_manager)
+            result = game.run() 
+            return result  
         elif soloPage == "exit":
             return screen, "home"
         elif soloPage == "results":

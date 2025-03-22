@@ -16,44 +16,45 @@ def get_screen_size():
 class SoloPlay:
     def __init__(self, screen, cursor, theme, image, achievements_manager):
         self.last_mouse_pos = None
-
         self.screen = screen
         self.W, self.H = screen.get_size()
-
+        
         # Paramètres du pinceau
         self.pen_color = BLACK
         self.pen_radius = 6
-
+        
         # État de la souris
         self.mouseDown = False
         self.mouse_pos = (0, 0)
-
-        # On définit les valeurs des rectangles d’interface
+        
+        # On définit les valeurs des rectangles d'interface
         self.define_layout(theme, image)
-
+        
         self.color_picker = ColorPicker(
             self.colors_rect.x,
             self.colors_rect.y,
             self.colors_rect.width,
             self.colors_rect.height)
-
+        
         # Canvas persistant (Surface)
         self.canvas_surf = pygame.Surface(
             (self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
-
+        
         self.achievements_manager = achievements_manager
-
+        self.cursor = cursor
+    
+    def run(self):
         # Boucle principale
         clock = pygame.time.Clock()
         running = True
         while running:
             clock.tick(CONFIG["fps"])
             self.events = pygame.event.get()
-
+            
             # Mise à jour de la taille si on redimensionne
             self.W, self.H = get_screen_size()
-
+            
             # Gestion des événements
             for event in self.events:
                 if event.type == pygame.QUIT:
@@ -65,33 +66,33 @@ class SoloPlay:
                     self.mouseDown = False
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouse_pos = event.pos
-
+            
             if self.mouseDown:
                 color = self.color_picker.get_color_at(pygame.mouse.get_pos())
                 if color:
                     self.pen_color = color
-
-            # Dessin de l’arrière-plan
+            
+            # Dessin de l'arrière-plan
             self.screen.fill(BEIGE)
-
+            
             # Dessin du canvas au centre
             self.draw_canvas()
-
+            
             # Dessin de la palette en haut à droite
             self.color_picker.draw(self.screen)
-
+            
             # Dessin du slider en dessous
             self.draw_slider()
-
+            
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
-
+            
             # Dessin du modèle
             pygame.draw.rect(self.screen, BLACK, self.model_rect, 2)
             self.screen.blit(self.model, self.model_rect)
-
+            
             self.achievements_manager.draw_popup_if_active(self.screen)
-
+            
             if self.mouseDown and self.validate_button_rect.collidepoint(
                     self.mouse_pos):
                 pygame.image.save(
@@ -99,10 +100,10 @@ class SoloPlay:
                     "sources/Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
                 PLAYER_DATA["solo_game_played"] += 1
                 save_data("PLAYER_DATA")
-
+                print("aaaaa")
                 return "results"
-
-            cursor.show(screen, self.mouse_pos, self.mouseDown)
+            
+            self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()
 
     def define_layout(self, theme, image):
