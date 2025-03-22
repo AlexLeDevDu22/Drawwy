@@ -39,6 +39,25 @@ def show_shop(
                      (main_panel_x, main_panel_y,
                       main_panel_width, main_panel_height),
                      border_radius=40)
+    
+    # Etoiles
+    num_stars = 0
+    for theme in SOLO_THEMES:
+        for image in theme["images"]:
+            num_stars += image["stars"]
+
+    star_icon = pygame.image.load("assets/icon_star.png")
+    star_icon = pygame.transform.scale(star_icon, (40, 40))
+    star_icon_rect = star_icon.get_rect(
+        center=(
+            main_panel_x +
+            115,
+            main_panel_y +
+            76))
+    screen.blit(star_icon, star_icon_rect)
+
+    draw_text("X"+str(num_stars), MEDIUM_FONT, BLACK, screen,
+              main_panel_x + 122 + MEDIUM_FONT.size("X"+20+str(num_stars))[0] // 2, main_panel_y + 76)
 
     # Titre
     draw_text("BOUTIQUE", BUTTON_FONT, GRAY, screen,
@@ -46,10 +65,8 @@ def show_shop(
     draw_text("BOUTIQUE", BUTTON_FONT, BLACK, screen,
               W // 2, main_panel_y + 80)
 
-    coins = PLAYER_DATA.get("coins", 0)
-
     # Afficher le solde
-    draw_text(str(coins), MEDIUM_FONT, BLACK, screen,
+    draw_text(str(PLAYER_DATA["coins"]), MEDIUM_FONT, BLACK, screen,
               main_panel_x + main_panel_width - 100, main_panel_y + 80)
 
     coin_icon = pygame.image.load("assets/icon_star.png")
@@ -59,7 +76,7 @@ def show_shop(
             main_panel_x +
             main_panel_width -
             MEDIUM_FONT.size(
-                str(coins))[0] //
+                str(PLAYER_DATA["coins"]))[0] //
             2 -
             126,
             main_panel_y +
@@ -203,7 +220,7 @@ def show_shop(
             price_color = (
                 0,
                 100,
-                0) if coins >= int(
+                0) if PLAYER_DATA["coins"] >= int(
                 item["price"]) else (
                 150,
                 0,
@@ -223,10 +240,10 @@ def show_shop(
                 if cursor_:
                     cursor = cursor_
 
-            elif item["index"] not in PLAYER_DATA["purchased_items"] and coins >= item["price"]:
-                coins -= item["price"]
+            elif item["index"] not in PLAYER_DATA["purchased_items"] and PLAYER_DATA["coins"] >= item["price"]:
+                PLAYER_DATA["coins"] -= item["price"]
                 PLAYER_DATA["purchased_items"].append(item["index"])
-                PLAYER_DATA["coins"] = coins
+                PLAYER_DATA["coins"] = PLAYER_DATA["coins"]
 
                 # ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
                 list_cursers = [e["index"] in PLAYER_DATA["purchased_items"]

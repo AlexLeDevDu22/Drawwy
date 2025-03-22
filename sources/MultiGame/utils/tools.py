@@ -77,7 +77,7 @@ def check_sentences(phrase1, phrase2):
 
 
 def emit_sio(sio, event, data):
-    if sio.connected:
+    if sio and sio.connected:
         try:
             loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
             # Crée une tâche si la boucle existe
@@ -126,8 +126,6 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
                 current_drawing_color = frame["color"]
             if "radius" in frame.keys():
                 current_drawing_radius = frame["radius"]
-
-            print(frame)
 
             MultiGame.CANVAS = draw_brush_line(
                 MultiGame.CANVAS,
