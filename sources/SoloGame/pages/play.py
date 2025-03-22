@@ -95,13 +95,14 @@ class SoloPlay:
             
             if self.mouseDown and self.validate_button_rect.collidepoint(
                     self.mouse_pos):
-                pygame.image.save(
-                    self.canvas_surf,
-                    "sources/Sologame/temp/mon_dessin.png")  # Sauvegarde du dessin
                 PLAYER_DATA["solo_game_played"] += 1
+                PLAYER_DATA["num_draws_total"] += 1
+                if PLAYER_DATA["num_draws_total"] == 10:
+                    self.achievements_manager.new_achievement(1)
+                elif PLAYER_DATA["num_draws_total"] == 50:
+                    self.achievements_manager.new_achievement(2)
                 save_data("PLAYER_DATA")
-                print("aaaaa")
-                return "results"
+                return screen, "results", self.canvas_surf
             
             self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()

@@ -7,6 +7,11 @@ import pygame
 import random
 
 
+state = {
+            "current_page": 0,
+            "selected_category": "Tous",
+            "selection_mode": False
+        }
 def show_shop(
         screen,
         cursor,
@@ -18,7 +23,7 @@ def show_shop(
         achievement_manager):
     """Affiche l'interface de la boutique des objets de décoration"""
     # Panneau principal (effet papier)
-    main_panel_width = 900
+    main_panel_width = 1100
     main_panel_height = 750
     main_panel_x = (W - main_panel_width) // 2
     main_panel_y = (H - main_panel_height) // 2
@@ -35,24 +40,10 @@ def show_shop(
                       main_panel_width, main_panel_height),
                      border_radius=40)
 
-    # Texture du papier (points aléatoires)
-    for _ in range(500):
-        px = random.randint(main_panel_x, main_panel_x + main_panel_width)
-        py = random.randint(main_panel_y, main_panel_y + main_panel_height)
-        if (px - main_panel_x - main_panel_width // 2)**2 + (py - \
-            main_panel_y - main_panel_height // 2)**2 <= (main_panel_width // 2)**2:
-            color_variation = random.randint(-15, 5)
-            point_color = (
-                min(255, max(0, BEIGE[0] + color_variation)),
-                min(255, max(0, BEIGE[1] + color_variation)),
-                min(255, max(0, BEIGE[2] + color_variation))
-            )
-            pygame.draw.circle(screen, point_color, (px, py), 1)
-
     # Titre
-    draw_text("BOUTIQUE", MEDIUM_FONT, GRAY, screen,
-              W // 2 + 4, main_panel_y + 80 + 4)
-    draw_text("BOUTIQUE", MEDIUM_FONT, BLACK, screen,
+    draw_text("BOUTIQUE", BUTTON_FONT, GRAY, screen,
+              W // 2 + 2, main_panel_y + 80 + 2)
+    draw_text("BOUTIQUE", BUTTON_FONT, BLACK, screen,
               W // 2, main_panel_y + 80)
 
     coins = PLAYER_DATA.get("coins", 0)
@@ -75,15 +66,6 @@ def show_shop(
             76))
     screen.blit(coin_icon, coin_icon_rect)
 
-    # Variables statiques pour la pagination et filtrage
-    # Utiliser un dictionnaire pour stocker l'état entre les appels
-    if not hasattr(show_shop, "state"):
-        show_shop.state = {
-            "current_page": 0,
-            "selected_category": "Tous",
-            "selection_mode": False
-        }
-
     SHOP_ITEMS_per_page = 4
     categories = ["Tous"] + list(set(item["category"] for item in SHOP_ITEMS))
 
@@ -103,7 +85,7 @@ def show_shop(
             tab_width and tab_y <= mouse_pos[1] <= tab_y + tab_height
 
         # Couleur de fond basée sur sélection/survol
-        if category == show_shop.state["selected_category"]:
+        if category == state["selected_category"]:
             tab_color = SOFT_ORANGE
         else:
             tab_color = ORANGE if hover else LIGHT_ORANGE
@@ -124,31 +106,31 @@ def show_shop(
 
         # Gestion des clics sur tab
         if mouse_click and hover:
-            show_shop.state["selected_category"] = category
-            show_shop.state["current_page"] = 0
+            state["selected_category"] = category
+            state["current_page"] = 0
 
     # Filtrer les SHOP_ITEMS selon la catégorie sélectionnée
-    filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if show_shop.state["selected_category"]
-                           == "Tous" or item["category"] == show_shop.state["selected_category"]]
+    filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if state["selected_category"]
+                           == "Tous" or item["category"] == state["selected_category"]]
 
     # Calculer le nombre total de pages
     total_pages = max(1, (len(filtered_SHOP_ITEMS) - 1) //
                       SHOP_ITEMS_per_page + 1)
 
     # Limiter la page courante
-    show_shop.state["current_page"] = min(
-        show_shop.state["current_page"], total_pages - 1)
+    state["current_page"] = min(
+        state["current_page"], total_pages - 1)
 
     # Afficher les SHOP_ITEMS
-    start_idx = show_shop.state["current_page"] * SHOP_ITEMS_per_page
-    item_width = 380
+    start_idx = state["current_page"] * SHOP_ITEMS_per_page
+    item_width = 0.42 * main_panel_width
     item_height = 180
     item_margin = 30
 
     for i in range(min(SHOP_ITEMS_per_page,
                        len(filtered_SHOP_ITEMS) - start_idx)):
         item = filtered_SHOP_ITEMS[start_idx + i]
-        item_x = main_panel_x + (i % 2) * (item_width + item_margin) + 70
+        item_x = (W-item_margin)//2 - item_width + (i % 2) * (item_width + item_margin)
         item_y = main_panel_y + 220 + (i // 2) * (item_height + item_margin)
 
         # Animation de survol
@@ -193,30 +175,30 @@ def show_shop(
 
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
-                  item_x + 225, item_y + 80)
+                  item_x + 300, item_y + 80)
 
         # Ajout de la rareté
         if "rarity" in item:
             # Définir la couleur selon la rareté
             rarity_colors = {
-                "Common": (150, 150, 150),
-                "Uncommon": (50, 200, 50),
-                "Rare": (50, 50, 200),
-                "Epic": (200, 50, 200),
-                "Legendary": (255, 165, 0)
+                "Commun": (30, 180, 60),      # Gris foncé, neutre et terne  
+                "Rare": (30, 80, 255),          # Bleu profond, plus distinct  
+                "Epique": (160, 40, 220),         # Violet intense  
+                "Legendaire": (255, 140, 0)      # Or vif, plus saturé  
             }
+
             rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
 
             # Afficher la rareté sous la description
             draw_text(item["rarity"], VERY_SMALL_FONT, rarity_color, screen,
-                      item_x + 225, item_y + 100)
+                      item_x + 225, item_y + 115)
 
         # Prix ou statut
         if item["index"] in PLAYER_DATA["purchased_items"]:
             status_text = "SÉLECTIONNÉ" if is_selected and item["category"] != "Emotes" else "ACHETÉ"
             status_color = (50, 150, 50) if is_selected else (100, 100, 100)
             draw_text(status_text, SMALL_FONT, status_color, screen,
-                      item_x + 220, item_y + 130)
+                      item_x + 220, item_y + 150)
         else:
             price_color = (
                 0,
@@ -227,7 +209,7 @@ def show_shop(
                 0,
                 0)
             draw_text(str(item['price']), SMALL_FONT, price_color, screen,
-                      item_x + 220, item_y + 130)
+                      item_x + 220, item_y + 150)
             coin_icon_rect = coin_icon.get_rect(
                 center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
             screen.blit(coin_icon, coin_icon_rect)
@@ -291,7 +273,7 @@ def show_shop(
             nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
         prev_color = SOFT_ORANGE if prev_hover else ORANGE
 
-        if show_shop.state["current_page"] > 0:
+        if state["current_page"] > 0:
             # Ombre
             pygame.draw.circle(
                 screen,
@@ -315,14 +297,14 @@ def show_shop(
             screen.blit(fleche_gauche, fleche_gauche_rect)
 
             if mouse_click and prev_hover:
-                show_shop.state["current_page"] -= 1
+                state["current_page"] -= 1
 
         # Bouton suivant
         next_hover = next_x <= mouse_pos[0] <= next_x + \
             nav_width and nav_y <= mouse_pos[1] <= nav_y + nav_height
         next_color = SOFT_ORANGE if next_hover else ORANGE
 
-        if show_shop.state["current_page"] < total_pages - 1:
+        if state["current_page"] < total_pages - 1:
             # Ombre
             pygame.draw.circle(
                 screen,
@@ -345,12 +327,12 @@ def show_shop(
             screen.blit(fleche_droite, fleche_droite_rect)
 
             if mouse_click and next_hover:
-                show_shop.state["current_page"] += 1
+                state["current_page"] += 1
 
         # Afficher numéro de page
         draw_text(
             f"Page {
-                show_shop.state['current_page'] + 1}/{total_pages}",
+                state['current_page'] + 1}/{total_pages}",
             SMALL_FONT,
             BLACK,
             screen,

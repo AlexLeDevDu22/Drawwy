@@ -1,20 +1,17 @@
 import cv2
 import numpy as np
+import pygame
 from skimage.metrics import structural_similarity as ssim
 
 
-def compare_images(img1_path, img2_path):
-    # Charger les images
-    img1 = cv2.imread(img1_path)
-    img2 = cv2.imread(img2_path)
+def compare_images(model_path, pygame_img):
+    # Charger l'image modèle depuis le chemin
+    img1 = cv2.imread(model_path)
 
-    # Vérifier si les images existent
-    if img1 is None:
-        print(f"Erreur : Impossible de charger {img1_path}")
-        return None
-    if img2 is None:
-        print(f"Erreur : Impossible de charger {img2_path}")
-        return None
+    # Convertir la surface pygame en un tableau numpy compatible avec OpenCV
+    img2 = pygame.surfarray.array3d(pygame_img)  # Convertit la surface en array (R, G, B)
+    img2 = np.transpose(img2, (1, 0, 2))  # Réorganise les axes (pygame et OpenCV n'ont pas le même format)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)  # Convertit RGB → BGR pour correspondre à OpenCV
 
     # Redimensionner img2 pour qu'elle ait la même taille qu'img1
     img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))

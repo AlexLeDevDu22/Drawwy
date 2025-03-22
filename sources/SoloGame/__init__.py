@@ -3,6 +3,7 @@ from SoloGame.pages.image_selector import image_selector
 from SoloGame.pages.play import SoloPlay
 from SoloGame.comparaison import compare_images
 from SoloGame.pages.image_comparaison import popup_result
+from shared.utils.data_manager import *
 import pygame
 
 
@@ -16,19 +17,13 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage == "images":
             screen, soloPage, image = image_selector(screen, cursor, theme)
         elif soloPage == "play":
-            game = SoloPlay(screen, cursor, theme, image, achievements_manager)
-            result = game.run() 
-            return result  
+            screen, soloPage, draw = SoloPlay(screen, cursor, theme, image, achievements_manager).run() 
         elif soloPage == "exit":
             return screen, "home"
         elif soloPage == "results":
-            img1_path = "sources/SoloGame/temp/mon_dessin.png"
-            img2_path = f"assets/soloImages/{
-                theme['path']}{
-                theme['images'][image]['path']}"
-            similarity_score = compare_images(img1_path, img2_path)
-            screen, soloPage, image = popup_result()
-            return screen, similarity_score
+            similarity_score = compare_images(f"assets/soloImages/{theme['path']}{theme['images'][image]['path']}", draw)
+            screen = popup_result(similarity_score)
+            return screen, "home"
            
 
 

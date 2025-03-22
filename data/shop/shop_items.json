@@ -6,7 +6,7 @@
     "description": "Pour les débutants",
     "image_path": "data/shop/cursors_assets/alien.png",
     "category": "Curseurs",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 1,
@@ -15,7 +15,7 @@
     "description": "Afin d'envahir la galaxy",
     "image_path": "data/shop/cursors_assets/alien.png",
     "category": "Curseurs",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 2,
@@ -24,7 +24,7 @@
     "description": "Une bordure quelconque",
     "image_path": "data/shop/borders_assets/bronze_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 3,
@@ -33,7 +33,7 @@
     "description": "MIAOU",
     "image_path": "data/shop/cursors_assets/cat.png",
     "category": "Curseurs",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 4,
@@ -42,7 +42,7 @@
     "description": "BOUH",
     "image_path": "data/shop/cursors_assets/ghost.png",
     "category": "Curseurs",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 5,
@@ -51,7 +51,7 @@
     "description": "Une bordure brillante",
     "image_path": "data/shop/borders_assets/diamond_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 6,
@@ -60,7 +60,7 @@
     "description": "Une bordure dore",
     "image_path": "data/shop/borders_assets/gold_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 7,
@@ -69,7 +69,7 @@
     "description": "Pour etre le GOAT de Drawwy",
     "image_path": "data/shop/borders_assets/grandmaster_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 8,
@@ -78,7 +78,7 @@
     "description": "Pour montrer sa puissance",
     "image_path": "data/shop/borders_assets/master_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 9,
@@ -87,7 +87,7 @@
     "description": "Pour montrer son talent ",
     "image_path": "data/shop/borders_assets/mythic_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 10,
@@ -96,7 +96,7 @@
     "description": "L'un des meilleurs ",
     "image_path": "data/shop/borders_assets/platinum_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 11,
@@ -105,7 +105,7 @@
     "description": "Meilleur qu'hier ",
     "image_path": "data/shop/borders_assets/silver_border.png",
     "category": "Bordures",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 12,
@@ -114,7 +114,7 @@
     "description": "ha! ha! Cuic!",
     "image_path": "data/shop/cursors_assets/robot.png",
     "category": "Curseurs",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 13,
@@ -123,7 +123,7 @@
     "description": "ook ook",
     "image_path": "data/shop/emotes_assets/SINGE.png",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 14,
@@ -132,7 +132,7 @@
     "description": "Clap clap",
     "image_path": "data/shop/emotes_assets/applaudissement.png",
     "category": "Emotes",
-    "rarity": "Common"
+    "rarity": "Commun"
   },
   {
     "index": 15,
@@ -150,7 +150,7 @@
     "description": "Pour une rentabilité excepionnel!",
     "image_path": "data/shop/emotes_assets/stonks.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 17,
@@ -159,7 +159,7 @@
     "description": "Tout va tres bien",
     "image_path": "data/shop/emotes_assets/This_is_fine.png",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 18,
@@ -168,7 +168,7 @@
     "description": "Un ptit chat trognon ",
     "image_path": "data/shop/emotes_assets/Nyan_cat.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 19,
@@ -177,7 +177,7 @@
     "description": "...",
     "image_path": "data/shop/emotes_assets/homer.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 20,
@@ -186,7 +186,7 @@
     "description": "...",
     "image_path": "data/shop/emotes_assets/duck.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 21,
@@ -195,7 +195,7 @@
     "description": "...",
     "image_path": "data/shop/emotes_assets/pepe_the_frog.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   },
   {
     "index": 22,
@@ -204,6 +204,6 @@
     "description": "...",
     "image_path": "data/shop/emotes_assets/siuuu.gif",
     "category": "Emotes",
-    "rarity": "Epic"
+    "rarity": "Epique"
   }
 ]

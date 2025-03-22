@@ -65,18 +65,11 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
     # Boutons
     for i, button_text in enumerate(["JOUER", "SUCCES", "QUITTER"]):
         if button_text not in buttons.keys():
-            if button_text == "QUITTER":
-                buttons[button_text] = Button("center",
-                                          int(main_panel_y + 350 + i * 1.3 * 80),
-                                          w=300,
+            buttons[button_text] = Button("center",
+                                          int(main_panel_y + 380 + i * 1.3 * 80 + (20 if button_text=="QUITTER" else  0)),
+                                          w=300 if button_text == "QUITTER" else 350,
                                           h=70,
                                           text=button_text)
-            else:
-                buttons[button_text] = Button("center",
-                                            int(main_panel_y + 350 + i * 1.3 * 80),
-                                            w=350,
-                                            h=80,
-                                            text=button_text)
 
         # Gestion des clics
         if buttons[button_text].check_hover(mouse_pos) and mouse_click:
@@ -124,7 +117,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
         text="CREDIT",
         radius=button_radius,
         circle=True,
-        text_font=pygame.font.Font("assets\\text_police\\Wowsers.ttf", 17))
+        text_font=pygame.font.Font("assets/text_police/Wowsers.ttf", 17))
 
     if credit_button.check_hover(mouse_pos) and mouse_click:
         return screen, "credits", buttons
