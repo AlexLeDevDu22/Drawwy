@@ -39,7 +39,6 @@ class MultiGame:
         self.CURRENT_DRAWER = 0
         self.CURRENT_SENTENCE = ""
         self.MESSAGES = []
-        self.CANVAS = None
         self.ALL_FRAMES = []
         self.STEP_NUM = 0
         self.ROLL_BACK = 0
@@ -99,6 +98,10 @@ class MultiGame:
 
             self.canvas_rect = pygame.Rect(
                 canvas_x, canvas_y, canvas_w, canvas_h)
+            
+            self.CANVAS = pygame.Surface(
+            (self.canvas_rect.width,
+             self.canvas_rect.height))
 
             while 1:
                 clock.tick(CONFIG["fps"])
@@ -145,7 +148,7 @@ class MultiGame:
 
                 self.achievements_manager.draw_popup_if_active(self.screen)
 
-                if not self.connected or len(self.PLAYERS) == 1:
+                if not self.connected or len(self.PLAYERS) <= 1:
                     text = SMALL_FONT.render(
                         "Connexion au serveur..." if not self.connected else "En attente de joueurs...", True, (0, 0, 0))
                     self.screen.blit(

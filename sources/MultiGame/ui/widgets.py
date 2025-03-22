@@ -259,14 +259,12 @@ def sentence(MultiGame):
             else:
                 font_size = FONT_SIZE_BASE - 4
 
-            font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", font_size)
-
             lines = tools.lines_return(
-                MultiGame.CURRENT_SENTENCE, font, 0.16 * MultiGame.W)
+                MultiGame.CURRENT_SENTENCE, MEDIUM_FONT, 0.16 * MultiGame.W)
 
             # Affichage ligne par ligne
             for i, ligne in enumerate(lines):
-                image_texte = font.render(
+                image_texte = MEDIUM_FONT.render(
                     " " + ligne + " ", True, (20, 10, 10))
                 if (not MultiGame.me["found"]
                         ) and not MultiGame.me["is_drawer"]:
@@ -281,10 +279,11 @@ def drawing(MultiGame):
         return
 
     #! show
-    MultiGame.screen.blit(
-        MultiGame.CANVAS,
-        (MultiGame.canvas_rect.x,
-         MultiGame.canvas_rect.y))
+    if MultiGame.connected and len(MultiGame.PLAYERS) > 2:
+        MultiGame.screen.blit(
+            MultiGame.CANVAS,
+            (MultiGame.canvas_rect.x,
+            MultiGame.canvas_rect.y))
     pygame.draw.rect(MultiGame.screen, BLACK, MultiGame.canvas_rect, 1)
 
     #! drawing
@@ -453,8 +452,7 @@ def slider_radius(MultiGame):
 
 def chat(MultiGame):
 
-    font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", 18)
-    guess_line = tools.lines_return(MultiGame.guess, font, 0.15 * MultiGame.W)
+    guess_line = tools.lines_return(MultiGame.guess, MEDIUM_FONT, 0.15 * MultiGame.W)
     input_box = pygame.Rect(0.82 *
                             MultiGame.W, 0.9533 *
                             MultiGame.H -
@@ -494,7 +492,7 @@ def chat(MultiGame):
 
     color = BLUE if MultiGame.guess_input_active else LIGHT_BLUE
     for i, line in enumerate(guess_line):
-        txt_surface = font.render(line, True, BLACK)
+        txt_surface = MEDIUM_FONT.render(line, True, BLACK)
         MultiGame.screen.blit(
             txt_surface, (input_box.x + 5, input_box.y + 5 + i * 20))
     pygame.draw.rect(MultiGame.screen, color, input_box, 2)
@@ -504,7 +502,6 @@ def chat(MultiGame):
 
     for mess in MultiGame.MESSAGES[::-1]:
         if mess["type"] != "emote":
-            font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", 16)
             if mess["type"] == "guess":
                 if mess["succeed"]:
 
@@ -523,13 +520,13 @@ def chat(MultiGame):
                 color = mess["color"]
 
             # write the message
-            lines = tools.lines_return(text, font, 0.16 * MultiGame.W)
+            lines = tools.lines_return(text, MEDIUM_FONT, 0.16 * MultiGame.W)
 
             for line in lines[::-1]:
                 if y > min_y + 16:
                     y -= 19
 
-                    image_texte = font.render(line, 1, color)
+                    image_texte = MEDIUM_FONT.render(line, 1, color)
                     MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W, y))
 
             if y < min_y + 18:
@@ -569,7 +566,7 @@ def chat(MultiGame):
         if mess["type"] == "emote" or (
                 mess["type"] == "guess" and not mess["succeed"]):
             y -= 20
-            image_texte = font.render(mess["pseudo"], 1, (80, 80, 80))
+            image_texte = MEDIUM_FONT.render(mess["pseudo"], 1, (80, 80, 80))
             MultiGame.screen.blit(image_texte, (0.82 * MultiGame.W + 30, y))
 
         y -= 10
@@ -582,7 +579,7 @@ def chat(MultiGame):
     emotes = [PYGAME_EMOTES[e] for e in PLAYER_DATA["purchased_items"]
               if SHOP_ITEMS[e]["category"] == "Emotes"]
 
-    if len(emotes) > 0:
+    if len(emotes) > 0 and MultiGame.SIO:
         num_emotes_rows = int(math.sqrt(len(emotes)))
         num_emotes_column = math.ceil(len(emotes) / num_emotes_rows)
 
