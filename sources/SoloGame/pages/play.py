@@ -161,31 +161,33 @@ class SoloPlay:
                                       2, model_width, model_height)
 
     def draw_canvas(self):
-        # Cadre du canvas
+    # Cadre du canvas
         pygame.draw.rect(self.screen, BLACK, self.canvas_rect, 2)
 
         # On blit la Surface du canvas
-        self.screen.blit(
-            self.canvas_surf,
-            (self.canvas_rect.x,
-             self.canvas_rect.y))
+        self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
 
         # Si la souris est enfoncée dans la zone du canvas, on dessine
         if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
-            # Coordonnées locales dans la surface
             local_x = self.mouse_pos[0] - self.canvas_rect.x
             local_y = self.mouse_pos[1] - self.canvas_rect.y
-            # Dessin d'un cercle
 
-            pygame.draw.circle(
-                self.canvas_surf,
-                self.pen_color,
-                (local_x,
-                 local_y),
-                self.pen_radius)
+            if self.last_canvas_pos:  # Vérifie qu'on a une position précédente
+                last_x, last_y = self.last_canvas_pos
 
-            # achievement
+                # Dessine une ligne entre la dernière position et la nouvelle
+                pygame.draw.line(self.canvas_surf, self.pen_color, (last_x, last_y), (local_x, local_y), self.pen_radius * 2)
+
+            # Met à jour la dernière position
+            self.last_canvas_pos = (local_x, local_y)
+        
+            # Achievement
             self.achievements_manager.new_achievement(0)
+
+        # Réinitialiser la dernière position quand la souris est relevée
+        if not self.mouseDown:
+            self.last_canvas_pos = None  # On reset pour éviter des traits indésirables
+
 
     def draw_slider(self):
         """Dessine un slider simple sous la palette pour régler la taille du pinceau."""

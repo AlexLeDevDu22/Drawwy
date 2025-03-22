@@ -35,7 +35,6 @@ class ImageCarousel:
         self.max_spin_speed = 40
         self.particles = []
         self.images_opacity = 0
-
     def start_spin(self):
         self.is_spinning = True
         self.spin_speed = random.randint(
@@ -259,6 +258,7 @@ def image_selector(screen, cursor, theme):
 
     clock = pygame.time.Clock()
 
+    image_roulette.start_spin()
     while True:
         mouse_pos = pygame.mouse.get_pos()
 

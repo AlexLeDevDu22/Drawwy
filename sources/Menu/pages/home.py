@@ -63,13 +63,20 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
     screen.blit(title_img_scaled, (title_x, title_y))
 
     # Boutons
-    for i, button_text in enumerate(["JOUER", "SUCCES", "QUITTER"]):
+    for i, button_text in enumerate(["JOUER", "SUCCES", "quitter"]):
         if button_text not in buttons.keys():
-            buttons[button_text] = Button("center",
+            if button_text == "quitter":
+                buttons[button_text] = Button("center",
                                           int(main_panel_y + 350 + i * 1.3 * 80),
-                                          w=350,
-                                          h=80,
+                                          w=300,
+                                          h=70,
                                           text=button_text)
+            else:
+                buttons[button_text] = Button("center",
+                                            int(main_panel_y + 350 + i * 1.3 * 80),
+                                            w=350,
+                                            h=80,
+                                            text=button_text)
 
         # Gestion des clics
         if buttons[button_text].check_hover(mouse_pos) and mouse_click:
@@ -84,7 +91,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
         buttons[button_text].draw(screen)
 
     # Shop
-    button_radius = 50
+    button_radius = 55
     shop_button = Button(
         main_panel_x +
         10,
@@ -117,7 +124,7 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons):
         text="CREDIT",
         radius=button_radius,
         circle=True,
-        text_font=VERY_SMALL_FONT)
+        text_font=pygame.font.Font("assets\\text_police\\Wowsers.ttf", 17))
 
     if credit_button.check_hover(mouse_pos) and mouse_click:
         return screen, "credits", buttons

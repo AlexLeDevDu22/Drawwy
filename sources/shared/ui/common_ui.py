@@ -30,9 +30,9 @@ LIGHT_PURPLE = (157, 127, 211)
 GOLD = (255, 215, 0)
 # Police personnalisée
 pygame.init()
-TITLE_FONT = pygame.font.Font("assets\\text_police\\Wowsers.ttf", 150)
+TITLE_FONT = pygame.font.Font(None, 150)
 BUTTON_FONT = pygame.font.Font("assets\\text_police\\Wowsers.ttf", 35)
-MEDIUM_FONT = pygame.font.Font("assets\\text_police\\Wowsers.ttf", 25)
+MEDIUM_FONT = pygame.font.Font(None, 25)
 SMALL_FONT = pygame.font.Font(pygame.font.match_font(
     "segoeuisymbol" if sys.platform.startswith("win") else "dejavusans"), 26)
-VERY_SMALL_FONT = pygame.font.Font("assets\\text_police\\Wowsers.ttf", 12)
+VERY_SMALL_FONT = pygame.font.Font("assets\\text_police\\Wowsers.ttf", 15)

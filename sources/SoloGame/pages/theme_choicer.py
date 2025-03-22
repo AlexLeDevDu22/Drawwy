@@ -311,7 +311,7 @@ def theme_choicer(screen, cursor):
             screen.blit(title, title_rect)
 
             # Dessiner le sous-titre
-            subtitle = BUTTON_FONT.render("Sélectionne un thème", True, WHITE)
+            subtitle = BUTTON_FONT.render("Sélectionne un theme", True, WHITE)
             subtitle_rect = subtitle.get_rect(center=(W // 2, 200))
             screen.blit(subtitle, subtitle_rect)
 
