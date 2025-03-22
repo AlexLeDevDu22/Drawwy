@@ -2,6 +2,7 @@ from SoloGame.pages.theme_choicer import theme_choicer
 from SoloGame.pages.image_selector import image_selector
 from SoloGame.pages.play import SoloPlay
 from SoloGame.comparaison import compare_images
+from SoloGame.pages.image_comparaison import popup_result
 import pygame
 
 
@@ -28,6 +29,7 @@ def soloGame(screen, cursor, achievements_manager):
 
             similarity_score = compare_images(img1_path, img2_path)
             return screen, similarity_score
+           
 
 
 if __name__ == '__main__':

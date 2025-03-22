@@ -446,7 +446,7 @@ class PopupAnimation:
         self.particles.draw(screen)
 
 
-def main():
+def popup_result():
     clock = pygame.time.Clock()
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill((230, 230, 230))
@@ -479,11 +479,11 @@ def main():
     sys.exit()
 
 
-if __name__ == "__main__":
+if __name__ == "__popup_result__":
     # Initialisation
     pygame.init()
     WIDTH, HEIGHT = 1300, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Animation de Score")
 
-    main()
+    popup_result()
