@@ -56,7 +56,7 @@ class AvatarManager:
             50,
             self.avatar_target_pos[1] +
             self.avatar_target_size +
-            25)
+            32)
         self.avatar_target_size_ratio = self.avatar_target_size / \
             self.avatar.get_size()[0]
 
@@ -169,7 +169,7 @@ class AvatarManager:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if not self.show_buttons:  # Si pas déjà en mode édition
                 if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
-                   self.avatar_start_pos[1] < mouse_pos[1] < self.avatar_start_pos[1] + self.avatar_size:
+                   self.avatar_start_pos[1] < mouse_pos[1] < self.avatar_start_pos[1] + self.avatar_size + 30:
                     self.input_text = PLAYER_DATA["pseudo"]
                     self.is_expanding = True
                     self.pseudo_editable = True
@@ -407,7 +407,7 @@ class AvatarManager:
             self.input_text +
             "|" if self.pseudo_editable else PLAYER_DATA["pseudo"],
             True,
-            WHITE)
+            (255, 102, 102))
         self.screen.blit(pseudo_surf, pseudo_pos)
 
         # Afficher les boutons et contrôles d'édition si activés

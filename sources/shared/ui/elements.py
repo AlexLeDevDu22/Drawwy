@@ -122,35 +122,43 @@ class Particle:
                 self.y)), int(
                 self.size))
 
-
 class ColorPicker:
-    def __init__(self, x, y, width, height, color_steps=30, dark_steps=15):
+    def __init__(self, x, y, width, height, color_steps=30, dark_steps=12):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_steps = color_steps  # Beaucoup plus de teintes
-        self.dark_steps = dark_steps  # Plus de niveaux d'assombrissement
+        self.color_steps = color_steps  
+        self.dark_steps = dark_steps  
         self.colors = self.generate_colors()
         self.selected_color = None
         self.selected_pos = None
 
     def generate_colors(self):
         colors = []
+
         for j in range(self.dark_steps):
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
-                # Assombrissement progressif
-                brightness = 1 - (j / (self.dark_steps - 1))
+                
+                # Intégration du blanc dans la première ligne
+                if j == 0:
+                    brightness = 100  # 100% de luminosité = blanc
+                    saturation = i / self.color_steps * 100  # Blanc -> Couleurs
+                else:
+                    saturation = 100  
+                    brightness = (1 - j / (self.dark_steps - 1)) ** 0.8 * 100  
+
                 color = pygame.Color(0)
-                color.hsva = (hue, 100, brightness * 100)
+                color.hsva = (hue, saturation, brightness)
                 row.append(color)
+
             colors.append(row)
+
         return colors
 
     def draw(self, surface):
         step_w = self.rect.width // self.color_steps
         step_h = self.rect.height // self.dark_steps
 
-        # Dessiner la grille de couleurs
         for j, row in enumerate(self.colors):
             for i, color in enumerate(row):
                 color_rect = pygame.Rect(
@@ -164,7 +172,7 @@ class ColorPicker:
         # Indiquer la couleur sélectionnée
         if self.selected_color and self.selected_pos:
             px, py = self.selected_pos
-            pygame.draw.rect(surface, WHITE, (px, py, step_w, step_h), 3)
+            pygame.draw.rect(surface, WHITE, (px, py, step_w, step_h), 2)
 
     def get_color_at(self, pos):
         x, y = pos

@@ -8,20 +8,23 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
     draw_text("Crédits", BUTTON_FONT, BLACK, screen, W // 2, 100)
 
     draw_text(
-        "Développé par: Robin Loisil",
+        "Fait grace à:",
         SMALL_FONT,
         BLACK,
         screen,
         W // 2,
-        300)
-    draw_text("Musique et sons: JUL ", SMALL_FONT, BLACK, screen, W // 2, 350)
+        300)    
+    draw_text("- Alexandre Garin: Staff Engineer", SMALL_FONT, (255, 102, 102), screen, W // 2, 350, True)
+    draw_text("- Robin Loisil: UX/UI Designer/Developer", SMALL_FONT, (255, 204, 102), screen, W // 2, 400, True)
+    draw_text("- Maxence Tardivel: Staff Engineer", SMALL_FONT, (255, 153, 255), screen, W // 2, 450, True)
+    draw_text("- ChatGPT: Debugger Assistant", SMALL_FONT, (153, 255, 153), screen, W // 2, 520, True)
     draw_text(
         "Merci d'avoir joué à DRAWWY !",
-        SMALL_FONT,
-        BLACK,
+        MEDIUM_FONT,
+        ORANGE,
         screen,
         W // 2,
-        400)
+        630)
 
     # Bouton retour
     if "back" not in buttons:

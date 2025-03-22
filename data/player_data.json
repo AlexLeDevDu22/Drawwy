@@ -1,10 +1,10 @@
 {
-    "pseudo": "Leleu",
+    "pseudo": "Shreck",
     "achievements": [
         {
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,
@@ -64,7 +64,7 @@
         {
             "title": "Clickers-mania",
             "explication": "Obtenir tous les clickers",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 255,
@@ -94,7 +94,7 @@
         {
             "title": "Coucou !",
             "explication": "Obtenir votre premiere emote",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 88,
                 41,
@@ -104,7 +104,7 @@
         {
             "title": "LV2 emoji",
             "explication": "Obtenir toutes les emotes",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 100,
@@ -114,7 +114,7 @@
         {
             "title": "Acheteur compulsif",
             "explication": "obtenir tous les items",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 0,
@@ -124,7 +124,7 @@
         {
             "title": "Une petite fortune",
             "explication": "Collecter 1000 pieces",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,
@@ -134,7 +134,7 @@
         {
             "title": "Picsou ?",
             "explication": "Collecter 10_000 pieces",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,
@@ -153,8 +153,8 @@
         }
     ],
     "solo_game_played": 0,
-    "multi_game_played": 10,
-    "coins": 94600,
+    "multi_game_played": 15,
+    "coins": 94639,
     "selected_items": {
         "Curseurs": null,
         "Bordures": 2,
@@ -162,27 +162,20 @@
     },
     "purchased_items": [
         0,
-        2,
-        3,
         1,
+        2,
         13,
-        16,
-        17,
+        3,
         14,
-        20,
-        18,
-        19,
-        21,
-        22,
-        4,
-        12,
-        15,
-        6,
-        7,
         5,
-        10,
-        8,
-        9,
-        11
+        15,
+        12,
+        16,
+        19,
+        20,
+        17,
+        18,
+        21,
+        22
     ]
 }

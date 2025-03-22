@@ -264,8 +264,10 @@ def start_server(serv_name):
     # Réinitialiser l'événement d'arrêt
     stop_event.clear()
 
+    # reset Ngrok
+    ngrok.kill()
+    os.system("rm -rf ~/.ngrok2")
     # Configuration de ngrok
-    from pyngrok import ngrok
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
     ngrok.set_api_key(CONFIG["servers"][server_name]["api"])
 
@@ -362,6 +364,7 @@ def stop_server():
         pass
 
     ngrok.kill()
+    os.system("rm -rf ~/.ngrok2")
 
     from pyngrok import ngrok as ngrok2
     ngrok2.get_tunnels()
