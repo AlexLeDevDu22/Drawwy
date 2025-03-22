@@ -152,11 +152,11 @@
             ]
         }
     ],
-    "solo_game_played": 3,
-    "multi_game_played": 25,
+    "solo_game_played": 4,
+    "multi_game_played": 26,
     "coins": 90409,
     "selected_items": {
-        "Curseurs": null,
+        "Curseurs": 15,
         "Bordures": 2,
         "Emotes": 22
     },

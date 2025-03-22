@@ -28,7 +28,7 @@ def timer(MultiGame):
         60}"
 
     # Créer un texte pour le timer
-    font = pygame.font.Font("assets/PermanentMarker.ttf", 25)
+    font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", 25)
     text_surface = font.render(timer_text, True, (0, 0, 0))
 
     # Calculer la taille du rectangle (qui sera juste la taille du texte)
@@ -453,7 +453,7 @@ def slider_radius(MultiGame):
 
 def chat(MultiGame):
 
-    font = pygame.font.Font("assets/PermanentMarker.ttf", 18)
+    font = pygame.font.Font("assets/text_police/PermanentMarker.ttf", 18)
     guess_line = tools.lines_return(MultiGame.guess, font, 0.15 * MultiGame.W)
     input_box = pygame.Rect(0.82 *
                             MultiGame.W, 0.9533 *
