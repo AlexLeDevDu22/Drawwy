@@ -157,10 +157,10 @@ def show_shop(
         # Image de l'item
         if item["category"] == "Emotes":
             tools.show_emote(screen,
-                             PYGAME_EMOTES[item["index"]],
-                             item_x + 20,
-                             item_y + item_height // 2 - 50,
-                             100)
+                            PYGAME_EMOTES[item["index"]],
+                            item_x + 20,  # Déplacer l'image vers la gauche
+                            item_y + item_height // 2 - 50,
+                            100)
         else:
             item_img = pygame.image.load(item["image_path"])
             item_img = pygame.transform.scale(item_img, (100, 100))
@@ -171,7 +171,7 @@ def show_shop(
 
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
-                  item_x + 220, item_y + 40)
+                item_x + 220, item_y + 40)  # Déplacer le texte plus à droite
 
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,

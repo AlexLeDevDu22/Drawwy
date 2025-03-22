@@ -27,6 +27,7 @@ if sys.platform.startswith("win"):
 threading.Thread(target=updater.check_for_shop_updates).start()
 
 pygame.init()
+
 W, H = tools.get_screen_size()
 screen = pygame.display.set_mode((W, H))
 pygame.display.set_icon(pygame.image.load("assets/icon.png"))
@@ -38,6 +39,21 @@ except BaseException:
     pass
 
 buttons = {}
+# Chargement des assets au démarrage
+title_img = pygame.image.load("assets/logo.png").convert_alpha()
+shadow_img = title_img.copy()
+shadow_img.fill((100, 100, 100, 150), None, pygame.BLEND_RGBA_MULT)
+orig_width, orig_height = title_img.get_size()
+
+# Création de la texture papier une seule fois
+paper_texture = pygame.Surface((900, 750), pygame.SRCALPHA)
+for _ in range(500):
+    px = random.randint(0, 900)
+    py = random.randint(0, 750)
+    color_variation = random.randint(-15, 5)
+    point_color = (min(255, max(0, BEIGE[0] + color_variation)), min(255, max(0, BEIGE[1] + color_variation)), min(255, max(0, BEIGE[2] + color_variation)))
+    pygame.draw.circle(paper_texture, point_color, (px, py), 1)
+
 
 # Créer quelques éléments de dessin flottants
 drawing_elements = [
@@ -163,7 +179,9 @@ while running:
             animation_counter += 1
             title_angle += 0.02
             screen, current_page, buttons = home.show_home(
-                screen, W, H, mouse_pos, mouse_click, title_angle, buttons)
+    screen, W, H, mouse_pos, mouse_click, title_angle, buttons,
+    title_img, shadow_img, orig_width, orig_height, paper_texture
+)
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
             screen, current_page, buttons = play.play_choicer(
