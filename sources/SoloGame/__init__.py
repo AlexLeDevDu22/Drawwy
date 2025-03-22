@@ -27,8 +27,7 @@ def soloGame(screen, cursor, achievements_manager):
                 theme['path']}{
                 theme['images'][image]['path']}"
             similarity_score = compare_images(img1_path, img2_path)
-            
-
+            screen, soloPage, image = popup_result()
             return screen, similarity_score
            
 
