@@ -144,7 +144,7 @@
         {
             "title": "C'est qui le patron ?",
             "explication": "Je sais pas, c'est toi ?",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,
