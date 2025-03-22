@@ -153,8 +153,8 @@
         }
     ],
     "solo_game_played": 0,
-    "multi_game_played": 18,
-    "coins": 93889,
+    "multi_game_played": 23,
+    "coins": 94639,
     "selected_items": {
         "Curseurs": null,
         "Bordures": 2,
@@ -162,10 +162,8 @@
     },
     "purchased_items": [
         0,
-        14,
-        13,
-        16,
-        17,
-        2
+        1,
+        2,
+        5
     ]
 }

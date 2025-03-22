@@ -280,19 +280,6 @@ def drawing(MultiGame):
     if not MultiGame.CANVAS:
         return
 
-    # 20% de la largeur de la fenêtre
-    zone_x_min = int(0.2 * MultiGame.W) + 2
-    # 60% de la largeur de la fenêtre
-    zone_x_max = int(0.8 * MultiGame.W) - 4
-    zone_y_min = int(0.04 * MultiGame.H) + 2   # Commence en haut de la fenêtre
-    # Remplie toute la hauteur de la fenêtre
-    zone_y_max = int(0.96 * MultiGame.H) - 4
-
-    # Affichage du CANVAS à l'écran
-    MultiGame.pixel_width = (zone_x_max - zone_x_min) // CONFIG["canvas_width"]
-    MultiGame.pixel_height = (
-        zone_y_max - zone_y_min) // CONFIG["canvas_height"]
-
     #! show
     MultiGame.screen.blit(
         MultiGame.CANVAS,
@@ -595,56 +582,57 @@ def chat(MultiGame):
     emotes = [PYGAME_EMOTES[e] for e in PLAYER_DATA["purchased_items"]
               if SHOP_ITEMS[e]["category"] == "Emotes"]
 
-    num_emotes_rows = int(math.sqrt(len(emotes)))
-    num_emotes_column = math.ceil(len(emotes) / num_emotes_rows)
+    if len(emotes) > 0:
+        num_emotes_rows = int(math.sqrt(len(emotes)))
+        num_emotes_column = math.ceil(len(emotes) / num_emotes_rows)
 
-    emote_margin = 12
-    emote_size = 50
+        emote_margin = 12
+        emote_size = 50
 
-    emotes_rect_size = (num_emotes_column * (emote_size + emote_margin),
-                        num_emotes_rows * (emote_size + emote_margin))
+        emotes_rect_size = (num_emotes_column * (emote_size + emote_margin),
+                            num_emotes_rows * (emote_size + emote_margin))
 
-    emotes_rect = pygame.Rect(input_box.x -
-                              emotes_rect_size[0] //
-                              2, input_box.y -
-                              45 -
-                              (emote_size +
-                               emote_margin) *
-                              num_emotes_rows, emotes_rect_size[0], emotes_rect_size[1])
+        emotes_rect = pygame.Rect(input_box.x -
+                                emotes_rect_size[0] //
+                                2, input_box.y -
+                                45 -
+                                (emote_size +
+                                emote_margin) *
+                                num_emotes_rows, emotes_rect_size[0], emotes_rect_size[1])
 
-    if MultiGame.show_emotes:
-        pygame.draw.rect(
-            MultiGame.screen,
-            BEIGE,
-            emotes_rect,
-            border_radius=15)
-        pygame.draw.rect(
-            MultiGame.screen,
-            BLACK,
-            emotes_rect,
-            1,
-            border_radius=15)
+        if MultiGame.show_emotes:
+            pygame.draw.rect(
+                MultiGame.screen,
+                BEIGE,
+                emotes_rect,
+                border_radius=15)
+            pygame.draw.rect(
+                MultiGame.screen,
+                BLACK,
+                emotes_rect,
+                1,
+                border_radius=15)
 
-        for i, emote in enumerate(emotes):
-            x = emotes_rect.x + emote_margin + i % num_emotes_column * \
-                (emote_size + emote_margin) - emote_margin // 2
-            y = emotes_rect.y + emote_margin + i // num_emotes_column * \
-                (emote_size + emote_margin) - emote_margin // 2
+            for i, emote in enumerate(emotes):
+                x = emotes_rect.x + emote_margin + i % num_emotes_column * \
+                    (emote_size + emote_margin) - emote_margin // 2
+                y = emotes_rect.y + emote_margin + i // num_emotes_column * \
+                    (emote_size + emote_margin) - emote_margin // 2
 
-            show_emote(MultiGame.screen, emote, x, y, emote_size)
+                show_emote(MultiGame.screen, emote, x, y, emote_size)
 
-            for event in MultiGame.events:
-                if pygame.MOUSEBUTTONDOWN == event.type:
-                    if pygame.Rect(
-                            x, y, emote_size, emote_size).collidepoint(
-                            pygame.mouse.get_pos()):
-                        e_mess = {"type": "emote",
-                                  "pid": MultiGame.PLAYER_ID,
-                                  "pseudo": MultiGame.me["pseudo"],
-                                  "emote_path": emote["image_path"].split("/")[-1],
-                                  "emote_index": emote["index"]}
-                        tools.emit_sio(MultiGame.SIO, "message", e_mess)
-                        MultiGame.MESSAGES.append(e_mess)
+                for event in MultiGame.events:
+                    if pygame.MOUSEBUTTONDOWN == event.type:
+                        if pygame.Rect(
+                                x, y, emote_size, emote_size).collidepoint(
+                                pygame.mouse.get_pos()):
+                            e_mess = {"type": "emote",
+                                    "pid": MultiGame.PLAYER_ID,
+                                    "pseudo": MultiGame.me["pseudo"],
+                                    "emote_path": emote["image_path"].split("/")[-1],
+                                    "emote_index": emote["index"]}
+                            tools.emit_sio(MultiGame.SIO, "message", e_mess)
+                            MultiGame.MESSAGES.append(e_mess)
 
     for event in MultiGame.events:
         if event.type == pygame.MOUSEBUTTONDOWN:

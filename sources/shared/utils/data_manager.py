@@ -15,7 +15,7 @@ def reload():
         SHOP_ITEMS = json.load(f)
     with open('data/solo_themes.json', encoding="utf-8") as f:
         SOLO_THEMES = json.load(f)
-    with open('sources/config.yaml') as f:
+    with open('config.yaml') as f:
         CONFIG = yaml.safe_load(f)
 
     PYGAME_EMOTES = {
