@@ -6,6 +6,8 @@ import threading
 
 players_per_server = {serv: None for serv in CONFIG["servers"].keys()}
 
+last_check_players=time.time()
+
 
 def set_player_count(name, server_url):
     """Récupère le nombre de joueurs connectés sur un serveur."""
@@ -54,8 +56,9 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
         hover = server_rect.collidepoint(mouse_pos) and connected
 
         # Récupérer le nombre de joueurs
-        if players_per_server[server_name] is None:
-            players_per_server[server_name] = -1
+        if players_per_server[server_name] is None or time.time()-last_check_players>5:
+            if players_per_server[server_name] is None:
+                players_per_server[server_name] = -1
             threading.Thread(
                 target=set_player_count,
                 args=(

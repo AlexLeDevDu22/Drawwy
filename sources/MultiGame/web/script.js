@@ -230,12 +230,14 @@ function draw(frames, delay) {
 
         drawLine(frame.x1, frame.y1, frame.x2, frame.y2, color, radius);
       }, index * frameDuration);
+
+      setTimeout(() => {
+        isDrawing = false;
+      }, totalDuration);
     });
   } else {
     frames.forEach(drawLine);
   }
-
-  isDrawing = false;
 }
 
 function drawLine(x1, y1, x2, y2, color, radius) {

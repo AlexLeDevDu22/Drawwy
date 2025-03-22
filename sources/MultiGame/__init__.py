@@ -82,28 +82,21 @@ class MultiGame:
             self.guess_input_active = False
             self.guess = ""
 
-            MultiGame.show_emotes = False
+            self.show_emotes = False
 
-            # 20% de la largeur de la fenêtre
-            zone_x_min = int(0.2 * self.W) + 2
-            # 60% de la largeur de la fenêtre
-            zone_x_max = int(0.8 * self.W) - 4
-            # Commence en haut de la fenêtre
-            zone_y_min = int(0.04 * self.H) + 2
-            # Remplie toute la hauteur de la fenêtre
-            zone_y_max = int(0.96 * self.H) - 4
-
-            canvas_width = CONFIG["canvas_width"]
-            canvas_height = CONFIG["canvas_height"]
+            zone_w = int(0.6 * self.W) - 6
+            zone_h = int(0.92 * self.H) - 6
 
             # Affichage du CANVAS à l'écran
-            pixel_width = (zone_x_max - zone_x_min) // canvas_width
-            pixel_height = (zone_y_max - zone_y_min) // canvas_height
+            self.pixel_width = zone_w // CONFIG["canvas_width"]
+            self.pixel_height = zone_h // CONFIG["canvas_height"]
 
-            canvas_x = self.W // 2 - pixel_width * canvas_width // 2
-            canvas_w = pixel_width * canvas_width
-            canvas_y = self.H // 2 - pixel_height * canvas_height // 2
-            canvas_h = pixel_height * canvas_height
+
+            canvas_x = self.W // 2 - self.pixel_width * CONFIG["canvas_width"] // 2
+            canvas_w = self.pixel_width * CONFIG["canvas_width"]
+            canvas_y = self.H // 2 - self.pixel_height * CONFIG["canvas_height"] // 2
+            canvas_h = self.pixel_height * CONFIG["canvas_height"]
+
             self.canvas_rect = pygame.Rect(
                 canvas_x, canvas_y, canvas_w, canvas_h)
 

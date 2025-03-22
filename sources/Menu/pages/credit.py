@@ -9,7 +9,7 @@ def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
 
     draw_text(
         "Fait grace à:",
-        SMALL_FONT,
+        MEDIUM_FONT,
         BLACK,
         screen,
         W // 2,

@@ -19,7 +19,7 @@ class Button:
             image=None,
             active=True):
         if not circle:
-            self.W = w if w else text_font.size(text)[0] + 16
+            self.W = w if w else text_font.size(text)[0] + 20
             self.H = h if h else text_font.size(text)[1] + 40
         else:
             self.W, self.H = radius * 2, radius * 2
