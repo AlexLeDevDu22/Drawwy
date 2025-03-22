@@ -1,10 +1,10 @@
 {
-    "pseudo": "Shreck",
+    "pseudo": "Leleu",
     "achievements": [
         {
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 0,
@@ -84,7 +84,7 @@
         {
             "title": "Seigneur des anneaux",
             "explication": "Obtenir toutes les bordures",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 148,
                 0,
@@ -94,7 +94,7 @@
         {
             "title": "Coucou !",
             "explication": "Obtenir votre premiere emote",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 88,
                 41,
@@ -153,8 +153,8 @@
         }
     ],
     "solo_game_played": 0,
-    "multi_game_played": 15,
-    "coins": 94639,
+    "multi_game_played": 18,
+    "coins": 93889,
     "selected_items": {
         "Curseurs": null,
         "Bordures": 2,
@@ -162,20 +162,10 @@
     },
     "purchased_items": [
         0,
-        1,
-        2,
-        13,
-        3,
         14,
-        5,
-        15,
-        12,
+        13,
         16,
-        19,
-        20,
         17,
-        18,
-        21,
-        22
+        2
     ]
 }
