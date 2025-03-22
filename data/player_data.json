@@ -1,10 +1,10 @@
 {
-    "pseudo": "Shreck",
+    "pseudo": "Leleu",
     "achievements": [
         {
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 0,
@@ -84,7 +84,7 @@
         {
             "title": "Seigneur des anneaux",
             "explication": "Obtenir toutes les bordures",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 148,
                 0,
@@ -94,7 +94,7 @@
         {
             "title": "Coucou !",
             "explication": "Obtenir votre premiere emote",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 88,
                 41,
