@@ -121,13 +121,14 @@ class ParticleSystem:
             else:
                 # Utiliser une surface temporaire pour l'alpha
                 temp_surface = pygame.Surface((particle['size'] * 2, particle['size'] * 2), pygame.SRCALPHA)
-                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente
+                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente 
+                color = tuple(map(int, particle['color'])) + (alpha,)
                 gfxdraw.filled_circle(
                     temp_surface,
-                    particle['size'],  # Centre X dans la surface temporaire
-                    particle['size'],  # Centre Y
+                    int(particle['size']),  # Centre X dans la surface temporaire
+                    int(particle['size']),  # Centre Y
                     int(particle['size']),
-                    (*particle['color'], alpha)
+                    color
                 )
                 surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
 
@@ -135,7 +136,7 @@ class ParticleSystem:
 
 class PopupAnimation:
     def __init__(self, score,screen, images=None):
-        self.score = score
+        self.score = int(score)
         self.screen = screen
         self.popup_width, self.popup_height = 600, 400
         self.popup_x = (WIDTH - self.popup_width) // 2
