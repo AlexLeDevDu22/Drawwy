@@ -4,7 +4,7 @@ from shared.tools import is_connected
 import os
 import requests
 from github import Github
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Remplacez par votre propre URL du dépôt GitHub
 OWNER = "AlexLeDevDu22"  # Exemple : "octocat"
@@ -71,13 +71,16 @@ def check_for_shop_updates():
         return
 
     repo = g.get_repo(f"{OWNER}/{REPO}")
+    
+    # Comparer avec la dernière mise à jour connue
+    last_update = get_last_update()
+
+    if last_update and last_update + timedelta(days=1) < datetime.now():
+        return
 
     # Récupérer la dernière mise à jour du dépôt
     latest_commit = repo.get_commits()[0]
     latest_commit_time = latest_commit.commit.author.date.replace(tzinfo=None)
-
-    # Comparer avec la dernière mise à jour connue
-    last_update = get_last_update()
 
     if not last_update or latest_commit_time > last_update:
         print("Mise à jour détectée, téléchargement des nouveaux fichiers...")

@@ -42,12 +42,13 @@ class MultiGame:
         self.ALL_FRAMES = []
         self.STEP_NUM = 0
         self.ROLL_BACK = 0
-        self.SIO = None
         self.GAMESTART = None
 
         self.achievements_manager = achievements_manager
 
         try:
+            self.is_connected = False
+            self.WS = None
             self.connection_loop = asyncio.new_event_loop()
             self.connexion_thread = threading.Thread(
                 target=connection.start_connexion, args=(
@@ -125,7 +126,7 @@ class MultiGame:
 
                     if self.game_remaining_time == 0:  # if game time over
                         if self.me["is_drawer"]:
-                            tools.emit_sio(self.SIO, "game_finished", None)
+                            tools.emit_sio(self.WS, {"header":"game_finished"})
                         self.GAMESTART = datetime.now()
 
                 self.events = pygame.event.get()

@@ -350,7 +350,7 @@ def drawing(MultiGame):
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
                         tools.emit_sio(
-                            MultiGame.SIO, "roll_back", MultiGame.ROLL_BACK)
+                            MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
                     # CTRL+Y
                     elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
@@ -361,15 +361,15 @@ def drawing(MultiGame):
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
                         tools.emit_sio(
-                            MultiGame.SIO, "roll_back", MultiGame.ROLL_BACK)
+                            MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
     # send draw
     if MultiGame.frame_num == CONFIG["fps"] - \
             1 and MultiGame.second_draw_frames != []:
         print("draw sended")
         tools.emit_sio(
-            MultiGame.SIO, "draw", tools.simplify_frames(
-                MultiGame.second_draw_frames))  # send draw
+            MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
+                MultiGame.second_draw_frames)})  # send draw
         MultiGame.second_draw_frames = []
 
 
@@ -572,14 +572,14 @@ def chat(MultiGame):
         y -= 10
 
      # emotes
-    emote_icon = pygame.image.load("assets/emote_icon.png").convert_alpha()
-    emote_icon = pygame.transform.scale(emote_icon, (30, 30))
-    MultiGame.screen.blit(emote_icon, (input_box.x + 5, input_box.y - 35))
-
     emotes = [PYGAME_EMOTES[e] for e in PLAYER_DATA["purchased_items"]
               if SHOP_ITEMS[e]["category"] == "Emotes"]
+    
+    if len(emotes) > 0 and MultiGame.is_connected:
+        emote_icon = pygame.image.load("assets/emote_icon.png").convert_alpha()
+        emote_icon = pygame.transform.scale(emote_icon, (30, 30))
+        MultiGame.screen.blit(emote_icon, (input_box.x + 5, input_box.y - 35))
 
-    if len(emotes) > 0 and MultiGame.SIO:
         num_emotes_rows = int(math.sqrt(len(emotes)))
         num_emotes_column = math.ceil(len(emotes) / num_emotes_rows)
 
@@ -623,12 +623,13 @@ def chat(MultiGame):
                         if pygame.Rect(
                                 x, y, emote_size, emote_size).collidepoint(
                                 pygame.mouse.get_pos()):
-                            e_mess = {"type": "emote",
+                            e_mess = {"header": "new_message",
+                                      "type": "emote",
                                     "pid": MultiGame.PLAYER_ID,
                                     "pseudo": MultiGame.me["pseudo"],
                                     "emote_path": emote["image_path"].split("/")[-1],
                                     "emote_index": emote["index"]}
-                            tools.emit_sio(MultiGame.SIO, "message", e_mess)
+                            tools.emit_sio(MultiGame.WS, e_mess)
                             MultiGame.MESSAGES.append(e_mess)
 
     for event in MultiGame.events:
@@ -642,9 +643,9 @@ def chat(MultiGame):
 
         if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
             if event.key == pygame.K_RETURN and MultiGame.guess.strip():
-                tools.emit_sio(MultiGame.SIO,
-                               "message",
-                               {"type": "guess",
+                tools.emit_sio(MultiGame.WS,
+                               {"header": "new_message",
+                                   "type": "guess",
                                 "pid": MultiGame.PLAYER_ID,
                                 "pseudo": MultiGame.me["pseudo"],
                                    "message": MultiGame.guess,
