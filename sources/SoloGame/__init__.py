@@ -21,7 +21,7 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage == "exit":
             return screen, "home"
         elif soloPage == "results":
-            temp_path = "temp_draw.png"
+            temp_path = "sources/SoloGame/temp/temp_draw.png"
             pygame.image.save(draw, temp_path)
 
             # Comparer l'image sauvegardée avec l'image de référence
