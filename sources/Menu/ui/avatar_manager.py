@@ -323,7 +323,7 @@ class AvatarManager:
                 self.show_buttons = True
                 self.pseudo_editable = True
 
-                self.colors = []
+                self.colors = [(255, 255, 255), (0, 0, 0)]
                 self.color_rects = []
                 for i in range(len(PLAYER_DATA["achievements"])):
                     if PLAYER_DATA["achievements"][i]["succeed"]:
