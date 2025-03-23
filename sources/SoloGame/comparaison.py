@@ -1,17 +1,33 @@
 import cv2
 import numpy as np
-import pygame
 from skimage.metrics import structural_similarity as ssim
+from SoloGame.pages.image_comparaison import popup_result
+import os
 
+def compare_images(img1_path, img2_path):
+    # Afficher les chemins pour debug
+    print(f"Chemin image 1 : {img1_path}")
+    print(f"Chemin image 2 : {img2_path}")
 
-def compare_images(model_path, pygame_img):
-    # Charger l'image modèle depuis le chemin
-    img1 = cv2.imread(model_path)
+    # Vérifier si les fichiers existent
+    if not os.path.exists(img1_path):
+        print(f"Erreur : {img1_path} n'existe pas.")
+        return None
+    if not os.path.exists(img2_path):
+        print(f"Erreur : {img2_path} n'existe pas.")
+        return None
 
-    # Convertir la surface pygame en un tableau numpy compatible avec OpenCV
-    img2 = pygame.surfarray.array3d(pygame_img)  # Convertit la surface en array (R, G, B)
-    img2 = np.transpose(img2, (1, 0, 2))  # Réorganise les axes (pygame et OpenCV n'ont pas le même format)
-    img2 = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)  # Convertit RGB → BGR pour correspondre à OpenCV
+    # Charger les images
+    img1 = cv2.imread(img1_path)
+    img2 = cv2.imread(img2_path)
+
+    # Vérifier si les images sont bien chargées
+    if img1 is None:
+        print(f"Erreur : Impossible de charger {img1_path}")
+        return None
+    if img2 is None:
+        print(f"Erreur : Impossible de charger {img2_path}")
+        return None
 
     # Redimensionner img2 pour qu'elle ait la même taille qu'img1
     img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
