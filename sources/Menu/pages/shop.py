@@ -57,7 +57,7 @@ def show_shop(
     screen.blit(star_icon, star_icon_rect)
 
     draw_text("X"+str(num_stars), MEDIUM_FONT, BLACK, screen,
-              main_panel_x + 122 + MEDIUM_FONT.size("X"+20+str(num_stars))[0] // 2, main_panel_y + 76)
+              main_panel_x + 142 + MEDIUM_FONT.size("X"+str(num_stars))[0] // 2, main_panel_y + 78)
 
     # Titre
     draw_text("BOUTIQUE", BUTTON_FONT, GRAY, screen,
@@ -67,9 +67,9 @@ def show_shop(
 
     # Afficher le solde
     draw_text(str(PLAYER_DATA["coins"]), MEDIUM_FONT, BLACK, screen,
-              main_panel_x + main_panel_width - 100, main_panel_y + 80)
+              main_panel_x + main_panel_width - 100, main_panel_y + 78)
 
-    coin_icon = pygame.image.load("assets/icon_star.png")
+    coin_icon = pygame.image.load("assets/icon_coin.png")
     coin_icon = pygame.transform.scale(coin_icon, (40, 40))
     coin_icon_rect = coin_icon.get_rect(
         center=(
@@ -188,11 +188,11 @@ def show_shop(
 
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
-                item_x + 220, item_y + 40)  # Déplacer le texte plus à droite
+                item_x + 225, item_y + 40)  # Déplacer le texte plus à droite
 
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
-                  item_x + 300, item_y + 80)
+                  item_x + 300, item_y + 76)
 
         # Ajout de la rareté
         if "rarity" in item:
@@ -212,24 +212,35 @@ def show_shop(
 
         # Prix ou statut
         if item["index"] in PLAYER_DATA["purchased_items"]:
-            status_text = "SÉLECTIONNÉ" if is_selected and item["category"] != "Emotes" else "ACHETÉ"
+            status_text = "ACHETÉ"
+            if is_selected and item["category"] != "Emotes":
+                status_text = "SÉLECTIONNÉ"
+            else:
+                status_text = "DEBLOQUÉ"
             status_color = (50, 150, 50) if is_selected else (100, 100, 100)
             draw_text(status_text, SMALL_FONT, status_color, screen,
                       item_x + 220, item_y + 150)
         else:
-            price_color = (
-                0,
-                100,
-                0) if PLAYER_DATA["coins"] >= int(
-                item["price"]) else (
-                150,
-                0,
-                0)
-            draw_text(str(item['price']), SMALL_FONT, price_color, screen,
-                      item_x + 220, item_y + 150)
-            coin_icon_rect = coin_icon.get_rect(
-                center=(item_x + 225 + SMALL_FONT.size(str(item['price']))[0], item_y + 128))
-            screen.blit(coin_icon, coin_icon_rect)
+            if item["category"] != "Bordures":
+                price_color = (
+                    0,
+                    100,
+                    0) if PLAYER_DATA["coins"] >= int(
+                    item["price"]) else (
+                    150,
+                    0,
+                    0)
+                draw_text(str(item['price']), SMALL_FONT, price_color, screen,
+                        item_x + 220, item_y + 150)
+                coin_icon_rect = coin_icon.get_rect(
+                    center=(item_x + 245 + SMALL_FONT.size(str(item['price']))[0]//2, item_y + 150))
+                screen.blit(coin_icon, coin_icon_rect)
+            else:
+                draw_text(str(item['stars_needed']), SMALL_FONT, (0, 0, 150), screen,
+                        item_x + 220, item_y + 150)
+                coin_icon_rect = star_icon.get_rect(
+                    center=(item_x + 245 + SMALL_FONT.size(str(item['stars_needed']))[0]//2, item_y + 150))
+                screen.blit(star_icon, coin_icon_rect)
 
         achievement_manager.draw_popup_if_active(screen)
 
@@ -240,7 +251,7 @@ def show_shop(
                 if cursor_:
                     cursor = cursor_
 
-            elif item["index"] not in PLAYER_DATA["purchased_items"] and PLAYER_DATA["coins"] >= item["price"]:
+            elif item["category"] != "Bordures" and PLAYER_DATA["coins"] >= item["price"]:
                 PLAYER_DATA["coins"] -= item["price"]
                 PLAYER_DATA["purchased_items"].append(item["index"])
                 PLAYER_DATA["coins"] = PLAYER_DATA["coins"]

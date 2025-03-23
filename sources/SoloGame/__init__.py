@@ -21,8 +21,12 @@ def soloGame(screen, cursor, achievements_manager):
         elif soloPage == "exit":
             return screen, "home"
         elif soloPage == "results":
-            similarity_score = compare_images(f"assets/soloImages/{theme['path']}{theme['images'][image]['path']}", draw)
-            screen = popup_result(similarity_score)
+            temp_path = "temp_draw.png"
+            pygame.image.save(draw, temp_path)
+
+            # Comparer l'image sauvegardée avec l'image de référence
+            similarity_score = compare_images(f"assets/soloImages/{theme['path']}{theme['images'][image]['path']}", temp_path)
+            screen = popup_result(similarity_score,screen)
             return screen, "home"
            
 

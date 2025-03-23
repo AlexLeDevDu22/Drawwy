@@ -102,7 +102,7 @@ class SoloPlay:
                 elif PLAYER_DATA["num_draws_total"] == 50:
                     self.achievements_manager.new_achievement(2)
                 save_data("PLAYER_DATA")
-                return screen, "results", self.canvas_surf
+                return self.screen, "results", self.canvas_surf
             
             self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()

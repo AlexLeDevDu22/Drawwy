@@ -10,7 +10,7 @@ from shared.tools import get_screen_size
 # Police
 font_large = pygame.font.SysFont('Arial', 36, bold=True)
 font_medium = pygame.font.SysFont('Arial', 24)
-WIDHT, HEIGHT = get_screen_size()
+WIDTH, HEIGHT = get_screen_size()
 
 
 def draw_background(surface):
@@ -109,34 +109,34 @@ class ParticleSystem:
                     (particle['size'] * 2, particle['size']), pygame.SRCALPHA)
                 pygame.draw.rect(
                     rect_surface,
-                    (*particle['color'],
-                     alpha),
-                    (0,
-                     0,
-                     particle['size'] * 2,
-                        particle['size']))
+                    (*particle['color'], alpha),
+                    (0, 0, particle['size'] * 2, particle['size'])
+                )
 
                 # Rotation du confetti
-                rotated_surface = pygame.transform.rotate(
-                    rect_surface, particle['rotation'])
-                rotated_rect = rotated_surface.get_rect(
-                    center=(particle['x'], particle['y']))
+                rotated_surface = pygame.transform.rotate(rect_surface, particle['rotation'])
+                rotated_rect = rotated_surface.get_rect(center=(particle['x'], particle['y']))
                 surface.blit(rotated_surface, rotated_rect)
+
             else:
-                # Dessiner une particule circulaire standard avec gfxdraw pour
-                # le support de l'alpha
+                # Utiliser une surface temporaire pour l'alpha
+                temp_surface = pygame.Surface((particle['size'] * 2, particle['size'] * 2), pygame.SRCALPHA)
+                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente
                 gfxdraw.filled_circle(
-                    surface,
-                    int(particle['x']),
-                    int(particle['y']),
+                    temp_surface,
+                    particle['size'],  # Centre X dans la surface temporaire
+                    particle['size'],  # Centre Y
                     int(particle['size']),
                     (*particle['color'], alpha)
                 )
+                surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
+
 
 
 class PopupAnimation:
-    def __init__(self, score, images=None):
+    def __init__(self, score,screen, images=None):
         self.score = score
+        self.screen = screen
         self.popup_width, self.popup_height = 600, 400
         self.popup_x = (WIDTH - self.popup_width) // 2
         self.popup_y = -self.popup_height  # Commencer hors écran
@@ -332,19 +332,19 @@ class PopupAnimation:
             star_surface.set_alpha(max(100, int(fill_percent * 2.55)))
 
         # Blitter la surface transparente sur l'écran
-        screen.blit(star_surface, (x - size, y - size - 20))
+        self.screen.blit(star_surface, (x - size, y - size - 20))
 
     def draw(self):
         # Dessiner le fond de la popup
         pygame.draw.rect(
-            screen,
+            self.screen,
             WHITE,
             (self.popup_x,
              self.popup_y,
              self.popup_width,
              self.popup_height))
         pygame.draw.rect(
-            screen,
+            self.screen,
             BLACK,
             (self.popup_x,
              self.popup_y,
@@ -354,11 +354,11 @@ class PopupAnimation:
 
         # Dessiner le titre et le score
         title_surface = font_large.render("Dessin achevé !!", True, BLACK)
-        screen.blit(title_surface, (self.popup_x + (self.popup_width -
+        self.screen.blit(title_surface, (self.popup_x + (self.popup_width -
                     title_surface.get_width()) // 2, self.popup_y + 30))
 
         score_surface = font_large.render(f"Score: {self.score}%", True, BLACK)
-        screen.blit(score_surface, (self.popup_x + (self.popup_width -
+        self.screen.blit(score_surface, (self.popup_x + (self.popup_width -
                     score_surface.get_width()) // 2, self.popup_y + 80))
 
         # Dessiner les étoiles
@@ -372,7 +372,7 @@ class PopupAnimation:
         for i in range(3):
             percentage_text = font_medium.render(
                 f"{30 + i * 20}%", True, BLACK)
-            screen.blit(
+            self.screen.blit(
                 percentage_text,
                 (start_x +
                  i *
@@ -397,7 +397,7 @@ class PopupAnimation:
         try:
             star_icon = pygame.image.load("assets/icon_star.png")
             star_icon = pygame.transform.scale(star_icon, (40, 40))
-            screen.blit(
+            self.screen.blit(
                 star_icon,
                 (self.popup_x +
                  self.popup_width -
@@ -416,7 +416,7 @@ class PopupAnimation:
                 100)
 
         text_x35 = font_medium.render("X35", True, BLACK)
-        screen.blit(
+        self.screen.blit(
             text_x35,
             (self.popup_x +
              self.popup_width -
@@ -429,7 +429,7 @@ class PopupAnimation:
         image_y = self.popup_y + 30
         image_spacing = 20
 
-        screen.blit(self.images[0], (image_x, image_y))
+        self.screen.blit(self.images[0], (image_x, image_y))
 
         # Flèche entre les images
 # Flèche entre les images (inversée mais dans la même zone)
@@ -438,23 +438,21 @@ class PopupAnimation:
             (image_x + 145, image_y + 190 - 30),  # Coin bas gauche
             (image_x + 105, image_y + 190 - 30)   # Coin bas droit
         ]
-        pygame.draw.polygon(screen, GRAY, arrow_points)
+        pygame.draw.polygon(self.screen, GRAY, arrow_points)
 
-        screen.blit(self.images[1], (image_x, image_y + 150 + 50))
+        self.screen.blit(self.images[1], (image_x, image_y + 150 + 50))
 
         # Dessiner toutes les particules
-        self.particles.draw(screen)
+        self.particles.draw( self.screen)
 
 
-def popup_result():
+def popup_result(similarity, screen):  # Assurer que screen est bien un paramètre
     clock = pygame.time.Clock()
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill((230, 230, 230))
     draw_background(background)
 
-    # Score à afficher (à modifier selon vos besoins)
-    score = 69
-    popup = PopupAnimation(score)
+    popup = PopupAnimation(similarity, screen)  # Passer screen
 
     running = True
     while running:
@@ -463,20 +461,18 @@ def popup_result():
                 running = False
             elif event.type == KEYDOWN:
                 if event.key == K_SPACE:
-                    # Recréer la popup avec un nouveau score pour tester
-                    score = random.randint(30, 100)
-                    popup = PopupAnimation(score)
+                    popup = PopupAnimation(similarity, screen)  # Passer screen ici aussi
 
         screen.blit(background, (0, 0))
-
         popup.update()
-        popup.draw()
+        popup.draw()  # Plus d'erreur ici
 
         pygame.display.flip()
         clock.tick(60)
 
     pygame.quit()
     sys.exit()
+
 
 
 if __name__ == "__popup_result__":
