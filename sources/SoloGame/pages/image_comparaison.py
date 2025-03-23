@@ -121,12 +121,13 @@ class ParticleSystem:
             else:
                 # Utiliser une surface temporaire pour l'alpha
                 temp_surface = pygame.Surface((particle['size'] * 2, particle['size'] * 2), pygame.SRCALPHA)
-                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente
+                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente 
+                color = tuple(map(int, particle['color'])) + (alpha,)
                 gfxdraw.filled_circle(
                     temp_surface,
-                    particle['size'],  # Centre X dans la surface temporaire
-                    particle['size'],  # Centre Y
-                    int(particle['size']),
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Déjà converti, c'est bien
                     (*particle['color'], alpha)
                 )
                 surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
@@ -135,7 +136,7 @@ class ParticleSystem:
 
 class PopupAnimation:
     def __init__(self, score,screen, images=None):
-        self.score = score
+        self.score = int(score)
         self.screen = screen
         self.popup_width, self.popup_height = 600, 400
         self.popup_x = (WIDTH - self.popup_width) // 2
@@ -149,11 +150,10 @@ class PopupAnimation:
 
         # Images (à remplacer par vos images)
         self.images = images or [
-            pygame.Surface(
-                (250, 150)), pygame.Surface(
-                (250, 150))]
-        self.images[0].fill(WHITE)
-        self.images[1].fill(WHITE)
+            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150)),
+            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150))
+        ]
+
 
         # Animation des étoiles
         # Pourcentage de remplissage de chaque étoile
