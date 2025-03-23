@@ -124,9 +124,9 @@ class ParticleSystem:
                 temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente
                 gfxdraw.filled_circle(
                     temp_surface,
-                    particle['size'],  # Centre X dans la surface temporaire
-                    particle['size'],  # Centre Y
-                    int(particle['size']),
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Déjà converti, c'est bien
                     (*particle['color'], alpha)
                 )
                 surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
