@@ -125,10 +125,10 @@ class ParticleSystem:
                 color = tuple(map(int, particle['color'])) + (alpha,)
                 gfxdraw.filled_circle(
                     temp_surface,
-                    int(particle['size']),  # Centre X dans la surface temporaire
-                    int(particle['size']),  # Centre Y
-                    int(particle['size']),
-                    color
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Convertir en entier
+                    int(particle['size']),  # Déjà converti, c'est bien
+                    (*particle['color'], alpha)
                 )
                 surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
 
