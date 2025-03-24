@@ -1,5 +1,5 @@
 {
-    "pseudo": "Leleu",
+    "pseudo": "Alx",
     "achievements": [
         {
             "id": 0,
@@ -172,7 +172,7 @@
     "num_draws_total": 13,
     "coins": 88309,
     "selected_items": {
-        "Curseurs": 1,
+        "Curseurs": null,
         "Bordures": 2,
         "Emotes": 22
     },

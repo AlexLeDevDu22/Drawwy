@@ -150,11 +150,10 @@ class PopupAnimation:
 
         # Images (à remplacer par vos images)
         self.images = images or [
-            pygame.Surface(
-                (250, 150)), pygame.Surface(
-                (250, 150))]
-        self.images[0].fill(WHITE)
-        self.images[1].fill(WHITE)
+            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150)),
+            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150))
+        ]
+
 
         # Animation des étoiles
         # Pourcentage de remplissage de chaque étoile

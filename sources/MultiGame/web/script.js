@@ -61,6 +61,8 @@ function clearCanvas() {
   canvas.width = gameConfig.canvasWidth;
   canvas.height = gameConfig.canvasHeight;
 
+  canvas.style.width = canvas.getClientRects().width + "px";
+
   // Clear the canvas
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -68,144 +70,153 @@ function clearCanvas() {
 clearCanvas();
 
 //* Handle WebSocket connection
+//* Handle WebSocket connection
 var socket = null;
 function handleConnection() {
-  socket = io(document.URL);
+  // Create a WebSocket connection
+  socket = new WebSocket(`wss://${window.location.host}/ws`);
 
-  socket.on("connect", () => {
+  socket.onopen = function () {
     console.log("Connecté au serveur WebSocket !");
 
-    // Envoyer un événement 'join' avec le pseudo et l'avatar
-    console.log(pseudo);
+    // Send join message with header field
     setTimeout(() => {
-      // etre connecté après python
-      socket.emit("join", {
-        pseudo: pseudo,
-        avatar: avatar,
-      });
+      socket.send(
+        JSON.stringify({
+          header: "join",
+          pseudo: pseudo,
+          avatar: avatar,
+        })
+      );
     }, 100);
-  });
+  };
 
-  socket.on("disconnect", () => {
+  socket.onclose = function () {
     console.log("Déconnexion du serveur WebSocket.");
 
     clearCanvas();
     chatMessages.innerHTML = "";
     playerList.innerHTML = "";
-  });
+  };
 
-  // Écouter l'événement 'welcome' pour recevoir l'état initial du jeu
-  socket.on("welcome", (data) => {
-    console.log("Bienvenue dans la partie :", data);
-    allFrames += data.all_frames;
-    console.log("start frames", data.all_frames);
-    if (data.all_frames.length > 0) draw(data.all_frames, false);
-    myId = data["pid"];
-    data["messages"].forEach((message) => {
-      addMessageToChat(
-        message.message,
-        message.succeed ? "#63ff6c" : null,
-        message.pseudo,
-        message.pid,
-        message.succeed
-      );
-    });
-    players = data.players;
-    currentSentence = data.sentence;
-    drawerId = data.drawer_id;
-    gameStartTime = new Date(data.new_game);
-    updatePlayerList();
-    updateWordDisplay();
-    toggleDrawingTools();
-  });
+  socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
 
-  socket.on("new_player", (data) => {
-    console.log("Nouveaux joueurs :", data);
-    players.push(data);
-    updatePlayerList();
-    addMessageToChat(pseudo + " viens de nous rejoindre!", "#63ff6c");
-  });
+    console.log(data);
 
-  socket.on("draw", (frames) => {
-    console.log("Mise à jour du dessin");
-    allFrames += frames;
-    drawingState.undoStack = [];
-    draw(frames, true);
-  });
-
-  socket.on("roll_back", (roll_back) => {
-    console.log("Roll back");
-    //resplit frames and undo stacks
-    allFrames += drawingState.undoStack;
-    drawingState.undoStack = allFrames.slice(-roll_back);
-
-    clearCanvas();
-    draw(allFrames, false);
-  });
-
-  socket.on("new_message", (mess) => {
-    console.log("Nouveau mess :", mess);
-    if (mess.type == "guess")
-      addMessageToChat(
-        mess.message,
-        mess.succeed ? "#63ff6c" : null,
-        mess.pseudo,
-        mess.pid,
-        mess.succeed
-      );
-    else if (mess.type == "emote")
-      addEmoteToChat(mess.emote_path, mess.pseudo, mess.pid);
-
-    if (mess.succeed) {
-      for (let i = 0; i < players.length; i++) {
-        if (players[i].pid == mess.pid) players[i].found = true;
-
-        mess.new_points.forEach((point) => {
-          if (players[i].pid == point.pid) players[i].points += point.points;
+    // Handle different message types based on the header
+    switch (data.header) {
+      case "welcome":
+        console.log("Bienvenue dans la partie :", data);
+        allFrames += data.all_frames;
+        console.log("start frames", data.all_frames);
+        if (data.all_frames.length > 0) draw(data.all_frames, false);
+        myId = data["pid"];
+        data["messages"].forEach((message) => {
+          addMessageToChat(
+            message.message,
+            message.succeed ? "#63ff6c" : null,
+            message.pseudo,
+            message.pid,
+            message.succeed
+          );
         });
-      }
+        players = data.players;
+        currentSentence = data.sentence;
+        drawerId = data.drawer_id;
+        gameStartTime = new Date(data.new_game);
+        updatePlayerList();
+        updateWordDisplay();
+        toggleDrawingTools();
+        break;
 
-      updatePlayerList();
+      case "new_player":
+        console.log("Nouveaux joueurs :", data);
+        players.push(data);
+        updatePlayerList();
+        addMessageToChat(pseudo + " viens de nous rejoindre!", "#63ff6c");
+        break;
+
+      case "draw":
+        console.log("Mise à jour du dessin");
+        allFrames += data.frames;
+        drawingState.undoStack = [];
+        draw(data.frames, true);
+        break;
+
+      case "roll_back":
+        console.log("Roll back");
+        allFrames += drawingState.undoStack;
+        drawingState.undoStack = allFrames.slice(-data.roll_back);
+
+        clearCanvas();
+        draw(allFrames, false);
+        break;
+
+      case "new_message":
+        console.log("Nouveau mess :", data);
+        if (data.type == "guess")
+          addMessageToChat(
+            data.message,
+            data.succeed ? "#63ff6c" : null,
+            data.pseudo,
+            data.pid,
+            data.succeed
+          );
+        else if (data.type == "emote")
+          addEmoteToChat(data.emote_path, data.pseudo, data.pid);
+
+        if (data.succeed) {
+          for (let i = 0; i < players.length; i++) {
+            if (players[i].pid == data.pid) players[i].found = true;
+
+            data.new_points.forEach((point) => {
+              if (players[i].pid == point.pid)
+                players[i].points += point.points;
+            });
+          }
+
+          updatePlayerList();
+        }
+        break;
+
+      case "new_game":
+        console.log("Nouvelle partie :", data);
+
+        clearCanvas();
+        allFrames = [];
+        currentSentence = data.new_sentence;
+        drawerId = data.drawer_id;
+        hasFound = false;
+        players.forEach((p) => (p.found = false));
+        console.log(players, drawerId);
+        addMessageToChat(
+          "Nouvelle partie, " +
+            players.find((p) => p.pid == drawerId)["pseudo"] +
+            " deviens le dessinateur !",
+          "#63ff6c"
+        );
+        gameStartTime = new Date(data.start_time);
+
+        updateWordDisplay();
+        updatePlayerList();
+        toggleDrawingTools();
+        startGameTimer();
+        break;
+
+      case "player_disconnected":
+        if (data.pid != myId) {
+          console.log("Joueur déconnecté :", data);
+          players = players.filter((player) => player.pid !== data.pid);
+          updatePlayerList();
+          addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
+        }
+        break;
+
+      default:
+        console.log("Mise à jour du jeu :", data);
     }
-  });
-
-  socket.on("new_game", (data) => {
-    console.log("Nouvelle partie :", data);
-
-    clearCanvas();
-    allFrames = [];
-    currentSentence = data.new_sentence;
-    drawerId = data.drawer_id;
-    hasFound = false;
-    players.forEach((p) => (p.found = false));
-    console.log(players, drawerId);
-    addMessageToChat(
-      "Nouvelle partie, " +
-        players.find((p) => p.pid == drawerId)["pseudo"] +
-        " deviens le dessinateur !",
-      "#63ff6c"
-    );
-    gameStartTime = new Date(data.start_time);
-
-    updateWordDisplay();
-    updatePlayerList();
-    toggleDrawingTools();
-    startGameTimer();
-  });
-
-  socket.on("player_disconnected", (data) => {
-    if (data.pid != myId) {
-      console.log("Joueur déconnecté :", data);
-      players = players.filter((player) => player.pid !== data.pid);
-      updatePlayerList();
-      addMessageToChat(data.pseudo + " à quitté la partie.", "#fc6455");
-    }
-  });
-
-  // Écouter les mises à jour du jeu
-  socket.on("update", (data) => {
-    console.log("Mise à jour du jeu :", data);
-  });
+  };
 }
 
 var isDrawing = false;
@@ -452,19 +463,48 @@ loginForm.addEventListener("submit", (e) => {
   }
 });
 
-// send message
+// Update sendMessage function
 function sendMessage(message) {
   if (message) {
-    socket.emit("message", {
-      type: "guess",
-      pid: myId,
-      pseudo: pseudo,
-      message: message,
-      remaining_time: remainingTime,
-    });
+    socket.send(
+      JSON.stringify({
+        header: "new_message",
+        type: "guess",
+        pid: myId,
+        pseudo: pseudo,
+        message: message,
+        remaining_time: remainingTime,
+      })
+    );
   }
 }
 
+// Update the draw sending code
+setInterval(() => {
+  if (drawingState.drawFrames.length > 0) {
+    const newFrames = parseFrames(drawingState.drawFrames);
+    console.log("Envoi du dessin", newFrames);
+    socket.send(
+      JSON.stringify({
+        header: "draw",
+        frames: newFrames,
+      })
+    );
+    drawingState.drawFrames = [];
+  }
+}, 1000);
+
+// Update handleGameEnd function
+function handleGameEnd() {
+  clearCanvas();
+  if (myId == drawerId) {
+    socket.send(
+      JSON.stringify({
+        header: "game_finished",
+      })
+    );
+  }
+}
 sendBtn.addEventListener("click", () => {
   if (chatInput.value == "") return;
   sendMessage(chatInput.value);
@@ -563,8 +603,8 @@ setInterval(() => {
 colorOptions.forEach((option) => {
   option.addEventListener("click", () => {
     drawingState.color = option.getAttribute("data-color");
-    colorOptions
-      .find((option) => option.classList.contains(".active"))
+    Array.from(colorOptions)
+      .find((option) => option.classList.contains("active"))
       .classList.remove("active");
     option.classList.add("active");
   });

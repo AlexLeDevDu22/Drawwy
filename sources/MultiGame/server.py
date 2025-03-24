@@ -1,69 +1,69 @@
 from shared.utils.data_manager import *
 
-import requests
 import os
-import threading
-import time
 from datetime import datetime
 import MultiGame.utils.sentences as sentences
 import MultiGame.utils.tools as tools
-from flask import Flask, request
-from flask_socketio import SocketIO, emit
 import shutil
-from pyngrok import ngrok
-
-# Initialisation de Flask et SocketIO
-app = Flask(__name__, static_folder='web', static_url_path='/')
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    async_mode="threading",
-    logger=False,
-    engineio_logger=False,
-    allow_unsafe_werkzeug=True)
+import ngrok
+from aiohttp import web
+import asyncio
+import psutil
 
 server_name = None
 
-# Variables du jeu
-players = []
-drawer_id = -1
-guess_list = []
-sentences_list = [sentences.new_sentence()]
-last_game_start = None
-all_frames = []
-roll_back = 0
-
 # Variables pour le serveur
-server_running = False
+server_started = False
 http_tunnel = None
 flask_thread = None
-stop_event = threading.Event()
 
-# Route principale pour servir l'index.html
+# Stocke les WebSockets
+app = None
+websockets = set()
 
+loop = None
 
-@app.route('/')
-def index():
-    return app.send_static_file('index.html')
+async def handle_websocket(request):
+    global ws
 
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
 
-@app.route('/num_players', methods=['GET'])
-def get_player_count():
-    return {"num_players": len(players)}, 200
+    # Ajouter le WebSocket à la liste
+    websockets.add(ws)
 
+    try: 
+        async for message in ws:
+            data = message.json()
 
-@socketio.on('connect')
-def handle_connect():
-    print("Nouveau client connecté")
+            if data["header"] == "join":
+                await handle_join(data, ws)
+            elif data["header"] == "new_message":
+                if data["type"] == "guess":
+                    await handle_guess(data)
+                elif data["type"] == "emote":
+                    await handle_emote(data)
+            elif data["header"] == "roll_back":
+                await handle_roll_back(data, ws)
+            elif data["header"] == "draw":
+                await handle_draw(data)
+            elif data["header"] == "game_finished":
+                await handle_new_game(data)
 
+    except Exception as e:
+        print(f"Error handling WebSocket: {e}")
+    finally:
+        # Enlever le WebSocket de la liste
+        await handle_disconnect(ws)
+        websockets.remove(ws)
+        return ws
 
-@socketio.on('disconnect')
-def handle_disconnect(data=None):
+async def handle_disconnect(ws):
     global players
     if players:
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
-            if player.get("sid") == request.sid:
+            if player["ws"] == ws:
                 print(f"Joueur {player['pseudo']} déconnecté")
                 players.pop(i)
                 break
@@ -73,14 +73,15 @@ def handle_disconnect(data=None):
             os.remove(f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
 
         # Envoyer la mise à jour des joueurs
-        emit('player_disconnected', {
+
+        await broadcast({
+            "header": "player_disconnected",
             "pid": player["pid"],
             "pseudo": player["pseudo"]
-        }, broadcast=True)
+        })
 
 
-@socketio.on('join')
-def handle_join(data):
+async def handle_join(data, ws):
     global players, last_game_start
 
     if len(players) > 0:
@@ -95,23 +96,26 @@ def handle_join(data):
         "avatar": data["avatar"],
         "points": 0,
         "found": False,
-        "sid": request.sid
+        "ws": ws
     })
 
     # Envoyer l'ID du joueur et l'état initial du jeu
-    emit('welcome',
-         {"pid": pid,
-          "players": [{"pid": p["pid"],
-                       "pseudo": p["pseudo"],
-                       "avatar": p["avatar"],
-                       "points": p["points"],
-                       "found": p["found"]} for p in players],
-          "sentence": sentences_list[-1],
-          "drawer_id": drawer_id,
-          "all_frames": all_frames,
-          "messages": guess_list,
-          "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
-          "roll_back": roll_back})
+    await broadcast({
+            "header": "welcome",
+            "pid": pid,
+            "players": [{"pid": p["pid"],
+                        "pseudo": p["pseudo"],
+                        "avatar": p["avatar"],
+                        "points": p["points"],
+                        "found": p["found"]} for p in players],
+            "sentence": sentences_list[-1],
+            "drawer_id": drawer_id,
+            "all_frames": all_frames,
+            "messages": guess_list,
+            "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
+            "roll_back": roll_back},
+          target_pid = pid
+          )
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
@@ -120,21 +124,20 @@ def handle_join(data):
                           sentences_list[-1],
                           False)
 
-    # Annoncer le nouveau joueur
-    emit('new_player', {
+    await broadcast({
+        "header": "new_player",
         "pid": pid,
         "pseudo": data["pseudo"],
         "avatar": data["avatar"],
         "points": 0,
         "found": False
-    }, broadcast=True, skip_sid=request.sid)
+    }, skip_id=pid)
 
     if len(players) == 2:
-        handle_new_game()
+        await handle_new_game()
 
 
-@socketio.on('game_finished')
-def handle_new_game(data=None):
+async def handle_new_game(data=None):
     global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
 
     guess_list = []
@@ -155,226 +158,185 @@ def handle_new_game(data=None):
     else:
         drawer_id = players[0]["pid"]
 
-    emit('new_game', {
+    await broadcast({
+        "header": "new_game",
         "drawer_id": drawer_id,
         "start_time": last_game_start.isoformat(),
         "new_sentence": sentences_list[-1]
-    }, broadcast=True)
+    })
 
 
-@socketio.on('draw')
-def handle_draw(frames):
+async def handle_draw(data):
     global all_frames
 
-    # Mise à jour du dessin
-    all_frames += frames
+    all_frames += data["frames"]
 
-    # Envoyer la mise à jour
-    emit('draw', frames, broadcast=True, skip_sid=request.sid)
+    await broadcast(data, skip_id=drawer_id)
 
 
-@socketio.on('roll_back')
-def handle_roll_back(data_roll_back):
+async def handle_roll_back(data, ws):
     global roll_back
 
-    roll_back = data_roll_back
+    roll_back = data["roll_back"]
 
-    emit('roll_back', roll_back, broadcast=True, skip_sid=request.sid)
+    await broadcast(data, skip_id=drawer_id)
 
 
-@socketio.on('message')
-def handle_message(message):
-    global players, drawer_id, guess_list, sentences_list, last_game_start
+async def handle_guess(message):
+    global players, drawer_id, guess_list, sentences_list
 
-    if message["type"] == "guess":
-        list_found = []
-        succeed = False
+    list_found = []
+    succeed = False
 
-        message["succeed"] = False
+    message["succeed"] = False
 
-        for i, player in enumerate(players):
-            if message["pid"] == player["pid"] and player["pid"] != drawer_id:
-                succeed = tools.check_sentences(
-                    sentences_list[-1], message["message"])
-                if succeed and not player["found"]:
-                    message["succeed"] = True
-                    # point au founder
-                    founder_points = int(
-                        (message["remaining_time"] /
-                         CONFIG["game_duration"]) *
-                        len(players) *
-                        CONFIG["points_per_found"])
-                    players[i]["points"] += founder_points
-                    players[i]["found"] = True
+    for i, player in enumerate(players):
+        if message["pid"] == player["pid"] and player["pid"] != drawer_id:
+            succeed = tools.check_sentences(
+                sentences_list[-1], message["message"])
+            if succeed and not player["found"]:
+                message["succeed"] = True
+                # point au founder
+                founder_points = int(
+                    (message["remaining_time"] /
+                        CONFIG["game_duration"]) *
+                    len(players) *
+                    CONFIG["points_per_found"])
+                players[i]["points"] += founder_points
+                players[i]["found"] = True
 
-                    # Donner des points au dessinateur
-                    drawer_points = CONFIG["points_per_found"]
-                    for j in range(len(players)):
-                        if players[j]["pid"] == drawer_id:
-                            players[j]["points"] += drawer_points
-                            break
+                # Donner des points au dessinateur
+                drawer_points = CONFIG["points_per_found"]
+                for j in range(len(players)):
+                    if players[j]["pid"] == drawer_id:
+                        players[j]["points"] += drawer_points
+                        break
 
-                    message["new_points"] = [{"pid": player["pid"], "points": founder_points}, {
-                        "pid": drawer_id, "points": drawer_points}]
+                message["new_points"] = [{"pid": player["pid"], "points": founder_points}, {
+                    "pid": drawer_id, "points": drawer_points}]
 
-            if player["pid"] != drawer_id:
-                print(player["pid"], player["found"])
-                list_found.append(player["found"])
+        if player["pid"] != drawer_id:
+            list_found.append(player["found"])
 
-        guess_list.append(message)
+    guess_list.append(message)
 
-        emit('new_message', message, broadcast=True)
+    await broadcast(message)
 
-        # Vérifier si tous les joueurs ont trouvé
-        if len(players) > 1 and all(list_found):
-            handle_new_game()
+    # Vérifier si tous les joueurs ont trouvé
+    if len(players) > 1 and all(list_found):
+        await handle_new_game()
 
-    elif message['type'] == "emote":
-        if not os.path.exists(
-            "sources/MultiGame/web/temp-assets/emotes/" +
+async def handle_emote(message):
+
+    message["header"] = "new_message"
+
+    if not os.path.exists(
+        "sources/MultiGame/web/temp-assets/emotes/" +
+            message["emote_path"]):
+        if os.path.exists(
+            "data/shop/emotes_assets/" +
                 message["emote_path"]):
-            if os.path.exists(
+            shutil.copyfile(
                 "data/shop/emotes_assets/" +
-                    message["emote_path"]):
-                shutil.copyfile(
-                    "data/shop/emotes_assets/" +
-                    message["emote_path"],
-                    "sources/MultiGame/web/temp-assets/emotes/" +
-                    message["emote_path"])
+                message["emote_path"],
+                "sources/MultiGame/web/temp-assets/emotes/" +
+                message["emote_path"])
 
-        emit('new_message', message, broadcast=True)
+    await broadcast(message)
 
+async def broadcast(message, skip_id=None, target_pid=None):
+    """Envoie un message à tous les WebSockets connectés."""
+    
+    for player in players:
+        if player["pid"] != skip_id and (target_pid is None or player["pid"] == target_pid):
+            await player["ws"].send_json(message)
 
-def flask_worker():
-    """Fonction pour exécuter le serveur Flask dans un thread"""
-    socketio.run(
-        app,
-        host='0.0.0.0',
-        port=8765,
-        debug=False,
-        use_reloader=False)
+def get_num_players(request):
+    return web.json_response({"num_players": len(players)})
 
+async def redirect_to_index(request):
+    """Redirige vers index.html"""
+    raise web.HTTPFound("/index.html") 
+    
+async def start_web():
+    global app
+
+    app = web.Application()
+    
+    # Route WebSocket
+    app.router.add_get("/ws", handle_websocket)
+
+    app.router.add_get("/", redirect_to_index) 
+
+    app.router.add_static("/", "sources/MultiGame/web", show_index=True)
+
+    app.router.add_get("/num_players", get_num_players)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", CONFIG["servers"][server_name]["port"])
+    await site.start()
 
 def start_server(serv_name):
-    """Démarre le serveur Flask-SocketIO et Ngrok."""
-    global server_running, http_tunnel, flask_thread, stop_event, server_name
+    """Démarre le serveur HTTP + WebSocket dans un thread."""
+    global server_started, server_name, loop, players, drawer_id, guess_list, sentences_list, last_game_start, all_frames, roll_back
+
+    # Variables du jeu
+    players = []
+    drawer_id = -1
+    guess_list = []
+    sentences_list = [sentences.new_sentence()]
+    last_game_start = None
+    all_frames = []
+    roll_back = 0
 
     server_name = serv_name
 
-    # Réinitialiser l'événement d'arrêt
-    stop_event.clear()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-    # reset Ngrok
+    free_port(CONFIG["servers"][server_name]["port"])
+
+    # Lancer Ngrok (facultatif si déjà lancé ailleurs)
     ngrok.kill()
-    os.system("rm -rf ~/.ngrok2")
-    # Configuration de ngrok
+    import ngrok
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
-    ngrok.set_api_key(CONFIG["servers"][server_name]["api"])
+    ngrok.connect(CONFIG["servers"][server_name]["port"], domain=CONFIG["servers"][server_name]["domain"])
 
-    # Exposer le port avec ngrok
-    http_tunnel = ngrok.connect(
-        8765,
-        "http",
-        domain=CONFIG["servers"][server_name]["domain"],
-        bind_tls=True)
+    loop.run_until_complete(start_web())  # Exécuter le serveur
+    server_started = True
+    loop.run_forever()
 
-    print(f"Serveur accessible via: {http_tunnel.public_url}")
-
-    try:
-        # Démarrer Flask dans un thread séparé
-        flask_thread = threading.Thread(target=flask_worker)
-        flask_thread.daemon = True
-        flask_thread.start()
-
-        # Marquer le serveur comme en cours d'exécution
-        server_running = True
-
-        # Attendre que le serveur soit arrêté
-        while not stop_event.is_set() and flask_thread.is_alive():
-            time.sleep(0.5)
-
-    except KeyboardInterrupt:
-        stop_server()
-
+def free_port(port):
+    """Libère le port s'il est occupé, sans erreur de permission."""
+    current_pid = os.getpid()  # Récupère le PID du script en cours
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            for conn in proc.connections(kind='inet'):
+                if conn.laddr.port == port:
+                    # Ne pas tuer le processus si c'est le processus actuel
+                    if proc.info['pid'] != current_pid:
+                        print(f"Libération du port {port} utilisé par le processus {proc.info['pid']}")
+                        os.kill(proc.info['pid'], 9)  # Force kill
+        except (psutil.AccessDenied, psutil.NoSuchProcess):
+            pass  # Ignore les erreurs de permission ou si le process n'existe plus
 
 def stop_server():
-    """Arrête proprement le serveur Flask-SocketIO et Ngrok."""
-    global server_running, http_tunnel, stop_event, server_name
 
-    if not server_name:
+    """Ferme proprement le serveur WebSocket, HTTP et Ngrok."""
+    global app, websockets, server_started, loop
+
+    if not loop:
         return
 
-    print("Arrêt du serveur en cours...")
+    loop.stop()
 
-    # Signaler l'arrêt
-    stop_event.set()
+    ngrok.disconnect(CONFIG["servers"][server_name]["domain"])  # Déconnecte Ngrok
 
-    # Déconnecter ngrok
-    if http_tunnel:
-        print("Fermeture du tunnel ngrok...")
-        ngrok.disconnect(http_tunnel.public_url)
+    free_port(CONFIG["servers"][server_name]["port"])
 
-    # Signaler aux clients la fermeture du serveur
-    # try:
-    #     emit('server_shutdown', {'message': 'Le serveur va s\'arrêter.'}, broadcast=True)
-    # except Exception as e:
-    #     print(f"Erreur lors de l'envoi du message de fermeture: {e}")
-
-    for filename in os.listdir("sources/MultiGame/web/temp-assets/avatars"):
-        os.remove(os.path.join("sources/MultiGame/web/temp-assets/avatars", filename))
-
-    # Au cas ou...
-    try:
-        endpoints = requests.get(
-            "https://api.ngrok.com/endpoints",
-            headers={
-                "Authorization": "Bearer " +
-                CONFIG["servers"][server_name]["api"],
-                "Ngrok-Version": "2"}).json()["endpoints"]
-        if endpoints:
-            requests.delete(
-                "https://api.ngrok.com/endpoints/" +
-                endpoints[0]["id"],
-                headers={
-                    "Authorization": "Bearer " +
-                    CONFIG["servers"][server_name]["api"],
-                    "Ngrok-Version": "2"})
-
-        ts = requests.get(
-            "https://api.ngrok.com/tunnel_sessions",
-            headers={
-                "Authorization": "Bearer " +
-                "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW",
-                "Content-Type": "application/json",
-                "Ngrok-Version": "2"},
-            json={}).json()["tunnel_sessions"]
-
-        if ts:
-            requests.post(
-                "https://api.ngrok.com/tunnel_sessions/" +
-                ts[0]["id"] +
-                "/stop",
-                headers={
-                    "Authorization": "Bearer " +
-                    "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW",
-                    "Content-Type": "application/json",
-                    "Ngrok-Version": "2"},
-                json={}).json()
-    except BaseException:
-        pass
-
-    ngrok.kill()
-    os.system("rm -rf ~/.ngrok2")
-
-    from pyngrok import ngrok as ngrok2
-    ngrok2.get_tunnels()
-    ngrok2.kill()
-
-    # Marquer le serveur comme arrêté
-    server_running = False
-
-    print("Serveur arrêté avec succès.")
-
+    server_started = False
+    
 
 # Fonction pour être compatible avec un import et un lancement direct
 if __name__ == '__main__':

@@ -39,4 +39,4 @@ def compare_images(img1_path, img2_path):
     # Calculer la similarité SSIM
     score, _ = ssim(img1_gray, img2_gray, full=True)
 
-    return score * 100  # Retourne la similarité en pourcentage
+    return int(score * 100)  # Retourne la similarité en pourcentage

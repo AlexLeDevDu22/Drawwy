@@ -4,8 +4,7 @@ from shared.ui.common_ui import *
 import pygame
 from PIL import Image, ImageFilter
 import time
-import socketio
-import os
+import requests
 import socket
 import asyncio
 
@@ -19,14 +18,8 @@ def is_connected():
         return False
 
 
-async def test_server(server_name):
-    try:
-        sio = socketio.AsyncClient()
-        await sio.connect(f"https://{CONFIG["servers"][server_name]["domain"]}")
-        return True
-    except BaseException:
-        return False
-
+def test_server(server_name):
+    return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/players_num").status_code == 200
 
 def load_bmp_to_matrix(file_path):
     """Charge une image BMP et retourne une matrice de pixels."""
@@ -76,18 +69,14 @@ def check_sentences(phrase1, phrase2):
     return score > CONFIG["sentence_checker_seuil"]
 
 
-def emit_sio(sio, event, data):
-    if sio and sio.connected:
+def emit_sio(ws, data):
+    if ws:
         try:
             loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
-            # Crée une tâche si la boucle existe
-            loop.create_task(sio.emit(event, data))
         except RuntimeError:
-            # Créer une nouvelle boucle si aucune n'existe
-            loop = asyncio.new_event_loop()
+            loop = asyncio.new_event_loop()  # Crée une nouvelle boucle si aucune n'existe
             asyncio.set_event_loop(loop)
-            # Exécuter directement l'événement
-            loop.run_until_complete(sio.emit(event, data))
+        asyncio.run(ws.send(json.dumps(data)))
 
 
 def simplify_frames(frames):

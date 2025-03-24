@@ -3,16 +3,19 @@ servers:
     auth_token: "2j0ZXs82uJ78fmGVfSKxkQ26Nhl_2MiAUCneGVvY4BmQDLMya"
     domain: "vital-mastiff-publicly.ngrok-free.app"
     api: "2uBh0vcHjqPdwVi3t4gz9D9ZEH9_3R1frHq58vY8VQEzSuUMW"
+    port: 8765
 
   Smoothly:
     auth_token: "2uaepshfgfXbFazHgLVrtGH1IsO_7ABTr6aEWtt6bZksmJf8h"
     domain: "smoothly-on-hyena.ngrok-free.app"
     api: "ak_2uafcx7VDVvaUvckKoEWawgK74O"
+    port: 8766
 
   Faithful:
     auth_token: "2udPshjR6WsKGo77os4TjN5chmX_26Up9EChUALvx2j4y8fgF"
     domain: "next-boxer-faithful.ngrok-free.app"
     api: "2ue1ZKkjebeEIwvvDxXowlTvo3i_2uKULVDsyEo6A5prX7Gyg"
+    port: 8767
 
 sentence_checker_seuil: 0.8
 game_duration: 150
