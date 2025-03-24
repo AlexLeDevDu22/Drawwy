@@ -5,10 +5,10 @@ from datetime import datetime
 import MultiGame.utils.sentences as sentences
 import MultiGame.utils.tools as tools
 import shutil
-import ngrok
 from aiohttp import web
 import asyncio
-import psutil
+import socket
+from pyngrok import ngrok
 
 server_name = None
 
@@ -16,6 +16,8 @@ server_name = None
 server_started = False
 http_tunnel = None
 flask_thread = None
+
+port = None
 
 # Stocke les WebSockets
 app = None
@@ -259,7 +261,7 @@ async def redirect_to_index(request):
     raise web.HTTPFound("/index.html") 
     
 async def start_web():
-    global app
+    global app, port
 
     app = web.Application()
     
@@ -274,12 +276,20 @@ async def start_web():
 
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", CONFIG["servers"][server_name]["port"])
+    site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
+
+
+def get_free_port():
+    """Retourne un port libre utilisable."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("", 0))  # Bind sur un port aléatoire libre
+        return s.getsockname()[1]  # Retourne le numéro du port
+
 
 def start_server(serv_name):
     """Démarre le serveur HTTP + WebSocket dans un thread."""
-    global server_started, server_name, loop, players, drawer_id, guess_list, sentences_list, last_game_start, all_frames, roll_back
+    global ngrok, server_started, server_name, loop, players, drawer_id, guess_list, sentences_list, last_game_start, all_frames, roll_back, port
 
     # Variables du jeu
     players = []
@@ -294,49 +304,46 @@ def start_server(serv_name):
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-
-    free_port(CONFIG["servers"][server_name]["port"])
-
-    # Lancer Ngrok (facultatif si déjà lancé ailleurs)
+    # Lancer Ngrok
     ngrok.kill()
-    import ngrok
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
-    ngrok.connect(CONFIG["servers"][server_name]["port"], domain=CONFIG["servers"][server_name]["domain"])
+    port=get_free_port()
+    ngrok.connect(port, domain=CONFIG["servers"][server_name]["domain"])
 
     loop.run_until_complete(start_web())  # Exécuter le serveur
     server_started = True
     loop.run_forever()
 
-def free_port(port):
-    """Libère le port s'il est occupé, sans erreur de permission."""
-    current_pid = os.getpid()  # Récupère le PID du script en cours
-    for proc in psutil.process_iter(['pid', 'name']):
-        try:
-            for conn in proc.connections(kind='inet'):
-                if conn.laddr.port == port:
-                    # Ne pas tuer le processus si c'est le processus actuel
-                    if proc.info['pid'] != current_pid:
-                        print(f"Libération du port {port} utilisé par le processus {proc.info['pid']}")
-                        os.kill(proc.info['pid'], 9)  # Force kill
-        except (psutil.AccessDenied, psutil.NoSuchProcess):
-            pass  # Ignore les erreurs de permission ou si le process n'existe plus
-
 def stop_server():
-
     """Ferme proprement le serveur WebSocket, HTTP et Ngrok."""
-    global app, websockets, server_started, loop
+    global app, websockets, server_started, server_name, loop, ngrok
 
-    if not loop:
+    if not server_started or not loop:
         return
 
-    loop.stop()
+    print("🛑 Arrêt du serveur...")
 
-    ngrok.disconnect(CONFIG["servers"][server_name]["domain"])  # Déconnecte Ngrok
+    async def shutdown():
+        global server_started, server_name, ngrok
+        # Fermer toutes les WebSockets
+        for ws in list(websockets):
+            await ws.close()
 
-    free_port(CONFIG["servers"][server_name]["port"])
+        # Fermer l'application web
+        if app is not None:
+            await app.shutdown()
+            await app.cleanup()
+        
+        ngrok.disconnect(CONFIG["servers"][server_name]["domain"])
 
-    server_started = False
-    
+        server_started = False
+
+        # Arrêter toutes les tâches restantes
+        tasks = [t for t in asyncio.all_tasks(loop) if t is not asyncio.current_task()]
+        [t.cancel() for t in tasks]  # Annuler les tâches actives
+
+        loop.stop()
+    asyncio.run_coroutine_threadsafe(shutdown(), loop)
 
 # Fonction pour être compatible avec un import et un lancement direct
 if __name__ == '__main__':

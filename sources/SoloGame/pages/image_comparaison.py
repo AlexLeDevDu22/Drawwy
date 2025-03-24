@@ -6,12 +6,17 @@ from pygame.locals import *
 from pygame import gfxdraw
 from shared.ui.common_ui import *
 from shared.tools import get_screen_size
+from shared.utils.data_manager import *
 
 # Police
 font_large = pygame.font.SysFont('Arial', 36, bold=True)
 font_medium = pygame.font.SysFont('Arial', 24)
 WIDTH, HEIGHT = get_screen_size()
 
+num_stars = 0
+for theme in SOLO_THEMES:
+    for image in theme["images"]:
+        num_stars += image["stars"]
 
 def draw_background(surface):
     # Dégradé de fond bleu clair
@@ -135,7 +140,7 @@ class ParticleSystem:
 
 
 class PopupAnimation:
-    def __init__(self, score,screen, images=None):
+    def __init__(self, score, screen, model_path, draw):
         self.score = int(score)
         self.screen = screen
         self.popup_width, self.popup_height = 600, 400
@@ -148,11 +153,8 @@ class PopupAnimation:
         self.animation_done = False
         self.animation_progress = 0
 
-        # Images (à remplacer par vos images)
-        self.images = images or [
-            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150)),
-            pygame.transform.scale(pygame.image.load("sources/SoloGame/temp/temp_draw.png"), (250, 150))
-        ]
+        self.model_image = pygame.image.load(model_path)
+        self.draw = draw
 
 
         # Animation des étoiles
@@ -243,6 +245,8 @@ class PopupAnimation:
 
                     if self.stars_fill[i] < 100:
                         all_filled = False
+
+                    num_stars+=1
 
             if all_filled:
                 self.stars_filled = True
@@ -415,9 +419,8 @@ class PopupAnimation:
                 20,
                 100)
 
-        text_x35 = font_medium.render("X35", True, BLACK)
         self.screen.blit(
-            text_x35,
+            MEDIUM_FONT.render("X"+str(num_stars), True, BLACK),
             (self.popup_x +
              self.popup_width -
              65,
@@ -427,12 +430,11 @@ class PopupAnimation:
         # Dessiner les images à droite
         image_x = self.popup_x + self.popup_width + 20
         image_y = self.popup_y + 30
-        image_spacing = 20
 
-        self.screen.blit(self.images[0], (image_x, image_y))
+        self.screen.blit(self.model_image, (image_x, image_y))
 
         # Flèche entre les images
-# Flèche entre les images (inversée mais dans la même zone)
+        # Flèche entre les images (inversée mais dans la même zone)
         arrow_points = [
             (image_x + 125, image_y + 190 - 10),  # Point en haut
             (image_x + 145, image_y + 190 - 30),  # Coin bas gauche
@@ -440,28 +442,28 @@ class PopupAnimation:
         ]
         pygame.draw.polygon(self.screen, GRAY, arrow_points)
 
-        self.screen.blit(self.images[1], (image_x, image_y + 150 + 50))
+        self.screen.blit(self.draw, (image_x, image_y + 150 + 50))
 
         # Dessiner toutes les particules
         self.particles.draw( self.screen)
 
 
-def popup_result(similarity, screen):  # Assurer que screen est bien un paramètre
+def popup_result(screen, similarity, model_path, draw):  # Assurer que screen est bien un paramètre
     clock = pygame.time.Clock()
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill((230, 230, 230))
     draw_background(background)
 
-    popup = PopupAnimation(similarity, screen)  # Passer screen
+    popup = PopupAnimation(similarity, screen, model_path, draw)  # Passer screen
 
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
-                running = False
-            elif event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    popup = PopupAnimation(similarity, screen)  # Passer screen ici aussi
+               return screen
+            # elif event.type == KEYDOWN:
+            #     if event.key == K_SPACE:
+            #         popup = PopupAnimation(similarity, screen)  # Passer screen ici aussi
 
         screen.blit(background, (0, 0))
         popup.update()

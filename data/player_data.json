@@ -1,5 +1,5 @@
 {
-    "pseudo": "Alx",
+    "pseudo": "Maxence",
     "achievements": [
         {
             "id": 0,
@@ -27,7 +27,7 @@
             "id": 2,
             "title": "Maitre du crayon",
             "explication": "Dessinez 50 dessins",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 0,
@@ -167,9 +167,9 @@
             ]
         }
     ],
-    "solo_game_played": 16,
+    "solo_game_played": 106,
     "multi_game_played": 44,
-    "num_draws_total": 13,
+    "num_draws_total": 103,
     "coins": 88309,
     "selected_items": {
         "Curseurs": null,
