@@ -5,7 +5,7 @@ from shared.ui.elements import Button
 
 def play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons):
     # Titre
-    draw_text("Mode de jeu", BUTTON_FONT, BLACK, screen, W // 2, 100)
+    draw_text("Mode de jeu", BUTTON_FONT, BLACK, screen, W // 2, 150)
 
     # Options de jeu
     game_modes = ["Solo", "Multijoueurs"]

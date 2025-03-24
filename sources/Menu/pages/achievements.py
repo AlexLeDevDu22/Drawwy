@@ -14,7 +14,7 @@ def show_achievements(
         buttons,
         scroll_y=0):
     # Titre
-    draw_text("SUCCÈS", BUTTON_FONT, BLACK, screen, W // 2, 100)
+    draw_text("SUCCES", BUTTON_FONT, BLACK, screen, W // 2, 100)
     achievement_height = 70
     total_height = len(PLAYER_DATA["achievements"]) * \
         (achievement_height + 10) + 60

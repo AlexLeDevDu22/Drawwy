@@ -178,6 +178,7 @@ class SoloPlay:
 
                 # Dessine une ligne entre la dernière position et la nouvelle
                 pygame.draw.line(self.canvas_surf, self.pen_color, (last_x, last_y), (local_x, local_y), self.pen_radius * 2)
+                pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
             # Met à jour la dernière position
             self.last_canvas_pos = (local_x, local_y)

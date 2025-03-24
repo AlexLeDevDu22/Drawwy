@@ -298,6 +298,7 @@ def start_server(serv_name):
     free_port(CONFIG["servers"][server_name]["port"])
 
     # Lancer Ngrok (facultatif si déjà lancé ailleurs)
+    ngrok.kill()
     import ngrok
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
     ngrok.connect(CONFIG["servers"][server_name]["port"], domain=CONFIG["servers"][server_name]["domain"])
@@ -331,7 +332,6 @@ def stop_server():
     loop.stop()
 
     ngrok.disconnect(CONFIG["servers"][server_name]["domain"])  # Déconnecte Ngrok
-    ngrok.kill()
 
     free_port(CONFIG["servers"][server_name]["port"])
 

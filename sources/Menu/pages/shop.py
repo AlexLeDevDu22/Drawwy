@@ -6,6 +6,7 @@ import shared.tools as tools
 import pygame
 import random
 
+random_seed = random.randint(0, 1000)
 
 state = {
             "current_page": 0,
@@ -129,6 +130,12 @@ def show_shop(
     # Filtrer les SHOP_ITEMS selon la catégorie sélectionnée
     filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if state["selected_category"]
                            == "Tous" or item["category"] == state["selected_category"]]
+
+    # Mélanger les SHOP_ITEMS (toujours de la meme maniere) si la catégorie est "Tous"
+    if state["selected_category"] == "Tous":
+        random.seed(random_seed)
+        random.shuffle(filtered_SHOP_ITEMS)
+        random.seed(None)
 
     # Calculer le nombre total de pages
     total_pages = max(1, (len(filtered_SHOP_ITEMS) - 1) //
