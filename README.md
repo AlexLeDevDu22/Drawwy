@@ -1,26 +1,24 @@
-pip freeze > doc/requirements.txt
+﻿\# Drawwy
 
-& doc/install-requirements.ps1
+\## Gameplay
+Il y a 2 mods, le solo et le multijoueur:
 
-autopep8 --in-place --aggressive --aggressive --recursive . --exclude .venv,.git,.vscode
+-En solo, le but est simplement de reproduire un dessin choisis au hasard parmi les thèmes présentes à l'identique.
 
-Si on lance le script pour la première fois sur l'ordi, ya un long chargement
+-En multijoueur, tu es contre tes adversaires et il faut essayer de deviner un mot qu'un dessinateur choisis au hasard dans la zone au milieu de l'écran. Et si tu es dessinateur, le but est de faire deviner aux autres la phrase qui te sera attribué.
 
-SUR WINDOW!!!!
-pip install aiohttp
+\## Installation
 
-Pour Pull depuis le lycée:
-installer git(dans le powershell):
-iwr -useb get.scoop.sh | iex
-scoop install git
+1\. Installer les dépendances:
 
-se co gitlab:
-git config --global --get-all credential.helper
-git config --global --add credential.helper "store --file ~/.git-credentials"
-git config --global user.name "FIRST_NAME LAST_NAME"
-git config --global user.email "MY_NAME@example.com"
+pip install -r requirements.txt
 
-    git remote add nsi https://AlexLeDevDu22:glpat-37iFxwP77FXmyHNtLMvf@gitlab.com/maxence.tardivel.mt/truc-nsi
-    git remote set-url nsi https://AlexLeDevDu22:glpat-37iFxwP77FXmyHNtLMvf@gitlab.com/maxence.tardivel.mt/truc-nsi
-    git pull nsi main
-    git branch checkout main
+2\. Lancez le jeu !
+
+\```
+
+cd "racine du projet"
+
+python source/main.py
+
+\```
