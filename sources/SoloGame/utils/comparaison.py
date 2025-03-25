@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
-from SoloGame.pages.image_comparaison import popup_result
-import os
 import pygame
 
 def compare_images(img1_path, img2_surface):

@@ -11,7 +11,7 @@ class SoloPlay:
     def __init__(self, screen, cursor, model_path, achievements_manager):
         self.last_mouse_pos = None
         self.screen = screen
-        self.W, self.H = screen.get_size()
+        self.W, self.H = get_screen_size()
         
         # Paramètres du pinceau
         self.pen_color = BLACK

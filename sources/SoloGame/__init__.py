@@ -4,8 +4,6 @@ from imageio import save
 from SoloGame.pages.theme_choicer import theme_choicer
 from SoloGame.pages.image_selector import image_selector
 from SoloGame.pages.play import SoloPlay
-from SoloGame.utils.comparaison import compare_images
-from SoloGame.pages.image_comparaison import popup_result
 from shared.utils.data_manager import *
 import pygame
 

@@ -321,6 +321,7 @@ class PopupAnimation:
             pygame.draw.polygon(self.screen, GRAY, arrow_points)
 
             self.screen.blit(self.draw_image, (image_x, image_y + 150 + 50))
-
+            
             # Dessiner toutes les particules
             self.particles.draw( self.screen)
+            
