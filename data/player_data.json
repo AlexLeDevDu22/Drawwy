@@ -1,5 +1,5 @@
 {
-    "pseudo": "Alx",
+    "pseudo": "plof",
     "achievements": [
         {
             "id": 0,
@@ -167,14 +167,14 @@
             ]
         }
     ],
-    "solo_game_played": 16,
+    "solo_game_played": 17,
     "multi_game_played": 44,
-    "num_draws_total": 13,
+    "num_draws_total": 14,
     "coins": 88309,
     "selected_items": {
-        "Curseurs": null,
+        "Curseurs": 0,
         "Bordures": 2,
-        "Emotes": 22
+        "Emotes": 14
     },
     "purchased_items": [
         21,
