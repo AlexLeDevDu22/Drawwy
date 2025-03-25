@@ -1,23 +1,17 @@
-import pygame
-import sys
 from shared.ui.elements import ColorPicker
 from shared.utils.data_manager import *
-
-
-from shared.ui.common_ui import *
+from shared.utils.common_utils import *
 from shared.tools import *
-
-
-def get_screen_size():
-    info_ecran = pygame.display.Info()
-    return info_ecran.current_w, info_ecran.current_h
-
+from SoloGame.ui.result_popup import PopupAnimation
+from SoloGame.utils.comparaison import compare_images
+import pygame
+import sys
 
 class SoloPlay:
-    def __init__(self, screen, cursor, theme, image, achievements_manager):
+    def __init__(self, screen, cursor, model_path, achievements_manager):
         self.last_mouse_pos = None
         self.screen = screen
-        self.W, self.H = screen.get_size()
+        self.W, self.H = get_screen_size()
         
         # Paramètres du pinceau
         self.pen_color = BLACK
@@ -28,7 +22,7 @@ class SoloPlay:
         self.mouse_pos = (0, 0)
         
         # On définit les valeurs des rectangles d'interface
-        self.define_layout(theme, image)
+        self.define_layout(model_path)
         
         self.color_picker = ColorPicker(
             self.colors_rect.x,
@@ -43,9 +37,9 @@ class SoloPlay:
         
         self.achievements_manager = achievements_manager
         self.cursor = cursor
-    
-    def run(self):
-        # Boucle principale
+
+        self.popup_result = PopupAnimation(self.screen, self.W, self.H)
+
         clock = pygame.time.Clock()
         running = True
         while running:
@@ -92,9 +86,11 @@ class SoloPlay:
             self.screen.blit(self.model, self.model_rect)
             
             self.achievements_manager.draw_popup_if_active(self.screen)
+
+            self.popup_result.update()
+            self.popup_result.draw()
             
-            if self.mouseDown and self.validate_button_rect.collidepoint(
-                    self.mouse_pos):
+            if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos): # Validation du dessin
                 PLAYER_DATA["solo_game_played"] += 1
                 PLAYER_DATA["num_draws_total"] += 1
                 if PLAYER_DATA["num_draws_total"] == 10:
@@ -102,12 +98,26 @@ class SoloPlay:
                 elif PLAYER_DATA["num_draws_total"] == 50:
                     self.achievements_manager.new_achievement(2)
                 save_data("PLAYER_DATA")
-                return self.screen, "results", self.canvas_surf
+
+                # end game
+                self.similarity_score = compare_images(model_path, self.canvas_surf)
+                for theme in SOLO_THEMES:
+                    for image in theme["images"]:
+                        if image["path"] == model_path:
+                            if self.similarity_score >= 70:
+                                image["stars"] = 3
+                            elif self.similarity_score >= 50:
+                                image["stars"] = 2
+                            elif self.similarity_score >= 30:
+                                image["stars"] = 1
+                            save_data("SOLO_THEMES")
+                            break
+                self.popup_result.start(self.similarity_score, model_path, self.canvas_surf)
             
             self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()
 
-    def define_layout(self, theme, image):
+    def define_layout(self, model_path):
 
         # Canvas
         self.canvas_rect = pygame.Rect(
@@ -147,8 +157,7 @@ class SoloPlay:
             validate_button_h
         )
 
-        self.model = pygame.image.load(
-            f"assets/soloImages/{theme["path"]}{theme['images'][image]["path"]}")
+        self.model = pygame.image.load(model_path)
         model_width = self.W - self.canvas_rect.right - 20
         model_height = self.model.get_height() * model_width // self.model.get_width()
         self.model = pygame.transform.scale(

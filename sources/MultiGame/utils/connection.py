@@ -11,7 +11,6 @@ connection_loop = None
 
 def start_connexion(MultiGameClass, server_name):
     try:
-
         if not tools.test_server(server_name):  # start the serv
 
             import MultiGame.server as server
@@ -27,12 +26,12 @@ def start_connexion(MultiGameClass, server_name):
         connection_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(connection_loop)
         MultiGameClass.connection_loop.run_until_complete(
-            handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server)))
+            handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server), port=server.port if MultiGameClass.server else None))
     except RuntimeError:
         print("connexion fermé")
 
 
-async def handle_connection_client(MultiGame, server_name, is_server):
+async def handle_connection_client(MultiGame, server_name, is_server, port=None):
 
     def welcome(data):
         MultiGame.connected = True
@@ -53,7 +52,6 @@ async def handle_connection_client(MultiGame, server_name, is_server):
 
     def player_disconnected(data):
         for i in range(len(MultiGame.PLAYERS)):
-            print(MultiGame.PLAYERS[i]["pid"], data["pid"])
             if MultiGame.PLAYERS[i]["pid"] == data["pid"]:
                 player = MultiGame.PLAYERS.pop(i)
                 MultiGame.MESSAGES.append(
@@ -141,7 +139,7 @@ async def handle_connection_client(MultiGame, server_name, is_server):
             tools.update_canva_by_frames(
                 MultiGame, MultiGame.ALL_FRAMES, reset=True, delay=False)
 
-    async with websockets.connect(f"ws://localhost:{CONFIG["servers"][server_name]["port"]}/ws" if is_server else f"wss://{CONFIG["servers"][server_name]["domain"]}/ws") as websocket:
+    async with websockets.connect(f"ws://localhost:{port}/ws" if is_server else f"wss://{CONFIG["servers"][server_name]["domain"]}/ws") as websocket:
         MultiGame.WS = websocket
 
         MultiGame.is_connected = True
@@ -160,7 +158,6 @@ async def handle_connection_client(MultiGame, server_name, is_server):
             elif data["header"] == "new_game":
                 new_game(data)
             elif data["header"] == "draw":
-                print("recevied draw clienr")
                 draw(data)
             elif data["header"] == "new_message":
                 new_message(data)
@@ -168,7 +165,6 @@ async def handle_connection_client(MultiGame, server_name, is_server):
                 roll_back(data)
             elif data["header"] == "draw":
                 draw(data)
-
 
 
 def disconnect(MultiGame):
@@ -184,6 +180,8 @@ def disconnect(MultiGame):
             cancel_tasks, MultiGame.connection_loop)
 
     MultiGame.server.stop_server()
+    MultiGame.is_connected = False
+    MultiGame.server = None
     # Attendre la fin du thread de connexion
     #MultiGame.connexion_thread.join()
     print("Déconnexion terminée.")

@@ -2,6 +2,7 @@ from shared.ui.common_ui import *
 from shared.tools import get_screen_size, apply_circular_mask
 from shared.utils.data_manager import *
 import pygame
+import shutil
 
 # Classe pour la gestion de l'avatar
 
@@ -173,15 +174,12 @@ class AvatarManager:
                     self.input_text = PLAYER_DATA["pseudo"]
                     self.is_expanding = True
                     self.pseudo_editable = True
-                    return True
             else:
                 if self.decrease_button_rect.collidepoint(mouse_pos):
                     self.brush_size = max(self.size_min, self.brush_size - 5)
-                    return True
 
                 elif self.increase_button_rect.collidepoint(mouse_pos):
                     self.brush_size = min(self.size_max, self.brush_size + 5)
-                    return True
 
                 # Valider
                 elif self.validate_button_rect.collidepoint(mouse_pos):
@@ -205,20 +203,16 @@ class AvatarManager:
                     if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
                         achievements_manager.new_achievement(14)
 
-                    return True
-
                 # Annuler
                 elif self.cancel_button_rect.collidepoint(mouse_pos) and self.input_text != "":
                     self.avatar = self.avatar_original.copy()
                     self.is_retracting = True
                     self.show_buttons = False
-                    return True
 
                 # Sélection de couleur
                 for i, rect in enumerate(self.color_rects):
                     if rect.collidepoint(mouse_pos):
                         self.brush_color = self.colors[i]
-                        return True
 
                 # Vérifier si on dessine sur l'avatar
                 avatar_pos = self.get_current_avatar_position()
@@ -236,11 +230,9 @@ class AvatarManager:
                          py),
                         self.brush_size //
                         self.avatar_target_size_ratio)
-                    return True
 
         elif event.type == pygame.MOUSEBUTTONUP and self.show_buttons:
             self.save_state()
-            return True
 
         elif event.type == pygame.KEYDOWN and self.pseudo_editable:
             if event.key == pygame.K_RETURN:  # Valider avec ENTER
@@ -265,37 +257,36 @@ class AvatarManager:
                 nom = PLAYER_DATA["pseudo"].lower()
                 if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
                     achievements_manager.new_achievement(14)
-
-                return True
             elif event.key == pygame.K_ESCAPE and self.input_text != "":  # Annuler avec ESC
                 self.avatar = self.avatar_original.copy()
                 self.is_retracting = True
                 self.show_buttons = False
-                return True
             elif event.key == pygame.K_UP:
                 self.brush_size = min(self.size_max, self.brush_size + 5)
-                return True
             elif event.key == pygame.K_DOWN:
                 self.brush_size = max(self.size_max, self.brush_size - 5)
-                return True
             elif event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Z (Undo)
                 if len(self.history) > 1:
                     self.redo_stack.append(self.history.pop())
                     self.avatar = self.history[-1].copy()
-                return True
             elif event.key == pygame.K_y and pygame.key.get_mods() & pygame.KMOD_CTRL:  # Ctrl+Y (REDo)
                 if self.redo_stack:
                     self.avatar = self.redo_stack.pop()
                     self.history.append(self.avatar.copy())
-                return True
             elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
-                return True
             elif event.unicode and len(self.input_text) < 10:
                 self.input_text += event.unicode
-                return True
 
-        return False  # L'événement n'a pas été géré
+                # easter eggs
+                if self.input_text == "Alx":
+                    self.avatar = pygame.image.load("assets/easter_eggs/alex.jpg").convert_alpha()
+
+                if self.input_text == "Maxence":
+                    self.avatar = pygame.image.load("assets/easter_eggs/maxence.png").convert_alpha()
+
+                if self.input_text == "Plof":
+                    self.avatar = pygame.image.load("assets/easter_eggs/plof.png").convert_alpha()
 
     def update(self, mouse_pos, mouse_pressed):
         # Dessin sur l'avatar si en mode édition et que la souris est appuyée
