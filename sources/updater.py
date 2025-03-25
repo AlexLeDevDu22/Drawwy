@@ -16,7 +16,7 @@ UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront télécharg
 g = Github()
 
 
-def get_last_update():
+def get_last_check():
     """Lire la dernière date de mise à jour à partir du fichier"""
     if os.path.exists(LAST_UPDATE_FILE):
         with open(LAST_UPDATE_FILE, 'r') as f:
@@ -26,7 +26,7 @@ def get_last_update():
     return None
 
 
-def set_last_update(update_time):
+def set_last_check(update_time):
     """Enregistrer la dernière date de mise à jour dans le fichier"""
     with open(LAST_UPDATE_FILE, 'w') as f:
         f.write(update_time.strftime("%Y-%m-%dT%H:%M:%S"))
@@ -73,7 +73,7 @@ def check_for_shop_updates():
     repo = g.get_repo(f"{OWNER}/{REPO}")
     
     # Comparer avec la dernière mise à jour connue
-    last_update = get_last_update()
+    last_update = get_last_check()
 
     if last_update and last_update + timedelta(days=1) < datetime.now():
         return
@@ -95,9 +95,10 @@ def check_for_shop_updates():
                 os.remove(p)
 
         # Mettre à jour la dernière date de mise à jour
-        set_last_update(latest_commit_time)
         print(f"Mise à jour terminée, fichiers téléchargés dans {UPDATE_DIR}")
-        data.reload()
+        
+    set_last_check(datetime.now())
+    data.reload()
 
 
 # Créer le dossier de mise à jour si nécessaire
