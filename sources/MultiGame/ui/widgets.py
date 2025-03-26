@@ -69,6 +69,14 @@ def players(MultiGame):
         image_texte,
         (4.5 / 100 * MultiGame.W,
          5.5 / 100 * MultiGame.H))
+    
+    pygame.draw.rect(
+        MultiGame.screen,
+        ORANGE,
+        (0.01 * MultiGame.W,
+         0.11 * MultiGame.H,
+         0.18 * MultiGame.W,
+         2))
 
     dico_co = [
         [(1 / 100 * MultiGame.W, (11 + i * 7) / 100 * MultiGame.H, 18 / 100 * MultiGame.W, 7 / 100 * MultiGame.H),
