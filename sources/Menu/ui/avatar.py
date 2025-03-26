@@ -290,7 +290,7 @@ class AvatarManager:
                     self.avatar = pygame.image.load("assets/easter_eggs/maxence.png").convert_alpha()
 
                 if self.input_text == "Plof":
-                    self.avatar = pygame.image.load("assets/easter_eggs/plof.png").convert_alpha()
+                    self.avatar = pygame.image.load("assets/easter_eggs/plof.jpg").convert_alpha()
 
                 if self.input_text == "Shrek":
                     self.avatar = pygame.image.load("assets/easter_eggs/shrek.png").convert_alpha()

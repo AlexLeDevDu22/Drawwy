@@ -25,7 +25,7 @@ def start_connexion(MultiGameClass, server_name):
         global connection_loop
         connection_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(connection_loop)
-        MultiGameClass.connection_loop.run_until_complete(
+        connection_loop.run_until_complete(
             handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server), port=server.port if MultiGameClass.server else None))
     except RuntimeError:
         print("connexion fermé")
@@ -184,5 +184,5 @@ def disconnect(MultiGame):
         MultiGame.server = None
     MultiGame.is_connected = False
     # Attendre la fin du thread de connexion
-    #MultiGame.connexion_thread.join()
+    MultiGame.connexion_thread.join()
     print("Déconnexion terminée.")
