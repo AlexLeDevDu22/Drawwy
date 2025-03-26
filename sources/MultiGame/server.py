@@ -65,6 +65,7 @@ async def handle_disconnect(ws):
     if players:
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
+            print(i, player["ws"], ws)
             if player["ws"] == ws:
                 print(f"Joueur {player['pseudo']} déconnecté")
                 players.pop(i)

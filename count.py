@@ -8,10 +8,6 @@ def count_lines(file_path):
         lines = [line for line in lines if line.strip() and not line.strip().startswith('#')]
         return len(lines)
 
-def get_file_extension(file_name):
-    """Renvoie l'extension de fichier."""
-    return os.path.splitext(file_name)[1].lower()
-
 def count_code_lines_in_directory(directory):
     """Compte les lignes de code par langage dans un dossier (et ses sous-dossiers)."""
     language_lines = {}  # Dictionnaire pour stocker le nombre de lignes par langage
@@ -19,7 +15,7 @@ def count_code_lines_in_directory(directory):
     for root, dirs, files in os.walk(directory):
         for file_name in files:
             file_path = os.path.join(root, file_name)
-            file_ext = get_file_extension(file_name)
+            file_ext = os.path.splitext(file_name)[1].lower()
             
             # Ajouter des extensions de fichiers pour chaque langage que tu veux analyser
             if file_ext in ['.py', '.js', '.java', '.html', '.css', '.cpp', '.c', '.rb', '.php', '.go']:

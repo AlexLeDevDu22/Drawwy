@@ -179,9 +179,10 @@ def disconnect(MultiGame):
         MultiGame.connection_loop.call_soon_threadsafe(
             cancel_tasks, MultiGame.connection_loop)
 
-    MultiGame.server.stop_server()
+    if MultiGame.server:
+        MultiGame.server.stop_server()
+        MultiGame.server = None
     MultiGame.is_connected = False
-    MultiGame.server = None
     # Attendre la fin du thread de connexion
     #MultiGame.connexion_thread.join()
     print("Déconnexion terminée.")
