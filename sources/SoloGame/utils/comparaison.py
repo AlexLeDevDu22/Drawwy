@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pygame
+import random
 from skimage.metrics import structural_similarity as ssim
 
 def simplify_image(image, num_colors=12, contrast_threshold=20, color_boost=1.3, clean_size=3):
@@ -61,7 +62,7 @@ def compare_images(solo_class, img1_path, img2_surface):
     # Vérification si le dessin est presque vide
     white_ratio = np.mean(img2) / 255  # % de blanc dans l'image
     if white_ratio > 0.9 or np.mean(edges2) < 5:
-        solo_class.similarity_score=5
+        solo_class.similarity_score=random.randint(1, 5)
         solo_class.similarity_score_ready=True
         return 5
 

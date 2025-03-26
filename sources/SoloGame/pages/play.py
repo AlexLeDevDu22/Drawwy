@@ -42,7 +42,7 @@ class SoloPlay:
         self.popup_result = PopupAnimation(self.screen, self.W, self.H)
 
         self.similarity_score = None
-        self.similiraty_score_ready = False
+        self.similarity_score_ready = False
 
         self.can_draw = True
 
@@ -113,8 +113,8 @@ class SoloPlay:
             elif self.mouse_down and self.quit_button.hover:
                 return
             
-            if self.similiraty_score_ready and self.similiraty_score!=-1:
-                self.similiraty_score_ready = False
+            if self.similarity_score_ready and self.similarity_score!=-1:
+                self.similarity_score_ready = False
                # end game
                 for i in range(len(SOLO_THEMES)):
                     for j in range(len(SOLO_THEMES[i]["images"])):
@@ -144,16 +144,18 @@ class SoloPlay:
     def define_layout(self, model_path):
 
         # Canvas
+        palette_width = int(0.25 * self.W)
+        palette_height = int(0.30 * self.H)
+
+
         self.canvas_rect = pygame.Rect(
-            int(0.05 * self.W),    # marge à gauche
+            int((self.W - 0.90 * self.H-40-palette_width)//2),    # marge à gauche
             int(0.05 * self.H),    # marge en haut
             int(0.90 * self.H),    # 70% de la largeur
             int(0.90 * self.H)     # 90% de la hauteur
         )
 
         # Palette
-        palette_width = int(0.25 * self.W)
-        palette_height = int(0.30 * self.H)
         self.colors_rect = pygame.Rect(
             self.canvas_rect.right + 40,
             int(0.05 * self.H),

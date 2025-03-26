@@ -65,15 +65,14 @@ async def handle_disconnect(ws):
     if players:
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
-            print(i, player["ws"], ws)
             if player["ws"] == ws:
                 print(f"Joueur {player['pseudo']} déconnecté")
+                if player["avatar"]["type"] == "matrix" and os.path.exists(
+                    f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
+                    os.remove(f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
+                 
                 players.pop(i)
                 break
-
-        if player["avatar"]["type"] == "matrix" and os.path.exists(
-                f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
-            os.remove(f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
 
         # Envoyer la mise à jour des joueurs
 
@@ -82,6 +81,9 @@ async def handle_disconnect(ws):
             "pid": player["pid"],
             "pseudo": player["pseudo"]
         })
+
+        if player["pid"] == drawer_pid:
+            await handle_new_game()
 
 
 async def handle_join(data, ws):
@@ -112,7 +114,7 @@ async def handle_join(data, ws):
                         "points": p["points"],
                         "found": p["found"]} for p in players],
             "sentence": sentences_list[-1],
-            "drawer_id": drawer_id,
+            "drawer_pid": drawer_pid,
             "all_frames": all_frames,
             "messages": guess_list,
             "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
@@ -141,7 +143,7 @@ async def handle_join(data, ws):
 
 
 async def handle_new_game(data=None):
-    global last_game_start, players, drawer_id, sentences_list, guess_list, all_frames, roll_back
+    global last_game_start, players, drawer_pid, sentences_list, guess_list, all_frames, roll_back
 
     guess_list = []
     all_frames = []
@@ -153,17 +155,17 @@ async def handle_new_game(data=None):
         players[i]["found"] = False
 
     # Changer de dessinateur
-    if drawer_id != -1:
+    if drawer_pid != -1:
         for i in range(len(players)):
-            if int(players[i]["pid"]) == int(drawer_id):
-                drawer_id = players[(i + 1) % len(players)]["pid"]
+            if int(players[i]["pid"]) == int(drawer_pid):
+                drawer_pid = players[(i + 1) % len(players)]["pid"]
                 break
     else:
-        drawer_id = players[0]["pid"]
+        drawer_pid = players[0]["pid"]
 
     await broadcast({
         "header": "new_game",
-        "drawer_id": drawer_id,
+        "drawer_pid": drawer_pid,
         "start_time": last_game_start.isoformat(),
         "new_sentence": sentences_list[-1]
     })
@@ -174,7 +176,7 @@ async def handle_draw(data):
 
     all_frames += data["frames"]
 
-    await broadcast(data, skip_id=drawer_id)
+    await broadcast(data, skip_id=drawer_pid)
 
 
 async def handle_roll_back(data, ws):
@@ -182,11 +184,11 @@ async def handle_roll_back(data, ws):
 
     roll_back = data["roll_back"]
 
-    await broadcast(data, skip_id=drawer_id)
+    await broadcast(data, skip_id=drawer_pid)
 
 
 async def handle_guess(message):
-    global players, drawer_id, guess_list, sentences_list
+    global players, drawer_pid, guess_list, sentences_list
 
     list_found = []
     succeed = False
@@ -194,7 +196,7 @@ async def handle_guess(message):
     message["succeed"] = False
 
     for i, player in enumerate(players):
-        if message["pid"] == player["pid"] and player["pid"] != drawer_id:
+        if message["pid"] == player["pid"] and player["pid"] != drawer_pid:
             succeed = tools.check_sentences(
                 sentences_list[-1], message["message"])
             if succeed and not player["found"]:
@@ -211,14 +213,14 @@ async def handle_guess(message):
                 # Donner des points au dessinateur
                 drawer_points = CONFIG["points_per_found"]
                 for j in range(len(players)):
-                    if players[j]["pid"] == drawer_id:
+                    if players[j]["pid"] == drawer_pid:
                         players[j]["points"] += drawer_points
                         break
 
                 message["new_points"] = [{"pid": player["pid"], "points": founder_points}, {
-                    "pid": drawer_id, "points": drawer_points}]
+                    "pid": drawer_pid, "points": drawer_points}]
 
-        if player["pid"] != drawer_id:
+        if player["pid"] != drawer_pid:
             list_found.append(player["found"])
 
     guess_list.append(message)
@@ -290,11 +292,11 @@ def get_free_port():
 
 def start_server(serv_name):
     """Démarre le serveur HTTP + WebSocket dans un thread."""
-    global ngrok, server_started, server_name, loop, players, drawer_id, guess_list, sentences_list, last_game_start, all_frames, roll_back, port
+    global ngrok, server_started, server_name, loop, players, drawer_pid, guess_list, sentences_list, last_game_start, all_frames, roll_back, port
 
     # Variables du jeu
     players = []
-    drawer_id = -1
+    drawer_pid = -1
     guess_list = []
     sentences_list = [sentences.new_sentence()]
     last_game_start = None

@@ -24,7 +24,7 @@ def start_connexion(MultiGameClass, server_name):
         asyncio.set_event_loop(MultiGameClass.connection_loop)
         MultiGameClass.connection_loop.run_until_complete(
             handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server), port=server.port if MultiGameClass.server else None))
-    except RuntimeError or asyncio.exceptions.CancelledError:
+    except asyncio.exceptions.CancelledError:
         print("connexion fermé")
 
 
@@ -37,7 +37,7 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
         MultiGame.MESSAGES = data["messages"]
         MultiGame.PLAYERS = data["players"]
         MultiGame.CURRENT_SENTENCE = data["sentence"]
-        MultiGame.CURRENT_DRAWER = data["drawer_id"]
+        MultiGame.CURRENT_DRAWER = data["drawer_pid"]
         tools.update_canva_by_frames(
             MultiGame, data["all_frames"], delay=False)
 
@@ -74,7 +74,7 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
              MultiGame.canvas_rect.height))  # reset canvas
         MultiGame.CANVAS.fill((255, 255, 255))
         MultiGame.CURRENT_SENTENCE = data["new_sentence"]
-        MultiGame.CURRENT_DRAWER = data["drawer_id"]
+        MultiGame.CURRENT_DRAWER = data["drawer_pid"]
         MultiGame.ALL_FRAMES = []
         for i in range(len(MultiGame.PLAYERS)):
             MultiGame.PLAYERS[i]["found"] = False
@@ -170,37 +170,52 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
                 draw(data)
 
 
+async def shutdown(loop, MultiGame):
+    try:
+        print("Début de la fermeture...")
+
+        # Fermer la WebSocket proprement si elle est ouverte
+        if MultiGame.WS and not MultiGame.WS.closed:
+            try:
+                await asyncio.wait_for(MultiGame.WS.close(), timeout=3)
+                print("WebSocket fermée proprement")
+            except asyncio.TimeoutError:
+                print("⚠️ Timeout lors de la fermeture de la WebSocket")
+
+        # Annuler toutes les tâches asyncio en attente
+        tasks = [t for t in asyncio.all_tasks(loop) if not t.done()]
+        print(f"{len(tasks)} tâches en cours d'annulation...")
+
+        for task in tasks:
+            task.cancel()
+            try:
+                await asyncio.wait_for(task, timeout=2)  # On force l'attente max 2s
+            except asyncio.CancelledError:
+                pass
+            except asyncio.TimeoutError:
+                print("⚠️ Une tâche a mis trop de temps à s'annuler")
+
+        # Fermer proprement la boucle asyncio
+        print("Arrêt de la boucle asyncio...")
+        loop.stop()
+
+    except Exception as e:
+        print(f"Erreur lors de l'arrêt : {e}")
+
+    finally:
+        print("Fermeture terminée ✅")
+
 def disconnect(MultiGame):
     if MultiGame.connection_loop and not MultiGame.connection_loop.is_closed():
-        async def shutdown(loop):
-            # Fermer toutes les connexions WebSocket si elles existent
-            if hasattr(MultiGame, "websocket") and MultiGame.websocket is not None:
-                await MultiGame.websocket.close()
-                print("WebSocket fermé proprement")
-
-            # Annuler toutes les tâches asyncio
-            tasks = [t for t in asyncio.all_tasks(loop) if not t.done()]
-            for task in tasks:
-                try:
-                    task.cancel()
-                    await task
-                except asyncio.exceptions.CancelledError:
-                    pass
-
-            # Fermer proprement la boucle
-            loop.stop()
-            loop.close()
-            print("Boucle asyncio arrêtée et fermée")
-
-        print("oooo")
-        future = asyncio.run_coroutine_threadsafe(shutdown(MultiGame.connection_loop), MultiGame.connection_loop)
-        future.result()
+        future = asyncio.run_coroutine_threadsafe(shutdown(MultiGame.connection_loop, MultiGame), MultiGame.connection_loop)
+        future.result(timeout=5)  # On attend max 5s pour éviter un blocage
 
     if MultiGame.server:
         MultiGame.server.stop_server()
         MultiGame.server = None
 
     MultiGame.is_connected = False
+
     # Attendre la fin du thread de connexion
-    MultiGame.connexion_thread.join()
-    print("Déconnexion terminée.")
+    if MultiGame.connexion_thread:
+        MultiGame.connexion_thread.join()

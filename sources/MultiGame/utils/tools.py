@@ -69,7 +69,7 @@ def check_sentences(phrase1, phrase2):
     return score > CONFIG["sentence_checker_seuil"]
 
 
-def emit_sio(ws, data):
+def send_ws(ws, data):
     if ws:
         try:
             loop = asyncio.get_running_loop()  # Essaie d'obtenir une boucle existante
@@ -118,12 +118,12 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
 
             MultiGame.CANVAS = draw_brush_line(
                 MultiGame.CANVAS,
-                frame["x1"] * MultiGame.pixel_width,
-                frame["y1"] * MultiGame.pixel_height,
-                frame["x2"] * MultiGame.pixel_width,
-                frame["y2"] * MultiGame.pixel_height,
+                frame["x1"] * MultiGame.pixel_size,
+                frame["y1"] * MultiGame.pixel_size,
+                frame["x2"] * MultiGame.pixel_size,
+                frame["y2"] * MultiGame.pixel_size,
                 current_drawing_color,
-                current_drawing_radius * MultiGame.pixel_height)
+                current_drawing_radius * MultiGame.pixel_size//4)
             time.sleep(duration)
 
         MultiGame.ALL_FRAMES.append(frame)

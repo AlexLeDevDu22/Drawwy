@@ -332,10 +332,10 @@ def drawing(MultiGame):
                                 MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius)
                             frame = {
                                 "type": "line",
-                                "x1": x1 // MultiGame.pixel_width,
-                                "y1": y1 // MultiGame.pixel_width,
-                                "x2": x2 // MultiGame.pixel_width,
-                                "y2": y2 // MultiGame.pixel_width,
+                                "x1": x1 // MultiGame.pixel_size,
+                                "y1": y1 // MultiGame.pixel_size,
+                                "x2": x2 // MultiGame.pixel_size,
+                                "y2": y2 // MultiGame.pixel_size,
                                 "color": MultiGame.pen_color,
                                 "radius": MultiGame.pen_radius}
                             MultiGame.second_draw_frames.append(frame)
@@ -357,7 +357,7 @@ def drawing(MultiGame):
                         tools.update_canva_by_frames(
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
-                        tools.emit_sio(
+                        tools.send_ws(
                             MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
                     # CTRL+Y
@@ -368,13 +368,13 @@ def drawing(MultiGame):
                         tools.update_canva_by_frames(
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
-                        tools.emit_sio(
+                        tools.send_ws(
                             MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
     # send draw
     if MultiGame.frame_num == CONFIG["fps"] - \
             1 and MultiGame.second_draw_frames != []:
-        tools.emit_sio(
+        tools.send_ws(
             MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
                 MultiGame.second_draw_frames)})  # send draw
         MultiGame.second_draw_frames = []
@@ -402,7 +402,7 @@ def slider_radius(MultiGame):
         1)
 
     try:
-        MultiGame.pixel_height  # test la variable
+        MultiGame.pixel_size  # test la variable
     except BaseException:
         return
 
@@ -411,7 +411,7 @@ def slider_radius(MultiGame):
     slider_min = slider_x + 10
     slider_max = slider_x + slider_w - 10
     radius_slider_pos = slider_min + \
-        (MultiGame.pen_radius // MultiGame.pixel_height - 1) * (slider_max - slider_min) / 10
+        (MultiGame.pen_radius // MultiGame.pixel_size - 1) * (slider_max - slider_min) / 10
 
     # Fond du slider
     pygame.draw.rect(MultiGame.screen, (200, 200, 200),
@@ -454,7 +454,7 @@ def slider_radius(MultiGame):
                                                 10 /
                                                 (slider_max -
                                                  slider_min))) *
-                                           MultiGame.pixel_height)
+                                           MultiGame.pixel_size)
 
 
 def chat(MultiGame):
@@ -636,7 +636,7 @@ def chat(MultiGame):
                                     "pseudo": MultiGame.me["pseudo"],
                                     "emote_path": emote["image_path"].split("/")[-1],
                                     "emote_index": emote["index"]}
-                            tools.emit_sio(MultiGame.WS, e_mess)
+                            tools.send_ws(MultiGame.WS, e_mess)
                             MultiGame.MESSAGES.append(e_mess)
 
     for event in MultiGame.events:
@@ -650,7 +650,7 @@ def chat(MultiGame):
 
         if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
             if event.key == pygame.K_RETURN and MultiGame.guess.strip():
-                tools.emit_sio(MultiGame.WS,
+                tools.send_ws(MultiGame.WS,
                                {"header": "new_message",
                                    "type": "guess",
                                 "pid": MultiGame.PLAYER_ID,

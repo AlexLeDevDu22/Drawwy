@@ -120,11 +120,13 @@ class Particle:
                 self.y)), int(
                 self.size))
 
+import pygame
+
 class ColorPicker:
     def __init__(self, x, y, width, height, color_steps=30, dark_steps=12):
         self.rect = pygame.Rect(x, y, width, height)
         self.color_steps = color_steps  
-        self.dark_steps = dark_steps  
+        self.dark_steps = dark_steps + 1  # Une ligne de plus pour les gris
         self.colors = self.generate_colors()
         self.selected_color = None
         self.selected_pos = None
@@ -132,18 +134,21 @@ class ColorPicker:
     def generate_colors(self):
         colors = []
 
-        for j in range(self.dark_steps):
+        # Première ligne = Nuancier de gris (du blanc au noir)
+        gray_row = []
+        for i in range(self.color_steps):
+            gray_value = int(255 * (1 - i / (self.color_steps - 1)))
+            gray_row.append(pygame.Color(gray_value, gray_value, gray_value))
+        colors.append(gray_row)
+
+        # Les autres lignes = Teintes colorées
+        for j in range(self.dark_steps - 1):  
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
-                
-                # Intégration du blanc dans la première ligne
-                if j == 0:
-                    brightness = 100  # 100% de luminosité = blanc
-                    saturation = i / self.color_steps * 100  # Blanc -> Couleurs
-                else:
-                    saturation = 100  
-                    brightness = (1 - j / (self.dark_steps - 1)) ** 0.8 * 100  
+
+                saturation = 100
+                brightness = 100 * ((self.dark_steps - 1 - j) / (self.dark_steps - 1)) ** 0.9  # Adoucissement de la transition
 
                 color = pygame.Color(0)
                 color.hsva = (hue, saturation, brightness)
@@ -170,7 +175,7 @@ class ColorPicker:
         # Indiquer la couleur sélectionnée
         if self.selected_color and self.selected_pos:
             px, py = self.selected_pos
-            pygame.draw.rect(surface, WHITE, (px, py, step_w, step_h), 2)
+            pygame.draw.rect(surface, (255, 255, 255), (px, py, step_w, step_h), 2)
 
     def get_color_at(self, pos):
         x, y = pos

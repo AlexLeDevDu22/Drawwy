@@ -108,7 +108,7 @@ function handleConnection() {
     switch (data.header) {
       case "welcome":
         console.log("Bienvenue dans la partie :", data);
-        allFrames += data.all_frames;
+        allFrames.concat(data.all_frames);
         console.log("start frames", data.all_frames);
         if (data.all_frames.length > 0) draw(data.all_frames, false);
         myId = data["pid"];
@@ -123,7 +123,7 @@ function handleConnection() {
         });
         players = data.players;
         currentSentence = data.sentence;
-        drawerId = data.drawer_id;
+        drawerId = data.drawer_pid;
         gameStartTime = new Date(data.new_game);
         updatePlayerList();
         updateWordDisplay();
@@ -139,14 +139,14 @@ function handleConnection() {
 
       case "draw":
         console.log("Mise à jour du dessin");
-        allFrames += data.frames;
+        allFrames.concat(data.frames);
         drawingState.undoStack = [];
         draw(data.frames, true);
         break;
 
       case "roll_back":
         console.log("Roll back");
-        allFrames += drawingState.undoStack;
+        allFrames.concat(drawingState.undoStack);
         drawingState.undoStack = allFrames.slice(-data.roll_back);
 
         clearCanvas();
@@ -186,7 +186,7 @@ function handleConnection() {
         clearCanvas();
         allFrames = [];
         currentSentence = data.new_sentence;
-        drawerId = data.drawer_id;
+        drawerId = data.drawer_pid;
         hasFound = false;
         players.forEach((p) => (p.found = false));
         console.log(players, drawerId);
@@ -219,11 +219,8 @@ function handleConnection() {
   };
 }
 
-var isDrawing = false;
 function draw(frames, delay) {
   if (!frames || frames.length === 0) return;
-  while (isDrawing) {}
-  isDrawing = true;
 
   let totalDuration = 1000; // On suppose que ça a pris 1s pour faire tous les traits
   let frameDuration = totalDuration / frames.length; // Temps moyen entre chaque trait
@@ -479,21 +476,6 @@ function sendMessage(message) {
   }
 }
 
-// Update the draw sending code
-setInterval(() => {
-  if (drawingState.drawFrames.length > 0) {
-    const newFrames = parseFrames(drawingState.drawFrames);
-    console.log("Envoi du dessin", newFrames);
-    socket.send(
-      JSON.stringify({
-        header: "draw",
-        frames: newFrames,
-      })
-    );
-    drawingState.drawFrames = [];
-  }
-}, 1000);
-
 // Update handleGameEnd function
 function handleGameEnd() {
   clearCanvas();
@@ -549,8 +531,10 @@ canvas.addEventListener("mousemove", (e) => {
       radius: drawingState.radius,
     };
     drawingState.currentStroke.push(frame);
+    console.log(typeof allFrames);
     allFrames.push(frame);
 
+    console.log(pos);
     drawingState.lastPos = pos;
   }
 });

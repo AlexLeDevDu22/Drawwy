@@ -1,5 +1,5 @@
 {
-    "pseudo": "Jean Pierr",
+    "pseudo": "Jean Mich",
     "achievements": [
         {
             "id": 0,
@@ -167,10 +167,10 @@
             ]
         }
     ],
-    "solo_game_played": 178,
+    "solo_game_played": 179,
     "multi_game_played": 44,
-    "num_draws_total": 175,
-    "coins": 88516,
+    "num_draws_total": 176,
+    "coins": 88564,
     "selected_items": {
         "Curseurs": 0,
         "Bordures": 2,

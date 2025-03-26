@@ -88,14 +88,14 @@ class MultiGame:
             zone_h = int(0.92 * self.H) - 6
 
             # Affichage du CANVAS à l'écran
-            self.pixel_width = zone_w // CONFIG["canvas_width"]
-            self.pixel_height = zone_h // CONFIG["canvas_height"]
+            self.pixel_size = zone_w // CONFIG["canvas_width"]
+            self.pixel_size = zone_h // CONFIG["canvas_height"]
 
 
-            canvas_x = self.W // 2 - self.pixel_width * CONFIG["canvas_width"] // 2
-            canvas_w = self.pixel_width * CONFIG["canvas_width"]
-            canvas_y = self.H // 2 - self.pixel_height * CONFIG["canvas_height"] // 2
-            canvas_h = self.pixel_height * CONFIG["canvas_height"]
+            canvas_x = self.W // 2 - self.pixel_size * CONFIG["canvas_width"] // 2
+            canvas_w = self.pixel_size * CONFIG["canvas_width"]
+            canvas_y = self.H // 2 - self.pixel_size * CONFIG["canvas_height"] // 2
+            canvas_h = self.pixel_size * CONFIG["canvas_height"]
 
             self.canvas_rect = pygame.Rect(
                 canvas_x, canvas_y, canvas_w, canvas_h)
@@ -131,7 +131,7 @@ class MultiGame:
 
                     if self.game_remaining_time == 0:  # if game time over
                         if self.me["is_drawer"]:
-                            tools.emit_sio(self.WS, {"header":"game_finished"})
+                            tools.send_ws(self.WS, {"header":"game_finished"})
                         self.GAMESTART = datetime.now()
 
                 self.events = pygame.event.get()

@@ -401,7 +401,7 @@ body {
 .chat-input {
   flex-grow: 1;
   padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
+  border: 2px solid #ccc;
   border-radius: 18px;
   outline: none;
 }
