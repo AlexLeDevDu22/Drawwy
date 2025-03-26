@@ -114,8 +114,8 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
     # Bouton retour
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")
-    if buttons["back"].check_hover(mouse_pos) and mouse_click:
+    buttons["back"].draw(screen, mouse_pos)
+    if buttons["back"].hover and mouse_click:
         return screen, "home", buttons, None
-    buttons["back"].draw(screen)
 
     return screen, "Select server", buttons, None

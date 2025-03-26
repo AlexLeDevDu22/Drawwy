@@ -19,8 +19,8 @@ class Button:
             image=None,
             active=True):
         if not circle:
-            self.W = w if w else text_font.size(text)[0] + 20
-            self.H = h if h else text_font.size(text)[1] + 40
+            self.W = w if w else text_font.size(text)[0] + 40
+            self.H = h if h else text_font.size(text)[1] + 36
         else:
             self.W, self.H = radius * 2, radius * 2
 
@@ -40,7 +40,9 @@ class Button:
         self.disabled_color = HIDED_ORANGE  # Gris pour les boutons désactivés
         self.shadow_offset = 5
 
-    def draw(self, screen):
+    def draw(self, screen, mouse_pos, locked=False):
+        self.hover = self.rect.collidepoint(mouse_pos) and self.active and not locked
+
         color = SOFT_ORANGE if self.hover else (
             ORANGE if self.active else self.disabled_color)
         shadow_color = DARK_BEIGE if self.active else (100, 100, 100)
@@ -91,10 +93,6 @@ class Button:
                  self.Y +
                  self.H *
                  0.15))
-
-    def check_hover(self, pos):
-        self.hover = self.rect.collidepoint(pos) and self.active
-        return self.hover
 
 # Classe pour les effets de particules
 

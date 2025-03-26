@@ -54,7 +54,8 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_
                                           text=button_text)
 
         # Gestion des clics
-        if buttons[button_text].check_hover(mouse_pos) and mouse_click:
+        buttons[button_text].draw(screen, mouse_pos)
+        if buttons[button_text].hover and mouse_click:
             if button_text == "QUITTER":
                 pygame.quit()
                 sys.exit()
@@ -63,7 +64,6 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_
             elif button_text == "SUCCES":
                 return screen, "achievements", buttons
 
-        buttons[button_text].draw(screen)
 
     # Shop
     button_radius = 55
@@ -80,9 +80,9 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_
         text_font=VERY_SMALL_FONT,
         image="assets/icon_shop.png")
 
-    if shop_button.check_hover(mouse_pos) and mouse_click:
+    shop_button.draw(screen, mouse_pos)
+    if shop_button.hover and mouse_click:
         return screen, "shop", buttons
-    shop_button.draw(screen)
 
     # Crédits
     credit_button = Button(
@@ -101,8 +101,8 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_
         circle=True,
         text_font=pygame.font.Font("assets/text_police/Wowsers.ttf", 17))
 
-    if credit_button.check_hover(mouse_pos) and mouse_click:
+    credit_button.draw(screen, mouse_pos)
+    if credit_button.hover and mouse_click:
         return screen, "credits", buttons
-    credit_button.draw(screen)
 
     return screen, "home", buttons

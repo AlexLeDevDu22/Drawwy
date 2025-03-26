@@ -10,7 +10,6 @@ import math
 import random
 from pygame import gfxdraw
 import time
-import os
 
 
 class ImageCarousel:
@@ -239,7 +238,7 @@ def image_selector(screen, cursor, theme):
     # Créer le bouton pour commencer à dessiner (initialement désactivé)
     start_drawing_button = Button((W -
                                    (BUTTON_FONT.size("Tourner")[0] +
-                                    80)) //
+                                    70)) //
                                   2 +
                                   BUTTON_FONT.size("Tourner")[0] +
                                   40, H *
@@ -281,28 +280,23 @@ def image_selector(screen, cursor, theme):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Vérifier le clic sur le bouton de rotation
-                if spin_button.check_hover(
-                        mouse_pos) and not image_roulette.is_spinning:
+                if spin_button.hover and not image_roulette.is_spinning:
                     image_roulette.start_spin()
 
                 # Vérifier le clic sur le bouton de dessin
-                if start_drawing_button.check_hover(
-                        mouse_pos) and image_roulette.selected_image is not None and not image_roulette.is_spinning:
+                if start_drawing_button.hover and image_roulette.selected_image is not None and not image_roulette.is_spinning:
                     # Lancer le compte à rebours
                     if not show_countdown:
                         show_countdown = True
                         countdown_start_time = time.time()
 
-                if back_button.check_hover(mouse_pos):
+                if back_button.hover:
                     return screen, "themes", image_roulette.selected_image
 
         # Mettre à jour les survols
-        spin_button.check_hover(mouse_pos)
 
         start_drawing_button.active = image_roulette.selected_image is not None and not image_roulette.is_spinning
-        start_drawing_button.check_hover(mouse_pos)
 
-        back_button.check_hover(mouse_pos)
 
         # Mettre à jour les objets flottants
         for obj in floating_objects:
@@ -337,13 +331,13 @@ def image_selector(screen, cursor, theme):
 
         # Dessiner le bouton de rotation
         if not image_roulette.selected_image or not image_roulette.is_spinning:
-            spin_button.draw(screen)
+            spin_button.draw(screen, mouse_pos)
 
         # Dessiner le bouton de dessin si une image est sélectionnée
         if image_roulette.selected_image is not None:
-            start_drawing_button.draw(screen)
+            start_drawing_button.draw(screen, mouse_pos)
 
-        back_button.draw(screen)
+        back_button.draw(screen, mouse_pos)
 
         # Afficher le compte à rebours si actif
         if show_countdown:
