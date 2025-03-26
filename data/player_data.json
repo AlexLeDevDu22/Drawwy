@@ -1,5 +1,5 @@
 {
-    "pseudo": "Shrek",
+    "pseudo": "Alex",
     "achievements": [
         {
             "id": 0,
@@ -167,14 +167,14 @@
             ]
         }
     ],
-    "solo_game_played": 172,
+    "solo_game_played": 176,
     "multi_game_played": 44,
-    "num_draws_total": 169,
+    "num_draws_total": 173,
     "coins": 88516,
     "selected_items": {
         "Curseurs": 0,
         "Bordures": 2,
-        "Emotes": 14
+        "Emotes": 18
     },
     "purchased_items": [
         21,
