@@ -21,10 +21,10 @@ class AvatarManager:
             self.avatar_original = pygame.image.load(
                 self.avatar_path).convert_alpha()
             self.avatar_original = pygame.transform.scale(
-                self.avatar_original, (100, 100))
+                self.avatar_original, (self.avatar_size, self.avatar_size))
         except BaseException:
             # Créer un avatar par défaut
-            self.avatar_original = pygame.Surface((100, 100), pygame.SRCALPHA)
+            self.avatar_original = pygame.Surface((self.avatar_size, self.avatar_size), pygame.SRCALPHA)
             self.avatar_original.fill((100, 100, 255, 255))  # Bleu par défaut
             pygame.draw.circle(self.avatar_original, ORANGE, (50, 50), 50)
 
@@ -198,6 +198,8 @@ class AvatarManager:
                         self.avatar_size +
                         30)
                     save_data("PLAYER_DATA")
+
+                    self.avatar_original = self.avatar.copy()
                     # achievement leleu
                     nom = PLAYER_DATA["pseudo"].lower()
                     if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
@@ -253,6 +255,8 @@ class AvatarManager:
                 nom = PLAYER_DATA["pseudo"].lower()
                 save_data("PLAYER_DATA")
 
+                self.avatar_original = self.avatar.copy()
+
                 # achievement leleu
                 nom = PLAYER_DATA["pseudo"].lower()
                 if nom == "leleu" or nom == "fred leleu" or nom == "frederic leleu" or nom == "mr leleu":
@@ -287,6 +291,11 @@ class AvatarManager:
 
                 if self.input_text == "Plof":
                     self.avatar = pygame.image.load("assets/easter_eggs/plof.png").convert_alpha()
+
+                if self.input_text == "Shrek":
+                    self.avatar = pygame.image.load("assets/easter_eggs/shrek.png").convert_alpha()
+                      
+                self.avatar = pygame.transform.scale(self.avatar, (self.avatar_size, self.avatar_size))
 
     def update(self, mouse_pos, mouse_pressed):
         # Dessin sur l'avatar si en mode édition et que la souris est appuyée

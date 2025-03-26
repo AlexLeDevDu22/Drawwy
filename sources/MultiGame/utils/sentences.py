@@ -53,7 +53,7 @@ sujets = [
     "Un ballon de foot vivant",
     "Une brique de lait",
     "Un poisson rouge",
-    "Shreck"]
+    "Shrek"]
 
 actions = [
     "qui fait du ski",

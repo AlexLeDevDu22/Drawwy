@@ -366,7 +366,6 @@ def drawing(MultiGame):
     # send draw
     if MultiGame.frame_num == CONFIG["fps"] - \
             1 and MultiGame.second_draw_frames != []:
-        print("draw sended")
         tools.emit_sio(
             MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
                 MultiGame.second_draw_frames)})  # send draw
