@@ -1,3 +1,4 @@
+from re import S
 from shared.ui.elements import ColorPicker
 from shared.utils.data_manager import *
 from shared.utils.common_utils import *
@@ -5,7 +6,6 @@ from shared.tools import *
 from SoloGame.ui.result_popup import PopupAnimation
 from SoloGame.utils.comparaison import compare_images
 import pygame
-import sys
 
 class SoloPlay:
     def __init__(self, screen, cursor, model_path, achievements_manager):
@@ -52,8 +52,7 @@ class SoloPlay:
             # Gestion des événements
             for event in self.events:
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown = True
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -97,22 +96,25 @@ class SoloPlay:
                     self.achievements_manager.new_achievement(1)
                 elif PLAYER_DATA["num_draws_total"] == 50:
                     self.achievements_manager.new_achievement(2)
-                save_data("PLAYER_DATA")
 
                 # end game
                 self.similarity_score = compare_images(model_path, self.canvas_surf)
-                for theme in SOLO_THEMES:
-                    for image in theme["images"]:
-                        if image["path"] == model_path:
+                for i in range(len(SOLO_THEMES)):
+                    for j in range(len(SOLO_THEMES[i]["images"])):
+                        if SOLO_THEMES[i]["images"][j]["path"] == model_path:
+                            SOLO_THEMES[i]["images"][j]["num_try"] += 1
                             if self.similarity_score >= 70:
-                                image["stars"] = 3
+                                SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 3)
                             elif self.similarity_score >= 50:
-                                image["stars"] = 2
+                                SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 2)
                             elif self.similarity_score >= 30:
-                                image["stars"] = 1
+                                SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 1)
                             save_data("SOLO_THEMES")
                             break
+                save_data("PLAYER_DATA", "SOLO_THEMES")
                 self.popup_result.start(self.similarity_score, model_path, self.canvas_surf)
+
+                pygame.image.save(self.canvas_surf, "assets/your_best_draws/" + str(PLAYER_DATA["solo_game_played"]) + ".png")
             
             self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
             pygame.display.flip()
@@ -157,18 +159,17 @@ class SoloPlay:
             validate_button_h
         )
 
-        self.model = pygame.image.load(model_path)
-        model_width = self.W - self.canvas_rect.right - 20
-        model_height = self.model.get_height() * model_width // self.model.get_width()
-        self.model = pygame.transform.scale(
-            self.model, (model_width, model_height))
+        model_size = self.W - self.canvas_rect.right - 20
+        model = pygame.image.load(model_path)
+        self.model = pygame.transform.scale(model, (model_size, model_size))
+
         self.model_rect = pygame.Rect(self.canvas_rect.right +
                                       10, self.validate_button_rect.top +
                                       10 +
                                       (self.H -
                                        self.validate_button_rect.top -
-                                       model_height) //
-                                      2, model_width, model_height)
+                                       model_size) //
+                                      2, model_size, model_size)
 
     def draw_canvas(self):
     # Cadre du canvas
@@ -177,23 +178,24 @@ class SoloPlay:
         # On blit la Surface du canvas
         self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
 
-        # Si la souris est enfoncée dans la zone du canvas, on dessine
-        if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
-            local_x = self.mouse_pos[0] - self.canvas_rect.x
-            local_y = self.mouse_pos[1] - self.canvas_rect.y
+        if not self.popup_result.started:
+            # Si la souris est enfoncée dans la zone du canvas, on dessine
+            if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
+                local_x = self.mouse_pos[0] - self.canvas_rect.x
+                local_y = self.mouse_pos[1] - self.canvas_rect.y
 
-            if self.last_canvas_pos:  # Vérifie qu'on a une position précédente
-                last_x, last_y = self.last_canvas_pos
+                if self.last_canvas_pos:  # Vérifie qu'on a une position précédente
+                    last_x, last_y = self.last_canvas_pos
 
-                # Dessine une ligne entre la dernière position et la nouvelle
-                pygame.draw.line(self.canvas_surf, self.pen_color, (last_x, last_y), (local_x, local_y), self.pen_radius * 2)
-                pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
+                    # Dessine une ligne entre la dernière position et la nouvelle
+                    pygame.draw.line(self.canvas_surf, self.pen_color, (last_x, last_y), (local_x, local_y), self.pen_radius * 2)
+                    pygame.draw.circle(self.canvas_surf, self.pen_color, (local_x, local_y), self.pen_radius)
 
-            # Met à jour la dernière position
-            self.last_canvas_pos = (local_x, local_y)
-        
-            # Achievement
-            self.achievements_manager.new_achievement(0)
+                # Met à jour la dernière position
+                self.last_canvas_pos = (local_x, local_y)
+            
+                # Achievement
+                self.achievements_manager.new_achievement(0)
 
         # Réinitialiser la dernière position quand la souris est relevée
         if not self.mouseDown:

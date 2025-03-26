@@ -9,26 +9,25 @@ from datetime import datetime, timedelta
 # Remplacez par votre propre URL du dépôt GitHub
 OWNER = "AlexLeDevDu22"  # Exemple : "octocat"
 REPO = "Drawwy-Shop"  # Exemple : "Hello-World"
-LAST_UPDATE_FILE = "data/last_update.txt"
+LAST_CHECK_FILE = "data/last_update_checked.txt"
 UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront téléchargés
 
 # Créez une instance de l'API GitHub
 g = Github()
 
-
 def get_last_check():
     """Lire la dernière date de mise à jour à partir du fichier"""
-    if os.path.exists(LAST_UPDATE_FILE):
-        with open(LAST_UPDATE_FILE, 'r') as f:
-            last_update = f.read().strip()
-            if last_update != "":
-                return datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%S")
+    if os.path.exists(LAST_CHECK_FILE):
+        with open(LAST_CHECK_FILE, 'r') as f:
+            last_check = f.read().strip()
+            if last_check != "":
+                return datetime.strptime(last_check, "%Y-%m-%dT%H:%M:%S")
     return None
 
 
 def set_last_check(update_time):
     """Enregistrer la dernière date de mise à jour dans le fichier"""
-    with open(LAST_UPDATE_FILE, 'w') as f:
+    with open(LAST_CHECK_FILE, 'w') as f:
         f.write(update_time.strftime("%Y-%m-%dT%H:%M:%S"))
 
 
@@ -73,16 +72,16 @@ def check_for_shop_updates():
     repo = g.get_repo(f"{OWNER}/{REPO}")
     
     # Comparer avec la dernière mise à jour connue
-    last_update = get_last_check()
+    last_check = get_last_check()
 
-    if last_update and last_update + timedelta(days=1) < datetime.now():
+    if last_check and last_check + timedelta(days=1) > datetime.now():
         return
 
     # Récupérer la dernière mise à jour du dépôt
     latest_commit = repo.get_commits()[0]
     latest_commit_time = latest_commit.commit.author.date.replace(tzinfo=None)
 
-    if not last_update or latest_commit_time > last_update:
+    if not last_check or latest_commit_time > last_check:
         print("Mise à jour détectée, téléchargement des nouveaux fichiers...")
 
         # Télécharger récursivement tous les fichiers/dossiers
@@ -99,7 +98,6 @@ def check_for_shop_updates():
         
     set_last_check(datetime.now())
     data.reload()
-
 
 # Créer le dossier de mise à jour si nécessaire
 if not os.path.exists(UPDATE_DIR):

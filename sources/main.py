@@ -1,4 +1,4 @@
-from Menu.ui.avatar_manager import AvatarManager
+from Menu.ui.avatar import AvatarManager
 from Menu.ui.elements import *
 from shared.utils.common_utils import AchievementManager
 from Menu.pages import play, home, credit, shop, achievements, choice_server
@@ -7,18 +7,15 @@ from shared.utils.data_manager import *
 import Menu.pages.play as play
 import shared.tools as tools
 import updater
+from datetime import datetime
+from shared.ui.common_ui import *
+from MultiGame import MultiGame
+from SoloGame import soloGame
 
 import pygame
 import threading
 import sys
 import random
-from datetime import datetime
-from shared.ui.common_ui import *
-from MultiGame import MultiGame
-from SoloGame import soloGame
-from shared.ui.common_ui import *
-from MultiGame import MultiGame
-from SoloGame import soloGame
 
 if sys.platform.startswith("win"):
     import pygetwindow as gw
@@ -30,7 +27,7 @@ pygame.init()
 
 W, H = tools.get_screen_size()
 screen = pygame.display.set_mode((W, H))
-pygame.display.set_icon(pygame.image.load("assets/icon.png"))
+pygame.display.set_icon(pygame.image.load("assets/logo.png"))
 pygame.display.set_caption("Drawwy")
 
 try:

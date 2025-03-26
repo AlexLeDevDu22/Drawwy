@@ -1,3 +1,4 @@
+from sympy import im
 from shared.ui.common_ui import *
 from shared.ui.elements import Button
 from SoloGame.ui.elements import FloatingObject
@@ -13,7 +14,7 @@ import os
 
 
 class ImageCarousel:
-    def __init__(self, X, Y, images):
+    def __init__(self, X, Y, images, theme):
         self.W = W
         self.H = H
         self.carousel_height = 200
@@ -24,6 +25,7 @@ class ImageCarousel:
             self.size,
             self.size)
         self.images = images
+        self.theme = theme
         self.current_offset = 0  # Position actuelle des images
         self.deceleration = 0.2  # Décélération progressive
         self.is_spinning = False
@@ -35,6 +37,10 @@ class ImageCarousel:
         self.max_spin_speed = 40
         self.particles = []
         self.images_opacity = 0
+
+        star_icon = pygame.image.load("assets/icon_star.png").convert_alpha()
+        self.star_icon = pygame.transform.scale(star_icon, (30, 30))
+
     def start_spin(self):
         self.is_spinning = True
         self.spin_speed = random.randint(
@@ -142,6 +148,12 @@ class ImageCarousel:
             img_surface.blit(
                 scaled_img, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
+            # image stars
+            size = self.star_icon.get_height()*max(0.3, scale_factor)
+            for j in range(self.theme["images"][i]["stars"]):
+                star_icon = pygame.transform.scale(self.star_icon, (size, size))
+                img_surface.blit(star_icon, (10 + j * int(size*1.25), scaled_img.get_height() - 8 - size))
+
             # Blitter l'image arrondie sur la surface principale
             surface.blit(
                 img_surface,
@@ -218,7 +230,7 @@ def image_selector(screen, cursor, theme):
         f"assets/soloImages/{theme["path"]}{image["path"]}") for image in theme["images"]]
 
     # Créer la roulette d'images
-    image_roulette = ImageCarousel(W, H, images)
+    image_roulette = ImageCarousel(W, H, images, theme)
 
     # Créer le bouton pour lancer la roulette
     spin_button = Button(
@@ -280,8 +292,6 @@ def image_selector(screen, cursor, theme):
                     if not show_countdown:
                         show_countdown = True
                         countdown_start_time = time.time()
-                    # Si on voulait passer à la page suivante, ce serait ici
-                    print("Lancement de l'interface de dessin...")
 
                 if back_button.check_hover(mouse_pos):
                     return screen, "themes", image_roulette.selected_image

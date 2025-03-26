@@ -49,19 +49,19 @@ def reload():
             PYGAME_EMOTES[i]["gif_start_time"] = time.time()
 
 
-def save_data(file):
+def save_data(*args):
     global PLAYER_DATA
     global SOLO_THEMES
 
-    with open(f'data/{file.lower()}.json', 'w', encoding="utf-8") as f:
-        if file == "PLAYER_DATA":
-            json.dump(PLAYER_DATA, f, ensure_ascii=False, indent=4)
-        elif file == "SOLO_THEMES":
-            json.dump(SOLO_THEMES, f, ensure_ascii=False, indent=4)
-        else:
-            print(file, " ce fichier n'est pas reconnu")
-            raise ValueError
-
+    for file in args:
+        with open(f'data/{file.lower()}.json', 'w', encoding="utf-8") as f:
+            if file == "PLAYER_DATA":
+                json.dump(PLAYER_DATA, f, ensure_ascii=False, indent=4)
+            elif file == "SOLO_THEMES":
+                json.dump(SOLO_THEMES, f, ensure_ascii=False, indent=4)
+            else:
+                print(file, " ce fichier n'est pas reconnu")
+                raise ValueError
 
 PLAYER_DATA = {}
 SHOP_ITEMS = []

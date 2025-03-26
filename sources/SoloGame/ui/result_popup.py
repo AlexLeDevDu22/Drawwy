@@ -6,15 +6,10 @@ import pygame
 import math
 import random
 
-num_stars = 0
-for theme in SOLO_THEMES:
-    for image in theme["images"]:
-        num_stars += image["stars"]
-
 class PopupAnimation:
     def __init__(self,screen, W,H):
         self.screen = screen
-        self.popup_width, self.popup_height = 600, 400
+        self.popup_width, self.popup_height = 1050, 750
         self.popup_x = (W - self.popup_width) // 2
         self.popup_y = -self.popup_height  # Commencer hors écran
         self.target_y = (H - self.popup_height) // 2
@@ -22,7 +17,7 @@ class PopupAnimation:
         self.started = False
 
         # Animation de transition
-        self.animation_speed = 5
+        self.animation_speed = 10
         self.animation_done = False
         self.animation_progress = 0
 
@@ -34,6 +29,11 @@ class PopupAnimation:
         self.star_jump = [0, 0, 0]
         self.star_rotation = [0, 0, 0]
 
+        self.num_stars = 0
+        for theme in SOLO_THEMES:
+            for image in theme["images"]:
+                self.num_stars += image["stars"]
+
         # Système de particules
         self.particles = Confetti()
         self.particle_timer = 0
@@ -43,9 +43,13 @@ class PopupAnimation:
         self.entry_particles_created = False
         self.star_particles_created = [False, False, False]
 
+        self.image_size = 400
+
     def start(self, score, model_path, draw_image):
         self.model_image = pygame.image.load(model_path)
+        self.model_image = pygame.transform.scale(self.model_image, (self.image_size , self.image_size ))
         self.draw_image = draw_image
+        self.draw_image = pygame.transform.scale(self.draw_image, (self.image_size , self.image_size ))
 
         self.score = int(score)
         # Détermine combien d'étoiles sont remplies
@@ -64,10 +68,11 @@ class PopupAnimation:
             # Animation d'entrée de la popup
             if self.popup_y < self.target_y:
                 self.popup_y += self.animation_speed
+                self.animation_speed += 1
 
                 # Créer des particules pour l'entrée
                 if not self.entry_particles_created and self.popup_y > 0:
-                    for _ in range(30):
+                    for _ in range(12*self.filled_stars):
                         self.particles.add_confetti(
                             random.randint(
                                 self.popup_x,
@@ -122,8 +127,8 @@ class PopupAnimation:
 
                         if self.stars_fill[i] < 100:
                             all_filled = False
-
-                        num_stars+=1
+                        else:
+                            self.num_stars+=1
 
                 if all_filled:
                     self.stars_filled = True
@@ -235,7 +240,7 @@ class PopupAnimation:
                 2)
 
             # Dessiner le titre et le score
-            title_surface = MEDIUM_FONT.render("Dessin achevé !!", True, BLACK)
+            title_surface = BUTTON_FONT.render("Dessin acheve !!", True, BLACK)
             self.screen.blit(title_surface, (self.popup_x + (self.popup_width -
                         title_surface.get_width()) // 2, self.popup_y + 30))
 
@@ -265,7 +270,7 @@ class PopupAnimation:
                     2,
                     star_y +
                     star_size +
-                    10))
+                    20))
 
                 self.draw_star(
                     start_x + i * star_spacing + star_size // 2,
@@ -283,7 +288,7 @@ class PopupAnimation:
                     star_icon,
                     (self.popup_x +
                     self.popup_width -
-                    110,
+                    135,
                     self.popup_y +
                     18))
             except BaseException:
@@ -291,37 +296,39 @@ class PopupAnimation:
                 self.draw_star(
                     self.popup_x +
                     self.popup_width -
-                    90,
+                    115,
                     self.popup_y +
                     30,
                     20,
                     100)
 
             self.screen.blit(
-                MEDIUM_FONT.render("X"+str(num_stars), True, BLACK),
+                MEDIUM_FONT.render("X"+str(self.num_stars), True, BLACK),
                 (self.popup_x +
                 self.popup_width -
-                65,
+                90,
                 self.popup_y +
-                25))
+                28))
 
             # Dessiner les images à droite
-            image_x = self.popup_x + self.popup_width + 20
-            image_y = self.popup_y + 30
+            image_x = self.popup_x + self.popup_width//2 - 20 - self.image_size 
+            image_y = self.popup_y + self.popup_height - 30 - self.image_size 
 
+            pygame.draw.rect(self.screen, LIGHT_ORANGE, (image_x -2, image_y -2 , self.image_size +4, self.image_size + 4))
             self.screen.blit(self.model_image, (image_x, image_y))
 
             # Flèche entre les images
-            # Flèche entre les images (inversée mais dans la même zone)
             arrow_points = [
-                (image_x + 125, image_y + 190 - 10),  # Point en haut
-                (image_x + 145, image_y + 190 - 30),  # Coin bas gauche
-                (image_x + 105, image_y + 190 - 30)   # Coin bas droit
+                (image_x + self.image_size  + 10, image_y + self.image_size//2 - 20),
+                (image_x + self.image_size  + 30, image_y + self.image_size//2),
+                (image_x + self.image_size  + 10, image_y + self.image_size//2 + 20)
             ]
-            pygame.draw.polygon(self.screen, GRAY, arrow_points)
 
-            self.screen.blit(self.draw_image, (image_x, image_y + 150 + 50))
-            
+            pygame.draw.polygon(self.screen, SOFT_ORANGE, arrow_points)
+
+            pygame.draw.rect(self.screen, ORANGE, (image_x + self.image_size + 38, image_y - 2, self.image_size + 4, self.image_size + 4))
+            self.screen.blit(self.draw_image, (image_x + self.image_size + 40, image_y))
+
             # Dessiner toutes les particules
             self.particles.draw( self.screen)
             
