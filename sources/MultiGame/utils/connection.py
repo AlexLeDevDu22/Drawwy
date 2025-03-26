@@ -1,4 +1,5 @@
 import asyncio
+from asyncio import exceptions
 import websockets
 import threading
 import MultiGame.utils.tools as tools
@@ -6,8 +7,6 @@ from shared.utils.data_manager import *
 import time
 from datetime import datetime
 import pygame
-
-connection_loop = None
 
 def start_connexion(MultiGameClass, server_name):
     try:
@@ -22,12 +21,10 @@ def start_connexion(MultiGameClass, server_name):
             while not server.server_started:
                 time.sleep(0.1)
 
-        global connection_loop
-        connection_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(connection_loop)
-        connection_loop.run_until_complete(
+        asyncio.set_event_loop(MultiGameClass.connection_loop)
+        MultiGameClass.connection_loop.run_until_complete(
             handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server), port=server.port if MultiGameClass.server else None))
-    except RuntimeError:
+    except RuntimeError or asyncio.exceptions.CancelledError:
         print("connexion fermé")
 
 
@@ -112,10 +109,16 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
     def new_message(mess):
         # ajouter à la liste de message
         if mess["pid"] == MultiGame.PLAYER_ID:
+            num_my_mess = 0
             for i in range(len(MultiGame.MESSAGES)-1, -1, -1):
                 if MultiGame.MESSAGES[i]["type"] != "system" and MultiGame.MESSAGES[i]["pid"] == mess["pid"]:
-                    MultiGame.MESSAGES.pop(i)
-                    break
+                    num_my_mess+=1
+                    if num_my_mess == 1:
+                        MultiGame.MESSAGES.pop(i)
+            
+            if num_my_mess == 1 and mess["type"] == "guess" and mess["succeed"]: # succeed and first message
+                MultiGame.achievements_manager.new_achievement(3)
+
         MultiGame.MESSAGES.append(mess)
 
         # update found and points
@@ -168,20 +171,35 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
 
 
 def disconnect(MultiGame):
-    global connection_loop
-    if connection_loop.is_running():
-        def cancel_tasks(loop):
-            asyncio.set_event_loop(loop)
-            for task in asyncio.all_tasks(loop):
-                task.cancel()
-            loop.stop()
+    if MultiGame.connection_loop and not MultiGame.connection_loop.is_closed():
+        async def shutdown(loop):
+            # Fermer toutes les connexions WebSocket si elles existent
+            if hasattr(MultiGame, "websocket") and MultiGame.websocket is not None:
+                await MultiGame.websocket.close()
+                print("WebSocket fermé proprement")
 
-        connection_loop.call_soon_threadsafe(
-            cancel_tasks, connection_loop)
+            # Annuler toutes les tâches asyncio
+            tasks = [t for t in asyncio.all_tasks(loop) if not t.done()]
+            for task in tasks:
+                try:
+                    task.cancel()
+                    await task
+                except asyncio.exceptions.CancelledError:
+                    pass
+
+            # Fermer proprement la boucle
+            loop.stop()
+            loop.close()
+            print("Boucle asyncio arrêtée et fermée")
+
+        print("oooo")
+        future = asyncio.run_coroutine_threadsafe(shutdown(MultiGame.connection_loop), MultiGame.connection_loop)
+        future.result()
 
     if MultiGame.server:
         MultiGame.server.stop_server()
         MultiGame.server = None
+
     MultiGame.is_connected = False
     # Attendre la fin du thread de connexion
     MultiGame.connexion_thread.join()

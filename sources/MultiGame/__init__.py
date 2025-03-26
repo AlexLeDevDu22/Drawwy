@@ -1,6 +1,6 @@
 from shared.ui.common_ui import *
 from MultiGame.ui.widgets import *
-from shared.ui.elements import ColorPicker
+from shared.ui.elements import ColorPicker, Button
 import MultiGame.utils.connection as connection
 from shared.utils.data_manager import *
 
@@ -49,6 +49,7 @@ class MultiGame:
         try:
             self.is_connected = False
             self.WS = None
+            self.connection_loop = asyncio.new_event_loop()
             self.connexion_thread = threading.Thread(
                 target=connection.start_connexion, args=(
                     self, server_name,))
@@ -102,6 +103,11 @@ class MultiGame:
             self.CANVAS = pygame.Surface(
             (self.canvas_rect.width,
              self.canvas_rect.height))
+            
+            self.quit_button = Button(
+                self.W // 2 - 60,
+                self.H - 82,
+                text= "Quitter")
 
             while 1:
                 clock.tick(CONFIG["fps"])
@@ -143,6 +149,7 @@ class MultiGame:
                             self.pen_color = color
                     self.color_picker.draw(self.screen)
                     slider_radius(self)
+                self.quit_button.draw(self.screen, self.mouse_pos)
                 chat(self)
                 timer(self)
 
@@ -174,6 +181,12 @@ class MultiGame:
                     elif event.type == pygame.MOUSEBUTTONUP:
                         self.mouse_down = False
                         self.last_canvas_click = None
+
+                        if self.quit_button.hover:
+                            threading.Thread(
+                            target=connection.disconnect, args=(
+                                self,), daemon=True).start()
+                            return
                     if event.type == pygame.MOUSEMOTION:
                         if self.mouse_down:
                             self.lastMouseDown = self.mouse_down

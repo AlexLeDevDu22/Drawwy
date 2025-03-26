@@ -5,6 +5,8 @@ from skimage.metrics import structural_similarity as ssim
 
 def simplify_image(image, num_colors=12, contrast_threshold=20, color_boost=1.3, clean_size=3):
     """Simplifie une image en réduisant le nombre de couleurs et en supprimant les petits détails."""
+    
+
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convertir BGR en RGB
     pixels = image.reshape((-1, 3)).astype(np.float32)
     
@@ -28,66 +30,61 @@ def simplify_image(image, num_colors=12, contrast_threshold=20, color_boost=1.3,
     
     # Suppression des petits points
     kernel = np.ones((clean_size, clean_size), np.uint8)
-    final_image = cv2.morphologyEx(color_boosted_image, cv2.MORPH_OPEN, kernel)
-    
-    return final_image
+    image = cv2.morphologyEx(color_boosted_image, cv2.MORPH_OPEN, kernel)
+
+    return image
 
 def extract_important_shapes(image):
-    """ Détecte les zones importantes avec une meilleure précision. """
+    """ Détecte les zones importantes avec plus de précision. """
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Filtre adaptatif pour éliminer le bruit tout en gardant les contrastes
-    adaptive_thresh = cv2.adaptiveThreshold(
-        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2
-    )
-
-    # Fermer les formes (évite les contours trop fragmentés)
+    adaptive_thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     kernel = np.ones((3,3), np.uint8)
     edges = cv2.dilate(adaptive_thresh, kernel, iterations=1)
-
     return edges
 
-def compare_images(img1_path, img2_surface):
-    """Compare une image de référence et un dessin fait par l'utilisateur."""
+def compare_images(solo_class, img1_path, img2_surface):
+    """Compare une image de référence et un dessin fait par l'utilisateur avec des critères plus stricts."""
+    solo_class.similarity_score=-1
+    
     img1 = cv2.imread(img1_path)
-    img1 = simplify_image(img1, num_colors=12)
+    img1 = simplify_image(img1, num_colors=6)
     
     img2 = pygame.surfarray.array3d(img2_surface)
     img2 = np.transpose(img2, (1, 0, 2))
     img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
-    img2 = simplify_image(img2, num_colors=12)
+    img2 = simplify_image(img2, num_colors=6)
     
     # Extraction des formes importantes
     edges1 = extract_important_shapes(img1)
     edges2 = extract_important_shapes(img2)
     
-    # Vérifier si l'image dessinée est vide
-    if np.mean(edges2) < 5:
-        return 0  # Rien n'a été dessiné
-    
-    # Comparaison de la similarité des formes (SSIM)
+    # Vérification si le dessin est presque vide
+    white_ratio = np.mean(img2) / 255  # % de blanc dans l'image
+    if white_ratio > 0.9 or np.mean(edges2) < 5:
+        solo_class.similarity_score=5
+        solo_class.similarity_score_ready=True
+        return 5
+
+    # Comparaison des formes (SSIM)
     ssim_score, _ = ssim(edges1, edges2, full=True)
     shape_score = ssim_score * 100
-    
-    # Densité des bords dans l'image de référence et l'image dessinée
-    edge_density_1 = np.count_nonzero(edges1) / edges1.size
-    edge_density_2 = np.count_nonzero(edges2) / edges2.size
-    
-    # Bonus pour les détails : si l'utilisateur a dessiné des petites formes similaires
-    detail_bonus = 0
-    if edge_density_2 > edge_density_1 * 1.1:  # Si la densité des bords dans l'image dessinée est plus élevée que le modèle
-        detail_bonus = 10  # Ajouter un bonus pour les petits détails
 
-    # Calcul du score de surface
+    # Calcul du taux de remplissage
     nonzero1 = np.count_nonzero(edges1)
     nonzero2 = np.count_nonzero(edges2)
     
     if nonzero2 == 0:
+        solo_class.similarity_score=0
+        solo_class.similarity_score_ready=True
         return 0
     
     surface_ratio = min(nonzero2 / nonzero1, nonzero1 / nonzero2) * 100
     surface_score = max(0, surface_ratio)
-    
+
+    # Comparaison des pixels globaux pour détecter les différences majeures
+    pixel_diff = np.mean(np.abs(img1.astype("float") - img2.astype("float"))) / 255
+    pixel_penalty = max(0, (1 - pixel_diff) * 100)  # Si les pixels sont trop différents, baisse la note
+
     # Comparaison des couleurs dans les zones importantes
     mask = edges1 > 0
     img1_colors = img1[mask]
@@ -95,10 +92,14 @@ def compare_images(img1_path, img2_surface):
     
     if len(img1_colors) > 0 and len(img2_colors) > 0:
         diff_color = np.mean(np.abs(img1_colors.astype("float") - img2_colors.astype("float")))
-        color_score = max(0, 100 - diff_color * 0.1)
+        color_score = max(0, 100 - diff_color * 0.2)
     else:
         color_score = 50
     
-    # Calcul du score final avec bonus pour les détails
-    final_score = (shape_score * 0.6) + (surface_score * 0.3) + (color_score * 0.1) + detail_bonus
-    return int(final_score)
+    # Score final équilibré
+    final_score = int((shape_score * 0.5) + (surface_score * 0.3) + (color_score * 0.1) - (pixel_penalty * 0.1))
+
+    solo_class.similarity_score=final_score
+    solo_class.similarity_score_ready=True
+
+    return final_score
