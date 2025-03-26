@@ -63,6 +63,7 @@ def compare_images(solo_class, img1_path, img2_surface):
     if white_ratio > 0.9 or np.mean(edges2) < 5:
         solo_class.similarity_score=5
         solo_class.similarity_score_ready=True
+        return 5
 
     # Comparaison des formes (SSIM)
     ssim_score, _ = ssim(edges1, edges2, full=True)
@@ -75,6 +76,7 @@ def compare_images(solo_class, img1_path, img2_surface):
     if nonzero2 == 0:
         solo_class.similarity_score=0
         solo_class.similarity_score_ready=True
+        return 0
     
     surface_ratio = min(nonzero2 / nonzero1, nonzero1 / nonzero2) * 100
     surface_score = max(0, surface_ratio)

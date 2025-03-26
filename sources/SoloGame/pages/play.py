@@ -113,7 +113,7 @@ class SoloPlay:
             elif self.mouse_down and self.quit_button.hover:
                 return
             
-            if self.similiraty_score_ready and self.similiraty_score>=0:
+            if self.similiraty_score_ready and self.similiraty_score!=-1:
                 self.similiraty_score_ready = False
                # end game
                 for i in range(len(SOLO_THEMES)):

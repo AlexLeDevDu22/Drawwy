@@ -238,7 +238,7 @@ def image_selector(screen, cursor, theme):
     # Créer le bouton pour commencer à dessiner (initialement désactivé)
     start_drawing_button = Button((W -
                                    (BUTTON_FONT.size("Tourner")[0] +
-                                    90)) //
+                                    70)) //
                                   2 +
                                   BUTTON_FONT.size("Tourner")[0] +
                                   40, H *
