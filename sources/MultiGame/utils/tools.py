@@ -17,7 +17,6 @@ def is_connected():
     except OSError:
         return False
 
-
 def test_server(server_name):
     try: return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/num_players", timeout=4).status_code == 200
     except: return False
