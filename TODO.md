@@ -1,27 +1,27 @@
 🟥 Robin | 🟩 Maxence | 🟦 Alex
 
-- [X] 🟦 Update du shop
-- [X] 🟦 Réparer Multi
-- [X] 🟦 Bonne déconnection du server
-- [X] 🟩 FINIR LE MODE SOLO
-- [X] 🟦 Stockage des données à la fin d'une partie (joué, gagné, points)
-- [X] 🟥 Bon achievements
-- [ ] 🟥 Achievements intégré au jeux
+- [x] 🟦 Update du shop
+- [x] 🟦 Réparer Multi
+- [x] 🟦 Bonne déconnection du server
+- [x] 🟩 FINIR LE MODE SOLO
+- [x] 🟦 Stockage des données à la fin d'une partie (joué, gagné, points)
+- [x] 🟥 Bon achievements
+- [x] 🟥 Achievements intégré au jeux
 - [ ] 🟥 Couronne quand tous les achievements
-- [X] 🟦 Emotes dans le shop
-- [X] 🟦 Emotes dans le chat
-- [X] 🟩 Rareté d'items dans le shop
-- [ ] 🟥 Pouvoir quitter le Multi
+- [x] 🟦 Emotes dans le shop
+- [x] 🟦 Emotes dans le chat
+- [x] 🟩 Rareté d'items dans le shop
+- [x] 🟥 Pouvoir quitter le Multi
 - [ ] 🟥 Possibilité de régénére une phrase (1 fois par game, payer)
-- [X] 🟦🟩 Limite de jouers
-- [X] 🟦🟩 Plusieurs servers
-- [X] 🟦 Plus de FPS
+- [x] 🟦🟩 Limite de jouers
+- [x] 🟦🟩 Plusieurs servers
+- [x] 🟦 Plus de FPS
 - [ ] 🟥 Rendre moins "fade" l'ui drawer
-- [X] 🟩 Skin souris animé on click
-- [ ] 🟥🟩 easter egg
+- [x] 🟩 Skin souris animé on click
+- [x] 🟥🟩 easter egg
 
-- [ ] 🟩Vidéo 
+- [ ] 🟩Vidéo
 - [ ] 🟥🟩🟦 PDF
 - [ ] 🟥 README
-- [ ] 🟦 Shéma de structuration
+- [x] 🟦 Shéma de structuration
 - [ ] 🟦 DocString

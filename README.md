@@ -26,20 +26,9 @@ python source/main.py
 3\. La version web!
 
 Si vous souhaité acceder a la version en ligne du multijoueur, il suffit d'utiliser les adresses si dessous selon le serveur:
-    Mastiff:"vital-mastiff-publicly.ngrok-free.app"
 
+    Mastiff: vital-mastiff-publicly.ngrok-free.app
+    Smoothly: smoothly-on-hyena.ngrok-free.app
+    Faithful: next-boxer-faithful.ngrok-free.app
 
-
-    Smoothly:"smoothly-on-hyena.ngrok-free.app"
-  
-
-
-    Faithful:"next-boxer-faithful.ngrok-free.app"
-
-PS: La version web n'est accessible que lorsqu'un joueur y est présent sur la version python
-
- 
-
-
-
-
+PS: La version web n'est accessible que lorsqu'un joueur y est déja présent depuis la version python

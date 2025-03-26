@@ -153,14 +153,14 @@ class ThemeCard:
         name_rect = name_texte.get_rect(
             center=(
                 scaled_rect.centerx + 2,
-                scaled_rect.centery + 62))
+                scaled_rect.centery + 65))
         screen.blit(name_texte, name_rect)
 
         name_texte = MEDIUM_FONT.render(self.theme_info["name"], True, WHITE)
         name_rect = name_texte.get_rect(
             center=(
                 scaled_rect.centerx,
-                scaled_rect.centery + 60))
+                scaled_rect.centery + 63))
         screen.blit(name_texte, name_rect)
 
 
@@ -263,9 +263,6 @@ def theme_choicer(screen, cursor):
             for card in theme_cards:
                 card.rect.collidepoint(mouse_pos)
 
-            start_button.check_hover(mouse_pos)
-            quit_button.check_hover(mouse_pos)
-
         # Mettre à jour les objets flottants
         for obj in floating_objects:
             obj.update()
@@ -322,8 +319,8 @@ def theme_choicer(screen, cursor):
                 card.draw(screen)
 
             # Dessiner le bouton de démarrage
-            start_button.draw(screen)
-            quit_button.draw(screen)
+            start_button.draw(screen, mouse_pos)
+            quit_button.draw(screen, mouse_pos)
 
         # Mettre à jour l'affichage
         cursor.show(screen, mouse_pos, True in pygame.mouse.get_pressed())

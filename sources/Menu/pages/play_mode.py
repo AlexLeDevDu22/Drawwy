@@ -53,7 +53,7 @@ def play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons):
 
     if "back" not in buttons:
         buttons["back"] = Button("center", H * 0.8, text="RETOUR")
-    if buttons["back"].check_hover(mouse_pos) and mouse_click:
+    buttons["back"].draw(screen, mouse_pos)
+    if buttons["back"].hover and mouse_click:
         return screen, "home", buttons
-    buttons["back"].draw(screen)
     return screen, "play", buttons

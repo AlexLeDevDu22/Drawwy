@@ -1,5 +1,6 @@
 from re import S
-from shared.ui.elements import ColorPicker
+import threading
+from shared.ui.elements import ColorPicker, Button
 from shared.utils.data_manager import *
 from shared.utils.common_utils import *
 from shared.tools import *
@@ -18,7 +19,7 @@ class SoloPlay:
         self.pen_radius = 6
         
         # État de la souris
-        self.mouseDown = False
+        self.mouse_down = False
         self.mouse_pos = (0, 0)
         
         # On définit les valeurs des rectangles d'interface
@@ -40,6 +41,11 @@ class SoloPlay:
 
         self.popup_result = PopupAnimation(self.screen, self.W, self.H)
 
+        self.similarity_score = None
+        self.similiraty_score_ready = False
+
+        self.can_draw = True
+
         clock = pygame.time.Clock()
         running = True
         while running:
@@ -54,13 +60,13 @@ class SoloPlay:
                 if event.type == pygame.QUIT:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.mouseDown = True
+                    self.mouse_down = True
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    self.mouseDown = False
+                    self.mouse_down = False
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouse_pos = event.pos
             
-            if self.mouseDown:
+            if self.mouse_down:
                 color = self.color_picker.get_color_at(pygame.mouse.get_pos())
                 if color:
                     self.pen_color = color
@@ -80,6 +86,8 @@ class SoloPlay:
             # Dessin du bouton "Valider" en bas à droite
             self.draw_validate_button()
             
+            self.quit_button.draw(self.screen, self.mouse_pos)
+            
             # Dessin du modèle
             pygame.draw.rect(self.screen, BLACK, self.model_rect, 2)
             self.screen.blit(self.model, self.model_rect)
@@ -89,7 +97,10 @@ class SoloPlay:
             self.popup_result.update()
             self.popup_result.draw()
             
-            if self.mouseDown and self.validate_button_rect.collidepoint(self.mouse_pos): # Validation du dessin
+            if self.mouse_down and self.validate_button_rect.collidepoint(self.mouse_pos) and self.can_draw: # Validation du dessin
+                
+                self.can_draw = False
+
                 PLAYER_DATA["solo_game_played"] += 1
                 PLAYER_DATA["num_draws_total"] += 1
                 if PLAYER_DATA["num_draws_total"] == 10:
@@ -97,26 +108,37 @@ class SoloPlay:
                 elif PLAYER_DATA["num_draws_total"] == 50:
                     self.achievements_manager.new_achievement(2)
 
-                # end game
-                self.similarity_score = compare_images(model_path, self.canvas_surf)
+                threading.Thread(target = compare_images, args=(self, model_path, self.canvas_surf,)).start()
+
+            elif self.mouse_down and self.quit_button.hover:
+                return
+            
+            if self.similiraty_score_ready and self.similiraty_score>=0:
+                self.similiraty_score_ready = False
+               # end game
                 for i in range(len(SOLO_THEMES)):
                     for j in range(len(SOLO_THEMES[i]["images"])):
-                        if SOLO_THEMES[i]["images"][j]["path"] == model_path:
+                        if SOLO_THEMES[i]["images"][j]["path"] == model_path.split("/")[-1]:
                             SOLO_THEMES[i]["images"][j]["num_try"] += 1
                             if self.similarity_score >= 70:
                                 SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 3)
+                                if self.similarity_score>=90:
+                                    self.achievements_manager.new_achievement(4)
                             elif self.similarity_score >= 50:
                                 SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 2)
                             elif self.similarity_score >= 30:
                                 SOLO_THEMES[i]["images"][j]["stars"] = max(SOLO_THEMES[i]["images"][j]["stars"], 1)
-                            save_data("SOLO_THEMES")
                             break
                 save_data("PLAYER_DATA", "SOLO_THEMES")
-                self.popup_result.start(self.similarity_score, model_path, self.canvas_surf)
 
                 pygame.image.save(self.canvas_surf, "assets/your_best_draws/" + str(PLAYER_DATA["solo_game_played"]) + ".png")
+                
+                self.popup_result.start(self.similarity_score, model_path, self.canvas_surf)
+            elif self.similarity_score == -1:
+                
+                draw_text("Comparaison en cours...",surface=self.screen, x=self.W // 2, y=self.H // 2, color=BLACK, font=MEDIUM_FONT, shadow=True)
             
-            self.cursor.show(self.screen, self.mouse_pos, self.mouseDown)
+            self.cursor.show(self.screen, self.mouse_pos, self.mouse_down)
             pygame.display.flip()
 
     def define_layout(self, model_path):
@@ -125,7 +147,7 @@ class SoloPlay:
         self.canvas_rect = pygame.Rect(
             int(0.05 * self.W),    # marge à gauche
             int(0.05 * self.H),    # marge en haut
-            int(0.70 * self.W),    # 70% de la largeur
+            int(0.90 * self.H),    # 70% de la largeur
             int(0.90 * self.H)     # 90% de la hauteur
         )
 
@@ -133,7 +155,7 @@ class SoloPlay:
         palette_width = int(0.25 * self.W)
         palette_height = int(0.30 * self.H)
         self.colors_rect = pygame.Rect(
-            self.canvas_rect.right + 10,
+            self.canvas_rect.right + 40,
             int(0.05 * self.H),
             palette_width - 20,
             palette_height
@@ -143,33 +165,32 @@ class SoloPlay:
         slider_width = palette_width - 20
         slider_height = int(0.10 * self.H)
         self.slider_rect = pygame.Rect(
-            self.canvas_rect.right + 10,
+            self.canvas_rect.right + 40,
             self.colors_rect.bottom + 10,
             slider_width,
             slider_height
         )
 
         # Valider
-        validate_button_w = 365
+        validate_button_w = 300
         validate_button_h = 50
         self.validate_button_rect = pygame.Rect(
-            self.slider_rect.left + (self.slider_rect.width - validate_button_w) // 2,
-            self.slider_rect.bottom + 10,
+            self.slider_rect.left + self.slider_rect.width - 80 - validate_button_w,
+            self.slider_rect.bottom + 15,
             validate_button_w,
             validate_button_h
         )
 
-        model_size = self.W - self.canvas_rect.right - 20
+        # quit button
+        self.quit_button = Button(self.slider_rect.left + self.slider_rect.width - 72, self.slider_rect.bottom + 10, 60, 60, None, 25, image="assets/quit.svg")
+
+        model_size = self.H - self.validate_button_rect.top - 120
         model = pygame.image.load(model_path)
         self.model = pygame.transform.scale(model, (model_size, model_size))
 
         self.model_rect = pygame.Rect(self.canvas_rect.right +
-                                      10, self.validate_button_rect.top +
-                                      10 +
-                                      (self.H -
-                                       self.validate_button_rect.top -
-                                       model_size) //
-                                      2, model_size, model_size)
+                                      40, self.validate_button_rect.top +
+                                      70, model_size, model_size)
 
     def draw_canvas(self):
     # Cadre du canvas
@@ -178,9 +199,9 @@ class SoloPlay:
         # On blit la Surface du canvas
         self.screen.blit(self.canvas_surf, (self.canvas_rect.x, self.canvas_rect.y))
 
-        if not self.popup_result.started:
+        if self.can_draw:
             # Si la souris est enfoncée dans la zone du canvas, on dessine
-            if self.mouseDown and self.canvas_rect.collidepoint(self.mouse_pos):
+            if self.mouse_down and self.canvas_rect.collidepoint(self.mouse_pos):
                 local_x = self.mouse_pos[0] - self.canvas_rect.x
                 local_y = self.mouse_pos[1] - self.canvas_rect.y
 
@@ -198,7 +219,7 @@ class SoloPlay:
                 self.achievements_manager.new_achievement(0)
 
         # Réinitialiser la dernière position quand la souris est relevée
-        if not self.mouseDown:
+        if not self.mouse_down:
             self.last_canvas_pos = None  # On reset pour éviter des traits indésirables
 
 
@@ -226,7 +247,7 @@ class SoloPlay:
         pygame.draw.circle(self.screen, RED, (knob_x, knob_y), knob_size)
 
         # Gestion du clic pour modifier la taille du pinceau
-        if self.mouseDown:
+        if self.mouse_down:
             mx, my = self.mouse_pos
             if self.slider_rect.collidepoint(mx, my):
                 # On borne la position entre line_start et line_end

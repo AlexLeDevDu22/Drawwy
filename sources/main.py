@@ -1,11 +1,12 @@
 from Menu.ui.avatar import AvatarManager
 from Menu.ui.elements import *
 from shared.utils.common_utils import AchievementManager
-from Menu.pages import play, home, credit, shop, achievements, choice_server
+from Menu.pages import home, credit, shop, achievements, choice_server
 from shared.utils.common_utils import *
 from shared.utils.data_manager import *
-import Menu.pages.play as play
+import Menu.pages.play_mode as play_mode
 import shared.tools as tools
+from Menu.pages import play_mode
 import updater
 from datetime import datetime
 from shared.ui.common_ui import *
@@ -181,7 +182,7 @@ while running:
 )
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
-            screen, current_page, buttons = play.play_choicer(
+            screen, current_page, buttons = play_mode.play_choicer(
                 screen, W, H, mouse_pos, mouse_click, connected, buttons)
         elif current_page == "Solo":
             soloGame(screen, cursor, achievements_manager)
