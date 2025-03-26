@@ -131,10 +131,9 @@
         "path": "9.png",
         "stars": 0,
         "num_try": 0
-      }
-    ]
-  },
-  {
+      },
+
+    {
     "index": 1,
     "name": "Nourriture",
     "icon": "🍔",
