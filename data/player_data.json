@@ -1,5 +1,5 @@
 {
-    "pseudo": "Shrek",
+    "pseudo": "Alx",
     "achievements": [
         {
             "id": 0,
@@ -128,9 +128,9 @@
             "explication": "obtenir tous les items",
             "succeed": true,
             "couleurs": [
-                0,
-                0,
-                0
+                173,
+                216,
+                230
             ]
         },
         {
@@ -139,9 +139,9 @@
             "explication": "Collecter 1000 pieces",
             "succeed": true,
             "couleurs": [
-                0,
-                0,
-                0
+                255,
+                200,
+                100
             ]
         },
         {
@@ -150,9 +150,9 @@
             "explication": "Collecter 10_000 pieces",
             "succeed": true,
             "couleurs": [
-                0,
-                0,
-                0
+                216,
+                191,
+                216
             ]
         },
         {
@@ -161,16 +161,16 @@
             "explication": "Je sais pas, c'est toi ?",
             "succeed": true,
             "couleurs": [
-                0,
-                0,
-                0
+                64,
+                224,
+                208
             ]
         }
     ],
     "solo_game_played": 172,
     "multi_game_played": 44,
     "num_draws_total": 169,
-    "coins": 88309,
+    "coins": 88334,
     "selected_items": {
         "Curseurs": 0,
         "Bordures": 2,
