@@ -17,10 +17,10 @@ def is_connected():
     except OSError:
         return False
 
-
 def test_server(server_name):
-    try: return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/players_num", timeout=4).status_code == 200
+    try: return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/num_players", timeout=4).status_code == 200
     except: return False
+
 def load_bmp_to_matrix(file_path):
     """Charge une image BMP et retourne une matrice de pixels."""
     # Charger l'image avec Pygame
