@@ -1,300 +1,341 @@
 [
-    {
+  {
+    "index": 0,
+    "name": "Paysage",
+    "icon": "🏞️",
+    "color": [34, 153, 84],
+    "path": "landscape/",
+    "images": [
+      {
         "index": 0,
-        "name": "Paysage",
-        "icon": "🏞️",
-        "color": [
-            34,
-            153,
-            84
-        ],
-        "path": "landscape/",
-        "images": [
-            {
-                "index": 0,
-                "path": "0.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 1,
-                "path": "1.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 2,
-                "path": "2.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 3,
-                "path": "3.png",
-                "stars": 0,
-                "num_try": 1
-            },
-            {
-                "index": 4,
-                "path": "4.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 5,
-                "path": "5.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 6,
-                "path": "6.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 7,
-                "path": "7.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 8,
-                "path": "8.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 9,
-                "path": "9.png",
-                "stars": 0,
-                "num_try": 0
-            }
-        ]
-    },
-    {
+        "path": "0.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
         "index": 1,
-        "name": "Nourriture",
-        "icon": "🍔",
-        "color": [
-            255,
-            99,
-            71
-        ],
-        "path": "food/",
-        "images": [
-            {
-                "index": 0,
-                "path": "1.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 1,
-                "path": "10.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 2,
-                "path": "11.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 3,
-                "path": "2.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 4,
-                "path": "3.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 5,
-                "path": "4.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 6,
-                "path": "5.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 7,
-                "path": "6.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 8,
-                "path": "7.jpg",
-                "stars": 2,
-                "num_try": 1
-            },
-            {
-                "index": 9,
-                "path": "8.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 10,
-                "path": "9.jpg",
-                "stars": 0,
-                "num_try": 0
-            }
-        ]
-    },
-    {
+        "path": "1.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
         "index": 2,
-        "name": "Culture Pop",
-        "icon": "🎬",
-        "color": [
-            255,
-            223,
-            0
-        ],
-        "path": "pop/",
-        "images": [
-            {
-                "index": 0,
-                "path": "1.jpeg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 1,
-                "path": "2.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 2,
-                "path": "3.png",
-                "stars": 0,
-                "num_try": 1
-            },
-            {
-                "index": 3,
-                "path": "4.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 4,
-                "path": "5.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 5,
-                "path": "6.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 6,
-                "path": "6.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 7,
-                "path": "7.jpg",
-                "stars": 2,
-                "num_try": 1
-            },
-            {
-                "index": 8,
-                "path": "8.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 9,
-                "path": "9.jpg",
-                "stars": 0,
-                "num_try": 0
-            }
-        ]
-    },
-    {
+        "path": "2.png",
+        "stars": 1,
+        "num_try": 0
+      },
+      {
         "index": 3,
-        "name": "Sport",
-        "icon": "🏀",
-        "color": [
-            85,
-            165,
-            252
-        ],
-        "path": "sport/",
-        "images": [
-            {
-                "index": 0,
-                "path": "0.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 1,
-                "path": "1.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 2,
-                "path": "2.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 3,
-                "path": "3.png",
-                "stars": 0,
-                "num_try": 1
-            },
-            {
-                "index": 4,
-                "path": "4.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 5,
-                "path": "5.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 6,
-                "path": "6.png",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 7,
-                "path": "7.jpg",
-                "stars": 2,
-                "num_try": 1
-            },
-            {
-                "index": 8,
-                "path": "8.jpg",
-                "stars": 0,
-                "num_try": 0
-            },
-            {
-                "index": 9,
-                "path": "9.jpg",
-                "stars": 0,
-                "num_try": 0
-            }
-        ]
-    }
+        "path": "3.png",
+        "stars": 3,
+        "num_try": 0
+      },
+      {
+        "index": 4,
+        "path": "4.png",
+        "stars": 2,
+        "num_try": 0
+      },
+      {
+        "index": 5,
+        "path": "5.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 6,
+        "path": "6.png",
+        "stars": 3,
+        "num_try": 0
+      },
+      {
+        "index": 7,
+        "path": "7.png",
+        "stars": 1,
+        "num_try": 0
+      },
+      {
+        "index": 8,
+        "path": "8.png",
+        "stars": 2,
+        "num_try": 0
+      },
+      {
+        "index": 9,
+        "path": "9.png",
+        "stars": 3,
+        "num_try": 0
+      }
+    ]
+  },
+  {
+    "index": 1,
+    "name": "Nourriture",
+    "icon": "🍔",
+    "color": [255, 99, 71],
+    "path": "food/",
+    "images": []
+  },
+  {
+    "index": 2,
+    "path": "2.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 3,
+    "path": "3.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 4,
+    "path": "4.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 5,
+    "path": "5.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 6,
+    "path": "6.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 7,
+    "path": "7.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 8,
+    "path": "8.png",
+    "stars": 0,
+    "num_try": 0
+  },
+  {
+    "index": 9,
+    "path": "9.png",
+    "stars": 0,
+    "num_try": 0
+  },
+
+  {
+    "index": 1,
+    "name": "Nourriture",
+    "icon": "🍔",
+    "color": [255, 99, 71],
+    "path": "food/",
+    "images": [
+      {
+        "index": 0,
+        "path": "1.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 1,
+        "path": "10.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 2,
+        "path": "11.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 3,
+        "path": "2.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 4,
+        "path": "3.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 5,
+        "path": "4.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 6,
+        "path": "5.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 7,
+        "path": "6.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 8,
+        "path": "7.jpg",
+        "stars": 2,
+        "num_try": 1
+      },
+      {
+        "index": 9,
+        "path": "8.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 10,
+        "path": "9.jpg",
+        "stars": 0,
+        "num_try": 0
+      }
+    ]
+  },
+  {
+    "index": 2,
+    "name": "Culture Pop",
+    "icon": "🎬",
+    "color": [255, 223, 0],
+    "path": "pop/",
+    "images": [
+      {
+        "index": 0,
+        "path": "1.jpeg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 1,
+        "path": "2.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 2,
+        "path": "3.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 3,
+        "path": "4.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 4,
+        "path": "5.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 5,
+        "path": "6.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 6,
+        "path": "6.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 7,
+        "path": "7.jpg",
+        "stars": 2,
+        "num_try": 1
+      },
+      {
+        "index": 8,
+        "path": "8.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 9,
+        "path": "9.jpg",
+        "stars": 0,
+        "num_try": 0
+      }
+    ]
+  },
+  {
+    "index": 3,
+    "name": "Sport",
+    "icon": "🏀",
+    "color": [85, 165, 252],
+    "path": "sport/",
+    "images": [
+      {
+        "index": 0,
+        "path": "0.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 1,
+        "path": "1.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 2,
+        "path": "2.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 3,
+        "path": "3.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 4,
+        "path": "4.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 5,
+        "path": "5.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 6,
+        "path": "6.png",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 7,
+        "path": "7.jpg",
+        "stars": 2,
+        "num_try": 1
+      },
+      {
+        "index": 8,
+        "path": "8.jpg",
+        "stars": 0,
+        "num_try": 0
+      },
+      {
+        "index": 9,
+        "path": "9.jpg",
+        "stars": 0,
+        "num_try": 0
+      }
+    ]
+  }
 ]

@@ -296,16 +296,6 @@ def theme_choicer(screen, cursor):
                 intro_stage = 2
 
         else:
-            # Animation terminée, afficher l'interface
-
-            # Dessiner le titre avec une ombre
-            title_shadow = TITLE_FONT.render("DRAWWY", True, BLACK)
-            title_shadow_rect = title_shadow.get_rect(center=(W // 2 + 4, 104))
-            screen.blit(title_shadow, title_shadow_rect)
-
-            title = TITLE_FONT.render("DRAWWY", True, WHITE)
-            title_rect = title.get_rect(center=(W // 2, 100))
-            screen.blit(title, title_rect)
 
             # Dessiner le sous-titre
             subtitle = BUTTON_FONT.render("Selectionne un theme", True, WHITE)
