@@ -14,7 +14,7 @@ servers:
     domain: "next-boxer-faithful.ngrok-free.app"
     api: "2ue1ZKkjebeEIwvvDxXowlTvo3i_2uKULVDsyEo6A5prX7Gyg"
 
-sentence_checker_seuil: 0.8
+sentence_checker_seuil: 0.72
 game_duration: 150
 canvas_height: 200
 canvas_width: 200
@@ -23,7 +23,6 @@ points_per_found: 25
 gif_ips: 16
 
 fps: 50
-refresh_drawing_time: 1
 
 players_colors:
   - [255, 220, 220] # 1er - Rose pâle
@@ -36,20 +35,6 @@ players_colors:
   - [240, 190, 255] # 8e - Mauve pastel
   - [250, 200, 230] # 9e - Rose bonbon
   - [255, 210, 210] # 10e - Rose saumoné
-
-drawing_colors:
-  - [255, 0, 0] # Rouge
-  - [0, 255, 0] # Vert
-  - [0, 0, 255] # Bleu
-  - [255, 255, 0] # Jaune
-  - [255, 165, 0] # Orange
-  - [128, 0, 128] # Violet
-  - [0, 0, 0] # Noir
-  - [255, 255, 255] # Blanc
-  - [0, 255, 255] # Cyan
-  - [255, 20, 147] # Rose vif
-  - [139, 69, 19] # Marron
-  - [128, 128, 128] # Gris
 
 succeed_color: [99, 255, 108] #63ff6c
 bad_color: [252, 100, 85] #fc6455
