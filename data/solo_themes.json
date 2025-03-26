@@ -74,63 +74,6 @@
     "icon": "🍔",
     "color": [255, 99, 71],
     "path": "food/",
-    "images": []
-  },
-  {
-    "index": 2,
-    "path": "2.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 3,
-    "path": "3.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 4,
-    "path": "4.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 5,
-    "path": "5.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 6,
-    "path": "6.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 7,
-    "path": "7.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 8,
-    "path": "8.png",
-    "stars": 0,
-    "num_try": 0
-  },
-  {
-    "index": 9,
-    "path": "9.png",
-    "stars": 0,
-    "num_try": 0
-  },
-
-  {
-    "index": 1,
-    "name": "Nourriture",
-    "icon": "🍔",
-    "color": [255, 99, 71],
-    "path": "food/",
     "images": [
       {
         "index": 0,

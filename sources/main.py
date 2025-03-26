@@ -1,18 +1,17 @@
+from shared.ui.common_ui import *
 from Menu.ui.avatar import AvatarManager
 from Menu.ui.elements import *
-from shared.utils.common_utils import AchievementManager
 from Menu.pages import home, credit, shop, achievements, choice_server
 from shared.utils.common_utils import *
 from shared.utils.data_manager import *
 import Menu.pages.play_mode as play_mode
 import shared.tools as tools
-from Menu.pages import play_mode
 import updater
-from datetime import datetime
-from shared.ui.common_ui import *
+from Menu.pages import play_mode
 from MultiGame import MultiGame
 from SoloGame import soloGame
 
+from datetime import datetime
 import pygame
 import threading
 import sys
