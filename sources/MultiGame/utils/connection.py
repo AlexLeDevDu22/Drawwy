@@ -169,15 +169,15 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
 
 def disconnect(MultiGame):
     global connection_loop
-    if MultiGame.connection_loop.is_running():
+    if connection_loop.is_running():
         def cancel_tasks(loop):
             asyncio.set_event_loop(loop)
             for task in asyncio.all_tasks(loop):
                 task.cancel()
             loop.stop()
 
-        MultiGame.connection_loop.call_soon_threadsafe(
-            cancel_tasks, MultiGame.connection_loop)
+        connection_loop.call_soon_threadsafe(
+            cancel_tasks, connection_loop)
 
     if MultiGame.server:
         MultiGame.server.stop_server()

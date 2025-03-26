@@ -49,7 +49,6 @@ class MultiGame:
         try:
             self.is_connected = False
             self.WS = None
-            self.connection_loop = asyncio.new_event_loop()
             self.connexion_thread = threading.Thread(
                 target=connection.start_connexion, args=(
                     self, server_name,))
