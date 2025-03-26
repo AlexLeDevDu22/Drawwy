@@ -195,7 +195,7 @@ def show_shop(
 
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
-                item_x + 225, item_y + 40)  # Déplacer le texte plus à droite
+                item_x + 290, item_y + 40)  # Déplacer le texte plus à droite
 
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
