@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
+    "pseudo": "Alex",
+=======
     "pseudo": "Alx le bg",
+>>>>>>> 7c6cdc61b9951a7f8f65963ed43e8714eca15a09
     "achievements": [
         {
             "id": 0,
@@ -167,14 +171,20 @@
             ]
         }
     ],
+<<<<<<< HEAD
+    "solo_game_played": 176,
+    "multi_game_played": 44,
+    "num_draws_total": 173,
+=======
     "solo_game_played": 177,
     "multi_game_played": 44,
     "num_draws_total": 174,
+>>>>>>> 7c6cdc61b9951a7f8f65963ed43e8714eca15a09
     "coins": 88516,
     "selected_items": {
         "Curseurs": 0,
         "Bordures": 2,
-        "Emotes": 14
+        "Emotes": 18
     },
     "purchased_items": [
         21,
