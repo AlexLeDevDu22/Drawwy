@@ -107,9 +107,7 @@ class MultiGame:
             self.quit_button = Button(
                 self.W // 2 - 60,
                 self.H - 82,
-                120,
-                50,
-                "Quitter")
+                text= "Quitter")
 
             while 1:
                 clock.tick(CONFIG["fps"])
