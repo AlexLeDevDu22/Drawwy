@@ -172,9 +172,9 @@
     "num_draws_total": 169,
     "coins": 88309,
     "selected_items": {
-        "Curseurs": null,
+        "Curseurs": 0,
         "Bordures": 2,
-        "Emotes": 22
+        "Emotes": 14
     },
     "purchased_items": [
         21,
