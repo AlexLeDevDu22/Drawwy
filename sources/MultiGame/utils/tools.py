@@ -8,21 +8,24 @@ import requests
 import socket
 import asyncio
 
-
-def is_connected():
-    try:
-        # Tente de se connecter à un serveur DNS public (Google)
-        socket.create_connection(("8.8.8.8", 53), timeout=3)
-        return True
-    except OSError:
-        return False
-
 def test_server(server_name):
+    """
+    Vérifie si le serveur MultiGame est disponible.
+
+    :param str server_name: Le nom du serveur à tester.
+    :return: True si le serveur est disponible, False sinon.
+    """
     try: return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/num_players", timeout=4).status_code == 200
     except: return False
 
 def load_bmp_to_matrix(file_path):
-    """Charge une image BMP et retourne une matrice de pixels."""
+    """
+    Charge une image .BMP et la convertit en une matrice de pixels.
+
+    :param str file_path: Chemin absolu vers l'image .BMP à charger.
+    :return: Une matrice de pixels (RGB) de l'image.
+    :rtype: list[list[tuple[int, int, int]]]
+    """
     # Charger l'image avec Pygame
     image = pygame.image.load(file_path).convert()
     width, height = image.get_size()
@@ -40,7 +43,13 @@ def load_bmp_to_matrix(file_path):
 
 
 def matrix_to_image(pixel_matrix):
-    """Affiche une matrice de pixels sur une surface Pygame."""
+    """
+    Convertit une matrice de pixels en une image Pygame Surface.
+
+    :param list[list[tuple[int, int, int]]] pixel_matrix: Une matrice de pixels RGB ou RGBA.
+    :return: Une Surface Pygame représentant l'image.
+    :rtype: pygame.Surface
+    """
     width = len(pixel_matrix[0])  # Largeur de la matrice
     height = len(pixel_matrix)  # Hauteur de la matrice
 
@@ -61,6 +70,19 @@ model = SentenceTransformer(
 
 
 def check_sentences(phrase1, phrase2):
+    """
+    Vérifie si deux phrases sont similaires.
+
+    :param str phrase1: Première phrase.
+    :param str phrase2: Seconde phrase.
+    :return: True si les phrases sont similaires, False sinon.
+    :rtype: bool
+
+    La similitude est déterminée en fonction de la valeur de configuration
+    ``sentence_checker_seuil``. La fonction utilise le modèle de langage
+    ``paraphrase-multilingual-MiniLM-L12-v2`` pour calculer la similarité
+    entre les deux phrases.
+    """
     global model
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)

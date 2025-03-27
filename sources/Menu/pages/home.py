@@ -3,7 +3,26 @@ from shared.ui.elements import Button
 import pygame
 import math
 
-def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_img, shadow_img, orig_width, orig_height, paper_texture):
+def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_img, shadow_img, orig_width, orig_height):
+    """
+    Displays the main home screen interface with animated title and interactive buttons.
+
+    Args:
+        screen (Surface): The main display surface.
+        W (int): The width of the screen.
+        H (int): The height of the screen.
+        mouse_pos (tuple): Current position of the mouse cursor.
+        mouse_click (bool): Indicates whether the mouse has been clicked.
+        title_angle (float): Angle used for animating the title image.
+        buttons (dict): A dictionary to manage button instances.
+        title_img (Surface): Image representing the title.
+        shadow_img (Surface): Shadow image for the title.
+        orig_width (int): Original width of the title image.
+        orig_height (int): Original height of the title image.
+
+    Returns:
+        tuple: The updated screen surface, the current page name, and the buttons dictionary.
+    """
     # Panneau principal (effet papier)
     main_panel_width = 900
     main_panel_height = 750
@@ -22,8 +41,6 @@ def show_home(screen, W, H, mouse_pos, mouse_click, title_angle, buttons, title_
                       main_panel_width, main_panel_height),
                      border_radius=40)
 
-    # Affichage de la texture papier (optimisation : pré-générée)
-    screen.blit(paper_texture, (main_panel_x, main_panel_y))
 
     # Animation de l'image du titre (échelle)
     title_scale = 1.3 + 0.1 * math.sin(title_angle * 1.8)

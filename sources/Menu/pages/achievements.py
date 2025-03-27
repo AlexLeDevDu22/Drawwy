@@ -13,6 +13,19 @@ def show_achievements(
         mouse_click,
         buttons,
         scroll_y=0):
+    """
+    Affiche l'interface des succ s (achievements)
+    Arguments:
+        screen {Surface} -- La surface de l' cran
+        W {int} -- La largeur de l'cran
+        H {int} -- La hauteur de l'cran
+        mouse_pos {tuple} -- La position actuelle de la souris
+        mouse_click {bool} -- Si le bouton gauche de la souris est cliqu
+        buttons {dict} -- Les boutons de l'interface
+        scroll_y {int} -- La hauteur de d placement du d filement
+    Returns:
+        tuple -- Le tuple contenant la surface de l'cran, le nom de la page courante et les boutons de l'interface
+    """
     # Titre
     draw_text("SUCCES", BUTTON_FONT, BLACK, screen, W // 2, 100)
     achievement_height = 70

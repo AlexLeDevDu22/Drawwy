@@ -8,6 +8,7 @@ from shared.utils.data_manager import *
 import threading
 import pygame
 import MultiGame.utils.tools as tools
+from shared.tools import is_connected
 import asyncio
 import os
 from datetime import datetime, timedelta
@@ -24,7 +25,22 @@ class MultiGame:
             H,
             achievements_manager,
             server_name):
-        if not tools.is_connected():
+        """
+        Constructeur de la classe MultiGame.
+
+        Args:
+            screen (pygame.display): L'écran de jeu.
+            cursor (Cursor): Le curseur de la souris.
+            clock (pygame.time.Clock): L'horloge du jeu.
+            W (int): La largeur de l'écran.
+            H (int): La hauteur de l'écran.
+            achievements_manager (AchievementsManager): Le gestionnaire des succès.
+            server_name (str): Le nom du serveur.
+
+        Returns:
+            None
+        """
+        if not is_connected():
             print("Désolé, une connexion internet est requise.")
             return
 
@@ -103,6 +119,7 @@ class MultiGame:
             self.CANVAS = pygame.Surface(
             (self.canvas_rect.width,
              self.canvas_rect.height))
+            self.CANVAS.fill(WHITE)
             
             self.quit_button = Button(
                 self.W // 2 - 60,

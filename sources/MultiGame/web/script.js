@@ -1,6 +1,6 @@
 //! Game Configuration
 const gameConfig = {
-  gameDuration: 150, // seconds
+  gameDuration: 180, // seconds
   canvasWidth: 200,
   canvasHeight: 200,
   serverUrl: "https://vital-mastiff-publicly.ngrok-free.app",
@@ -70,8 +70,14 @@ function clearCanvas() {
 clearCanvas();
 
 //* Handle WebSocket connection
-//* Handle WebSocket connection
 var socket = null;
+/**
+ * Handle the WebSocket connection
+ * @function handleConnection
+ * @param {string} pseudo - The player's pseudo
+ * @param {object} avatar - The player's avatar object
+ * @param {object} players - The list of players
+ */
 function handleConnection() {
   // Create a WebSocket connection
   socket = new WebSocket(`wss://${window.location.host}/ws`);
@@ -99,10 +105,13 @@ function handleConnection() {
     playerList.innerHTML = "";
   };
 
+  /**
+   * Handle a message from the server
+   * @param {MessageEvent} event - The WebSocket message event
+   * @listens WebSocket#message
+   */
   socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
-
-    console.log(data);
 
     // Handle different message types based on the header
     switch (data.header) {
@@ -219,6 +228,13 @@ function handleConnection() {
   };
 }
 
+/**
+ * Dessine les frames sur le canvas.
+ * Si delay est vrai, dessine les frames en prenant en compte le temps entre chaque trait.
+ * Si delay est faux, dessine les frames immédiatement.
+ * @param {Frame[]} frames - Les frames à dessiner.
+ * @param {boolean} delay - Si il faut dessiner les frames avec un délai ou non.
+ */
 function draw(frames, delay) {
   if (!frames || frames.length === 0) return;
 
@@ -248,6 +264,15 @@ function draw(frames, delay) {
   }
 }
 
+/**
+ * Dessine une ligne sur le canvas.
+ * @param {number} x1 - Coordonnée x du point de départ.
+ * @param {number} y1 - Coordonnée y du point de départ.
+ * @param {number} x2 - Coordonnée x du point d'arrivée.
+ * @param {number} y2 - Coordonnée y du point d'arrivée.
+ * @param {string} color - La couleur de la ligne.
+ * @param {number} radius - Le rayon des cercles aux extrémités.
+ */
 function drawLine(x1, y1, x2, y2, color, radius) {
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -268,11 +293,20 @@ function drawLine(x1, y1, x2, y2, color, radius) {
   ctx.fill(); // Remplir le cercle
 }
 
+/**
+ * Toggle the opacity of the drawing tools based on whether the player is the current drawer or not.
+ */
 function toggleDrawingTools() {
   drawingTools.style.opacity = myId == drawerId ? 1 : 0;
 }
 
-// Update player list UI
+/**
+ * Updates the player list.
+ * It clears the player list and regenerates all the player items.
+ * It adds classes based on player status.
+ * If the player is the current drawer, it adds a class to the player item.
+ * If the player has found the word, it adds a class to the player item.
+ */
 function updatePlayerList() {
   playerList.innerHTML = "";
 
@@ -328,6 +362,18 @@ function updatePlayerList() {
   });
 }
 
+/**
+ * Adds a message to the chat with the given text, color, and author.
+ * If an author is given and the message is not a success message, it adds a pseudo above the message.
+ * If the message is a success message, it changes the message text to indicate that the author has found the word.
+ * It adds classes to the message to indicate its type and author.
+ * Finally, it scrolls the chat to the bottom.
+ * @param {string} message - The text of the message.
+ * @param {string} [color] - The background color of the message.
+ * @param {string} [messPseudo] - The pseudo of the author of the message if it is a player message.
+ * @param {number} [pid] - The ID of the author of the message if it is a player message.
+ * @param {boolean} [succeed] - If the message is a success message.
+ */
 function addMessageToChat(message, color, messPseudo, pid, succeed) {
   if (messPseudo && !succeed) {
     let pseudo = document.createElement("p");
@@ -353,6 +399,15 @@ function addMessageToChat(message, color, messPseudo, pid, succeed) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+/**
+ * Adds an emote to the chat with the given path and author.
+ * If an author is given, it adds a pseudo above the emote.
+ * It adds classes to the emote to indicate its type and author.
+ * Finally, it scrolls the chat to the bottom.
+ * @param {string} emotePath - The path of the emote asset.
+ * @param {string} [messPseudo] - The pseudo of the author of the emote if it is a player emote.
+ * @param {number} [pid] - The ID of the author of the emote if it is a player emote.
+ */
 function addEmoteToChat(emotePath, messPseudo, pid) {
   let pseudo = document.createElement("p");
   pseudo.textContent = messPseudo;
@@ -369,7 +424,14 @@ function addEmoteToChat(emotePath, messPseudo, pid) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Update word display based on current game state
+/**
+ * Updates the text of the hint text element depending on the current game state.
+ *
+ * If there is only one player, it shows a message indicating that the game is waiting for more players.
+ * If the player is the drawer, it shows the full word.
+ * If the player has found the word, it shows a message indicating that the word has been found.
+ * Otherwise, it shows a message asking the player to guess the word.
+ */
 function updateWordDisplay() {
   if (players.length == 1) {
     hintText.textContent = "En attente de joueurs...";
@@ -387,7 +449,17 @@ function updateWordDisplay() {
   }
 }
 
-// Start game timer
+/**
+ * Starts the game timer.
+ *
+ * Initializes the remaining time to the game duration, removes the "not-started" class from the timer progress bar,
+ * and calls updateTimerDisplay.
+ *
+ * Then, every second, it updates the remaining time by subtracting the elapsed seconds since the game start time.
+ * It calls updateTimerDisplay with the updated remaining time.
+ *
+ * If the remaining time reaches 0, it clears the interval and calls handleGameEnd.
+ */
 function startGameTimer() {
   remainingTime = gameConfig.gameDuration;
   timerProgress.classList.remove("not-started");
@@ -407,7 +479,13 @@ function startGameTimer() {
   }, 1000);
 }
 
-// Update timer display
+/**
+ * Updates the display of the timer in the game section.
+ *
+ * It updates the text of the timer to show the remaining time in minutes and seconds.
+ * It also updates the width of the progress bar to represent the remaining time.
+ * Finally, it changes the color of the timer text to red if the remaining time is below 30% of the game duration.
+ */
 function updateTimerDisplay() {
   const minutes = Math.floor(remainingTime / 60);
   const seconds = remainingTime % 60;
@@ -425,6 +503,11 @@ function updateTimerDisplay() {
   }
 }
 
+/**
+ * Handles the end of the game.
+ *
+ * Clears the canvas, and if the current player is the drawer, it sends a "game_finished" event to the server.
+ */
 function handleGameEnd() {
   clearCanvas();
   if (myId == drawerId) socket.emit("game_finished", null);
@@ -460,7 +543,14 @@ loginForm.addEventListener("submit", (e) => {
   }
 });
 
-// Update sendMessage function
+/**
+ * Sends a new message to the server.
+ *
+ * The message is sent as a JSON object containing the message itself, the player's ID, pseudo, and remaining time.
+ * The message is only sent if it is not empty.
+ *
+ * @param {string} message - The message to be sent.
+ */
 function sendMessage(message) {
   if (message) {
     socket.send(
@@ -476,7 +566,11 @@ function sendMessage(message) {
   }
 }
 
-// Update handleGameEnd function
+/**
+ * Handles the end of the game.
+ *
+ * Clears the canvas, and if the current player is the drawer, it sends a "game_finished" event to the server.
+ */
 function handleGameEnd() {
   clearCanvas();
   if (myId == drawerId) {
@@ -554,6 +648,14 @@ function getMousePos(e) {
     y: parseInt((canvas.height / canvas.clientHeight) * (e.clientY - rect.top)),
   };
 }
+
+/**
+ * Simplifies a list of frames by removing redundant color and radius properties.
+ * Converts hex color values to RGB arrays for frames of type 'line'.
+ *
+ * @param {Array} frames - The array of frame objects to be processed. Each frame object should have a 'type' property and, if the type is 'line', may have 'color' and 'radius' properties.
+ * @returns {Array} - The modified array of frames with redundant properties removed and hex colors converted to RGB.
+ */
 
 function parseFrames(frames) {
   function hexToRGB(hex) {

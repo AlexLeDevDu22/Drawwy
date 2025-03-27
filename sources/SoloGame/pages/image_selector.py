@@ -14,6 +14,14 @@ import time
 
 class ImageCarousel:
     def __init__(self, X, Y, images, theme):
+        """
+        Initialisation de l'objet ImageCarousel.
+
+        :param X: La position centrale en X du carousel.
+        :param Y: La position centrale en Y du carousel.
+        :param images: La liste des images à afficher dans le carousel.
+        :param theme: Le thème associé au carousel, permettant de récupérer les couleurs et les polices.
+        """
         self.W = W
         self.H = H
         self.carousel_height = 200
@@ -41,6 +49,14 @@ class ImageCarousel:
         self.star_icon = pygame.transform.scale(star_icon, (30, 30))
 
     def start_spin(self):
+        """
+        Initiates the spinning of the image carousel with a random speed.
+
+        This method sets the carousel to a spinning state by assigning a random
+        initial spin speed between a defined range and calculates the time at which
+        the selection process will complete. The spinning continues until the
+        selection delay time has passed.
+        """
         self.is_spinning = True
         self.spin_speed = random.randint(
             self.max_spin_speed - 20,
@@ -48,6 +64,19 @@ class ImageCarousel:
         self.selection_time = time.time() + self.selection_delay
 
     def update(self):
+        """
+        Updates the image carousel's position and spinning state.
+
+        This method is called once per frame and updates the position of the
+        carousel based on its spinning state. If the carousel is spinning,
+        it will continue to spin until the selection delay time has passed.
+        Once the selection delay has passed, the carousel will slow down and
+        eventually stop at a random position. The selected image is then
+        stored in the `selected_image` attribute.
+
+        The method also updates the opacity of the images and adds particles
+        to celebrate the selection of an image.
+        """
         if self.is_spinning:
             self.current_offset += self.spin_speed
             self.current_offset %= len(
@@ -119,6 +148,19 @@ class ImageCarousel:
         self.particles = [p for p in self.particles if p['life'] > 0]
 
     def draw(self, surface):
+        """
+        Draws the image carousel and associated effects onto the given surface.
+
+        This method iterates over the images in the carousel, applying visual effects
+        such as shaking and scaling based on the current spinning state. It also draws
+        stars and particles to create a dynamic visual presentation. The images are
+        rendered with rounded corners and varying opacities, and the entire carousel
+        may exhibit a shaking effect to simulate dynamic movement.
+
+        :param surface: The Pygame surface on which to render the carousel and effects.
+        :type surface: pygame.Surface
+        """
+
         center_x = self.rect.centerx
         for i, img in enumerate(self.images):
             shake_x = random.uniform(-self.shake_intensity * (self.spin_speed / self.max_spin_speed),
@@ -221,6 +263,21 @@ def draw_background(surface):
 
 
 def image_selector(screen, cursor, theme):
+    """
+    Page de sélection d'image pour le mode Solo.
+
+    Cette page permet de sélectionner une image parmi celles proposées par le thème
+    actuel. L'utilisateur peut lancer une roulette pour sélectionner une image
+    aléatoirement. Une fois une image sélectionnée, l'utilisateur peut lancer le
+    compte à rebours pour démarrer la page de dessin.
+
+    :param screen: La surface de l'écran.
+    :param cursor: L'objet curseur.
+    :param theme: Le thème actuel.
+    :return: La prochaine page à afficher (soit "themes" pour revenir au menu
+             des thèmes, soit "play" pour lancer la page de dessin) et l'image
+             sélectionnée.
+    """
     global W, H
     W, H = pygame.display.Info().current_w, pygame.display.Info().current_h
 

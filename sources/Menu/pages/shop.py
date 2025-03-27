@@ -22,8 +22,28 @@ def show_shop(
         mouse_click,
         buttons,
         achievement_manager):
-    """Affiche l'interface de la boutique des objets de décoration"""
-    # Panneau principal (effet papier)
+    """
+    Renders the shop interface and handles user interactions.
+
+    Args:
+        screen: The screen to render the shop interface on.
+        cursor: The current cursor position.
+        W (int): The width of the screen.
+        H (int): The height of the screen.
+        mouse_pos (tuple): The current mouse position.
+        mouse_click (bool): Whether the mouse was clicked.
+        buttons: The current state of the game buttons.
+        achievement_manager: The achievement manager instance.
+
+    Returns:
+        tuple: A tuple containing the updated screen, cursor, game state, buttons, and achievement manager.
+
+    Notes:
+        This function is responsible for rendering the shop interface, handling user input, and updating the game state accordingly.
+        It includes features such as pagination, item displays, and achievement notifications.
+    """
+
+    # Panneau principal
     main_panel_width = 1100
     main_panel_height = 750
     main_panel_x = (W - main_panel_width) // 2
@@ -258,41 +278,44 @@ def show_shop(
                 if cursor_:
                     cursor = cursor_
 
-            elif item["category"] != "Bordures" and PLAYER_DATA["coins"] >= item["price"]:
-                PLAYER_DATA["coins"] -= item["price"]
-                PLAYER_DATA["purchased_items"].append(item["index"])
-                PLAYER_DATA["coins"] = PLAYER_DATA["coins"]
+            else:
+                if item["category"] != "Bordures" and PLAYER_DATA["coins"] >= item["price"]:
+                    PLAYER_DATA["coins"] -= item["price"]
+                    PLAYER_DATA["purchased_items"].append(item["index"])
+                    PLAYER_DATA["selected_items"][item["category"]] = item["index"]
+                    if item["category"] == "Curseurs":
+                        cursor = CustomCursor(item["image_path"])
 
-                # ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
-                list_cursers = [e["index"] in PLAYER_DATA["purchased_items"]
-                                for e in SHOP_ITEMS if e["category"] == "Curseurs"]
-                list_borders = [e["index"] in PLAYER_DATA["purchased_items"]
+                    # ALL ACHIEVEMENT EN RAPPORT AVEC LES ITEMS
+                    list_cursers = [e["index"] in PLAYER_DATA["purchased_items"]
+                                    for e in SHOP_ITEMS if e["category"] == "Curseurs"]
+                    list_emotes = [e["index"] in PLAYER_DATA["purchased_items"]
+                                for e in SHOP_ITEMS if e["category"] == "Emotes"]
+                    list_all = [e["index"] in PLAYER_DATA["purchased_items"]
+                                for e in SHOP_ITEMS]
+                    
+                    if item["category"] == "Curseurs":
+                        achievement_manager.new_achievement(5)
+                    if all(list_cursers):
+                        achievement_manager.new_achievement(6)
+                    if item["category"] == "Emotes":
+                        achievement_manager.new_achievement(9)
+                    if all(list_emotes):
+                        achievement_manager.new_achievement(10)
+                    if all(list_all):
+                        achievement_manager.new_achievement(11)
+
+                elif num_stars >= item["stars_needed"]: # achat des bordures avec les étoiles
+                    PLAYER_DATA["purchased_items"].append(item["index"])
+                    PLAYER_DATA["selected_items"][item["category"]] = item["index"]
+
+                    # achievements avec les bordures
+                    list_borders = [e["index"] in PLAYER_DATA["purchased_items"]
                                 for e in SHOP_ITEMS if e["category"] == "Bordures"]
-                list_emotes = [e["index"] in PLAYER_DATA["purchased_items"]
-                               for e in SHOP_ITEMS if e["category"] == "Emotes"]
-                list_all = [e["index"] in PLAYER_DATA["purchased_items"]
-                            for e in SHOP_ITEMS]
-                if item["category"] == "Curseurs":
-                    achievement_manager.new_achievement(5)
-
-                if all(list_cursers):
-                    achievement_manager.new_achievement(6)
-
-                if item["category"] == "Bordures":
                     achievement_manager.new_achievement(7)
-
-                if all(list_borders):
-                    achievement_manager.new_achievement(8)
-
-                if item["category"] == "Emotes":
-                    achievement_manager.new_achievement(9)
-
-                if all(list_emotes):
-                    achievement_manager.new_achievement(10)
-
-                if all(list_all):
-                    achievement_manager.new_achievement(11)
-
+                    if all(list_borders):
+                        achievement_manager.new_achievement(8)
+                
                 save_data("PLAYER_DATA")
 
     # Boutons de pagination
@@ -407,6 +430,21 @@ def show_shop(
 
 def toggle_select(item, cursor):
     # Basculer la sélection
+    """
+    Toggles the selection of a shop item for the player.
+
+    If the item is not an "Emotes" category and is currently selected,
+    it will be deselected. Specifically for "Curseurs", the cursor is reset.
+    Otherwise, the item is selected, and if it's a "Curseurs", the cursor is updated.
+
+    Args:
+        item (dict): The item to be toggled, containing its category and index.
+        cursor (CustomCursor): The current cursor object.
+
+    Returns:
+        CustomCursor: The updated cursor object if a "Curseurs" was toggled.
+    """
+
     if item["category"] != "Emotes" and item["index"] == PLAYER_DATA["selected_items"][item["category"]]:  # désélectionner
         if item["category"] == "Curseurs":
             PLAYER_DATA["selected_items"]["Curseurs"] = None

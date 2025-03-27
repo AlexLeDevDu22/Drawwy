@@ -15,7 +15,18 @@ import os
 
 
 def timer(MultiGame):
+    """
+    Dessine le timer du jeu sur l'écran.
 
+    Il y a un timer qui descend en bas de l'écran, et qui est rafraichi
+    toutes les secondes. Il y a un padding un peu plus grand pour
+    que le timer ne soit pas trop près de l'ecran, et qu'il soit
+    plus lisible. Il y a un padding un peu plus grand pour que le timer
+    ne soit pas trop près de l'ecran, et qu'il soit plus lisible.
+
+    :param MultiGame: instance de la classe MultiGame
+    :return: None
+    """
     if len(MultiGame.PLAYERS) == 1:
         return
 
@@ -48,6 +59,18 @@ def timer(MultiGame):
 
 
 def players(MultiGame):
+    """
+    Draws the player list on the game screen.
+
+    This function renders a list of players on the left side of the screen,
+    displaying their avatars, pseudo names, and points. It highlights the current
+    drawer and indicates whether a player has found the correct answer.
+    The avatars can be either matrix-based or emoji-based, and the display
+    adapts accordingly.
+
+    :param MultiGame: instance of the MultiGame class
+    :return: None
+    """
     pygame.draw.rect(
         MultiGame.screen,
         WHITE,
@@ -126,19 +149,17 @@ def players(MultiGame):
                              dico_co[i][0][3] - 6))
 
         # avatar
-
         if player["avatar"]["type"] == "matrix":
-            # pygame.draw.circle(MultiGame.screen, BLUE, (dico_co[y][1][0]+avatar.get_width()//2,dico_co[y][1][1]+avatar.get_height()//2), avatar.get_width()//2+3)
-            if player["avatar"]["type"] == "matrix" and (
-                    "pygame_border" not in player["avatar"].keys()):
-                border = pygame.image.load(player["avatar"]["border_path"])
-                border = pygame.transform.scale(
-                    border, (5 / 100 * MultiGame.H + 6, 5 / 100 * MultiGame.H + 6))
-                MultiGame.PLAYERS[i]["avatar"]["pygame_border"] = border
-            MultiGame.screen.blit(
-                player["avatar"]["pygame_border"],
-                (dico_co[i][1][0] - 3,
-                 dico_co[i][1][1] - 3))
+            if player["avatar"]["has_border"]:
+                if "pygame_border" not in player["avatar"].keys():
+                    border = pygame.image.load(player["avatar"]["border_path"])
+                    border = pygame.transform.scale(
+                        border, (5 / 100 * MultiGame.H + 6, 5 / 100 * MultiGame.H + 6))
+                    MultiGame.PLAYERS[i]["avatar"]["pygame_border"] = border
+                MultiGame.screen.blit(
+                    player["avatar"]["pygame_border"],
+                    (dico_co[i][1][0] - 3,
+                    dico_co[i][1][1] - 3))
 
             if player["avatar"]["type"] == "matrix" and (
                     "pygame_image" not in player["avatar"].keys()):
@@ -222,6 +243,11 @@ def players(MultiGame):
 
 
 def sentence(MultiGame):
+    """
+    Dessine le widget de la phrase à trouver sur l'écran.
+    Ce widget est un rectangle qui contient le texte de la phrase à trouver.
+    Si le joueur n'a pas encore trouvé la phrase, le texte est flouté.
+    """
     if len(MultiGame.PLAYERS) > 1:
         pygame.draw.rect(
             MultiGame.screen,
@@ -282,7 +308,15 @@ def sentence(MultiGame):
 
 
 def drawing(MultiGame):
-    """Permet de dessiner uniquement dans la zone de dessin."""
+    """
+    Dessine le canvas et permet de dessiner dessus si le joueur est le dessinateur.
+
+    Args:
+        MultiGame (MultiGame): Le jeu.
+
+    Returns:
+        None
+    """
     if not MultiGame.CANVAS:
         return
 
@@ -371,16 +405,26 @@ def drawing(MultiGame):
                         tools.send_ws(
                             MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
-    # send draw
-    if MultiGame.frame_num == CONFIG["fps"] - \
-            1 and MultiGame.second_draw_frames != []:
-        tools.send_ws(
-            MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
-                MultiGame.second_draw_frames)})  # send draw
-        MultiGame.second_draw_frames = []
+        # send draw
+        if MultiGame.frame_num == CONFIG["fps"] - \
+                1 and MultiGame.second_draw_frames != []:
+            tools.send_ws(
+                MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
+                    MultiGame.second_draw_frames)})  # send draw
+            MultiGame.second_draw_frames = []
 
 
 def slider_radius(MultiGame):
+    """
+    Draws a slider on the screen to adjust the pen radius.
+
+    The slider allows users to visually adjust the pen radius used for drawing.
+    It consists of a track and a movable knob that represents the current pen
+    size. The knob position is updated based on user interaction. This function
+    also includes a preview of the pen size.
+
+    :param MultiGame: Instance of the MultiGame class.
+    """
     pygame.draw.rect(
         MultiGame.screen,
         WHITE,
@@ -458,7 +502,36 @@ def slider_radius(MultiGame):
 
 
 def chat(MultiGame):
+    """
+    Draws a chat on the screen where players can send messages to each other.
 
+    The chat consists of a box where players can type their messages and a log
+    of the messages that have been sent. The chat also supports sending emotes
+    which are small images that can be sent to represent an emotion.
+
+    The chat window is divided into two parts: the top part is the log of the
+    messages and the bottom part is the input box where players can type their
+    messages. The log of the messages is updated in real time and can be
+    scrolled up and down by the player. The input box is where players can
+    type their messages and it is limited to 150 characters. When a player
+    presses the send button, their message is sent to the server and it is
+    added to the log of the messages.
+
+    The chat also supports sending emotes. Emotes are small images that can be
+    sent to represent an emotion. Emotes are purchased in the shop and can be
+    sent by clicking on the emote icon in the chat window. When an emote is
+    sent, it is added to the log of the messages.
+
+    The chat window is updated in real time and can be moved around the screen
+    by the player. The chat window is also resized when the player resizes the
+    game window.
+
+    Parameters
+    ----------
+    MultiGame : MultiGame
+        Instance of the MultiGame class.
+
+    """
     guess_line = tools.lines_return(MultiGame.guess, MEDIUM_FONT, 0.15 * MultiGame.W)
     input_box = pygame.Rect(0.82 *
                             MultiGame.W, 0.9533 *
@@ -469,6 +542,7 @@ def chat(MultiGame):
                             MultiGame.W, max(40, 15 +
                                              20 *
                                              len(guess_line)))
+
 
     # Mise à jour visuelle
     min_y = 0.4083 * \

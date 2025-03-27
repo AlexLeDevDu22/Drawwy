@@ -16,6 +16,21 @@ except BaseException:
 
 class ThemeCard:
     def __init__(self, x, y, width, height, theme_info):
+        """
+        Initialize a ThemeCard object with specified position, dimensions, and theme information.
+
+        :param x: The x-coordinate of the card's position.
+        :type x: int
+        :param y: The y-coordinate of the card's position.
+        :type y: int
+        :param width: The width of the card.
+        :type width: int
+        :param height: The height of the card.
+        :type height: int
+        :param theme_info: A dictionary containing theme-specific information such as color.
+        :type theme_info: dict
+        """
+
         self.rect = pygame.Rect(x, y, width, height)
         self.y = y
         self.theme_info = theme_info
@@ -32,6 +47,23 @@ class ThemeCard:
         return tuple(min(255, c + amount) for c in color)
 
     def draw(self, screen):
+        """
+        Draws the theme card on the screen with animations and effects.
+
+        This method handles the hover and selection animations for the theme card,
+        updating the animation progress accordingly. It also manages the creation and
+        movement of particles when the card is selected, and ensures expired particles
+        are removed.
+
+        The card is drawn with a hover scaling effect, and if selected, additional
+        effects such as a border and glow are rendered. The theme icon is displayed
+        using emojis if available, otherwise a fallback font is used. The theme name
+        is drawn at the bottom of the card.
+
+        :param screen: The surface on which to draw the theme card.
+        :type screen: pygame.Surface
+        """
+
         # Animation de survol
         if (self.is_hovered or self.is_selected) and self.animation_progress < 1:
             self.animation_progress += 0.1
@@ -176,6 +208,23 @@ def draw_background(screen):
 
 
 def theme_choicer(screen, cursor):
+    """
+    Displays the theme selection screen for Solo mode.
+
+    This screen allows the user to choose a theme for the game by
+    interacting with theme cards. The user can hover over cards to
+    highlight them and click to select. Once a theme is selected, the
+    user can proceed to the image selection or exit the game.
+
+    :param screen: The surface on which to draw the theme selection screen.
+    :type screen: pygame.Surface
+    :param cursor: The custom cursor object to display.
+    :type cursor: CustomCursor
+    :return: A tuple containing the screen, the next page ("images" or "exit"),
+             and the selected theme.
+    :rtype: tuple
+    """
+
     global W, H
     W, H = pygame.display.Info().current_w, pygame.display.Info().current_h
     # Créer les cartes de thèmes

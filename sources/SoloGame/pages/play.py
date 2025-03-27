@@ -10,6 +10,18 @@ import pygame
 
 class SoloPlay:
     def __init__(self, screen, cursor, model_path, achievements_manager):
+        """
+        Constructeur de la classe SoloPlay.
+
+        Args:
+            screen (pygame.display): L'écran de jeu.
+            cursor (Cursor): Le curseur de la souris.
+            model_path (str): Le chemin du modèle à reproduire.
+            achievements_manager (AchievementsManager): Le gestionnaire des succès.
+
+        Returns:
+            None
+        """
         self.last_mouse_pos = None
         self.screen = screen
         self.W, self.H = get_screen_size()
@@ -142,6 +154,19 @@ class SoloPlay:
             pygame.display.flip()
 
     def define_layout(self, model_path):
+        """
+        Set up the layout for the drawing interface.
+
+        This method defines the positions and sizes of various UI elements required
+        for the drawing interface, including the canvas, color palette, size slider,
+        validation button, quit button, and model image. It makes use of the screen
+        dimensions (self.W, self.H) to calculate appropriate sizes and positions
+        for these elements.
+
+        Args:
+            model_path (str): The file path to the model image that will be displayed
+            in the interface.
+        """
 
         # Canvas
         palette_width = int(0.25 * self.W)
@@ -195,7 +220,21 @@ class SoloPlay:
                                       70, model_size, model_size)
 
     def draw_canvas(self):
-    # Cadre du canvas
+        """
+        Dessine le canvas et permet de dessiner dessus si le joueur est le dessinateur.
+
+        Si la souris est enfoncée dans la zone du canvas, on dessine en prenant en compte
+        la taille du pinceau (`self.pen_radius`) et la couleur du pinceau (`self.pen_color`).
+        On utilise la méthode `pygame.draw.line` pour dessiner une ligne entre la dernière
+        position et la nouvelle, et la méthode `pygame.draw.circle` pour dessiner le cercle
+        correspondant au pinceau.
+
+        Si la souris est relevée, on réinitialise la dernière position pour éviter des traits
+        indésirables.
+
+        :return: None
+        """
+        # Cadre du canvas
         pygame.draw.rect(self.screen, BLACK, self.canvas_rect, 2)
 
         # On blit la Surface du canvas
@@ -226,7 +265,22 @@ class SoloPlay:
 
 
     def draw_slider(self):
-        """Dessine un slider simple sous la palette pour régler la taille du pinceau."""
+        """
+        Draws and manages a slider on the screen to adjust the brush size.
+
+        This function visually represents a slider with a knob that users can interact with
+        to change the size of the brush used for drawing. The slider is drawn as a horizontal
+        line with a movable knob. The knob's position is proportional to the current brush size.
+        The user can click and drag the knob along the slider to adjust the brush size, which
+        is then updated accordingly.
+
+        The slider is drawn using Pygame's drawing functions, and interacts with the mouse
+
+        to update the brush size in real-time.
+
+        :return: None
+        """
+
         pygame.draw.rect(self.screen, (220, 220, 220), self.slider_rect)
         pygame.draw.rect(self.screen, BLACK, self.slider_rect, 2)
 
@@ -260,6 +314,14 @@ class SoloPlay:
                     self.pen_radius = 1
 
     def draw_validate_button(self):
+        """
+        Dessine le bouton de validation du dessin.
+
+        Le bouton est un rectangle vert avec une bordure noire et contient le texte "Valider".
+        Il est placé en bas à droite de l'écran.
+
+        :return: None
+        """
         # Fond du bouton
         pygame.draw.rect(self.screen, (0, 255, 0), self.validate_button_rect)
         # Bordure noire

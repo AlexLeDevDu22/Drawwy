@@ -7,6 +7,14 @@ import math
 
 class BackgroundElement:
     def __init__(self, x, y):
+        """
+        Initialisation de l'objet BackgroundElement.
+
+        :param x: La position x de l'élément
+        :param y: La position y de l'élément
+        :type x: int
+        :type y: int
+        """
         self.x = x
         self.y = y
         self.type = random.choice(["flower", "star", "heart", "cloud"])
@@ -20,11 +28,32 @@ class BackgroundElement:
         self.initial_title_scale = self.title_scale
 
     def update(self):
+        """
+        Met à jour la position de l'élément en fonction de sa vitesse et de son angle actuel.
+
+        La position est mise à jour en fonction de la formule suivante:
+        - La position x est augmentée de sinus de l'angle actuel, multiplié par la vitesse.
+        - La position y est augmentée de cosinus de l'angle actuel, multiplié par la vitesse.
+        - L'angle actuel est mis à jour en ajoutant l'angle de changement.
+        """
         self.title_scale += self.title_scale_change
         self.x += math.sin(self.title_scale) * self.speed
         self.y += math.cos(self.title_scale) * self.speed
 
     def draw(self, surface):
+        """
+        Dessine l'élément sur la surface donnée.
+
+        La méthode draw choisit la méthode appropriée pour dessiner l'élément en fonction de son type.
+        Les méthodes de dessin sont:
+        - draw_flower pour les fleurs
+        - draw_star pour les étoiles
+        - draw_heart pour les c?urs
+        - draw_cloud pour les nuages
+
+        :param surface: La surface sur laquelle dessiner l'élément
+        :type surface: pygame.Surface
+        """
         if self.type == "flower":
             self.draw_flower(surface)
         elif self.type == "star":
@@ -35,6 +64,18 @@ class BackgroundElement:
             self.draw_cloud(surface)
 
     def draw_flower(self, surface):
+        
+        """
+        Dessine une fleur sur la surface donnée.
+
+        La fleur est représentée par 5 pétales (cercles) disposées de manière régulière
+        autour d'un centre. Les pétales sont de la même couleur que l'élément.
+        Un cercle jaune est dessiné au centre de la fleur.
+        Un cercle noir est dessiné en contour de chaque pétale et du cercle central.
+
+        :param surface: La surface sur laquelle dessiner la fleur
+        :type surface: pygame.Surface
+        """
         center = (int(self.x), int(self.y))
         petal_distance = self.size // 2.5
         # Remove random trembling by using fixed title_scales
@@ -50,6 +91,16 @@ class BackgroundElement:
         pygame.draw.circle(surface, (0, 0, 0), center, self.size // 4, 2)
 
     def draw_star(self, surface):
+        """
+        Dessine une étoile sur la surface donnée.
+
+        L'étoile est représentée par 10 points disposés de manière régulière
+        autour d'un centre. Les points sont de la même couleur que l'élément.
+        Un contour noir est dessiné en contour de l'étoile.
+
+        :param surface: La surface sur laquelle dessiner l'étoile
+        :type surface: pygame.Surface
+        """
         points = []
         # Remove random trembling by using fixed title_scales
         for i in range(10):
@@ -62,8 +113,17 @@ class BackgroundElement:
         pygame.draw.polygon(surface, (0, 0, 0), points, 3)
 
     def draw_heart(self, surface):
-        """Improved heart shape with smoother curves"""
         # Heart shape parameters
+        """
+        Dessine un coeur sur la surface donnée.
+
+        Le coeur est représenté par des équations paramétriques pour une forme plus lisse.
+        Les points sont de la même couleur que l'élément.
+        Un contour noir est dessiné en contour du coeur.
+
+        :param surface: La surface sur laquelle dessiner le coeur
+        :type surface: pygame.Surface
+        """
         size = self.size
         # Create a list of points for the heart shape
         points = []
@@ -81,7 +141,16 @@ class BackgroundElement:
         pygame.draw.polygon(surface, (0, 0, 0), points, 2)
 
     def draw_cloud(self, surface):
-        """Improved cloud with smoother shape and better organization"""
+        """
+        Dessine un nuage sur la surface donnée.
+
+        Le nuage est représenté par un cercle central plus large, ainsi que 5 cercles
+        supplémentaires pour former la forme de nuage. Les cercles sont de la même couleur
+        que l'élément. Un contour noir est dessiné en contour du nuage.
+
+        :param surface: La surface sur laquelle dessiner le nuage
+        :type surface: pygame.Surface
+        """
         # Cloud base parameters
         cloud_radius = self.size // 2.5
         small_radius = cloud_radius * 0.8

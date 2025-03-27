@@ -8,6 +8,39 @@ import random
 
 class PopupAnimation:
     def __init__(self,screen, W,H):
+        """
+        Initialize the PopupAnimation with screen dimensions and set initial states.
+
+        Args:
+            screen (pygame.Surface): The display surface to render the popup.
+            W (int): The width of the screen.
+            H (int): The height of the screen.
+
+        Attributes:
+            popup_width (int): The width of the popup.
+            popup_height (int): The height of the popup.
+            popup_x (int): The x-coordinate for the popup's initial position.
+            popup_y (int): The y-coordinate for the popup's initial position.
+            target_y (int): The target y-coordinate for the popup's final position.
+            started (bool): Flag indicating if the animation has started.
+            animation_speed (int): The speed of the popup's entrance animation.
+            animation_done (bool): Flag indicating if the animation is complete.
+            animation_progress (int): Progress of the animation.
+            stars_fill (list): The fill percentage of each star.
+            star_animation_speed (int): The speed of star fill animation.
+            stars_filled (bool): Flag indicating if the stars are fully filled.
+            star_jump (list): The jump offsets for star animations.
+            star_rotation (list): The rotation angles for star animations.
+            num_stars (int): The total number of stars across all themes.
+
+            particles (Confetti): The particle system for animations.
+            particle_timer (int): Timer for controlling particle release.
+            shine_angle (int): The angle for the shine effect.
+            entry_particles_created (bool): Flag for entry particle creation.
+            star_particles_created (list): Flags for star particle creation.
+            image_size (int): The size of the model image.
+        """
+
         self.screen = screen
         self.popup_width, self.popup_height = 1050, 750
         self.popup_x = (W - self.popup_width) // 2
@@ -46,6 +79,16 @@ class PopupAnimation:
         self.image_size = 400
 
     def start(self, score, model_path, draw_image):
+        """
+        Démarre l'animation du popup de score.
+
+        Mets en place les éléments graphiques et les valeurs pour l'animation.
+
+        Args:
+            score (int): Le score à afficher.
+            model_path (str): Le chemin vers l'image du modèle.
+            draw_image (pygame.Surface): L'image du dessin.
+        """
         self.model_image = pygame.image.load(model_path)
         self.model_image = pygame.transform.scale(self.model_image, (self.image_size , self.image_size ))
         self.draw_image = draw_image
@@ -64,6 +107,20 @@ class PopupAnimation:
         self.started = True
 
     def update(self):
+        """
+        Updates the state of the popup animation, including its position,
+        star fill animations, and particle effects.
+
+        This method handles the entrance animation of the popup, where the
+        popup moves to its target position and creates entry particles. Once
+        the popup reaches its target position, it triggers star fill animations
+        based on the score, creating particles as stars fill up. After all stars
+        are filled, it animates the stars with jump and rotation effects, and
+        continuously generates particles around the title for visual effects.
+
+        Additionally, it updates the shine angle for visual effects and manages
+        the lifecycle of particles by updating them each frame.
+        """
         if self.started:
             # Animation d'entrée de la popup
             if self.popup_y < self.target_y:
@@ -163,6 +220,22 @@ class PopupAnimation:
             self.particles.update()
 
     def draw_star(self, x, y, size, fill_percent, jump_offset=0, rotation=0):
+        """
+        Draws a star at the given position with the given size and fill percentage.
+
+        The star is drawn on a transparent surface, which is then blitted onto the screen.
+        The outline of the star is drawn in black, and the fill is drawn in yellow.
+        If the fill percentage is greater than 100, the star is drawn with a shine effect.
+        The shine effect is drawn as four lines, each with a different angle, to create a
+        starburst-like effect.
+
+        :param x: The x position of the star
+        :param y: The y position of the star
+        :param size: The size of the star
+        :param fill_percent: The percentage of the star to fill
+        :param jump_offset: The y offset of the star, used to create a jumping effect
+        :param rotation: The rotation of the star, used to create a rotating effect
+        """
         # Créer une surface transparente
         star_surface = pygame.Surface(
             (size * 2, size * 2 + 20), pygame.SRCALPHA)
@@ -221,6 +294,12 @@ class PopupAnimation:
         self.screen.blit(star_surface, (x - size, y - size - 20))
 
     def draw(self): 
+        """
+        Draw the popup with its components, including the background, title, score,
+        stars, and images. The stars are drawn with their respective fill percentages,
+        and the images are drawn with a border and a connecting arrow between them.
+        The particles are also drawn on top of the popup.
+        """
         if self.started:
             # Dessiner le fond de la popup
             pygame.draw.rect(

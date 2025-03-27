@@ -18,6 +18,30 @@ class Button:
             text_font=BUTTON_FONT,
             image=None,
             active=True):
+        """
+        Cr e un bouton avec des param tres de position, de taille, de texte, de police, de rayon, de forme circulaire ou non, d'image, d'activation ou non.
+
+        :param x: La position x du bouton. Si "center", le bouton est centr .
+        :type x: int or str
+        :param y: La position y du bouton. Si "center", le bouton est centr .
+        :type y: int or str
+        :param w: La largeur du bouton. Si None, la largeur est calcul e en fonction de la taille de la police.
+        :type w: int or None
+        :param h: La hauteur du bouton. Si None, la hauteur est calcul e en fonction de la taille de la police.
+        :type h: int or None
+        :param text: Le texte du bouton. Si None, le bouton n'a pas de texte.
+        :type text: str or None
+        :param radius: Le rayon du bouton si il est circulaire. Si None, le bouton n'est pas circulaire.
+        :type radius: int or None
+        :param circle: Le bool enan pour savoir si le bouton est circulaire ou non.
+        :type circle: bool
+        :param text_font: La police du texte du bouton.
+        :type text_font: pygame.font.Font
+        :param image: L'image du bouton. Si None, le bouton n'a pas d'image.
+        :type image: pygame.Surface or None
+        :param active: Le bool enan pour savoir si le bouton est actif ou non.
+        :type active: bool
+        """
         if not circle:
             self.W = w if w else text_font.size(text)[0] + 40
             self.H = h if h else text_font.size(text)[1] + 36
@@ -41,6 +65,16 @@ class Button:
         self.shadow_offset = 5
 
     def draw(self, screen, mouse_pos, locked=False):
+        """
+        Dessine le bouton sur l'cran.
+
+        :param screen: L'cran de jeu.
+        :type screen: pygame.display.Surface
+        :param mouse_pos: La position de la souris.
+        :type mouse_pos: tuple
+        :param locked: Si le bouton est verrouill , il n'est pas cliquable.
+        :type locked: bool
+        """
         self.hover = self.rect.collidepoint(mouse_pos) and self.active and not locked
 
         color = SOFT_ORANGE if self.hover else (
@@ -99,6 +133,17 @@ class Button:
 
 class Particle:
     def __init__(self, x, y, color):
+        """
+        Initialize a Particle object with position, color, size, speed, and lifetime.
+
+        :param x: The x-coordinate of the particle.
+        :type x: int or float
+        :param y: The y-coordinate of the particle.
+        :type y: int or float
+        :param color: The color of the particle.
+        :type color: tuple
+        """
+
         self.x = x
         self.y = y
         self.color = color
@@ -124,6 +169,22 @@ import pygame
 
 class ColorPicker:
     def __init__(self, x, y, width, height, color_steps=30, dark_steps=12):
+        """
+        Initialize a ColorPicker object with the given position, size, and color parameters.
+
+        :param x: The x-coordinate of the ColorPicker.
+        :type x: int
+        :param y: The y-coordinate of the ColorPicker.
+        :type y: int
+        :param width: The width of the ColorPicker.
+        :type width: int
+        :param height: The height of the ColorPicker.
+        :type height: int
+        :param color_steps: The number of color steps to generate. Defaults to 30.
+        :type color_steps: int
+        :param dark_steps: The number of dark steps to generate. Defaults to 12.
+        :type dark_steps: int
+        """
         self.rect = pygame.Rect(x, y, width, height)
         self.color_steps = color_steps  
         self.dark_steps = dark_steps + 1  # Une ligne de plus pour les gris
@@ -132,6 +193,15 @@ class ColorPicker:
         self.selected_pos = None
 
     def generate_colors(self):
+        """
+        Generate the colors for the color picker.
+
+        Returns a 2D list of colors, where the first row is a grayscale palette
+        and the other rows are color palettes with decreasing brightness.
+
+        :return: A 2D list of colors.
+        :rtype: list
+        """
         colors = []
 
         # Première ligne = Nuancier de gris (du blanc au noir)
@@ -159,6 +229,16 @@ class ColorPicker:
         return colors
 
     def draw(self, surface):
+        """
+        Draw the color picker onto the given surface.
+
+        This method draws all the colors in the color picker onto the given
+        surface. The colors are drawn in a grid with the given size, and the
+        currently selected color is highlighted with a white border.
+
+        :param surface: The surface to draw onto.
+        :type surface: pygame.Surface
+        """
         step_w = self.rect.width // self.color_steps
         step_h = self.rect.height // self.dark_steps
 
@@ -178,6 +258,19 @@ class ColorPicker:
             pygame.draw.rect(surface, (255, 255, 255), (px, py, step_w, step_h), 2)
 
     def get_color_at(self, pos):
+        """
+        Get the color at the given position.
+
+        If the given position is within the color picker's rectangle,
+        this method returns the color at that position as a tuple of
+        three integers (red, green, blue). If the position is not
+        within the color picker, this method returns None.
+
+        :param pos: The position to get the color at.
+        :type pos: tuple
+        :return: The color at the given position, or None if the position is not within the color picker.
+        :rtype: tuple or None
+        """
         x, y = pos
         if self.rect.collidepoint(x, y):
             step_w = self.rect.width // self.color_steps

@@ -17,12 +17,13 @@ import threading
 import sys
 import random
 
-if sys.platform.startswith("win"):
+if sys.platform.startswith("win"): # pour windows
     import pygetwindow as gw
 
-# check for shop update
+# mises à jour du shop
 threading.Thread(target=updater.check_for_shop_updates).start()
 
+#! init
 pygame.init()
 
 W, H = tools.get_screen_size()
@@ -30,27 +31,21 @@ screen = pygame.display.set_mode((W, H))
 pygame.display.set_icon(pygame.image.load("assets/logo.png"))
 pygame.display.set_caption("Drawwy")
 
-try:
+clock = pygame.time.Clock()
+running = True
+
+try: # set drawwy to first plan for windows
     gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
 except BaseException:
     pass
 
+#! menu vars
 buttons = {}
 # Chargement des assets au démarrage
 title_img = pygame.image.load("assets/logo.png").convert_alpha()
 shadow_img = title_img.copy()
 shadow_img.fill((100, 100, 100, 150), None, pygame.BLEND_RGBA_MULT)
 orig_width, orig_height = title_img.get_size()
-
-# Création de la texture papier une seule fois
-paper_texture = pygame.Surface((900, 750), pygame.SRCALPHA)
-for _ in range(500):
-    px = random.randint(0, 900)
-    py = random.randint(0, 750)
-    color_variation = random.randint(-15, 5)
-    point_color = (min(255, max(0, BEIGE[0] + color_variation)), min(255, max(0, BEIGE[1] + color_variation)), min(255, max(0, BEIGE[2] + color_variation)))
-    pygame.draw.circle(paper_texture, point_color, (px, py), 1)
-
 
 # Créer quelques éléments de dessin flottants
 drawing_elements = [
@@ -66,6 +61,7 @@ particles = []
 animation_counter = 0
 title_angle = 0
 
+# check de la co internet
 connected = tools.is_connected()
 last_sec_check_connection = datetime.now().second
 
@@ -73,22 +69,19 @@ last_sec_check_connection = datetime.now().second
 last_current_page = "home"
 current_page = "home"
 
-# Créer le gestionnaire d'avatar
+# gestionnaire d'avatar
 avatar_manager = AvatarManager(screen)
-
+# gestionnaire d'achievments
+achievements_manager = AchievementManager(W, H)
+# gestionnaire de curseur
 if PLAYER_DATA["selected_items"]["Curseurs"]:
     cursor = CustomCursor(
         SHOP_ITEMS[PLAYER_DATA["selected_items"]["Curseurs"]]["image_path"])
 else:
     cursor = CustomCursor(None)
 
-clock = pygame.time.Clock()
-running = True
-
 # Initialiser scroll_y et total_height
 scroll_y = 0
-total_height = 0
-achievements_manager = AchievementManager(W, H)
 
 while running:
 
@@ -177,7 +170,7 @@ while running:
             title_angle += 0.02
             screen, current_page, buttons = home.show_home(
     screen, W, H, mouse_pos, mouse_click, title_angle, buttons,
-    title_img, shadow_img, orig_width, orig_height, paper_texture
+    title_img, shadow_img, orig_width, orig_height
 )
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":

@@ -5,6 +5,18 @@ import pygame
 import os
 
 def draw_text(text, font, color, surface, x, y, shadow=False):
+    """
+    Dessine un texte sur une surface pygame.
+
+    Args:
+        text (str): Le texte  souhaite.
+        font (pygame.font.Font): La police du texte.
+        color (tuple): La couleur du texte.
+        surface (pygame.Surface): La surface sur laquelle dessiner le texte.
+        x (int): La coordon ne x du centre du texte.
+        y (int): La coordon ne y du centre du texte.
+        shadow (bool): Si True, dessine une ombre grise derri re le texte.
+    """
     textobj = font.render(text, True, color)
     textrect = textobj.get_rect()
     textrect.center = (x, y)
@@ -18,6 +30,14 @@ class AchievementManager:
 
     def __init__(self, W, H):
         # dessiner la boite
+        """
+        Initialize the AchievementManager with screen dimensions and set initial states.
+
+        Args:
+            W (int): The width of the screen.
+            H (int): The height of the screen.
+        """
+
         self.width = 500
         self.height = 100
         self.W = W
@@ -26,6 +46,13 @@ class AchievementManager:
         self.start_time = pygame.time.get_ticks()
 
     def new_achievement(self, index):
+        """
+        Mark an achievement as succeeded and activate the achievement popup.
+
+        Args:
+            index (int): The index of the achievement to be marked as succeeded.
+        """
+
         self.current_achievement = PLAYER_DATA["achievements"][index]
         if not self.current_achievement["succeed"]:
             PLAYER_DATA["achievements"][index]["succeed"] = True
@@ -34,6 +61,15 @@ class AchievementManager:
             self.start_time = pygame.time.get_ticks()
 
     def draw_popup_if_active(self, screen):
+        """
+        Draw an achievement popup if one is active.
+
+        The popup will be drawn for 5 seconds, with an animation that slides it in from the right.
+
+        Args:
+            screen (pygame.display): The screen to draw the popup on.
+
+        """
         if self.popup_active:
             if self.start_time + 5000 < pygame.time.get_ticks():
                 self.popup_active = False
@@ -131,6 +167,14 @@ class AchievementManager:
 
 class CustomCursor:
     def __init__(self, cursor_path):
+        """
+        Initialize the custom cursor.
+
+        :param cursor_path: The path to the image representing the normal state of the cursor.
+        :type cursor_path: str
+
+        :raises FileNotFoundError: If the image at `cursor_path` does not exist.
+        """
         self.custom_cursor = bool(cursor_path)
         pygame.mouse.set_visible(not self.custom_cursor)
 
@@ -147,6 +191,16 @@ class CustomCursor:
                 self.as_pressed_cursor = True
 
     def show(self, screen, mouse_pos=None, mouse_pressed=False):
+        """
+        Draw the custom cursor on the given screen at the specified mouse position.
+
+        :param screen: The screen to draw the cursor on.
+        :type screen: pygame.display
+        :param mouse_pos: The mouse position to draw the cursor at. If `None`, it will be drawn at the current mouse position.
+        :type mouse_pos: tuple or None
+        :param mouse_pressed: If `True`, the pressed version of the cursor will be drawn if it is available.
+        :type mouse_pressed: bool
+        """
         if self.custom_cursor:
             if mouse_pos:
                 mouse_x, mouse_y = mouse_pos

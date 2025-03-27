@@ -4,10 +4,24 @@ from shared.ui.elements import Button
 
 
 def play_choicer(screen, W, H, mouse_pos, mouse_click, connected, buttons):
-    # Titre
-    draw_text("Mode de jeu", BUTTON_FONT, BLACK, screen, W // 2, 150)
+    """
+    Displays the game mode selection screen and handles user interaction.
 
-    # Options de jeu
+    Args:
+        W (int): The width of the screen.
+        H (int): The height of the screen.
+        mouse_pos (tuple): The current position of the mouse.
+        mouse_click (bool): True if the left mouse button was clicked.
+        connected (bool): True if the player is connected to the internet.
+        buttons (dict): A dictionary of button elements.
+
+    Returns:
+        tuple: A tuple containing:
+
+            - The name of the next page to display.
+            - The updated dictionary of buttons.
+    """
+
     game_modes = ["Solo", "Multijoueurs"]
     mode_width = 300
     mode_height = 200

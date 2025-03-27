@@ -26,6 +26,20 @@ websockets = set()
 loop = None
 
 async def handle_websocket(request):
+    """
+    Handle a WebSocket connection.
+
+    This function is a callback that is called by aiohttp when a WebSocket connection is established. It
+    sets up the WebSocket and adds it to the list of active WebSockets. It then listens for messages on
+    the WebSocket and dispatches them to the appropriate handler function. If an error occurs, it prints
+    the error and removes the WebSocket from the list of active WebSockets.
+
+    Parameters:
+    request (aiohttp.web.Request): The request that established the WebSocket connection
+
+    Returns:
+    aiohttp.web.WebSocketResponse: The WebSocketResponse object that was created
+    """
     global ws
 
     ws = web.WebSocketResponse()
@@ -46,7 +60,7 @@ async def handle_websocket(request):
                 elif data["type"] == "emote":
                     await handle_emote(data)
             elif data["header"] == "roll_back":
-                await handle_roll_back(data, ws)
+                await handle_roll_back(data)
             elif data["header"] == "draw":
                 await handle_draw(data)
             elif data["header"] == "game_finished":
@@ -61,6 +75,18 @@ async def handle_websocket(request):
         return ws
 
 async def handle_disconnect(ws):
+    """
+    Handles the disconnection of a player.
+
+    This function is called when a WebSocket connection is closed. It removes the player associated
+    with the given WebSocket from the players list and performs necessary cleanup, such as removing
+    the player's avatar file. It broadcasts a message to inform other players of the disconnection 
+    and starts a new game if the disconnected player was the current drawer.
+
+    Parameters:
+    ws (aiohttp.web.WebSocketResponse): The WebSocket connection of the player that disconnected.
+    """
+
     global players
     if players:
         # Trouver le joueur qui s'est déconnecté
@@ -87,6 +113,18 @@ async def handle_disconnect(ws):
 
 
 async def handle_join(data, ws):
+    """
+    Handles a player joining the game.
+
+    This function is called when a player joins the game. It adds the player to the players list
+    and sends the player's ID and the initial game state to the player. It also saves the player's avatar
+    if it is a matrix. It broadcasts a message to inform other players of the new player and starts
+    a new game if there are two players.
+
+    Parameters:
+    data (dict): The data sent by the player when they joined.
+    ws (aiohttp.web.WebSocketResponse): The WebSocket connection of the player that joined.
+    """
     global players, last_game_start
 
     if len(players) > 0:
@@ -143,6 +181,17 @@ async def handle_join(data, ws):
 
 
 async def handle_new_game(data=None):
+    """
+    Starts a new game when a player joins.
+
+    This function resets the game state: it clears the guess list, resets the frames list,
+    sets the roll back to 0, starts a new timer, generates a new sentence, resets the points
+    of all players and changes the drawer.
+
+    Parameters:
+    data (dict): The data sent by the player when they joined (not used).
+
+    """
     global last_game_start, players, drawer_pid, sentences_list, guess_list, all_frames, roll_back
 
     guess_list = []
@@ -172,6 +221,16 @@ async def handle_new_game(data=None):
 
 
 async def handle_draw(data):
+    """
+    Handles the draw event from a player.
+
+    This function is called when a player sends a draw event. It appends the received frames to the global frames list
+    and broadcasts the received frames to all players except the drawer.
+
+    Parameters:
+    data (dict): The data sent by the player, containing drawing information to update the canvas.
+    """
+    
     global all_frames
 
     all_frames += data["frames"]
@@ -179,7 +238,18 @@ async def handle_draw(data):
     await broadcast(data, skip_id=drawer_pid)
 
 
-async def handle_roll_back(data, ws):
+async def handle_roll_back(data):
+    """
+    Handles the roll_back event from a player.
+
+    This function is called when a player requests to rollback the drawing to a previous step.
+    It updates the roll_back variable and broadcasts the received roll_back value to all players
+    except the drawer.
+
+    Parameters:
+    data (dict): The data sent by the player, containing the number of steps to rollback.
+    ws (aiohttp.web.WebSocketResponse): The WebSocket connection of the player that sent the event.
+    """
     global roll_back
 
     roll_back = data["roll_back"]
@@ -188,6 +258,17 @@ async def handle_roll_back(data, ws):
 
 
 async def handle_guess(message):
+    """
+    Handles the guess event from a player.
+
+    This function is called when a player sends a guess event. It checks if the guess is correct
+    and if the player is the first one to guess the sentence. If it is, it gives points to the
+    player and the drawer. It also broadcasts the guess to all players except the drawer.
+
+    Parameters:
+    message (dict): The data sent by the player, containing the guess message and the remaining time.
+
+    """
     global players, drawer_pid, guess_list, sentences_list
 
     list_found = []
@@ -232,7 +313,17 @@ async def handle_guess(message):
         await handle_new_game()
 
 async def handle_emote(message):
+    """
+    Handle an emote message.
 
+    This function is a callback that is called by aiohttp when an emote message is
+    received from a player. It copies the emote asset from the shop directory to the
+    temporary assets directory if it does not already exist, and then broadcasts the
+    message to all other players.
+
+    Parameters:
+    message (dict): The message containing the emote path
+    """
     message["header"] = "new_message"
 
     if not os.path.exists(
@@ -250,13 +341,38 @@ async def handle_emote(message):
     await broadcast(message)
 
 async def broadcast(message, skip_id=None, target_pid=None):
-    """Envoie un message à tous les WebSockets connectés."""
-    
+    """
+    Broadcast a message to all connected players.
+
+    This function sends the given message to all connected players, unless they have
+    the given skip_id. If a target_pid is given, the message is only sent to the player
+    with that ID.
+
+    Parameters:
+    message (dict): The message to be sent
+    skip_id (int): The ID of the player that should not receive the message
+    target_pid (int): The ID of the player that should receive the message. If None,
+        the message is sent to all players except the one with skip_id.
+    """
     for player in players:
         if player["pid"] != skip_id and (target_pid is None or player["pid"] == target_pid):
             await player["ws"].send_json(message)
 
 def get_num_players(request):
+    """
+    Returns the number of players currently connected.
+
+    This function handles a request to retrieve the number of players
+    currently connected to the server. It responds with a JSON object
+    containing the count of players.
+
+    Parameters:
+    request (aiohttp.web.Request): The request object (not used).
+
+    Returns:
+    aiohttp.web.Response: A JSON response with the number of players.
+    """
+
     return web.json_response({"num_players": len(players)})
 
 async def redirect_to_index(request):
@@ -264,6 +380,18 @@ async def redirect_to_index(request):
     raise web.HTTPFound("/index.html") 
     
 async def start_web():
+    """
+    Starts the web server.
+
+    This function sets up the aiohttp web application and begins
+    listening for incoming connections on the specified port.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     global app, port
 
     app = web.Application()
@@ -284,14 +412,37 @@ async def start_web():
 
 
 def get_free_port():
-    """Retourne un port libre utilisable."""
+    """
+    Retourne un numéro de port TCP libre sur la machine locale.
+
+    La fonction utilise la fonction bind() de la bibliothèque socket
+    pour demander un port TCP aléatoire libre sur la machine locale.
+    Le numéro du port est ensuite récupéré avec getsockname() et
+    retourné.
+
+    Returns:
+    int: Le numéro du port TCP libre.
+    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("", 0))  # Bind sur un port aléatoire libre
         return s.getsockname()[1]  # Retourne le numéro du port
 
 
 def start_server(serv_name):
-    """Démarre le serveur HTTP + WebSocket dans un thread."""
+    """
+    Démarre le serveur.
+
+    Cette fonction configure les variables du serveur, lance Ngrok,
+    configure le serveur web et le lance. Elle exécute ensuite
+    une boucle infinie pour maintenir le serveur en vie.
+
+    Parameters:
+    serv_name (str): Le nom du serveur, utilisé pour identifier
+        les paramètres du serveur dans le fichier de configuration.
+
+    Returns:
+    None
+    """
     global ngrok, server_started, server_name, loop, players, drawer_pid, guess_list, sentences_list, last_game_start, all_frames, roll_back, port
 
     # Variables du jeu
@@ -318,7 +469,15 @@ def start_server(serv_name):
     loop.run_forever()
 
 def stop_server():
-    """Ferme proprement le serveur WebSocket, HTTP et Ngrok."""
+    """
+    Arrête le serveur.
+
+    Cette fonction ferme toutes les WebSockets, stoppe l'application web,
+    ferme la connexion Ngrok et arrête la boucle d'événements.
+
+    Returns:
+    None
+    """
     global app, websockets, server_started, server_name, loop, ngrok
 
     if not server_started or not loop:

@@ -4,7 +4,22 @@ from shared.ui.elements import Button
 
 
 def show_credit(screen, W, H, mouse_pos, mouse_clicked, buttons):
+    """
+    Affiche l'interface des credits (les personnes qui ont aidé a la
+    création du jeu)
 
+    Arguments:
+        screen {Surface} -- La surface de l'écran
+        W {int} -- La largeur de l'écran
+        H {int} -- La hauteur de l'écran
+        mouse_pos {tuple} -- La position actuelle de la souris
+        mouse_clicked {bool} -- Si le bouton gauche de la souris est cliqué
+        buttons {dict} -- Les boutons de l'interface
+
+    Returns:
+        tuple -- Le tuple contenant la surface de l'écran, le nom de la page
+        courante et les boutons de l'interface
+    """
     draw_text("Credits", BUTTON_FONT, BLACK, screen, W // 2, 180)
 
     draw_text(

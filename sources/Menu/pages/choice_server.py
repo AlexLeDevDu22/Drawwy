@@ -24,7 +24,27 @@ def set_player_count(name, server_url):
 
 
 def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
+    """
+    Affiche la page de choix du serveur.
+
+    Args:
+        screen (Surface): La surface de l'écran.
+        W (int): La largeur de la surface.
+        H (int): La hauteur de la surface.
+        mouse_pos (tuple): La position de la souris.
+        mouse_click (bool): Vraie si le bouton gauche de la souris est enfoncé.
+        connected (bool): Vraie si le joueur est connecté à internet.
+        buttons (dict): Un dictionnaire des boutons affichés sur l'écran.
+
+    Returns:
+        tuple: Un tuple contenant :
+            - La surface modifiée.
+            - Le nom de la page à afficher.
+            - Le dictionnaire des boutons mis à jour.
+            - Le nom du serveur choisi (ou None si le joueur n'a pas cliqué).
+    """
     global players_per_server, last_check_players
+    
     # Titre
     draw_text(
         "Choisissez votre serveur",

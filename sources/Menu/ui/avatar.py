@@ -10,6 +10,12 @@ import shutil
 class AvatarManager:
 
     def __init__(self, screen):
+        """
+        Constructeur de la classe AvatarManager
+
+        :param screen: La surface de l'écran
+        :type screen: pygame.Surface
+        """
         self.screen = screen
         self.W, self.H = get_screen_size()
         self.avatar_size = 100
@@ -84,10 +90,11 @@ class AvatarManager:
 
         # Bordure d'avatar
         self.avatar_bordure_id = PLAYER_DATA["selected_items"]["Bordures"]
+        self.has_border = bool(PLAYER_DATA["selected_items"]["Bordures"])
         self.base_avatar_bordure = pygame.image.load(
-            SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])
+            SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"]) if self.has_border else None
         self.avatar_bordure = pygame.transform.scale(
-            self.base_avatar_bordure, (109, 109))
+            self.base_avatar_bordure, (109, 109)) if self.has_border else None
 
         # Boutons
         button_width, button_height = 160, 50
@@ -138,12 +145,24 @@ class AvatarManager:
             5)  # Icône à côté du texte
 
     def save_state(self):
+        """
+        Sauvegarde l'avatar actuel dans l'historique, en effa ant le premier élément si la longueur de l'historique atteint 20 éléments.
+        Efface également l'état de l'historique de REDo.
+        """
         self.history.append(self.avatar.copy())
         if len(self.history) > 20:  # Limite historique
             self.history.pop(0)
         self.redo_stack.clear()  # Reset REDo
 
     def size_button(self, rect, text, hover):
+        """
+        Dessine un bouton de taille de pinceau, avec un texte spécifié
+        et une couleur de fond qui change en fonction de l'état de survol.
+        
+        :param rect: Rectangle du bouton
+        :param text: Texte à afficher sur le bouton
+        :param hover: État de survol du bouton
+        """
         # Ombre
         offset = 3
         pygame.draw.rect(
@@ -167,6 +186,13 @@ class AvatarManager:
         self.screen.blit(text_surface, (text_x, text_y))
 
     def handle_event(self, event, mouse_pos, achievements_manager):
+        """
+        Gère les événements liés à l'avatar (clic, clavier, etc.).
+        
+        :param event: Événement Pygame
+        :param mouse_pos: Position de la souris
+        :param achievements_manager: Gestionnaire des achievements
+        """
         if event.type == pygame.MOUSEBUTTONDOWN:
             if not self.show_buttons:  # Si pas déjà en mode édition
                 if self.avatar_start_pos[0] < mouse_pos[0] < self.avatar_start_pos[0] + self.avatar_size and \
@@ -299,6 +325,14 @@ class AvatarManager:
 
     def update(self, mouse_pos, mouse_pressed):
         # Dessin sur l'avatar si en mode édition et que la souris est appuyée
+        """
+        Met à jour l'état de l'avatar (dessin, animations, etc.)
+
+        :param mouse_pos: La position de la souris
+        :type mouse_pos: tuple
+        :param mouse_pressed: Les boutons de la souris pressés
+        :type mouse_pressed: tuple
+        """
         avatar_size = self.get_current_avatar_size()
         if self.show_buttons and True in mouse_pressed:
             avatar_pos = self.get_current_avatar_position()
@@ -316,7 +350,7 @@ class AvatarManager:
         if self.is_expanding:
             self.anim_progress += 0.1
             self.avatar_bordure = pygame.transform.scale(
-                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09))
+                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09)) if self.has_border else None
             if self.anim_progress >= 1:
                 self.anim_progress = 1
                 self.is_expanding = False
@@ -342,7 +376,7 @@ class AvatarManager:
         if self.is_retracting:
             self.anim_progress -= 0.1
             self.avatar_bordure = pygame.transform.scale(
-                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09))
+                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09))  if self.has_border else None
             if self.anim_progress <= 0:
                 self.anim_progress = 0
                 self.is_retracting = False
@@ -350,12 +384,19 @@ class AvatarManager:
 
         if self.avatar_bordure_id != PLAYER_DATA["selected_items"]["Bordures"]:
             self.avatar_bordure_id = PLAYER_DATA["selected_items"]["Bordures"]
+            self.has_border = bool(SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]])
             self.base_avatar_bordure = pygame.image.load(
-                SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])
+                SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])  if self.has_border else None
             self.avatar_bordure = pygame.transform.scale(
-                self.base_avatar_bordure, (109, 109))
+                self.base_avatar_bordure, (109, 109)) if self.has_border else None
 
     def get_current_avatar_position(self):
+        """
+        Retourne la position actuelle de l'avatar en fonction de l'animation en cours
+
+        :return: Un tuple (x, y) de la position actuelle de l'avatar
+        :rtype: tuple
+        """
         return (int(self.avatar_start_pos[0] +
                     (self.avatar_target_pos[0] -
                      self.avatar_start_pos[0]) *
@@ -365,9 +406,24 @@ class AvatarManager:
                                              self.anim_progress))
 
     def get_current_avatar_size(self):
+        """
+        Retourne la taille actuelle de l'avatar en fonction de l'animation en cours
+
+        :return: La taille actuelle de l'avatar
+        :rtype: int
+        """
         return int(100 + (self.avatar_target_size - 100) * self.anim_progress)
 
     def get_current_pseudo_position(self):
+        """
+        Calculate the current position of the pseudo based on the animation progress.
+
+        The position is interpolated between the starting position and the target 
+        position according to the animation progress.
+
+        :return: A tuple (x, y) representing the current position of the pseudo.
+        :rtype: tuple
+        """
         return (int(self.pseudo_start_pos[0] +
                     (self.pseudo_target_pos[0] -
                      self.pseudo_start_pos[0]) *
@@ -377,14 +433,26 @@ class AvatarManager:
                                              self.anim_progress))
 
     def draw(self):
+        """Draws the avatar, pseudo, and editing controls on the screen.
+
+        This method handles the rendering of the avatar and its border, applies
+        a circular mask, and displays the pseudo text. It also renders color
+        selection rectangles, brush size preview, and control buttons for
+        editing mode, including validate and cancel buttons.
+
+        The avatar is drawn at its current animated position and size as determined
+        by the animation progress. If the avatar has a border, it is rendered
+        around the avatar. The pseudo text is rendered below the avatar, updating
+        dynamically if in editing mode.
+
+        If editing controls are displayed, it renders color palette rectangles,
+        brush size preview, and the buttons to increase/decrease brush size,
+        validate changes, and cancel changes.
+        """
         # Dessiner l'avatar
         avatar_pos = self.get_current_avatar_position()
         avatar_size = self.get_current_avatar_size()
         pseudo_pos = self.get_current_pseudo_position()
-
-        # pygame.draw.circle(self.screen, ORANGE,
-        #                 (avatar_pos[0] + avatar_size // 2, avatar_pos[1] + avatar_size // 2),
-        #                avatar_size // 2 + 4 + (8 * self.anim_progress))
 
         # Afficher l'avatar avec masque circulaire
         temp_avatar = pygame.transform.scale(
@@ -393,14 +461,15 @@ class AvatarManager:
         self.screen.blit(temp_avatar, avatar_pos)
 
         # Bordure d'avatar
-        self.screen.blit(
-            self.avatar_bordure,
-            (avatar_pos[0] -
-             avatar_size *
-             0.045,
-             avatar_pos[1] -
-             avatar_size *
-             0.045))
+        if self.has_border:
+            self.screen.blit(
+                self.avatar_bordure,
+                (avatar_pos[0] -
+                avatar_size *
+                0.045,
+                avatar_pos[1] -
+                avatar_size *
+                0.045))
 
         # Afficher le pseudo
         pseudo_surf = SMALL_FONT.render(

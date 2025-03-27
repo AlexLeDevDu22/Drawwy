@@ -16,7 +16,7 @@ UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront télécharg
 g = Github()
 
 def get_last_check():
-    """Lire la dernière date de mise à jour à partir du fichier"""
+    """Renvoie la date de la dernière mise à jour connue (None si jamais)"""
     if os.path.exists(LAST_CHECK_FILE):
         with open(LAST_CHECK_FILE, 'r') as f:
             last_check = f.read().strip()
@@ -32,7 +32,15 @@ def set_last_check(update_time):
 
 
 def download_file(url, file_path):
-    """Télécharger un fichier depuis une URL et le sauvegarder dans un fichier local"""
+    """Télécharge un fichier depuis une URL et l'enregistre à un emplacement local.
+
+    Args:
+        url (str): URL du fichier à télécharger.
+        file_path (str): Chemin local où enregistrer le fichier.
+    Raises:
+        requests.exceptions.RequestException: Si la requête échoue (par exemple si la
+            connexion internet est perdue).
+    """
     response = requests.get(url)
     response.raise_for_status()
     with open(file_path, 'wb') as f:
@@ -40,7 +48,24 @@ def download_file(url, file_path):
 
 
 def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
-    """Télécharge récursivement tous les fichiers du repo"""
+    """
+    Télécharge le contenu d'un dépôt GitHub spécifié dans un répertoire local.
+
+    Parcourt de manière récursive les fichiers et dossiers du dépôt à partir d'un chemin donné et 
+    les télécharge dans un répertoire local spécifié. Le chemin local de chaque fichier/dossier 
+    téléchargé est renvoyé.
+
+    Args:
+        repo (github.Repository.Repository): Instance du dépôt GitHub à partir duquel télécharger.
+        path (str): Chemin dans le dépôt à partir duquel commencer le téléchargement (par défaut "").
+        local_dir (str): Répertoire local où stocker les fichiers téléchargés (par défaut UPDATE_DIR).
+
+    Returns:
+        list: Liste des chemins locaux de tous les fichiers et dossiers téléchargés.
+
+    Raises:
+        github.GithubException: Si la récupération du contenu échoue.
+    """
     contents = repo.get_contents(path)  # Liste des fichiers/dossiers à `path`
 
     all_paths = []
@@ -65,7 +90,15 @@ def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
 
 
 def check_for_shop_updates():
-    """Vérifier si une mise à jour est disponible pour le dépôt GitHub"""
+    """Vérifie si une mise à jour du shop est disponible sur le dépôt GitHub.
+
+    Si une mise à jour est disponible, télécharge les nouveaux fichiers dans le
+    dossier `UPDATE_DIR` et met à jour la date de la dernière mise à jour.
+
+    Si la connexion internet est perdue, sort sans faire quoi que ce soit.
+
+    Appelé une fois par jour par le thread `updater`.
+    """
     if not is_connected():
         return
 

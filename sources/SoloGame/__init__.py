@@ -8,6 +8,25 @@ from shared.utils.data_manager import *
 import pygame
 
 def soloGame(screen, cursor, achievements_manager):
+    """
+    Lance le mode Solo.
+
+    Ce mode permet de reproduire des images du jeu en mode solo.
+    Il comprend plusieurs pages :
+    - "themes" : page de sélection du thème
+    - "images" : page de sélection de l'image
+    - "play" : page de dessin
+    - "exit" : page de fin de jeu
+
+    :param screen: L'écran de jeu.
+    :type screen: pygame.Surface
+    :param cursor: Le curseur de la souris.
+    :type cursor: CustomCursor
+    :param achievements_manager: Le gestionnaire des succès.
+    :type achievements_manager: AchievementsManager
+    :return: L'écran de jeu et la page suivante.
+    :rtype: tuple
+    """
     soloPage = "themes"
     pygame.display.set_caption(f"Drawwy - Mode Solo")
 

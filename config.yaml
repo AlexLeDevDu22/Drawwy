@@ -14,8 +14,8 @@ servers:
     domain: "next-boxer-faithful.ngrok-free.app"
     api: "2ue1ZKkjebeEIwvvDxXowlTvo3i_2uKULVDsyEo6A5prX7Gyg"
 
-sentence_checker_seuil: 0.72
-game_duration: 150
+sentence_checker_seuil: 0.7
+game_duration: 180
 canvas_height: 200
 canvas_width: 200
 points_per_found: 25
