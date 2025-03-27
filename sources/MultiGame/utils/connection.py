@@ -248,9 +248,9 @@ async def handle_connection_client(
                     for i in range(len(MultiGame.PLAYERS)):
                         if MultiGame.PLAYERS[i]["pid"] == e["pid"]:
                             MultiGame.PLAYERS[i]["points"] += e["points"]
-                            if e["pid"] == MultiGame.PLAYER_ID:
-                                PLAYER_DATA["coins"] += e["points"]
-                                save_data("PLAYER_DATA")
+                    if e["pid"] == MultiGame.PLAYER_ID:
+                        PLAYER_DATA["coins"] += e["points"]
+                        save_data("PLAYER_DATA")
 
     def roll_back(roll_back):
         """
@@ -356,7 +356,10 @@ def disconnect(MultiGame):
                 MultiGame.connection_loop,
                 MultiGame),
             MultiGame.connection_loop)
-        future.result(timeout=5)  # On attend max 5s pour éviter un blocage
+        try:
+            future.result(timeout=5)
+        except asyncio.TimeoutError:
+            pass
 
     if MultiGame.server:
         MultiGame.server.stop_server()

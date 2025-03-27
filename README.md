@@ -38,4 +38,4 @@ Si vous souhaité acceder a la version en ligne du multijoueur, il suffit d'util
 
     Faithful: "next-boxer-faithful.ngrok-free.app"
 
-PS: La version web n'est accessible que lorsqu'un joueur y est déja présent depuis la version python
+PS: La version web n'est accessible que lorsque le serveur est déja lancé par le jeux python

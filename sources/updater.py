@@ -15,7 +15,6 @@ UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront télécharg
 # Créez une instance de l'API GitHub
 g = Github()
 
-
 def get_last_check():
     """Renvoie la date de la dernière mise à jour connue (None si jamais)"""
     if os.path.exists(LAST_CHECK_FILE):
@@ -103,7 +102,6 @@ def check_for_shop_updates():
     if not is_connected():
         return
 
-    repo = g.get_repo(f"{OWNER}/{REPO}")
 
     # Comparer avec la dernière mise à jour connue
     last_check = get_last_check()
@@ -111,6 +109,7 @@ def check_for_shop_updates():
     if last_check and last_check + timedelta(days=1) > datetime.now():
         return
 
+    repo = g.get_repo(f"{OWNER}/{REPO}")
     # Récupérer la dernière mise à jour du dépôt
     latest_commit = repo.get_commits()[0]
     latest_commit_time = latest_commit.commit.author.date.replace(tzinfo=None)

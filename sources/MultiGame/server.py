@@ -41,7 +41,6 @@ async def handle_websocket(request):
     Returns:
     aiohttp.web.WebSocketResponse: The WebSocketResponse object that was created
     """
-    global ws
 
     ws = web.WebSocketResponse()
     await ws.prepare(request)
@@ -93,7 +92,7 @@ async def handle_disconnect(ws):
     if players:
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
-            if player["ws"] == ws:
+            if id(player["ws"]) == id(ws):
                 if player["avatar"]["type"] == "matrix" and os.path.exists(
                         f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
                     os.remove(
