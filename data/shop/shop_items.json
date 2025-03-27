@@ -20,7 +20,7 @@
   {
     "index": 2,
     "name": "Bordure de bronze",
-    "stars_needed": 15,
+    "stars_needed": 10,
     "description": "Une bordure quelconque",
     "image_path": "data/shop/borders_assets/bronze_border.png",
     "category": "Bordures",
@@ -28,48 +28,48 @@
   },
   {
     "index": 3,
-    "name": "Curseur chat",
-    "price": 100,
-    "description": "MIAOU",
-    "image_path": "data/shop/cursors_assets/cat.png",
-    "category": "Curseurs",
-    "rarity": "Commun"
-  },
-  {
-    "index": 4,
-    "name": "Curseur fantome",
-    "price": 100,
-    "description": "BOUH",
-    "image_path": "data/shop/cursors_assets/ghost.png",
-    "category": "Curseurs",
-    "rarity": "Commun"
-  },
-  {
-    "index": 5,
-    "name": "Bordure en diamant",
+    "name": "Bordure argent",
     "stars_needed": 30,
-    "description": "Une bordure brillante",
-    "image_path": "data/shop/borders_assets/diamond_border.png",
+    "description": "Meilleur qu'hier ",
+    "image_path": "data/shop/borders_assets/silver_border.png",
     "category": "Bordures",
     "rarity": "Commun"
   },
   {
-    "index": 6,
+    "index": 4,
     "name": "Bordure en or",
     "stars_needed": 45,
     "description": "Une bordure dore",
     "image_path": "data/shop/borders_assets/gold_border.png",
     "category": "Bordures",
-    "rarity": "Commun"
+    "rarity": "Rare"
+  },
+  {
+    "index": 5,
+    "name": "Bordure platine",
+    "stars_needed": 60,
+    "description": "Une bordure brillante",
+    "image_path": "data/shop/borders_assets/platinum_border.png",
+    "category": "Bordures",
+    "rarity": "Rare"
+  },
+  {
+    "index": 6,
+    "name": "Bordure en diamant",
+    "stars_needed": 75,
+    "description": "L'un des meilleurs",
+    "image_path": "data/shop/borders_assets/diamond_border.png",
+    "category": "Bordures",
+    "rarity": "Epique"
   },
   {
     "index": 7,
-    "name": "Bordure de grand maitre",
-    "stars_needed": 120,
-    "description": "Pour etre le GOAT de Drawwy",
-    "image_path": "data/shop/borders_assets/grandmaster_border.png",
+    "name": "Bordure mythique",
+    "stars_needed": 90,
+    "description": "Pour montrer son talent",
+    "image_path": "data/shop/borders_assets/mythic_border.png",
     "category": "Bordures",
-    "rarity": "Commun"
+    "rarity": "Epique"
   },
   {
     "index": 8,
@@ -78,33 +78,33 @@
     "description": "Pour montrer sa puissance",
     "image_path": "data/shop/borders_assets/master_border.png",
     "category": "Bordures",
-    "rarity": "Commun"
+    "rarity": "Legendaire"
   },
   {
     "index": 9,
-    "name": "Bordure mythique",
-    "stars_needed": 90,
-    "description": "Pour montrer son talent ",
-    "image_path": "data/shop/borders_assets/mythic_border.png",
+    "name": "Bordure de grand maitre",
+    "stars_needed": 120,
+    "description": "Pour etre le GOAT de Drawwy",
+    "image_path": "data/shop/borders_assets/grandmaster_border.png",
     "category": "Bordures",
-    "rarity": "Commun"
+    "rarity": "Legendaire"
   },
   {
     "index": 10,
-    "name": "Bordure platine",
-    "stars_needed": 75,
-    "description": "L'un des meilleurs ",
-    "image_path": "data/shop/borders_assets/platinum_border.png",
-    "category": "Bordures",
+    "name": "Curseur chat",
+    "price": 100,
+    "description": "MIAOU",
+    "image_path": "data/shop/cursors_assets/cat.png",
+    "category": "Curseurs",
     "rarity": "Commun"
   },
   {
     "index": 11,
-    "name": "Bordure argent",
-    "stars_needed": 30,
-    "description": "Meilleur qu'hier ",
-    "image_path": "data/shop/borders_assets/silver_border.png",
-    "category": "Bordures",
+    "name": "Curseur fantome",
+    "price": 100,
+    "description": "BOUH",
+    "image_path": "data/shop/cursors_assets/ghost.png",
+    "category": "Curseurs",
     "rarity": "Commun"
   },
   {
