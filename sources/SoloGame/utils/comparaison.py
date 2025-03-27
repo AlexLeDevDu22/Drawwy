@@ -175,8 +175,8 @@ def compare_images(solo_class, img1_path, img2_surface):
         color_score = 50
 
     # Score final équilibré
-    final_score = int((shape_score * 0.5) + (surface_score * 0.3) +
-                      (color_score * 0.1) - (pixel_penalty * 0.1))
+    final_score = min(int((shape_score * 0.5) + (surface_score * 0.3) +
+                      (color_score * 0.3) - (pixel_penalty * 0.1)*1.1), 100)
 
     solo_class.similarity_score = final_score
     solo_class.similarity_score_ready = True

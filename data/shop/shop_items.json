@@ -20,7 +20,7 @@
   {
     "index": 2,
     "name": "Bordure de bronze",
-    "stars_needed": 20,
+    "stars_needed": 15,
     "description": "Une bordure quelconque",
     "image_path": "data/shop/borders_assets/bronze_border.png",
     "category": "Bordures",
@@ -47,7 +47,7 @@
   {
     "index": 5,
     "name": "Bordure en diamant",
-    "stars_needed": 40,
+    "stars_needed": 30,
     "description": "Une bordure brillante",
     "image_path": "data/shop/borders_assets/diamond_border.png",
     "category": "Bordures",
@@ -56,7 +56,7 @@
   {
     "index": 6,
     "name": "Bordure en or",
-    "stars_needed": 60,
+    "stars_needed": 45,
     "description": "Une bordure dore",
     "image_path": "data/shop/borders_assets/gold_border.png",
     "category": "Bordures",
@@ -65,7 +65,7 @@
   {
     "index": 7,
     "name": "Bordure de grand maitre",
-    "stars_needed": 80,
+    "stars_needed": 120,
     "description": "Pour etre le GOAT de Drawwy",
     "image_path": "data/shop/borders_assets/grandmaster_border.png",
     "category": "Bordures",
@@ -74,7 +74,7 @@
   {
     "index": 8,
     "name": "Bordure du maitre",
-    "stars_needed": 100,
+    "stars_needed": 105,
     "description": "Pour montrer sa puissance",
     "image_path": "data/shop/borders_assets/master_border.png",
     "category": "Bordures",
@@ -83,7 +83,7 @@
   {
     "index": 9,
     "name": "Bordure mythique",
-    "stars_needed": 120,
+    "stars_needed": 90,
     "description": "Pour montrer son talent ",
     "image_path": "data/shop/borders_assets/mythic_border.png",
     "category": "Bordures",
@@ -92,7 +92,7 @@
   {
     "index": 10,
     "name": "Bordure platine",
-    "stars_needed": 140,
+    "stars_needed": 75,
     "description": "L'un des meilleurs ",
     "image_path": "data/shop/borders_assets/platinum_border.png",
     "category": "Bordures",
@@ -101,7 +101,7 @@
   {
     "index": 11,
     "name": "Bordure argent",
-    "stars_needed": 160,
+    "stars_needed": 30,
     "description": "Meilleur qu'hier ",
     "image_path": "data/shop/borders_assets/silver_border.png",
     "category": "Bordures",

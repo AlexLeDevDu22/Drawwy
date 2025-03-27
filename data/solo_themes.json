@@ -26,7 +26,7 @@
                 "index": 2,
                 "path": "2.png",
                 "stars": 0,
-                "num_try": 0
+                "num_try": 1
             },
             {
                 "index": 3,
@@ -43,8 +43,8 @@
             {
                 "index": 5,
                 "path": "5.png",
-                "stars": 0,
-                "num_try": 0
+                "stars": 1,
+                "num_try": 1
             },
             {
                 "index": 6,
@@ -122,8 +122,8 @@
             {
                 "index": 6,
                 "path": "5.png",
-                "stars": 0,
-                "num_try": 0
+                "stars": 1,
+                "num_try": 1
             },
             {
                 "index": 7,
@@ -172,7 +172,7 @@
                 "index": 1,
                 "path": "2.png",
                 "stars": 0,
-                "num_try": 0
+                "num_try": 1
             },
             {
                 "index": 2,
@@ -268,8 +268,8 @@
             {
                 "index": 5,
                 "path": "5.png",
-                "stars": 0,
-                "num_try": 0
+                "stars": 1,
+                "num_try": 1
             },
             {
                 "index": 6,

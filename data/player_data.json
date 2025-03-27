@@ -167,9 +167,9 @@
             ]
         }
     ],
-    "solo_game_played": 0,
+    "solo_game_played": 2,
     "multi_game_played": 0,
-    "num_draws_total": 0,
+    "num_draws_total": 2,
     "coins": 0,
     "selected_items": {
         "Curseurs": 0,
