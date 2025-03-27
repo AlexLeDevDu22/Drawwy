@@ -67,7 +67,6 @@ class PopupAnimation:
         for theme in SOLO_THEMES:
             for image in theme["images"]:
                 self.num_stars += image["stars"]
-        print(self.num_stars)
 
         # Système de particules
         self.particles = Confetti()
