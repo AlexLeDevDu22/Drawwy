@@ -606,14 +606,14 @@ canvas.addEventListener("mousemove", (e) => {
 
   const pos = getMousePos(e);
   if (drawingState.lastPos) {
-    console.log(pos);
+    console.log(drawingState.radius);
     drawLine(
       drawingState.lastPos.x,
       drawingState.lastPos.y,
       pos.x,
       pos.y,
       drawingState.color,
-      drawingState.radius
+      drawingState.radius / 4
     );
     const frame = {
       type: "line",
@@ -625,10 +625,8 @@ canvas.addEventListener("mousemove", (e) => {
       radius: drawingState.radius,
     };
     drawingState.currentStroke.push(frame);
-    console.log(typeof allFrames);
     allFrames.push(frame);
 
-    console.log(pos);
     drawingState.lastPos = pos;
   }
 });
@@ -653,8 +651,8 @@ function getMousePos(e) {
  * Simplifies a list of frames by removing redundant color and radius properties.
  * Converts hex color values to RGB arrays for frames of type 'line'.
  *
- * @param {Array} frames - The array of frame objects to be processed. Each frame object should have a 'type' property and, if the type is 'line', may have 'color' and 'radius' properties.
- * @returns {Array} - The modified array of frames with redundant properties removed and hex colors converted to RGB.
+ * :param {Array} frames - The array of frame objects to be processed. Each frame object should have a 'type' property and, if the type is 'line', may have 'color' and 'radius' properties.
+ * :returns {Array} - The modified array of frames with redundant properties removed and hex colors converted to RGB.
  */
 
 function parseFrames(frames) {
@@ -667,11 +665,12 @@ function parseFrames(frames) {
     radius = null;
   frames.forEach((frame, i) => {
     if (frame.type == "line") {
+      console.log("f", frame);
       frame.color = hexToRGB(frame.color);
       if (frame.color == color) delete frames[i].color;
+      else color = frame.color;
       if (frame.radius == radius) delete frames[i].radius;
-      color = frame.color;
-      radius = frame.radius;
+      else radius = frame.radius;
     }
   });
   return frames;
@@ -681,7 +680,7 @@ setInterval(() => {
   if (drawingState.drawFrames.length > 0) {
     const newFrames = parseFrames(drawingState.drawFrames);
     console.log("Envoi du dessin", newFrames);
-    socket.emit("draw", newFrames);
+    socket.send(JSON.stringify({ header: "draw", frames: newFrames }));
     drawingState.drawFrames = [];
   }
 }, 1000);

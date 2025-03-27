@@ -332,80 +332,81 @@ def drawing(MultiGame):
     if MultiGame.me["is_drawer"]:
         if MultiGame.canvas_rect.collidepoint(
                 pygame.mouse.get_pos()):  # Vérifier si le clic est dans la zone de dessin
-            for event in MultiGame.events:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    MultiGame.ALL_FRAMES = tools.split_steps_by_roll_back(
-                        MultiGame.ALL_FRAMES, MultiGame.ROLL_BACK)[0]
-                    MultiGame.STEP_NUM = 0
-                    for frame in MultiGame.ALL_FRAMES:
-                        if frame["type"] in ["new_step", "shape"]:
-                            MultiGame.STEP_NUM += 1
-
-                    MultiGame.ROLL_BACK = 0
-                    MultiGame.second_draw_frames.append({"type": "new_step"})
-                    MultiGame.ALL_FRAMES.append({"type": "new_step"})
-
-                    MultiGame.achievements_manager.new_achievement(0)
-
-                elif MultiGame.mouse_down and event.type == pygame.MOUSEMOTION:
-                    # can draw
-                    if MultiGame.lastMouseDown and 0 < MultiGame.game_remaining_time < CONFIG[
+            # can draw
+            if MultiGame.connected and len(MultiGame.PLAYERS) > 1 and 0 < MultiGame.game_remaining_time < CONFIG[
                             "game_duration"]:
-                        # Position actuelle dans le CANVAS
-                        x2 = event.pos[0] - MultiGame.canvas_rect.x
-                        y2 = event.pos[1] - MultiGame.canvas_rect.y
+                for event in MultiGame.events:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        MultiGame.ALL_FRAMES = tools.split_steps_by_roll_back(
+                            MultiGame.ALL_FRAMES, MultiGame.ROLL_BACK)[0]
+                        MultiGame.STEP_NUM = 0
+                        for frame in MultiGame.ALL_FRAMES:
+                            if frame["type"] in ["new_step", "shape"]:
+                                MultiGame.STEP_NUM += 1
 
-                        # Dessiner une ligne entre last_click et la position
-                        # actuelle
-                        if MultiGame.last_canvas_click and MultiGame.last_canvas_click != (
-                                x2, y2):
-                            x1, y1 = MultiGame.last_canvas_click
+                        MultiGame.ROLL_BACK = 0
+                        MultiGame.second_draw_frames.append({"type": "new_step"})
+                        MultiGame.ALL_FRAMES.append({"type": "new_step"})
 
-                            # Générer les points entre les deux
-                            MultiGame.CANVAS = tools.draw_brush_line(
-                                MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius)
-                            frame = {
-                                "type": "line",
-                                "x1": x1 // MultiGame.pixel_size,
-                                "y1": y1 // MultiGame.pixel_size,
-                                "x2": x2 // MultiGame.pixel_size,
-                                "y2": y2 // MultiGame.pixel_size,
-                                "color": MultiGame.pen_color,
-                                "radius": MultiGame.pen_radius}
-                            MultiGame.second_draw_frames.append(frame)
-                            MultiGame.ALL_FRAMES.append(frame)
+                        MultiGame.achievements_manager.new_achievement(0)
 
-                        # Mettre à jour la dernière position
-                        MultiGame.last_canvas_click = (x2, y2)
+                    elif MultiGame.mouse_down and event.type == pygame.MOUSEMOTION:
+                        if MultiGame.lastMouseDown :
+                            # Position actuelle dans le CANVAS
+                            x2 = event.pos[0] - MultiGame.canvas_rect.x
+                            y2 = event.pos[1] - MultiGame.canvas_rect.y
 
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    MultiGame.STEP_NUM += 1
+                            # Dessiner une ligne entre last_click et la position
+                            # actuelle
+                            if MultiGame.last_canvas_click and MultiGame.last_canvas_click != (
+                                    x2, y2):
+                                x1, y1 = MultiGame.last_canvas_click
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_z and (
-                            pygame.key.get_mods() & pygame.KMOD_CTRL):  # CTRL+Z
+                                # Générer les points entre les deux
+                                MultiGame.CANVAS = tools.draw_brush_line(
+                                    MultiGame.CANVAS, x1, y1, x2, y2, MultiGame.pen_color, MultiGame.pen_radius)
+                                frame = {
+                                    "type": "line",
+                                    "x1": x1 // MultiGame.pixel_size,
+                                    "y1": y1 // MultiGame.pixel_size,
+                                    "x2": x2 // MultiGame.pixel_size,
+                                    "y2": y2 // MultiGame.pixel_size,
+                                    "color": MultiGame.pen_color,
+                                    "radius": MultiGame.pen_radius}
+                                MultiGame.second_draw_frames.append(frame)
+                                MultiGame.ALL_FRAMES.append(frame)
 
-                        MultiGame.ROLL_BACK = min(
-                            MultiGame.STEP_NUM, MultiGame.ROLL_BACK + 1)
+                            # Mettre à jour la dernière position
+                            MultiGame.last_canvas_click = (x2, y2)
 
-                        tools.update_canva_by_frames(
-                            MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        MultiGame.STEP_NUM += 1
 
-                        tools.send_ws(
-                            MultiGame.WS, {
-                                "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_z and (
+                                pygame.key.get_mods() & pygame.KMOD_CTRL):  # CTRL+Z
 
-                    # CTRL+Y
-                    elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+                            MultiGame.ROLL_BACK = min(
+                                MultiGame.STEP_NUM, MultiGame.ROLL_BACK + 1)
 
-                        MultiGame.ROLL_BACK = max(0, MultiGame.ROLL_BACK - 1)
+                            tools.update_canva_by_frames(
+                                MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
-                        tools.update_canva_by_frames(
-                            MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
+                            tools.send_ws(
+                                MultiGame.WS, {
+                                    "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
-                        tools.send_ws(
-                            MultiGame.WS, {
-                                "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
+                        # CTRL+Y
+                        elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+
+                            MultiGame.ROLL_BACK = max(0, MultiGame.ROLL_BACK - 1)
+
+                            tools.update_canva_by_frames(
+                                MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
+
+                            tools.send_ws(
+                                MultiGame.WS, {
+                                    "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
         # send draw
         if MultiGame.frame_num == CONFIG["fps"] - \

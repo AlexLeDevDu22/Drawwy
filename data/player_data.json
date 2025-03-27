@@ -108,9 +108,9 @@
     }
   ],
   "solo_game_played": 0,
-  "multi_game_played": 0,
-  "num_draws_total": 0,
-  "coins": 0,
+  "multi_game_played": 2,
+  "num_draws_total": 4,
+  "coins": 41,
   "selected_items": {
     "Curseurs": null,
     "Bordures": null,

@@ -1,3 +1,4 @@
+from regex import P
 from shared.ui.common_ui import *
 from shared.utils.common_utils import CustomCursor
 from shared.utils.common_utils import draw_text
@@ -323,7 +324,7 @@ def show_shop(
                         achievement_manager.new_achievement(11)
 
                 # achat des bordures avec les étoiles
-                elif num_stars >= item["stars_needed"]:
+                elif item["category"] == "Bordures" and num_stars >= item["stars_needed"]:
                     PLAYER_DATA["purchased_items"].append(item["index"])
                     PLAYER_DATA["selected_items"][item["category"]
                                                   ] = item["index"]
