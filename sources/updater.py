@@ -120,7 +120,6 @@ def check_for_shop_updates():
         # Télécharger récursivement tous les fichiers/dossiers
         all_path = download_repo_contents(repo)
 
-        print(all_path)
         for p in os.listdir(UPDATE_DIR):
             p = os.path.join(UPDATE_DIR, p)
             if p not in all_path and os.path.isfile(p):

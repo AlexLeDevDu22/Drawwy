@@ -114,13 +114,13 @@
       {
         "index": 6,
         "path": "5.png",
-        "stars": 1,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 7,
         "path": "6.jpg",
-        "stars": 0,
+        "stars": 3,
         "num_try": 0
       },
       {
@@ -252,7 +252,7 @@
       {
         "index": 5,
         "path": "5.png",
-        "stars": 1,
+        "stars": 0,
         "num_try": 0
       },
       {

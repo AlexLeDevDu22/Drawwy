@@ -49,6 +49,10 @@ class SoloPlay:
             (self.canvas_rect.width, self.canvas_rect.height))
         self.canvas_surf.fill(WHITE)
 
+        self.undo_stack = []  # Historique des actions (Undo)
+        self.redo_stack = []  # Historique des actions annulées (Redo)
+
+
         self.achievements_manager = achievements_manager
         self.cursor = cursor
 
@@ -74,10 +78,27 @@ class SoloPlay:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouse_down = True
+                    # Sauvegarde l'état actuel du canvas avant de dessiner
+                    self.undo_stack.append(self.canvas_surf.copy())
+                    # On vide la pile redo, car un nouveau trait invalide l'historique redo
+                    self.redo_stack.clear()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_down = False
                 elif event.type == pygame.MOUSEMOTION:
                     self.mouse_pos = event.pos
+                elif event.type == pygame.KEYDOWN:
+                    # Ctrl + Z -> Annuler
+                    if event.key == pygame.K_z and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        if self.undo_stack:
+                            self.redo_stack.append(self.canvas_surf.copy())  # Sauvegarde pour Redo
+                            self.canvas_surf.blit(self.undo_stack.pop(), (0, 0))  # Restaure l'état précédent
+
+                    # Ctrl + Y -> Rétablir
+                    elif event.key == pygame.K_y and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        if self.redo_stack:
+                            self.undo_stack.append(self.canvas_surf.copy())  # Sauvegarde pour Undo
+                            self.canvas_surf.blit(self.redo_stack.pop(), (0, 0))  # Restaure l'état annulé
+
 
             if self.mouse_down:
                 color = self.color_picker.get_color_at(pygame.mouse.get_pos())

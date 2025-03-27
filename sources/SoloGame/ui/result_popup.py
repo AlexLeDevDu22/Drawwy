@@ -67,6 +67,7 @@ class PopupAnimation:
         for theme in SOLO_THEMES:
             for image in theme["images"]:
                 self.num_stars += image["stars"]
+        print(self.num_stars)
 
         # Système de particules
         self.particles = Confetti()
@@ -106,6 +107,8 @@ class PopupAnimation:
             self.filled_stars = 2
         elif score >= 30:
             self.filled_stars = 1
+
+        self.num_stars += self.filled_stars
 
         self.started = True
 
@@ -188,8 +191,6 @@ class PopupAnimation:
 
                         if self.stars_fill[i] < 100:
                             all_filled = False
-                        else:
-                            self.num_stars += 1
 
                 if all_filled:
                     self.stars_filled = True

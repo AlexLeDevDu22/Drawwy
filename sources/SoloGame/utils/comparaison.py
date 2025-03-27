@@ -1,184 +1,89 @@
 import cv2
 import numpy as np
 import pygame
-import random
 from skimage.metrics import structural_similarity as ssim
-
-
-def simplify_image(
-        image,
-        num_colors=12,
-        contrast_threshold=20,
-        color_boost=1.3,
-        clean_size=3):
-    """
-    Simplifie une image en réduisant le nombre de couleurs, en augmentant la saturation des couleurs faibles, en détectant les zones à faible contraste et en supprimant les petits points.
-
-    Parameters
-    ----------
-    image : array
-        L'image à simplifier.
-    num_colors : int
-        Nombre de couleurs à garder. (défaut: 12)
-    contrast_threshold : int
-
-        Valeur de seuil pour la détection des contrastes. (défaut: 20)
-    color_boost : float
-        Facteur d'ajustement de la saturation. (défaut: 1.3)
-    clean_size : int
-        Taille du noyau pour la suppression des petits points. (défaut: 3)
-
-    Returns
-    -------
-    array
-        L'image simplifiée.
-    """
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convertir BGR en RGB
-    pixels = image.reshape((-1, 3)).astype(np.float32)
-
-    # Réduction des couleurs avec k-means
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
-    _, labels, palette = cv2.kmeans(
-        pixels, num_colors, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-    simplified_image = palette[labels.flatten()].reshape(
-        image.shape).astype(np.uint8)
-
-    # Détection des contrastes
-    gray = cv2.cvtColor(simplified_image, cv2.COLOR_RGB2GRAY)
-    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
-    contrast_map = np.abs(laplacian)
-    low_contrast_mask = contrast_map < contrast_threshold
-
-    # Ajustement de la saturation
-    hsv = cv2.cvtColor(simplified_image, cv2.COLOR_RGB2HSV)
-    h, s, v = cv2.split(hsv)
-    s[low_contrast_mask] = np.clip(s[low_contrast_mask] * color_boost, 0, 255)
-    hsv = cv2.merge([h, s, v])
-    color_boosted_image = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
-
-    # Suppression des petits points
-    kernel = np.ones((clean_size, clean_size), np.uint8)
-    image = cv2.morphologyEx(color_boosted_image, cv2.MORPH_OPEN, kernel)
-
-    return image
-
-
-def extract_important_shapes(image):
-    """
-    Extrait les contours importants d'une image.
-
-    Utilise une threshold adaptative pour détecter les contours, puis dilate l'image pour
-    fermer les petits espaces et élargir les contours.
-
-    Parameters
-    ----------
-    image : array
-        L'image en entrée.
-
-    Returns
-    -------
-    array
-        L'image avec les contours importants.
-    """
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    adaptive_thresh = cv2.adaptiveThreshold(
-        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-    kernel = np.ones((3, 3), np.uint8)
-    edges = cv2.dilate(adaptive_thresh, kernel, iterations=1)
-    return edges
-
+from sympy import im
 
 def compare_images(solo_class, img1_path, img2_surface):
     """
-    Compare two images and return a score based on the similarity of the shapes.
+    Compare two images (an image path and a Pygame surface) to calculate a similarity score.
+    The score is based on the following criteria:
+    1. Contours: Verifies that the overall shape is respected using the Canny edge detector.
+    2. Drawing ratio: Verifies that the quantity of drawing is similar to the model.
+    3. Color comparison: Compares the color histogram of the drawing, ignoring the white background.
+    4. Global structure comparison: Compares the global structure of the drawing using the Structural Similarity Index (SSIM).
+    The final score is a weighted sum of these criteria, with the following weights:
+    - Similarity: 50%
+    - Contours: 40%
+    - Drawing ratio: 20%
+    - Color comparison: 10%
+    The score is expressed as a percentage and is stored in the solo_class instance.
 
-    Parameters
-    ----------
-    solo_class : SoloGame
-        The SoloGame instance to store the result in.
-    img1_path : str
-        The path to the first image.
-    img2_surface : pygame.Surface
-        The second image as a pygame surface.
-
-    Returns
-    -------
-    int
-        A score between 0 and 100 based on the similarity of the shapes.
-
-    Notes
-    -----
-    The comparison is done in the following steps:
-    1. Simplification of the images to reduce the number of colors.
-    2. Extraction of the important shapes using an adaptive threshold.
-    3. Comparison of the shapes using the SSIM metric.
-    4. Calculation of the surface ratio between the two images.
-    5. Comparison of the global pixel values to detect major differences.
-    6. Comparison of the colors in the important zones.
-    7. Final score calculation based on the above steps.
+    :param solo_class: The SoloGame instance to store the similarity score in.
+    :param img1_path: The path to the reference image.
+    :param img2_surface: The Pygame surface to compare with the reference image.
+    :return: The similarity score as a percentage.
     """
     solo_class.similarity_score = -1
 
-    img1 = cv2.imread(img1_path)
-    img1 = simplify_image(img1, num_colors=6)
+    # Charger l'image de référence et la convertir en niveaux de gris
+    ref_img = cv2.imread(img1_path)
+    ref_gray = cv2.cvtColor(ref_img, cv2.COLOR_BGR2GRAY)
 
-    img2 = pygame.surfarray.array3d(img2_surface)
-    img2 = np.transpose(img2, (1, 0, 2))
-    img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
-    img2 = simplify_image(img2, num_colors=6)
+    # Convertir la surface pygame en image OpenCV
+    img2_surface_bytes = pygame.image.tostring(img2_surface, "RGB")
+    player_img = np.frombuffer(img2_surface_bytes, dtype=np.uint8).reshape((img2_surface.get_height(), img2_surface.get_width(), 3))
+    player_gray = cv2.cvtColor(player_img, cv2.COLOR_RGB2GRAY)
 
-    # Extraction des formes importantes
-    edges1 = extract_important_shapes(img1)
-    edges2 = extract_important_shapes(img2)
+    # Redimensionner à la même taille
+    player_gray = cv2.resize(player_gray, (ref_gray.shape[1], ref_gray.shape[0]))
+    player_img = cv2.resize(player_img, (ref_img.shape[1], ref_img.shape[0]))
 
-    # Vérification si le dessin est presque vide
-    white_ratio = np.mean(img2) / 255  # % de blanc dans l'image
-    if white_ratio > 0.9 or np.mean(edges2) < 5:
-        solo_class.similarity_score = random.randint(1, 5)
-        solo_class.similarity_score_ready = True
-        return 5
+    # --- 1. Contours : Vérifier si la forme générale est respectée ---
+    ref_edges = cv2.Canny(ref_gray, 50, 150)
+    player_edges = cv2.Canny(player_gray, 50, 150)
+    edge_similarity, _ = ssim(ref_edges, player_edges, full=True)
 
-    # Comparaison des formes (SSIM)
-    ssim_score, _ = ssim(edges1, edges2, full=True)
-    shape_score = ssim_score * 100
+    # --- 2. Vérifier la quantité de dessin par rapport au modèle ---
+    ref_non_white = np.count_nonzero(ref_gray < 250)
+    player_non_white = np.count_nonzero(player_gray < 250)
+    drawing_ratio = min(1, player_non_white / max(1, ref_non_white))  # Évite division par 0
 
-    # Calcul du taux de remplissage
-    nonzero1 = np.count_nonzero(edges1)
-    nonzero2 = np.count_nonzero(edges2)
+    # --- 3. Comparaison de couleur mais en ignorant le fond blanc ---
+    mask_ref = (ref_gray < 250)  # Pixels dessinés dans le modèle
+    mask_player = (player_gray < 250)  # Pixels dessinés par le joueur
 
-    if nonzero2 == 0:
-        solo_class.similarity_score = 0
-        solo_class.similarity_score_ready = True
-        return 0
+    if np.count_nonzero(mask_ref) > 0 and np.count_nonzero(mask_player) > 0:
+        # On garde uniquement les pixels non blancs pour l'histogramme
+        ref_pixels = ref_img[mask_ref]
+        player_pixels = player_img[mask_player]
 
-    surface_ratio = min(nonzero2 / nonzero1, nonzero1 / nonzero2) * 100
-    surface_score = max(0, surface_ratio)
-
-    # Comparaison des pixels globaux pour détecter les différences majeures
-    pixel_diff = np.mean(
-        np.abs(img1.astype("float") - img2.astype("float"))) / 255
-    # Si les pixels sont trop différents, baisse la note
-    pixel_penalty = max(0, (1 - pixel_diff) * 100)
-
-    # Comparaison des couleurs dans les zones importantes
-    mask = edges1 > 0
-    img1_colors = img1[mask]
-    img2_colors = img2[mask]
-
-    if len(img1_colors) > 0 and len(img2_colors) > 0:
-        diff_color = np.mean(
-            np.abs(
-                img1_colors.astype("float") -
-                img2_colors.astype("float")))
-        color_score = max(0, 100 - diff_color * 0.2)
+        # Vérifier si les matrices ne sont pas vides
+        if ref_pixels.shape[0] > 0 and player_pixels.shape[0] > 0:
+            ref_color_hist = cv2.calcHist([ref_pixels], [0], None, [8], [0, 256])
+            player_color_hist = cv2.calcHist([player_pixels], [0], None, [8], [0, 256])
+            color_similarity = cv2.compareHist(ref_color_hist, player_color_hist, cv2.HISTCMP_CORREL)
+        else:
+            color_similarity = 0  # Si les images sont vides après filtrage
     else:
-        color_score = 50
+        color_similarity = 0  # Si rien n'est dessiné
 
-    # Score final équilibré
-    final_score = min(int((shape_score * 0.5) + (surface_score * 0.3) +
-                      (color_score * 0.3) - (pixel_penalty * 0.1)*1.2), 100)
+    # --- 4. Comparaison globale de la structure du dessin ---
+    similarity, _ = ssim(ref_gray, player_gray, full=True)
 
-    solo_class.similarity_score = final_score
+    # --- 5. Score final avec meilleures pondérations ---
+    score = (similarity * 0.5 + edge_similarity * 0.4 + drawing_ratio * 0.2 + color_similarity * 0.1) * 100
+
+    # Appliquer des pénalités sévères si contours ou dessin absent
+    if drawing_ratio < 0.3:  # Si moins de 30% du modèle est dessiné
+        score *= 0.5
+    if edge_similarity < 0.2:  # Si les formes sont trop différentes
+        score *= 0.5
+
+    # Normaliser entre 0 et 100
+    score = max(0, min(100, int(score)))
+
+    solo_class.similarity_score = score
     solo_class.similarity_score_ready = True
 
-    return final_score
+    return score
