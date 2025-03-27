@@ -25,6 +25,7 @@ websockets = set()
 
 loop = None
 
+
 async def handle_websocket(request):
     """
     Handle a WebSocket connection.
@@ -48,7 +49,7 @@ async def handle_websocket(request):
     # Ajouter le WebSocket à la liste
     websockets.add(ws)
 
-    try: 
+    try:
         async for message in ws:
             data = message.json()
 
@@ -74,13 +75,14 @@ async def handle_websocket(request):
         websockets.remove(ws)
         return ws
 
+
 async def handle_disconnect(ws):
     """
     Handles the disconnection of a player.
 
     This function is called when a WebSocket connection is closed. It removes the player associated
     with the given WebSocket from the players list and performs necessary cleanup, such as removing
-    the player's avatar file. It broadcasts a message to inform other players of the disconnection 
+    the player's avatar file. It broadcasts a message to inform other players of the disconnection
     and starts a new game if the disconnected player was the current drawer.
 
     Parameters:
@@ -92,11 +94,11 @@ async def handle_disconnect(ws):
         # Trouver le joueur qui s'est déconnecté
         for i, player in enumerate(players):
             if player["ws"] == ws:
-                print(f"Joueur {player['pseudo']} déconnecté")
                 if player["avatar"]["type"] == "matrix" and os.path.exists(
-                    f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
-                    os.remove(f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
-                 
+                        f"sources/MultiGame/web/temp-assets/avatars/{player['pid']}.bmp"):
+                    os.remove(
+                        f"sources/MultiGame/web/temp-assets/avatars/{player["pid"]}.bmp")
+
                 players.pop(i)
                 break
 
@@ -144,21 +146,21 @@ async def handle_join(data, ws):
 
     # Envoyer l'ID du joueur et l'état initial du jeu
     await broadcast({
-            "header": "welcome",
-            "pid": pid,
-            "players": [{"pid": p["pid"],
-                        "pseudo": p["pseudo"],
-                        "avatar": p["avatar"],
-                        "points": p["points"],
-                        "found": p["found"]} for p in players],
-            "sentence": sentences_list[-1],
-            "drawer_pid": drawer_pid,
-            "all_frames": all_frames,
-            "messages": guess_list,
-            "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
-            "roll_back": roll_back},
-          target_pid = pid
-          )
+        "header": "welcome",
+        "pid": pid,
+        "players": [{"pid": p["pid"],
+                     "pseudo": p["pseudo"],
+                     "avatar": p["avatar"],
+                     "points": p["points"],
+                     "found": p["found"]} for p in players],
+        "sentence": sentences_list[-1],
+        "drawer_pid": drawer_pid,
+        "all_frames": all_frames,
+        "messages": guess_list,
+        "new_game": last_game_start.isoformat() if len(players) > 1 and last_game_start else False,
+        "roll_back": roll_back},
+        target_pid=pid
+    )
 
     # enregistrer l'avatar
     if data["avatar"]["type"] == "matrix":
@@ -230,7 +232,7 @@ async def handle_draw(data):
     Parameters:
     data (dict): The data sent by the player, containing drawing information to update the canvas.
     """
-    
+
     global all_frames
 
     all_frames += data["frames"]
@@ -312,6 +314,7 @@ async def handle_guess(message):
     if len(players) > 1 and all(list_found):
         await handle_new_game()
 
+
 async def handle_emote(message):
     """
     Handle an emote message.
@@ -340,6 +343,7 @@ async def handle_emote(message):
 
     await broadcast(message)
 
+
 async def broadcast(message, skip_id=None, target_pid=None):
     """
     Broadcast a message to all connected players.
@@ -355,8 +359,10 @@ async def broadcast(message, skip_id=None, target_pid=None):
         the message is sent to all players except the one with skip_id.
     """
     for player in players:
-        if player["pid"] != skip_id and (target_pid is None or player["pid"] == target_pid):
+        if player["pid"] != skip_id and (
+                target_pid is None or player["pid"] == target_pid):
             await player["ws"].send_json(message)
+
 
 def get_num_players(request):
     """
@@ -375,10 +381,12 @@ def get_num_players(request):
 
     return web.json_response({"num_players": len(players)})
 
+
 async def redirect_to_index(request):
     """Redirige vers index.html"""
-    raise web.HTTPFound("/index.html") 
-    
+    raise web.HTTPFound("/index.html")
+
+
 async def start_web():
     """
     Starts the web server.
@@ -395,11 +403,11 @@ async def start_web():
     global app, port
 
     app = web.Application()
-    
+
     # Route WebSocket
     app.router.add_get("/ws", handle_websocket)
 
-    app.router.add_get("/", redirect_to_index) 
+    app.router.add_get("/", redirect_to_index)
 
     app.router.add_static("/", "sources/MultiGame/web", show_index=True)
 
@@ -461,12 +469,13 @@ def start_server(serv_name):
     # Lancer Ngrok
     ngrok.kill()
     ngrok.set_auth_token(CONFIG["servers"][server_name]["auth_token"])
-    port=get_free_port()
+    port = get_free_port()
     ngrok.connect(port, domain=CONFIG["servers"][server_name]["domain"])
 
     loop.run_until_complete(start_web())  # Exécuter le serveur
     server_started = True
     loop.run_forever()
+
 
 def stop_server():
     """
@@ -483,8 +492,6 @@ def stop_server():
     if not server_started or not loop:
         return
 
-    print("🛑 Arrêt du serveur...")
-
     async def shutdown():
         global server_started, server_name, ngrok
         # Fermer toutes les WebSockets
@@ -495,17 +502,19 @@ def stop_server():
         if app is not None:
             await app.shutdown()
             await app.cleanup()
-        
+
         ngrok.disconnect(CONFIG["servers"][server_name]["domain"])
 
         server_started = False
 
         # Arrêter toutes les tâches restantes
-        tasks = [t for t in asyncio.all_tasks(loop) if t is not asyncio.current_task()]
+        tasks = [t for t in asyncio.all_tasks(
+            loop) if t is not asyncio.current_task()]
         [t.cancel() for t in tasks]  # Annuler les tâches actives
 
         loop.stop()
     asyncio.run_coroutine_threadsafe(shutdown(), loop)
+
 
 # Fonction pour être compatible avec un import et un lancement direct
 if __name__ == '__main__':

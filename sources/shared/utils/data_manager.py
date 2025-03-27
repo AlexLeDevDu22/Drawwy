@@ -10,11 +10,11 @@ def reload():
     """
     Reloads and updates global data structures from various data sources.
 
-    This function fetches and loads player data, shop items, solo themes, and 
-    configuration settings from JSON and YAML files. Additionally, it processes 
-    emotes from the shop items, distinguishing between image and GIF types, and 
-    prepares them for use in the Pygame environment. Emote images are loaded 
-    directly, while GIFs are processed into frames and their metadata is stored 
+    This function fetches and loads player data, shop items, solo themes, and
+    configuration settings from JSON and YAML files. Additionally, it processes
+    emotes from the shop items, distinguishing between image and GIF types, and
+    prepares them for use in the Pygame environment. Emote images are loaded
+    directly, while GIFs are processed into frames and their metadata is stored
     for animation.
     """
 
@@ -81,8 +81,8 @@ def save_data(*args):
             elif file == "SOLO_THEMES":
                 json.dump(SOLO_THEMES, f, ensure_ascii=False, indent=4)
             else:
-                print(file, " ce fichier n'est pas reconnu")
                 raise ValueError
+
 
 PLAYER_DATA = {}
 SHOP_ITEMS = []

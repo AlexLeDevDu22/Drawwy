@@ -6,7 +6,7 @@ import threading
 
 players_per_server = {serv: None for serv in CONFIG["servers"].keys()}
 
-last_check_players=time.time()
+last_check_players = time.time()
 
 
 def set_player_count(name, server_url):
@@ -44,7 +44,7 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
             - Le nom du serveur choisi (ou None si le joueur n'a pas cliqué).
     """
     global players_per_server, last_check_players
-    
+
     # Titre
     draw_text(
         "Choisissez votre serveur",
@@ -76,7 +76,8 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
         hover = server_rect.collidepoint(mouse_pos) and connected
 
         # Récupérer le nombre de joueurs
-        if players_per_server[server_name] is None or time.time() - last_check_players>5:
+        if players_per_server[server_name] is None or time.time(
+        ) - last_check_players > 5:
             if players_per_server[server_name] is None:
                 players_per_server[server_name] = -1
             threading.Thread(
@@ -87,7 +88,7 @@ def choice_server(screen, W, H, mouse_pos, mouse_click, connected, buttons):
                     server["domain"],
                 )).start()
             if i == len(CONFIG["servers"]) - 1:
-                last_check_players=time.time()
+                last_check_players = time.time()
 
         # Dessiner l'ombre
         pygame.draw.rect(

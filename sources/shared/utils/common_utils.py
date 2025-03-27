@@ -4,6 +4,7 @@ from shared.utils.data_manager import *
 import pygame
 import os
 
+
 def draw_text(text, font, color, surface, x, y, shadow=False):
     """
     Dessine un texte sur une surface pygame.
@@ -22,7 +23,10 @@ def draw_text(text, font, color, surface, x, y, shadow=False):
     textrect.center = (x, y)
     if shadow:
         text_obj_shadow = font.render(text, True, DARK_GRAY)
-        surface.blit(text_obj_shadow, (textrect.x + 2, textrect.y + 2))  # Ombre
+        surface.blit(
+            text_obj_shadow,
+            (textrect.x + 2,
+             textrect.y + 2))  # Ombre
     surface.blit(textobj, textrect)
 
 
@@ -76,11 +80,11 @@ class AchievementManager:
             anim_offset = 0
 
             if self.start_time + 4000 > pygame.time.get_ticks():
-                anim_offset = (self.width + 50) * min((pygame.time.get_ticks() -
-                                                       self.start_time) / 1000, 1) - (self.width + 50)
+                anim_offset = (self.width + 50) * min((pygame.time.get_ticks() - \
+                               self.start_time) / 1000, 1) - (self.width + 50)
             else:
-                anim_offset = (self.width + 50) * max((self.start_time + 5000 -
-                                                       pygame.time.get_ticks()) / 1000, 0) - (self.width + 50)
+                anim_offset = (self.width + 50) * max((self.start_time + 5000 - \
+                               pygame.time.get_ticks()) / 1000, 0) - (self.width + 50)
 
             box_rect_achievement = pygame.Rect(
                 50 + anim_offset, self.H - 230, self.width, self.height)

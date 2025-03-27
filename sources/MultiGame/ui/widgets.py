@@ -92,7 +92,7 @@ def players(MultiGame):
         image_texte,
         (4.5 / 100 * MultiGame.W,
          5.5 / 100 * MultiGame.H))
-    
+
     pygame.draw.rect(
         MultiGame.screen,
         ORANGE,
@@ -159,7 +159,7 @@ def players(MultiGame):
                 MultiGame.screen.blit(
                     player["avatar"]["pygame_border"],
                     (dico_co[i][1][0] - 3,
-                    dico_co[i][1][1] - 3))
+                     dico_co[i][1][1] - 3))
 
             if player["avatar"]["type"] == "matrix" and (
                     "pygame_image" not in player["avatar"].keys()):
@@ -301,7 +301,7 @@ def sentence(MultiGame):
                 image_texte = MEDIUM_FONT.render(
                     " " + ligne + " ", True, (20, 10, 10))
                 if (not MultiGame.me["found"]
-                        ) and not MultiGame.me["is_drawer"]:
+                    ) and not MultiGame.me["is_drawer"]:
                     image_texte = tools.flou(image_texte)
                 MultiGame.screen.blit(
                     image_texte, (0.026 * MultiGame.W, Y_START + (i * (font_size + 2))))
@@ -325,7 +325,7 @@ def drawing(MultiGame):
         MultiGame.screen.blit(
             MultiGame.CANVAS,
             (MultiGame.canvas_rect.x,
-            MultiGame.canvas_rect.y))
+             MultiGame.canvas_rect.y))
     pygame.draw.rect(MultiGame.screen, BLACK, MultiGame.canvas_rect, 1)
 
     #! drawing
@@ -392,7 +392,8 @@ def drawing(MultiGame):
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
                         tools.send_ws(
-                            MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
+                            MultiGame.WS, {
+                                "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
                     # CTRL+Y
                     elif event.key == pygame.K_y and (pygame.key.get_mods() & pygame.KMOD_CTRL):
@@ -403,14 +404,16 @@ def drawing(MultiGame):
                             MultiGame, MultiGame.ALL_FRAMES, delay=False, reset=True)
 
                         tools.send_ws(
-                            MultiGame.WS, {"header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
+                            MultiGame.WS, {
+                                "header": "roll_back", "roll_back": MultiGame.ROLL_BACK})
 
         # send draw
         if MultiGame.frame_num == CONFIG["fps"] - \
                 1 and MultiGame.second_draw_frames != []:
             tools.send_ws(
-                MultiGame.WS, {"header": "draw", "frames": tools.simplify_frames(
-                    MultiGame.second_draw_frames)})  # send draw
+                MultiGame.WS, {
+                    "header": "draw", "frames": tools.simplify_frames(
+                        MultiGame.second_draw_frames)})  # send draw
             MultiGame.second_draw_frames = []
 
 
@@ -532,7 +535,10 @@ def chat(MultiGame):
         Instance of the MultiGame class.
 
     """
-    guess_line = tools.lines_return(MultiGame.guess, MEDIUM_FONT, 0.15 * MultiGame.W)
+    guess_line = tools.lines_return(
+        MultiGame.guess,
+        MEDIUM_FONT,
+        0.15 * MultiGame.W)
     input_box = pygame.Rect(0.82 *
                             MultiGame.W, 0.9533 *
                             MultiGame.H -
@@ -542,7 +548,6 @@ def chat(MultiGame):
                             MultiGame.W, max(40, 15 +
                                              20 *
                                              len(guess_line)))
-
 
     # Mise à jour visuelle
     min_y = 0.4083 * \
@@ -655,7 +660,7 @@ def chat(MultiGame):
      # emotes
     emotes = [PYGAME_EMOTES[e] for e in PLAYER_DATA["purchased_items"]
               if SHOP_ITEMS[e]["category"] == "Emotes"]
-    
+
     if len(emotes) > 0 and MultiGame.is_connected:
         emote_icon = pygame.image.load("assets/emote_icon.png").convert_alpha()
         emote_icon = pygame.transform.scale(emote_icon, (30, 30))
@@ -670,13 +675,12 @@ def chat(MultiGame):
         emotes_rect_size = (num_emotes_column * (emote_size + emote_margin),
                             num_emotes_rows * (emote_size + emote_margin))
 
-        emotes_rect = pygame.Rect(input_box.x -
-                                emotes_rect_size[0] //
-                                2, input_box.y -
-                                45 -
-                                (emote_size +
-                                emote_margin) *
-                                num_emotes_rows, emotes_rect_size[0], emotes_rect_size[1])
+        emotes_rect = pygame.Rect(
+            input_box.x - emotes_rect_size[0] // 2,
+            input_box.y - 45 - (
+                emote_size + emote_margin) * num_emotes_rows,
+            emotes_rect_size[0],
+            emotes_rect_size[1])
 
         if MultiGame.show_emotes:
             pygame.draw.rect(
@@ -706,10 +710,10 @@ def chat(MultiGame):
                                 pygame.mouse.get_pos()):
                             e_mess = {"header": "new_message",
                                       "type": "emote",
-                                    "pid": MultiGame.PLAYER_ID,
-                                    "pseudo": MultiGame.me["pseudo"],
-                                    "emote_path": emote["image_path"].split("/")[-1],
-                                    "emote_index": emote["index"]}
+                                      "pid": MultiGame.PLAYER_ID,
+                                      "pseudo": MultiGame.me["pseudo"],
+                                      "emote_path": emote["image_path"].split("/")[-1],
+                                      "emote_index": emote["index"]}
                             tools.send_ws(MultiGame.WS, e_mess)
                             MultiGame.MESSAGES.append(e_mess)
 
@@ -725,12 +729,12 @@ def chat(MultiGame):
         if event.type == pygame.KEYDOWN and MultiGame.guess_input_active:
             if event.key == pygame.K_RETURN and MultiGame.guess.strip():
                 tools.send_ws(MultiGame.WS,
-                               {"header": "new_message",
-                                   "type": "guess",
-                                "pid": MultiGame.PLAYER_ID,
-                                "pseudo": MultiGame.me["pseudo"],
-                                   "message": MultiGame.guess,
-                                   "remaining_time": MultiGame.game_remaining_time})  # send message
+                              {"header": "new_message",
+                               "type": "guess",
+                               "pid": MultiGame.PLAYER_ID,
+                               "pseudo": MultiGame.me["pseudo"],
+                               "message": MultiGame.guess,
+                               "remaining_time": MultiGame.game_remaining_time})  # send message
                 MultiGame.MESSAGES.append({"type": "guess",
                                            "pid": MultiGame.PLAYER_ID,
                                            "pseudo": MultiGame.me["pseudo"],

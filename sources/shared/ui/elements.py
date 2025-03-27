@@ -75,7 +75,8 @@ class Button:
         :param locked: Si le bouton est verrouill , il n'est pas cliquable.
         :type locked: bool
         """
-        self.hover = self.rect.collidepoint(mouse_pos) and self.active and not locked
+        self.hover = self.rect.collidepoint(
+            mouse_pos) and self.active and not locked
 
         color = SOFT_ORANGE if self.hover else (
             ORANGE if self.active else self.disabled_color)
@@ -165,7 +166,6 @@ class Particle:
                 self.y)), int(
                 self.size))
 
-import pygame
 
 class ColorPicker:
     def __init__(self, x, y, width, height, color_steps=30, dark_steps=12):
@@ -186,7 +186,7 @@ class ColorPicker:
         :type dark_steps: int
         """
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_steps = color_steps  
+        self.color_steps = color_steps
         self.dark_steps = dark_steps + 1  # Une ligne de plus pour les gris
         self.colors = self.generate_colors()
         self.selected_color = None
@@ -212,13 +212,15 @@ class ColorPicker:
         colors.append(gray_row)
 
         # Les autres lignes = Teintes colorées
-        for j in range(self.dark_steps - 1):  
+        for j in range(self.dark_steps - 1):
             row = []
             for i in range(self.color_steps):
                 hue = i / self.color_steps * 360  # Teinte (HSV)
 
                 saturation = 100
-                brightness = 100 * ((self.dark_steps - 1 - j) / (self.dark_steps - 1)) ** 0.9  # Adoucissement de la transition
+                # Adoucissement de la transition
+                brightness = 100 * \
+                    ((self.dark_steps - 1 - j) / (self.dark_steps - 1)) ** 0.9
 
                 color = pygame.Color(0)
                 color.hsva = (hue, saturation, brightness)
@@ -255,7 +257,8 @@ class ColorPicker:
         # Indiquer la couleur sélectionnée
         if self.selected_color and self.selected_pos:
             px, py = self.selected_pos
-            pygame.draw.rect(surface, (255, 255, 255), (px, py, step_w, step_h), 2)
+            pygame.draw.rect(surface, (255, 255, 255),
+                             (px, py, step_w, step_h), 2)
 
     def get_color_at(self, pos):
         """

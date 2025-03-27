@@ -10,7 +10,7 @@ from shared.ui.common_ui import *
 def is_connected():
     """
     Vérifie si l'ordinateur est connect  internet.
-    
+
     Cette fonction tente de se connecter au serveur DNS public de Google
     (8.8.8.8) sur le port 53 et renvoie True si la connexion est établie
     et False sinon.
@@ -64,7 +64,7 @@ def apply_circular_mask(image):
     # Créer un masque avec canal alpha
     """
     Applique un masque circulaire avec transparence à une image Pygame.
-    
+
     La fonction crée un masque circulaire avec un canal alpha, le dessine sur
     une surface Pygame, puis applique ce masque sur l'image en utilisant la
     fonction `blit` avec le drapeau `BLEND_RGBA_MULT`. Cela permet de donner

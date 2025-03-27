@@ -64,7 +64,6 @@ class BackgroundElement:
             self.draw_cloud(surface)
 
     def draw_flower(self, surface):
-        
         """
         Dessine une fleur sur la surface donnée.
 

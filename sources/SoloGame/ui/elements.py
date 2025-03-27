@@ -7,6 +7,7 @@ import math
 import random
 from shared.ui.common_ui import *
 
+
 class FloatingObject:
     def __init__(self, x, y, size, color, speed, W):
         """
@@ -218,14 +219,18 @@ class Confetti:
                 )
 
                 # Rotation du confetti
-                rotated_surface = pygame.transform.rotate(rect_surface, particle['rotation'])
-                rotated_rect = rotated_surface.get_rect(center=(particle['x'], particle['y']))
+                rotated_surface = pygame.transform.rotate(
+                    rect_surface, particle['rotation'])
+                rotated_rect = rotated_surface.get_rect(
+                    center=(particle['x'], particle['y']))
                 surface.blit(rotated_surface, rotated_rect)
 
             else:
                 # Utiliser une surface temporaire pour l'alpha
-                temp_surface = pygame.Surface((particle['size'] * 2, particle['size'] * 2), pygame.SRCALPHA)
-                temp_surface.fill((0, 0, 0, 0))  # Rendre la surface transparente 
+                temp_surface = pygame.Surface(
+                    (particle['size'] * 2, particle['size'] * 2), pygame.SRCALPHA)
+                # Rendre la surface transparente
+                temp_surface.fill((0, 0, 0, 0))
                 color = tuple(map(int, particle['color'])) + (alpha,)
                 gfxdraw.filled_circle(
                     temp_surface,
@@ -234,4 +239,6 @@ class Confetti:
                     int(particle['size']),  # Déjà converti, c'est bien
                     (*particle['color'], alpha)
                 )
-                surface.blit(temp_surface, (int(particle['x'] - particle['size']), int(particle['y'] - particle['size'])))
+                surface.blit(temp_surface,
+                             (int(particle['x'] - particle['size']),
+                              int(particle['y'] - particle['size'])))

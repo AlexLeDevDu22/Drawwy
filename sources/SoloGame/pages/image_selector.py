@@ -190,10 +190,13 @@ class ImageCarousel:
                 scaled_img, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
             # image stars
-            size = self.star_icon.get_height()*max(0.3, scale_factor)
+            size = self.star_icon.get_height() * max(0.3, scale_factor)
             for j in range(self.theme["images"][i]["stars"]):
-                star_icon = pygame.transform.scale(self.star_icon, (size, size))
-                img_surface.blit(star_icon, (10 + j * int(size*1.25), scaled_img.get_height() - 8 - size))
+                star_icon = pygame.transform.scale(
+                    self.star_icon, (size, size))
+                img_surface.blit(star_icon,
+                                 (10 + j * int(size * 1.25),
+                                  scaled_img.get_height() - 8 - size))
 
             # Blitter l'image arrondie sur la surface principale
             surface.blit(
@@ -354,7 +357,6 @@ def image_selector(screen, cursor, theme):
 
         start_drawing_button.active = image_roulette.selected_image is not None and not image_roulette.is_spinning
 
-
         # Mettre à jour les objets flottants
         for obj in floating_objects:
             obj.update()
@@ -368,7 +370,6 @@ def image_selector(screen, cursor, theme):
         # Dessiner les objets flottants
         for obj in floating_objects:
             obj.draw(screen)
-
 
         # Dessiner le sous-titre avec le thème sélectionné
         subtitle = BUTTON_FONT.render(f"Theme: {theme["name"]}", True, WHITE)

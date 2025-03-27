@@ -9,10 +9,12 @@ import random
 random_seed = random.randint(0, 1000)
 
 state = {
-            "current_page": 0,
-            "selected_category": "Tous",
-            "selection_mode": False
-        }
+    "current_page": 0,
+    "selected_category": "Tous",
+    "selection_mode": False
+}
+
+
 def show_shop(
         screen,
         cursor,
@@ -60,7 +62,7 @@ def show_shop(
                      (main_panel_x, main_panel_y,
                       main_panel_width, main_panel_height),
                      border_radius=40)
-    
+
     # Etoiles
     num_stars = 0
     for theme in SOLO_THEMES:
@@ -77,8 +79,20 @@ def show_shop(
             76))
     screen.blit(star_icon, star_icon_rect)
 
-    draw_text("X"+str(num_stars), MEDIUM_FONT, BLACK, screen,
-              main_panel_x + 142 + MEDIUM_FONT.size("X"+str(num_stars))[0] // 2, main_panel_y + 78)
+    draw_text(
+        "X" +
+        str(num_stars),
+        MEDIUM_FONT,
+        BLACK,
+        screen,
+        main_panel_x +
+        142 +
+        MEDIUM_FONT.size(
+            "X" +
+            str(num_stars))[0] //
+        2,
+        main_panel_y +
+        78)
 
     # Titre
     draw_text("BOUTIQUE", BUTTON_FONT, GRAY, screen,
@@ -151,7 +165,8 @@ def show_shop(
     filtered_SHOP_ITEMS = [item for item in SHOP_ITEMS if state["selected_category"]
                            == "Tous" or item["category"] == state["selected_category"]]
 
-    # Mélanger les SHOP_ITEMS (toujours de la meme maniere) si la catégorie est "Tous"
+    # Mélanger les SHOP_ITEMS (toujours de la meme maniere) si la catégorie
+    # est "Tous"
     if state["selected_category"] == "Tous":
         random.seed(random_seed)
         random.shuffle(filtered_SHOP_ITEMS)
@@ -174,7 +189,8 @@ def show_shop(
     for i in range(min(SHOP_ITEMS_per_page,
                        len(filtered_SHOP_ITEMS) - start_idx)):
         item = filtered_SHOP_ITEMS[start_idx + i]
-        item_x = (W-item_margin)//2 - item_width + (i % 2) * (item_width + item_margin)
+        item_x = (W - item_margin) // 2 - item_width + \
+            (i % 2) * (item_width + item_margin)
         item_y = main_panel_y + 220 + (i // 2) * (item_height + item_margin)
 
         # Animation de survol
@@ -201,10 +217,10 @@ def show_shop(
         # Image de l'item
         if item["category"] == "Emotes":
             tools.show_emote(screen,
-                            PYGAME_EMOTES[item["index"]],
-                            item_x + 20,  # Déplacer l'image vers la gauche
-                            item_y + item_height // 2 - 50,
-                            100)
+                             PYGAME_EMOTES[item["index"]],
+                             item_x + 20,  # Déplacer l'image vers la gauche
+                             item_y + item_height // 2 - 50,
+                             100)
         else:
             item_img = pygame.image.load(item["image_path"])
             item_img = pygame.transform.scale(item_img, (100, 100))
@@ -215,7 +231,7 @@ def show_shop(
 
         # Nom de l'item
         draw_text(item["name"], SMALL_FONT, BLACK, screen,
-                item_x + 290, item_y + 40)  # Déplacer le texte plus à droite
+                  item_x + 290, item_y + 40)  # Déplacer le texte plus à droite
 
         # Description de l'item
         draw_text(item["description"], VERY_SMALL_FONT, GRAY, screen,
@@ -225,10 +241,10 @@ def show_shop(
         if "rarity" in item:
             # Définir la couleur selon la rareté
             rarity_colors = {
-                "Commun": (30, 180, 60),      # Gris foncé, neutre et terne  
-                "Rare": (30, 80, 255),          # Bleu profond, plus distinct  
-                "Epique": (160, 40, 220),         # Violet intense  
-                "Legendaire": (255, 140, 0)      # Or vif, plus saturé  
+                "Commun": (30, 180, 60),      # Gris foncé, neutre et terne
+                "Rare": (30, 80, 255),          # Bleu profond, plus distinct
+                "Epique": (160, 40, 220),         # Violet intense
+                "Legendaire": (255, 140, 0)      # Or vif, plus saturé
             }
 
             rarity_color = rarity_colors.get(item["rarity"], (100, 100, 100))
@@ -258,15 +274,15 @@ def show_shop(
                     0,
                     0)
                 draw_text(str(item['price']), SMALL_FONT, price_color, screen,
-                        item_x + 220, item_y + 150)
-                coin_icon_rect = coin_icon.get_rect(
-                    center=(item_x + 245 + SMALL_FONT.size(str(item['price']))[0]//2, item_y + 150))
+                          item_x + 220, item_y + 150)
+                coin_icon_rect = coin_icon.get_rect(center=(
+                    item_x + 245 + SMALL_FONT.size(str(item['price']))[0] // 2, item_y + 150))
                 screen.blit(coin_icon, coin_icon_rect)
             else:
-                draw_text(str(item['stars_needed']), SMALL_FONT, (0, 0, 150), screen,
-                        item_x + 220, item_y + 150)
-                coin_icon_rect = star_icon.get_rect(
-                    center=(item_x + 245 + SMALL_FONT.size(str(item['stars_needed']))[0]//2, item_y + 150))
+                draw_text(str(item['stars_needed']), SMALL_FONT,
+                          (0, 0, 150), screen, item_x + 220, item_y + 150)
+                coin_icon_rect = star_icon.get_rect(center=(
+                    item_x + 245 + SMALL_FONT.size(str(item['stars_needed']))[0] // 2, item_y + 150))
                 screen.blit(star_icon, coin_icon_rect)
 
         achievement_manager.draw_popup_if_active(screen)
@@ -282,7 +298,8 @@ def show_shop(
                 if item["category"] != "Bordures" and PLAYER_DATA["coins"] >= item["price"]:
                     PLAYER_DATA["coins"] -= item["price"]
                     PLAYER_DATA["purchased_items"].append(item["index"])
-                    PLAYER_DATA["selected_items"][item["category"]] = item["index"]
+                    PLAYER_DATA["selected_items"][item["category"]
+                                                  ] = item["index"]
                     if item["category"] == "Curseurs":
                         cursor = CustomCursor(item["image_path"])
 
@@ -290,10 +307,10 @@ def show_shop(
                     list_cursers = [e["index"] in PLAYER_DATA["purchased_items"]
                                     for e in SHOP_ITEMS if e["category"] == "Curseurs"]
                     list_emotes = [e["index"] in PLAYER_DATA["purchased_items"]
-                                for e in SHOP_ITEMS if e["category"] == "Emotes"]
+                                   for e in SHOP_ITEMS if e["category"] == "Emotes"]
                     list_all = [e["index"] in PLAYER_DATA["purchased_items"]
                                 for e in SHOP_ITEMS]
-                    
+
                     if item["category"] == "Curseurs":
                         achievement_manager.new_achievement(5)
                     if all(list_cursers):
@@ -305,17 +322,19 @@ def show_shop(
                     if all(list_all):
                         achievement_manager.new_achievement(11)
 
-                elif num_stars >= item["stars_needed"]: # achat des bordures avec les étoiles
+                # achat des bordures avec les étoiles
+                elif num_stars >= item["stars_needed"]:
                     PLAYER_DATA["purchased_items"].append(item["index"])
-                    PLAYER_DATA["selected_items"][item["category"]] = item["index"]
+                    PLAYER_DATA["selected_items"][item["category"]
+                                                  ] = item["index"]
 
                     # achievements avec les bordures
                     list_borders = [e["index"] in PLAYER_DATA["purchased_items"]
-                                for e in SHOP_ITEMS if e["category"] == "Bordures"]
+                                    for e in SHOP_ITEMS if e["category"] == "Bordures"]
                     achievement_manager.new_achievement(7)
                     if all(list_borders):
                         achievement_manager.new_achievement(8)
-                
+
                 save_data("PLAYER_DATA")
 
     # Boutons de pagination

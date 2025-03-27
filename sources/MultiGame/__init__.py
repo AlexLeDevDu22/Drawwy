@@ -1,3 +1,4 @@
+from numpy import save
 from shared.ui.common_ui import *
 from MultiGame.ui.widgets import *
 from shared.ui.elements import ColorPicker, Button
@@ -107,24 +108,28 @@ class MultiGame:
             self.pixel_size = zone_w // CONFIG["canvas_width"]
             self.pixel_size = zone_h // CONFIG["canvas_height"]
 
-
-            canvas_x = self.W // 2 - self.pixel_size * CONFIG["canvas_width"] // 2
+            canvas_x = self.W // 2 - self.pixel_size * \
+                CONFIG["canvas_width"] // 2
             canvas_w = self.pixel_size * CONFIG["canvas_width"]
-            canvas_y = self.H // 2 - self.pixel_size * CONFIG["canvas_height"] // 2
+            canvas_y = self.H // 2 - self.pixel_size * \
+                CONFIG["canvas_height"] // 2
             canvas_h = self.pixel_size * CONFIG["canvas_height"]
 
             self.canvas_rect = pygame.Rect(
                 canvas_x, canvas_y, canvas_w, canvas_h)
-            
+
             self.CANVAS = pygame.Surface(
-            (self.canvas_rect.width,
-             self.canvas_rect.height))
+                (self.canvas_rect.width,
+                 self.canvas_rect.height))
             self.CANVAS.fill(WHITE)
-            
+
             self.quit_button = Button(
                 self.W // 2 - 60,
                 self.H - 82,
-                text= "Quitter")
+                text="Quitter")
+
+            PLAYER_DATA["multi_game_played"] += 1
+            save_data("PLAYER_DATA")
 
             while 1:
                 clock.tick(CONFIG["fps"])
@@ -148,7 +153,7 @@ class MultiGame:
 
                     if self.game_remaining_time == 0:  # if game time over
                         if self.me["is_drawer"]:
-                            tools.send_ws(self.WS, {"header":"game_finished"})
+                            tools.send_ws(self.WS, {"header": "game_finished"})
                         self.GAMESTART = datetime.now()
 
                 self.events = pygame.event.get()
@@ -174,7 +179,11 @@ class MultiGame:
 
                 if not self.connected or len(self.PLAYERS) <= 1:
                     text = SMALL_FONT.render(
-                        "Connexion au serveur..." if not self.connected else "En attente de joueurs...", True, (0, 0, 0))
+                        "Connexion au serveur..." if not self.connected else "En attente de joueurs...",
+                        True,
+                        (0,
+                         0,
+                         0))
                     self.screen.blit(
                         text,
                         text.get_rect(
@@ -201,8 +210,8 @@ class MultiGame:
 
                         if self.quit_button.hover:
                             threading.Thread(
-                            target=connection.disconnect, args=(
-                                self,), daemon=True).start()
+                                target=connection.disconnect, args=(
+                                    self,), daemon=True).start()
                             return
                     if event.type == pygame.MOUSEMOTION:
                         if self.mouse_down:

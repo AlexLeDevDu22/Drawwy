@@ -6,8 +6,9 @@ import pygame
 import math
 import random
 
+
 class PopupAnimation:
-    def __init__(self,screen, W,H):
+    def __init__(self, screen, W, H):
         """
         Initialize the PopupAnimation with screen dimensions and set initial states.
 
@@ -90,9 +91,11 @@ class PopupAnimation:
             draw_image (pygame.Surface): L'image du dessin.
         """
         self.model_image = pygame.image.load(model_path)
-        self.model_image = pygame.transform.scale(self.model_image, (self.image_size , self.image_size ))
+        self.model_image = pygame.transform.scale(
+            self.model_image, (self.image_size, self.image_size))
         self.draw_image = draw_image
-        self.draw_image = pygame.transform.scale(self.draw_image, (self.image_size , self.image_size ))
+        self.draw_image = pygame.transform.scale(
+            self.draw_image, (self.image_size, self.image_size))
 
         self.score = int(score)
         # Détermine combien d'étoiles sont remplies
@@ -129,7 +132,7 @@ class PopupAnimation:
 
                 # Créer des particules pour l'entrée
                 if not self.entry_particles_created and self.popup_y > 0:
-                    for _ in range(12*self.filled_stars):
+                    for _ in range(12 * self.filled_stars):
                         self.particles.add_confetti(
                             random.randint(
                                 self.popup_x,
@@ -162,7 +165,8 @@ class PopupAnimation:
                         prev_fill = self.stars_fill[i]
                         self.stars_fill[i] += self.star_animation_speed
 
-                        # Créer des particules quand une étoile est remplie à 100%
+                        # Créer des particules quand une étoile est remplie à
+                        # 100%
                         if prev_fill < 100 and self.stars_fill[i] >= 100:
                             self.stars_fill[i] = 100
 
@@ -185,7 +189,7 @@ class PopupAnimation:
                         if self.stars_fill[i] < 100:
                             all_filled = False
                         else:
-                            self.num_stars+=1
+                            self.num_stars += 1
 
                 if all_filled:
                     self.stars_filled = True
@@ -293,7 +297,7 @@ class PopupAnimation:
         # Blitter la surface transparente sur l'écran
         self.screen.blit(star_surface, (x - size, y - size - 20))
 
-    def draw(self): 
+    def draw(self):
         """
         Draw the popup with its components, including the background, title, score,
         stars, and images. The stars are drawn with their respective fill percentages,
@@ -306,26 +310,33 @@ class PopupAnimation:
                 self.screen,
                 WHITE,
                 (self.popup_x,
-                self.popup_y,
-                self.popup_width,
-                self.popup_height))
+                 self.popup_y,
+                 self.popup_width,
+                 self.popup_height))
             pygame.draw.rect(
                 self.screen,
                 BLACK,
                 (self.popup_x,
-                self.popup_y,
-                self.popup_width,
-                self.popup_height),
+                 self.popup_y,
+                 self.popup_width,
+                 self.popup_height),
                 2)
 
             # Dessiner le titre et le score
             title_surface = BUTTON_FONT.render("Dessin acheve !!", True, BLACK)
-            self.screen.blit(title_surface, (self.popup_x + (self.popup_width -
-                        title_surface.get_width()) // 2, self.popup_y + 30))
+            self.screen.blit(title_surface, (self.popup_x +
+                                             (self.popup_width -
+                                              title_surface.get_width()) //
+                                             2, self.popup_y +
+                                             30))
 
-            score_surface = MEDIUM_FONT.render(f"Score: {self.score}%", True, BLACK)
-            self.screen.blit(score_surface, (self.popup_x + (self.popup_width -
-                        score_surface.get_width()) // 2, self.popup_y + 80))
+            score_surface = MEDIUM_FONT.render(
+                f"Score: {self.score}%", True, BLACK)
+            self.screen.blit(score_surface, (self.popup_x +
+                                             (self.popup_width -
+                                              score_surface.get_width()) //
+                                             2, self.popup_y +
+                                             80))
 
             # Dessiner les étoiles
             star_size = 40
@@ -341,15 +352,15 @@ class PopupAnimation:
                 self.screen.blit(
                     percentage_text,
                     (start_x +
-                    i *
-                    star_spacing -
-                    percentage_text.get_width() //
-                    2 +
-                    star_size //
-                    2,
-                    star_y +
-                    star_size +
-                    20))
+                     i *
+                     star_spacing -
+                     percentage_text.get_width() //
+                     2 +
+                     star_size //
+                     2,
+                     star_y +
+                     star_size +
+                     20))
 
                 self.draw_star(
                     start_x + i * star_spacing + star_size // 2,
@@ -366,10 +377,10 @@ class PopupAnimation:
                 self.screen.blit(
                     star_icon,
                     (self.popup_x +
-                    self.popup_width -
-                    135,
-                    self.popup_y +
-                    18))
+                     self.popup_width -
+                     135,
+                     self.popup_y +
+                     18))
             except BaseException:
                 # Dessiner une étoile simple si l'image n'est pas disponible
                 self.draw_star(
@@ -382,32 +393,44 @@ class PopupAnimation:
                     100)
 
             self.screen.blit(
-                MEDIUM_FONT.render("X"+str(self.num_stars), True, BLACK),
+                MEDIUM_FONT.render("X" + str(self.num_stars), True, BLACK),
                 (self.popup_x +
-                self.popup_width -
-                90,
-                self.popup_y +
-                28))
+                 self.popup_width -
+                 90,
+                 self.popup_y +
+                 28))
 
             # Dessiner les images à droite
-            image_x = self.popup_x + self.popup_width//2 - 20 - self.image_size 
-            image_y = self.popup_y + self.popup_height - 30 - self.image_size 
+            image_x = self.popup_x + self.popup_width // 2 - 20 - self.image_size
+            image_y = self.popup_y + self.popup_height - 30 - self.image_size
 
-            pygame.draw.rect(self.screen, LIGHT_ORANGE, (image_x -2, image_y -2 , self.image_size +4, self.image_size + 4))
+            pygame.draw.rect(
+                self.screen,
+                LIGHT_ORANGE,
+                (image_x - 2,
+                 image_y - 2,
+                 self.image_size + 4,
+                 self.image_size + 4))
             self.screen.blit(self.model_image, (image_x, image_y))
 
             # Flèche entre les images
             arrow_points = [
-                (image_x + self.image_size  + 10, image_y + self.image_size//2 - 20),
-                (image_x + self.image_size  + 30, image_y + self.image_size//2),
-                (image_x + self.image_size  + 10, image_y + self.image_size//2 + 20)
+                (image_x + self.image_size + 10, image_y + self.image_size // 2 - 20),
+                (image_x + self.image_size + 30, image_y + self.image_size // 2),
+                (image_x + self.image_size + 10, image_y + self.image_size // 2 + 20)
             ]
 
             pygame.draw.polygon(self.screen, SOFT_ORANGE, arrow_points)
 
-            pygame.draw.rect(self.screen, ORANGE, (image_x + self.image_size + 38, image_y - 2, self.image_size + 4, self.image_size + 4))
-            self.screen.blit(self.draw_image, (image_x + self.image_size + 40, image_y))
+            pygame.draw.rect(
+                self.screen,
+                ORANGE,
+                (image_x + self.image_size + 38,
+                 image_y - 2,
+                 self.image_size + 4,
+                 self.image_size + 4))
+            self.screen.blit(
+                self.draw_image, (image_x + self.image_size + 40, image_y))
 
             # Dessiner toutes les particules
-            self.particles.draw( self.screen)
-            
+            self.particles.draw(self.screen)

@@ -17,7 +17,7 @@ import threading
 import sys
 import random
 
-if sys.platform.startswith("win"): # pour windows
+if sys.platform.startswith("win"):  # pour windows
     import pygetwindow as gw
 
 # mises à jour du shop
@@ -34,7 +34,7 @@ pygame.display.set_caption("Drawwy")
 clock = pygame.time.Clock()
 running = True
 
-try: # set drawwy to first plan for windows
+try:  # set drawwy to first plan for windows
     gw.getWindowsWithTitle("Drawwy")[0].activate()  # First plan
 except BaseException:
     pass
@@ -90,10 +90,10 @@ while running:
     if nom == ("leleu" or nom == "mr leuleu" or nom ==
                "fred leleu" or nom == "frederic leleu"):
         achievements_manager.new_achievement(14)
-    #achievement id 12 et 13 (money)
-    if PLAYER_DATA["coins"]>= 1_000 and PLAYER_DATA["achievements"][12]["succeed"]== False:
+    # achievement id 12 et 13 (money)
+    if PLAYER_DATA["coins"] >= 1_000 and PLAYER_DATA["achievements"][12]["succeed"] == False:
         achievements_manager.new_achievement(12)
-    if PLAYER_DATA["coins"]>= 10_000 and PLAYER_DATA["achievements"][13]["succeed"]== False:
+    if PLAYER_DATA["coins"] >= 10_000 and PLAYER_DATA["achievements"][13]["succeed"] == False:
         achievements_manager.new_achievement(13)
 
     mouse_pos = pygame.mouse.get_pos()
@@ -169,9 +169,9 @@ while running:
             animation_counter += 1
             title_angle += 0.02
             screen, current_page, buttons = home.show_home(
-    screen, W, H, mouse_pos, mouse_click, title_angle, buttons,
-    title_img, shadow_img, orig_width, orig_height
-)
+                screen, W, H, mouse_pos, mouse_click, title_angle, buttons,
+                title_img, shadow_img, orig_width, orig_height
+            )
         # === CHOIX DU MODE DE JEUX ===
         elif current_page == "play":
             screen, current_page, buttons = play_mode.play_choicer(

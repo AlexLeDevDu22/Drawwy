@@ -15,6 +15,7 @@ UPDATE_DIR = "data/shop"  # Dossier où les nouveaux fichiers seront télécharg
 # Créez une instance de l'API GitHub
 g = Github()
 
+
 def get_last_check():
     """Renvoie la date de la dernière mise à jour connue (None si jamais)"""
     if os.path.exists(LAST_CHECK_FILE):
@@ -51,8 +52,8 @@ def download_repo_contents(repo, path="", local_dir=UPDATE_DIR):
     """
     Télécharge le contenu d'un dépôt GitHub spécifié dans un répertoire local.
 
-    Parcourt de manière récursive les fichiers et dossiers du dépôt à partir d'un chemin donné et 
-    les télécharge dans un répertoire local spécifié. Le chemin local de chaque fichier/dossier 
+    Parcourt de manière récursive les fichiers et dossiers du dépôt à partir d'un chemin donné et
+    les télécharge dans un répertoire local spécifié. Le chemin local de chaque fichier/dossier
     téléchargé est renvoyé.
 
     Args:
@@ -103,7 +104,7 @@ def check_for_shop_updates():
         return
 
     repo = g.get_repo(f"{OWNER}/{REPO}")
-    
+
     # Comparer avec la dernière mise à jour connue
     last_check = get_last_check()
 
@@ -128,9 +129,10 @@ def check_for_shop_updates():
 
         # Mettre à jour la dernière date de mise à jour
         print(f"Mise à jour terminée, fichiers téléchargés dans {UPDATE_DIR}")
-        
+
     set_last_check(datetime.now())
     data.reload()
+
 
 # Créer le dossier de mise à jour si nécessaire
 if not os.path.exists(UPDATE_DIR):

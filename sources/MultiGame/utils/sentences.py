@@ -117,6 +117,7 @@ actions = [
     "qui fait du trampoline sur la Lune",
 ]
 
+
 def new_sentence():
     """
     Return a new sentence composed of a random subject and action.

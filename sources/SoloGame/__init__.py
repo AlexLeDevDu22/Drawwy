@@ -7,6 +7,7 @@ from SoloGame.pages.play import SoloPlay
 from shared.utils.data_manager import *
 import pygame
 
+
 def soloGame(screen, cursor, achievements_manager):
     """
     Lance le mode Solo.
@@ -35,7 +36,9 @@ def soloGame(screen, cursor, achievements_manager):
             screen, soloPage, theme = theme_choicer(screen, cursor)
         elif soloPage == "images":
             screen, soloPage, image = image_selector(screen, cursor, theme)
-            model_path = f"assets/soloImages/{theme['path']}{theme['images'][image]['path']}"
+            model_path = f"assets/soloImages/{
+                theme['path']}{
+                theme['images'][image]['path']}"
         elif soloPage == "play":
             SoloPlay(screen, cursor, model_path, achievements_manager)
             soloPage = "exit"

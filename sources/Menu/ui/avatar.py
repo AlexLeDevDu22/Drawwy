@@ -30,7 +30,8 @@ class AvatarManager:
                 self.avatar_original, (self.avatar_size, self.avatar_size))
         except BaseException:
             # Créer un avatar par défaut
-            self.avatar_original = pygame.Surface((self.avatar_size, self.avatar_size), pygame.SRCALPHA)
+            self.avatar_original = pygame.Surface(
+                (self.avatar_size, self.avatar_size), pygame.SRCALPHA)
             self.avatar_original.fill((100, 100, 255, 255))  # Bleu par défaut
             pygame.draw.circle(self.avatar_original, ORANGE, (50, 50), 50)
 
@@ -84,6 +85,18 @@ class AvatarManager:
         self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60,
                                         self.avatar_target_pos[1] - 80, 50, 50)
                             for i in range(len(self.colors))]
+        for ach in PLAYER_DATA["achievements"]:
+            if ach["succeed"]:
+                self.colors.append(
+                    ach["couleurs"])
+
+                self.color_rects.append(
+                    pygame.Rect(
+                        self.avatar_target_pos[0] + len(
+                            self.color_rects) * 60,
+                        self.avatar_target_pos[1] - 80,
+                        50,
+                        50))
         # Palette de couleurs pour l'édition d'avatar
 
         self.brush_color = self.colors[0]
@@ -158,7 +171,7 @@ class AvatarManager:
         """
         Dessine un bouton de taille de pinceau, avec un texte spécifié
         et une couleur de fond qui change en fonction de l'état de survol.
-        
+
         :param rect: Rectangle du bouton
         :param text: Texte à afficher sur le bouton
         :param hover: État de survol du bouton
@@ -188,7 +201,7 @@ class AvatarManager:
     def handle_event(self, event, mouse_pos, achievements_manager):
         """
         Gère les événements liés à l'avatar (clic, clavier, etc.).
-        
+
         :param event: Événement Pygame
         :param mouse_pos: Position de la souris
         :param achievements_manager: Gestionnaire des achievements
@@ -310,18 +323,23 @@ class AvatarManager:
 
                 # easter eggs
                 if self.input_text == "Alx":
-                    self.avatar = pygame.image.load("assets/easter_eggs/alex.jpg").convert_alpha()
+                    self.avatar = pygame.image.load(
+                        "assets/easter_eggs/alex.jpg").convert_alpha()
 
                 if self.input_text == "Maxence":
-                    self.avatar = pygame.image.load("assets/easter_eggs/maxence.png").convert_alpha()
+                    self.avatar = pygame.image.load(
+                        "assets/easter_eggs/maxence.png").convert_alpha()
 
                 if self.input_text == "Plof":
-                    self.avatar = pygame.image.load("assets/easter_eggs/plof.jpg").convert_alpha()
+                    self.avatar = pygame.image.load(
+                        "assets/easter_eggs/plof.jpg").convert_alpha()
 
                 if self.input_text == "Shrek":
-                    self.avatar = pygame.image.load("assets/easter_eggs/shrek.png").convert_alpha()
-                      
-                self.avatar = pygame.transform.scale(self.avatar, (self.avatar_size, self.avatar_size))
+                    self.avatar = pygame.image.load(
+                        "assets/easter_eggs/shrek.png").convert_alpha()
+
+                self.avatar = pygame.transform.scale(
+                    self.avatar, (self.avatar_size, self.avatar_size))
 
     def update(self, mouse_pos, mouse_pressed):
         # Dessin sur l'avatar si en mode édition et que la souris est appuyée
@@ -350,33 +368,22 @@ class AvatarManager:
         if self.is_expanding:
             self.anim_progress += 0.1
             self.avatar_bordure = pygame.transform.scale(
-                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09)) if self.has_border else None
+                self.base_avatar_bordure,
+                (avatar_size * 1.09,
+                 avatar_size * 1.09)) if self.has_border else None
             if self.anim_progress >= 1:
                 self.anim_progress = 1
                 self.is_expanding = False
                 self.show_buttons = True
                 self.pseudo_editable = True
 
-                self.colors = [(255, 255, 255), (0, 0, 0)]
-                self.color_rects = []
-                for i in range(len(PLAYER_DATA["achievements"])):
-                    if PLAYER_DATA["achievements"][i]["succeed"]:
-                        self.colors.append(
-                            PLAYER_DATA["achievements"][i]["couleurs"])
-
-                        self.color_rects.append(
-                            pygame.Rect(
-                                self.avatar_target_pos[0] + len(
-                                    self.color_rects) * 60,
-                                self.avatar_target_pos[1] - 80,
-                                50,
-                                50))
-
         # Animation Retrait
         if self.is_retracting:
             self.anim_progress -= 0.1
             self.avatar_bordure = pygame.transform.scale(
-                self.base_avatar_bordure, (avatar_size * 1.09, avatar_size * 1.09))  if self.has_border else None
+                self.base_avatar_bordure,
+                (avatar_size * 1.09,
+                 avatar_size * 1.09)) if self.has_border else None
             if self.anim_progress <= 0:
                 self.anim_progress = 0
                 self.is_retracting = False
@@ -384,9 +391,10 @@ class AvatarManager:
 
         if self.avatar_bordure_id != PLAYER_DATA["selected_items"]["Bordures"]:
             self.avatar_bordure_id = PLAYER_DATA["selected_items"]["Bordures"]
-            self.has_border = bool(SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]])
+            self.has_border = bool(
+                SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]])
             self.base_avatar_bordure = pygame.image.load(
-                SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"])  if self.has_border else None
+                SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"]) if self.has_border else None
             self.avatar_bordure = pygame.transform.scale(
                 self.base_avatar_bordure, (109, 109)) if self.has_border else None
 
@@ -418,7 +426,7 @@ class AvatarManager:
         """
         Calculate the current position of the pseudo based on the animation progress.
 
-        The position is interpolated between the starting position and the target 
+        The position is interpolated between the starting position and the target
         position according to the animation progress.
 
         :return: A tuple (x, y) representing the current position of the pseudo.
@@ -465,11 +473,11 @@ class AvatarManager:
             self.screen.blit(
                 self.avatar_bordure,
                 (avatar_pos[0] -
-                avatar_size *
-                0.045,
-                avatar_pos[1] -
-                avatar_size *
-                0.045))
+                 avatar_size *
+                 0.045,
+                 avatar_pos[1] -
+                 avatar_size *
+                 0.045))
 
         # Afficher le pseudo
         pseudo_surf = SMALL_FONT.render(

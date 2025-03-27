@@ -8,6 +8,7 @@ import requests
 import socket
 import asyncio
 
+
 def test_server(server_name):
     """
     Vérifie si le serveur MultiGame est disponible.
@@ -15,8 +16,14 @@ def test_server(server_name):
     :param str server_name: Le nom du serveur à tester.
     :return: True si le serveur est disponible, False sinon.
     """
-    try: return requests.get(f"https://{CONFIG['servers'][server_name]['domain']}/num_players", timeout=4).status_code == 200
-    except: return False
+    try:
+        return requests.get(
+            f"https://{
+                CONFIG['servers'][server_name]['domain']}/num_players",
+            timeout=4).status_code == 200
+    except BaseException:
+        return False
+
 
 def load_bmp_to_matrix(file_path):
     """
@@ -87,7 +94,6 @@ def check_sentences(phrase1, phrase2):
     emb1 = model.encode(phrase1, convert_to_tensor=True)
     emb2 = model.encode(phrase2, convert_to_tensor=True)
     score = util.pytorch_cos_sim(emb1, emb2).item()
-    print(phrase1, phrase2, score)
     return score > CONFIG["sentence_checker_seuil"]
 
 
@@ -145,7 +151,7 @@ def update_canva_by_frames(MultiGame, frames, delay=True, reset=False):
                 frame["x2"] * MultiGame.pixel_size,
                 frame["y2"] * MultiGame.pixel_size,
                 current_drawing_color,
-                current_drawing_radius * MultiGame.pixel_size//4)
+                current_drawing_radius * MultiGame.pixel_size // 4)
             time.sleep(duration)
 
         MultiGame.ALL_FRAMES.append(frame)

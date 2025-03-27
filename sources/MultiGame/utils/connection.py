@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 import pygame
 
+
 def start_connexion(MultiGameClass, server_name):
     """
     Initializes and starts a connection for the multiplayer game.
@@ -37,12 +38,21 @@ def start_connexion(MultiGameClass, server_name):
 
         asyncio.set_event_loop(MultiGameClass.connection_loop)
         MultiGameClass.connection_loop.run_until_complete(
-            handle_connection_client(MultiGameClass, server_name, is_server=bool(MultiGameClass.server), port=server.port if MultiGameClass.server else None))
+            handle_connection_client(
+                MultiGameClass,
+                server_name,
+                is_server=bool(
+                    MultiGameClass.server),
+                port=server.port if MultiGameClass.server else None))
     except asyncio.exceptions.CancelledError:
-        print("connexion fermé")
+        pass
 
 
-async def handle_connection_client(MultiGame, server_name, is_server, port=None):
+async def handle_connection_client(
+        MultiGame,
+        server_name,
+        is_server,
+        port=None):
     """
     Handles the client connection to the server.
 
@@ -109,8 +119,7 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
         Parameters:
             data (dict): the data sent by the server
         """
-        
-        
+
         for i in range(len(MultiGame.PLAYERS)):
             if MultiGame.PLAYERS[i]["pid"] == data["pid"]:
                 player = MultiGame.PLAYERS.pop(i)
@@ -156,6 +165,10 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
                         "message": "Nouvelle partie ! C'est le tour de " +
                         MultiGame.PLAYERS[i]["pseudo"],
                         "color": CONFIG["succeed_color"]})
+                if MultiGame.PLAYER_ID == MultiGame.CURRENT_DRAWER:
+                    PLAYER_DATA["num_draws_total"] += 1
+                    save_data("PLAYER_DATA")
+
         MultiGame.GAMESTART = datetime.fromisoformat(data["start_time"])
         MultiGame.ROLL_BACK = 0
 
@@ -212,13 +225,14 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
         """
         if mess["pid"] == MultiGame.PLAYER_ID:
             num_my_mess = 0
-            for i in range(len(MultiGame.MESSAGES)-1, -1, -1):
+            for i in range(len(MultiGame.MESSAGES) - 1, -1, -1):
                 if MultiGame.MESSAGES[i]["type"] != "system" and MultiGame.MESSAGES[i]["pid"] == mess["pid"]:
-                    num_my_mess+=1
+                    num_my_mess += 1
                     if num_my_mess == 1:
                         MultiGame.MESSAGES.pop(i)
-            
-            if num_my_mess == 1 and mess["type"] == "guess" and mess["succeed"]: # succeed and first message
+
+            # succeed and first message
+            if num_my_mess == 1 and mess["type"] == "guess" and mess["succeed"]:
                 MultiGame.achievements_manager.new_achievement(3)
 
         MultiGame.MESSAGES.append(mess)
@@ -260,13 +274,13 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
         MultiGame.is_connected = True
 
         await websocket.send(json.dumps({"header": "join",
-                                          "pseudo": PLAYER_DATA["pseudo"],
-                                            "avatar": {"type": "matrix", 
-                                                       "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"),
-                                                        "border_path": SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"] if PLAYER_DATA["selected_items"]["Bordures"] else None,
-                                                        "has_border": bool(PLAYER_DATA["selected_items"]["Bordures"])}
-                                        })
-                            )
+                                         "pseudo": PLAYER_DATA["pseudo"],
+                                         "avatar": {"type": "matrix",
+                                                    "matrix": tools.load_bmp_to_matrix("data/avatar.bmp"),
+                                                    "border_path": SHOP_ITEMS[PLAYER_DATA["selected_items"]["Bordures"]]["image_path"] if PLAYER_DATA["selected_items"]["Bordures"] else None,
+                                                    "has_border": bool(PLAYER_DATA["selected_items"]["Bordures"])}
+                                         })
+                             )
 
         async for message in websocket:
             data = json.loads(message)
@@ -289,7 +303,6 @@ async def handle_connection_client(MultiGame, server_name, is_server, port=None)
                 draw(data)
 
 
-
 async def shutdown(loop, MultiGame):
     """
     Arrête proprement la boucle asyncio et ferme la WebSocket si elle est ouverte.
@@ -297,38 +310,32 @@ async def shutdown(loop, MultiGame):
     Cette fonction est appelée lorsque le serveur est fermé.
     """
     try:
-        print("Début de la fermeture...")
 
         # Fermer la WebSocket proprement si elle est ouverte
-        if MultiGame.WS and not MultiGame.WS.closed:
+        if MultiGame.WS:
             try:
                 await asyncio.wait_for(MultiGame.WS.close(), timeout=3)
-                print("WebSocket fermée proprement")
             except asyncio.TimeoutError:
-                print("⚠️ Timeout lors de la fermeture de la WebSocket")
+                pass
 
         # Annuler toutes les tâches asyncio en attente
         tasks = [t for t in asyncio.all_tasks(loop) if not t.done()]
-        print(f"{len(tasks)} tâches en cours d'annulation...")
 
         for task in tasks:
             task.cancel()
             try:
-                await asyncio.wait_for(task, timeout=2)  # On force l'attente max 2s
+                # On force l'attente max 2s
+                await asyncio.wait_for(task, timeout=2)
             except asyncio.CancelledError:
                 pass
             except asyncio.TimeoutError:
-                print("⚠️ Une tâche a mis trop de temps à s'annuler")
-
+                pass
         # Fermer proprement la boucle asyncio
-        print("Arrêt de la boucle asyncio...")
         loop.stop()
 
     except Exception as e:
         print(f"Erreur lors de l'arrêt : {e}")
 
-    finally:
-        print("Fermeture terminée ✅")
 
 def disconnect(MultiGame):
     """
@@ -344,7 +351,11 @@ def disconnect(MultiGame):
     - Attend la fin du thread de connexion
     """
     if MultiGame.connection_loop and not MultiGame.connection_loop.is_closed():
-        future = asyncio.run_coroutine_threadsafe(shutdown(MultiGame.connection_loop, MultiGame), MultiGame.connection_loop)
+        future = asyncio.run_coroutine_threadsafe(
+            shutdown(
+                MultiGame.connection_loop,
+                MultiGame),
+            MultiGame.connection_loop)
         future.result(timeout=5)  # On attend max 5s pour éviter un blocage
 
     if MultiGame.server:

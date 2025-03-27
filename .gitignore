@@ -1,6 +1,7 @@
 __pycache__
 paraphrase-multilingual-MiniLM-L12-v2
 .venv
+.vscode
 /sources/MultiGame/web/temp-assets/avatars/*
 !/sources/MultiGame/web/temp-assets/avatars/.gitkeep
 
@@ -9,3 +10,7 @@ paraphrase-multilingual-MiniLM-L12-v2
 
 /assets/your_best_draws/*
 !/assets/your_best_draws/.gitkeep
+
+backup
+
+data/shop/.git

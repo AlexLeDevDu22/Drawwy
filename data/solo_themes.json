@@ -21,19 +21,19 @@
       {
         "index": 2,
         "path": "2.png",
-        "stars": 1,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 3,
         "path": "3.png",
-        "stars": 3,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 4,
         "path": "4.png",
-        "stars": 2,
+        "stars": 0,
         "num_try": 0
       },
       {
@@ -45,25 +45,25 @@
       {
         "index": 6,
         "path": "6.png",
-        "stars": 3,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 7,
         "path": "7.png",
-        "stars": 1,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 8,
         "path": "8.png",
-        "stars": 2,
+        "stars": 0,
         "num_try": 0
       },
       {
         "index": 9,
         "path": "9.png",
-        "stars": 3,
+        "stars": 0,
         "num_try": 0
       }
     ]
@@ -126,7 +126,7 @@
       {
         "index": 8,
         "path": "7.jpg",
-        "stars": 2,
+        "stars": 0,
         "num_try": 1
       },
       {
@@ -195,8 +195,8 @@
       {
         "index": 7,
         "path": "7.jpg",
-        "stars": 2,
-        "num_try": 1
+        "stars": 0,
+        "num_try": 0
       },
       {
         "index": 8,
@@ -264,7 +264,7 @@
       {
         "index": 7,
         "path": "7.jpg",
-        "stars": 2,
+        "stars": 0,
         "num_try": 1
       },
       {
