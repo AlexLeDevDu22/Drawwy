@@ -74,7 +74,7 @@ avatar_manager = AvatarManager(screen)
 # gestionnaire d'achievments
 achievements_manager = AchievementManager(W, H)
 # gestionnaire de curseur
-if PLAYER_DATA["selected_items"]["Curseurs"]:
+if PLAYER_DATA["selected_items"]["Curseurs"] is not None:
     cursor = CustomCursor(
         SHOP_ITEMS[PLAYER_DATA["selected_items"]["Curseurs"]]["image_path"])
 else:

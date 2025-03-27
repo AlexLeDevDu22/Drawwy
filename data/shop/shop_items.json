@@ -4,7 +4,7 @@
     "name": "Starter",
     "price": 0,
     "description": "Pour les débutants",
-    "image_path": "data/shop/cursors_assets/alien.png",
+    "image_path": "data/shop/cursors_assets/default.png",
     "category": "Curseurs",
     "rarity": "Commun"
   },
@@ -174,7 +174,7 @@
     "index": 19,
     "name": " Homer ",
     "price": 200,
-    "description": "...",
+    "description": "Donut sucré au sucre",
     "image_path": "data/shop/emotes_assets/homer.gif",
     "category": "Emotes",
     "rarity": "Epique"
@@ -183,7 +183,7 @@
     "index": 20,
     "name": " La marche du canard ",
     "price": 200,
-    "description": "...",
+    "description": "Coin Coin",
     "image_path": "data/shop/emotes_assets/duck.gif",
     "category": "Emotes",
     "rarity": "Epique"
@@ -192,7 +192,7 @@
     "index": 21,
     "name": " Pepe the frog ",
     "price": 200,
-    "description": "...",
+    "description": "I'm a sad frog",
     "image_path": "data/shop/emotes_assets/pepe_the_frog.gif",
     "category": "Emotes",
     "rarity": "Epique"
@@ -201,7 +201,7 @@
     "index": 22,
     "name": "Siuuu",
     "price": 200,
-    "description": "...",
+    "description": "Siuuuuuu",
     "image_path": "data/shop/emotes_assets/siuuu.gif",
     "category": "Emotes",
     "rarity": "Epique"

@@ -36,10 +36,10 @@ def soloGame(screen, cursor, achievements_manager):
             screen, soloPage, theme = theme_choicer(screen, cursor)
         elif soloPage == "images":
             screen, soloPage, image = image_selector(screen, cursor, theme)
+        elif soloPage == "play":
             model_path = f"assets/soloImages/{
                 theme['path']}{
                 theme['images'][image]['path']}"
-        elif soloPage == "play":
             SoloPlay(screen, cursor, model_path, achievements_manager)
             soloPage = "exit"
         elif soloPage == "exit":
