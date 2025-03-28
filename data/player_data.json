@@ -5,7 +5,7 @@
             "id": 0,
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 0,
                 0,
@@ -38,7 +38,7 @@
             "id": 3,
             "title": "Maestro",
             "explication": "Trouvez une phrase du premier coup",
-            "succeed": true,
+            "succeed": false,
             "couleurs": [
                 255,
                 165,
@@ -168,13 +168,15 @@
         }
     ],
     "solo_game_played": 0,
-    "multi_game_played": 9,
-    "num_draws_total": 15,
-    "coins": 52,
+    "multi_game_played": 0,
+    "num_draws_total": 0,
+    "coins": 0,
     "selected_items": {
         "Curseurs": null,
         "Bordures": null,
         "Emotes": null
     },
-    "purchased_items": []
+    "purchased_items": [
+        
+    ]
 }
