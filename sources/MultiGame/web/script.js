@@ -148,7 +148,7 @@ function handleConnection() {
 
       case "draw":
         console.log("Mise à jour du dessin");
-        allFrames.concat(data.frames);
+        allFrames = allFrames.concat(data.frames);
         drawingState.undoStack = [];
         draw(data.frames, true);
         break;
