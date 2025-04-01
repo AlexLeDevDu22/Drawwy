@@ -168,15 +168,13 @@
         }
     ],
     "solo_game_played": 0,
-    "multi_game_played": 0,
-    "num_draws_total": 0,
+    "multi_game_played": 1,
+    "num_draws_total": 1,
     "coins": 0,
     "selected_items": {
         "Curseurs": null,
         "Bordures": null,
         "Emotes": null
     },
-    "purchased_items": [
-        
-    ]
+    "purchased_items": []
 }

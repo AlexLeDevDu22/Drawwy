@@ -119,11 +119,11 @@
   {
     "index": 13,
     "name": "SINGE",
-    "price": 100,
+    "price": 150,
     "description": "ook ook",
     "image_path": "data/shop/emotes_assets/SINGE.png",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Rare"
   },
   {
     "index": 14,
@@ -141,68 +141,122 @@
     "description": "couic squick",
     "image_path": "data/shop/cursors_assets/mouse.png",
     "category": "Curseurs",
-    "rarity": "Rare"
+    "rarity": "Commun"
   },
   {
     "index": 16,
     "name": "Stonks!",
-    "price": 200,
+    "price": 250,
     "description": "Pour une rentabilité excepionnel!",
     "image_path": "data/shop/emotes_assets/stonks.gif",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Legendaire"
   },
   {
     "index": 17,
     "name": "This is fine !",
-    "price": 200,
+    "price": 150,
     "description": "Tout va tres bien",
     "image_path": "data/shop/emotes_assets/This_is_fine.png",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Rare"
   },
   {
     "index": 18,
     "name": " Nyan cat ",
-    "price": 200,
+    "price": 150,
     "description": "Un ptit chat trognon ",
     "image_path": "data/shop/emotes_assets/Nyan_cat.gif",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Rare"
   },
   {
     "index": 19,
     "name": " Homer ",
-    "price": 200,
+    "price": 150,
     "description": "Donut sucré au sucre",
     "image_path": "data/shop/emotes_assets/homer.gif",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Rare"
   },
   {
     "index": 20,
     "name": " La marche du canard ",
-    "price": 200,
+    "price": 100,
     "description": "Coin Coin",
     "image_path": "data/shop/emotes_assets/duck.gif",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Commun"
   },
   {
     "index": 21,
     "name": " Pepe the frog ",
-    "price": 200,
+    "price": 100,
     "description": "I'm a sad frog",
     "image_path": "data/shop/emotes_assets/pepe_the_frog.gif",
     "category": "Emotes",
-    "rarity": "Epique"
+    "rarity": "Commun"
   },
   {
     "index": 22,
     "name": "Siuuu",
-    "price": 200,
+    "price": 150,
     "description": "Siuuuuuu",
     "image_path": "data/shop/emotes_assets/siuuu.gif",
+    "category": "Emotes",
+    "rarity": "Rare"
+  },
+  {
+    "index": 23,
+    "name": "POV",
+    "price": 200,
+    "description": "Impressionnant",
+    "image_path": "data/shop/emotes_assets/oui_oui_oui.gif",
+    "category": "Emotes",
+    "rarity": "Epique"
+  },
+  {
+    "index": 24,
+    "name": "Trop Fort!",
+    "price": 200,
+    "description": "Y'en a la-dedans!",
+    "image_path": "data/shop/emotes_assets/smart.gif",
+    "category": "Emotes",
+    "rarity": "Epique"
+  },
+  {
+    "index": 25,
+    "name": "What ?",
+    "price": 250,
+    "description": "Wait a second...",
+    "image_path": "data/shop/emotes_assets/the_rock.gif",
+    "category": "Emotes",
+    "rarity": "Legendaire"
+  },
+  {
+    "index": 26,
+    "name": "David Goodenough...",
+    "price": 200,
+    "description": "^\\_(^^)_/^",
+    "image_path": "data/shop/emotes_assets/david_goodenough.png",
+    "category": "Emotes",
+    "rarity": "Epique"
+  },
+  {
+    "index": 27,
+    "name": "NICE",
+    "price": 200,
+    "description": "NICKEL!",
+    "image_path": "data/shop/emotes_assets/nice_kid.gif",
+    "category": "Emotes",
+    "rarity": "Epique"
+  },
+  {
+    "index": 28,
+    "name": "HEHEHEHA",
+    "price": 200,
+    "description": "Le trolleur en personne",
+    "image_path": "data/shop/emotes_assets/heheheha.gif",
     "category": "Emotes",
     "rarity": "Epique"
   }
