@@ -1,11 +1,11 @@
 {
-    "pseudo": "Drawer",
+    "pseudo": "Leleu",
     "achievements": [
         {
             "id": 0,
             "title": "Premier pas",
             "explication": "Dessiner votre premier dessin",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 0,
                 0,
@@ -60,7 +60,7 @@
             "id": 4,
             "title": "Aaaaaaah ca change",
             "explication": "Achetez votre premier clicker",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 0,
@@ -104,7 +104,7 @@
             "id": 8,
             "title": "Coucou !",
             "explication": "Obtenir votre premiere emote",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 88,
                 41,
@@ -137,7 +137,7 @@
             "id": 11,
             "title": "Une petite fortune",
             "explication": "Collecter 1000 pieces",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 255,
                 200,
@@ -148,7 +148,7 @@
             "id": 12,
             "title": "Picsou ?",
             "explication": "Collecter 10_000 pieces",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 216,
                 191,
@@ -159,7 +159,7 @@
             "id": 13,
             "title": "C'est qui le patron ?",
             "explication": "Je sais pas, c'est toi ?",
-            "succeed": false,
+            "succeed": true,
             "couleurs": [
                 64,
                 224,
@@ -167,10 +167,10 @@
             ]
         }
     ],
-    "solo_game_played": 0,
-    "multi_game_played": 1,
-    "num_draws_total": 1,
-    "coins": 0,
+    "solo_game_played": 1,
+    "multi_game_played": 3,
+    "num_draws_total": 4,
+    "coins": 1111109685,
     "selected_items": {
         "Curseurs": null,
         "Bordures": null,

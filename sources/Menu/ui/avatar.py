@@ -81,25 +81,9 @@ class AvatarManager:
         self.size_min = 5
         self.size_max = 40
 
-        self.colors = [(255, 255, 255), (0, 0, 0)]
-        self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60,
-                                        self.avatar_target_pos[1] - 80, 50, 50)
-                            for i in range(len(self.colors))]
-        for ach in PLAYER_DATA["achievements"]:
-            if ach["succeed"]:
-                self.colors.append(
-                    ach["couleurs"])
-
-                self.color_rects.append(
-                    pygame.Rect(
-                        self.avatar_target_pos[0] + len(
-                            self.color_rects) * 60,
-                        self.avatar_target_pos[1] - 80,
-                        50,
-                        50))
         # Palette de couleurs pour l'édition d'avatar
 
-        self.brush_color = self.colors[0]
+        self.brush_color = (255,255,255)
 
         # Bordure d'avatar
         self.avatar_bordure_id = PLAYER_DATA["selected_items"]["Bordures"]
@@ -213,6 +197,16 @@ class AvatarManager:
                     self.input_text = PLAYER_DATA["pseudo"]
                     self.is_expanding = True
                     self.pseudo_editable = True
+
+                    self.colors = [(255, 255, 255), (0, 0, 0)]
+                    for ach in PLAYER_DATA["achievements"]:
+                        if ach["succeed"]:
+                            self.colors.append(
+                                ach["couleurs"])
+                    self.color_rects = [pygame.Rect(self.avatar_target_pos[0] + i * 60,
+                                                    self.avatar_target_pos[1] - 80, 50, 50)
+                                        for i in range(len(self.colors))]
+        
             else:
                 if self.decrease_button_rect.collidepoint(mouse_pos):
                     self.brush_size = max(self.size_min, self.brush_size - 5)

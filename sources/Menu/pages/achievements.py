@@ -115,12 +115,12 @@ def show_achievements(
                     screen,
                     WHITE,
                     (main_panel_x +
-                     90,
+                     86,
                      achievement_y +
                      achievement_height //
                      2),
                     (main_panel_x +
-                     100,
+                     96,
                      achievement_y +
                      achievement_height //
                      2 +
@@ -130,13 +130,13 @@ def show_achievements(
                     screen,
                     WHITE,
                     (main_panel_x +
-                     100,
+                     96,
                      achievement_y +
                      achievement_height //
                      2 +
                      10),
                     (main_panel_x +
-                     115,
+                     111,
                      achievement_y +
                      achievement_height //
                      2 -
